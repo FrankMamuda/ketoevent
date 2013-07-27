@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define GUI_LICENSE_H
 
 //
-// NOTE: using a modified YPlatorm2 (r25) code
-//
-
-//
 // includes
 //
 #include <QDialog>
+#include <QApplication>
 
 //
 // namespaces
@@ -48,7 +45,7 @@ public:
     ~Gui_License();
 
 private slots:
-    void on_aboutQtButton_clicked();
+    void on_aboutQtButton_clicked() { QApplication::aboutQt(); }
 
 private:
     Ui::Gui_License *ui;

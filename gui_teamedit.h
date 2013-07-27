@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QDialog>
+#include <QtWidgets/QDialog>
+#include <QCloseEvent>
 #include "gui_teamlistmodel.h"
 
 //
@@ -35,7 +36,7 @@ namespace Ui {
 }
 
 //
-// class:Gui_TeamEdit
+// class: Gui_TeamEdit
 //
 class Gui_TeamEdit : public QDialog {
     Q_OBJECT

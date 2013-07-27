@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include <QAbstractListModel>
-#include "sys_shared.h"
-#include "app_main.h"
+#include "main.h"
 
 //
-// class:Gui_TaskListModel
+// class: Gui_TaskListModel
 //
 class Gui_TaskListModel : public QAbstractListModel {
     Q_OBJECT
@@ -41,7 +40,8 @@ public:
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
     // this resets whole model based on data in m.taskList
-    void resetModelData() { this->reset(); }
+    void beginReset() { this->beginResetModel(); }
+    void endReset() { this->endResetModel(); }
 };
 
 #endif // GUI_TASKLISTMODEL_H

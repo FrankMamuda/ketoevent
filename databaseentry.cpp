@@ -21,27 +21,33 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include "gui_about.h"
-#include "ui_gui_about.h"
+#include "databaseentry.h"
+#include <QSqlQuery>
 
 /*
 ================
-construct
+setValue
 ================
 */
-Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), m_ui( new Ui::Gui_About ) {
-    m_ui->setupUi( this );
+void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
+    QSqlQuery query;
+    QVariant update;
 
-    // this is a fixed frame
-    this->setSizeGripEnabled( false );
+    // copy local value
+    update = value;
+
+    // make sure we don't perform useless updates
+    if ( this->record().value( name ) == update )
+        return;
+
+    // store local value
+    this->m_record.setValue( name, update );
+
+    // check for strings (should be wrapped in quotes)
+    if ( value.type() == QVariant::String )
+        update.setValue( QString( "'%1'" ).arg( value.toString()));
+
+    // update database value
+    if ( !this->table().isNull())
+        query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( this->table()).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt()));
 }
-
-/*
-================
-destruct
-================
-*/
-Gui_About::~Gui_About() {
-    delete m_ui;
-}
-

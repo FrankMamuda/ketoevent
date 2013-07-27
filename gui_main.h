@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,63 +25,51 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include <QMainWindow>
-#include "sys_shared.h"
-#include "sys_common.h"
+#include <QCloseEvent>
+#include <QTime>
 #include "gui_teamedit.h"
 #include "gui_taskedit.h"
+#include "gui_rankings.h"
+#include "gui_about.h"
+#include "gui_settings.h"
 
 //
-// namespaces
+// namespace: Ui
 //
 namespace Ui {
-    class Gui_Main;
+class Gui_Main;
 }
 
 //
-// class:Gui_Main
+// class: Gui_Main
 //
 class Gui_Main : public QMainWindow {
     Q_OBJECT
-
+    
 public:
     explicit Gui_Main( QWidget *parent = 0 );
     ~Gui_Main();
-
-public slots:
-    void save();
-    bool needsSaving();
-    void saveReminder();
-
-private slots:
-    void on_actionTeams_triggered();
-    void fillTeamList();
-    void fillTaskList();
-    void on_actionSave_triggered();
-    void updateView();
-    void enableSave();
-    void on_teamCombo_activated( int );
-    void on_actionAbout_triggered();
-    void on_actionTasks_triggered();
-    void on_actionRankings_triggered();
-    void on_clearButton_clicked();
-    void on_findTaskButton_returnPressed();
-    void on_findTaskButton_textChanged( const QString & );
-    void on_finishTime_timeChanged(const QTime &date);
-    void on_actionExit_triggered();
-    void on_actionSettings_triggered();
-    void toggleSaveFromCvar( QString, QString value );
-    void updateDrunkMode( QString, QString value );
-
+    
 private:
     Ui::Gui_Main *ui;
-    int lastIndex;
-    int currentMatch;
 
-signals:
-    void dataChanged();
+public slots:
+    void updateView();
+    void initialize();
+    void teamIndexChanged( int index );
+    void updateFinishTime( QTime time );
 
 protected:
     virtual void closeEvent( QCloseEvent * );
+
+private slots:
+    void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->updateView(); }
+    void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->updateView(); }
+    void on_actionRankings_triggered() { Gui_Rankings rankings( this ); rankings.exec(); }
+    void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
+    void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); }
+    void on_actionExit_triggered();
+    void fillTaskList();
 };
 
 #endif // GUI_MAIN_H

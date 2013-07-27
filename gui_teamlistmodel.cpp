@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,17 +36,10 @@ QVariant Gui_TeamListModel::data( const QModelIndex &index, int role ) const {
     if ( index.row() >= m.teamList.count())
         return QVariant();
 
-    // just supply view with team names from global list
     if ( role == Qt::DisplayRole )
         return m.teamList.at( index.row())->name();
-#if 0
-    // looks ugly
-    else if ( role == Qt::FontRole ) {
-        QFont font;
-        font.setPointSize( 12 );
-        return font;
-    }
-#endif
+    else if ( role == Qt::UserRole )
+        return m.teamList.at( index.row())->id();
     else
         return QVariant();
 }

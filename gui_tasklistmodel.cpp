@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,21 +38,22 @@ QVariant Gui_TaskListModel::data( const QModelIndex &index, int role ) const {
 
     // just supply view with team names from global list
     if ( role == Qt::DisplayRole ) {
-        App_TaskEntry *entryPtr = m.taskList.at( index.row());
-         return entryPtr->name();
+        return m.taskList.at( index.row())->name();
     } else if ( role == Qt::FontRole ) {
-        App_TaskEntry *entryPtr = m.taskList.at( index.row());
+        TaskEntry *taskPtr = m.taskList.at( index.row());
         QFont font;
 
-        if ( entryPtr->isChallenge()) {
+        if ( taskPtr->isChallenge()) {
             font.setBold( true );
             return font;
         }
 
-        if  ( entryPtr->type() == App_TaskEntry::Special ) {
+        if  ( taskPtr->type() == TaskEntry::Special ) {
             font.setItalic( true );
             return font;
         }
+    } else if ( role == Qt::UserRole ) {
+        return m.taskList.at( index.row())->id();
     }
 
     return QVariant();
@@ -69,3 +70,4 @@ Qt::ItemFlags Gui_TaskListModel::flags( const QModelIndex &index ) const {
 
     return QAbstractItemModel::flags( index );
 }
+

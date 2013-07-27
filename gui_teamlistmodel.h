@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include <QAbstractListModel>
-#include "sys_shared.h"
-#include "app_main.h"
+#include "main.h"
 
 //
-// class:Gui_TeamListModel
+// class: Gui_TeamListModel
 //
 class Gui_TeamListModel : public QAbstractListModel {
     Q_OBJECT
@@ -41,7 +40,10 @@ public:
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
     // this resets whole model based on data in m.teamList
-    void resetModelData() { this->reset(); }
+    void beginReset() { this->beginResetModel(); }
+
+    // TODO: IMPME
+    void endReset() { m.sort( Main::Teams ); this->endResetModel(); }
 };
 
 #endif // GUI_TEAMLISTMODEL_H

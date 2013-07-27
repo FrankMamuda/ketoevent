@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ namespace Ui {
 }
 
 //
-// class:Gui_TaskEdit
+// class: Gui_TaskEdit
 //
 class Gui_TaskEdit : public QDialog {
     Q_OBJECT
@@ -49,6 +49,11 @@ public:
         NoState = -1,
         Add,
         Edit
+    };
+    enum MoveDirection {
+        NoWhere = -1,
+        Up,
+        Down
     };
 
     explicit Gui_TaskEdit( QWidget * = 0 );
@@ -69,17 +74,19 @@ private slots:
     void findTask();    
     void on_findTask_textChanged(const QString &arg1);
     void on_taskType_currentIndexChanged(int index);
-    void changeTaskType( App_TaskEntry::Types type );
+    void changeTaskType( TaskEntry::Types type );
+    void on_upButton_clicked();
+    void on_downButton_clicked();
 
 private:
     Ui::Gui_TaskEdit *ui;
     AddEditState m_state;
     Gui_TaskListModel *listModelPtr;
     int currentMatch;
+    void move( MoveDirection direction );
 
 protected:
     virtual void keyPressEvent( QKeyEvent * );
 };
-
 
 #endif // GUI_TASKEDIT_H
