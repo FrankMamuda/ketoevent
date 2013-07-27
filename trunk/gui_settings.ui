@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
-    <height>390</height>
+    <width>338</width>
+    <height>331</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res_main.qrc">
+   <iconset resource="resources.qrc">
     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -76,6 +76,20 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="closeButton">
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="0" column="1">
@@ -174,71 +188,33 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QCheckBox" name="autoSave">
-        <property name="text">
-         <string>Autosave log</string>
+       <widget class="QCheckBox" name="checkBox">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QCheckBox" name="drunkMode">
         <property name="text">
-         <string>Drunk mode</string>
+         <string>Sort tasks alphabetically (main screen)</string>
         </property>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QPushButton" name="closeButton">
-     <property name="text">
-      <string>Close</string>
-     </property>
-     <property name="icon">
-      <iconset resource="res_main.qrc">
-       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Data import/export</string>
+    <widget class="QPushButton" name="buttonImport">
+     <property name="text">
+      <string>Import database</string>
      </property>
-     <layout class="QGridLayout" name="dataLayout">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="buttonImport">
-        <property name="text">
-         <string>Import team logs</string>
-        </property>
-        <property name="icon">
-         <iconset resource="res_main.qrc">
-          <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="buttonExport">
-        <property name="text">
-         <string>Export team logs</string>
-        </property>
-        <property name="icon">
-         <iconset resource="res_main.qrc">
-          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="res_main.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections>
   <connection>

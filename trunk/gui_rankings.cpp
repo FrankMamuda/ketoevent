@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -63,9 +63,9 @@ void Gui_Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0, numChallenges = 0;
 
     this->ui->tTeams->setText( QString( "%1\n" ).arg( m.teamList.count()));
-    foreach ( App_TeamEntry *teamPtr, m.teamList ) {
+    foreach ( TeamEntry *teamPtr, m.teamList ) {
         numParcipiants += teamPtr->members();
-        numTasks += teamPtr->logList.count()/* - teamPtr->challenges()*/;
+        numTasks += teamPtr->logList.count();
         numChallenges += teamPtr->challenges();
     }
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));

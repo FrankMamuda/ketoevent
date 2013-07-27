@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include "gui_rankingmodel.h"
-#include "sys_common.h"
 #include <QFont>
+#include <QColor>
 
 /*
 ================
@@ -48,35 +48,35 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
     }
 
     if ( role == Qt::DisplayRole ) {
-        App_TeamEntry *entryPtr = m.teamList.at( index.row());
+        TeamEntry *teamPtr = m.teamList.at( index.row());
 
         switch ( index.column()) {
         case TeamName:
-            return entryPtr->name();
+            return teamPtr->name();
 
         case Tasks:
-            return entryPtr->logList.count();
+            return teamPtr->logList.count();
 
         case Challenges:
-            return entryPtr->challenges();
+            return teamPtr->challenges();
 
         case Combos:
-            return entryPtr->combos();
+            return teamPtr->combos();
 
         case Grade:
-            return entryPtr->grade();
+            return teamPtr->grade();
 
         case Time:
-            return entryPtr->timeOnTrack();
+            return teamPtr->timeOnTrack();
 
         case Penalty:
-            return entryPtr->penalty();
+            return teamPtr->penalty();
 
             //
             // VERY IMPORTANT: penalty points are only substracted here, for display purposes
             //
         case Points:
-            points = entryPtr->points() - entryPtr->penalty();
+            points = teamPtr->points() - teamPtr->penalty();
 
             if ( points <= 0 )
                 points = 0;
@@ -89,7 +89,7 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
     } else if ( role == Qt::TextColorRole ) {
         if ( index.column() == Penalty ) {
             if ( this->data( index, Qt::DisplayRole ).toInt() > 0 )
-                return Qt::red;
+                return QColor( Qt::red );
         }
     } else if ( role == Qt::TextAlignmentRole )
         return Qt::AlignCenter;

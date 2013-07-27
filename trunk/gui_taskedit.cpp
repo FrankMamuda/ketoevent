@@ -1,13 +1,32 @@
+/*
+===========================================================================
+Copyright (C) 2013 Avotu Briezhaudzetava
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see http://www.gnu.org/licenses/.
+
+===========================================================================
+*/
 
 //
 // includes
 //
 #include "gui_taskedit.h"
-#include "app_taskentry.h"
-#include "app_main.h"
+#include "main.h"
 #include "ui_gui_taskedit.h"
 #include <QMessageBox>
-#include "sys_filesystem.h"
+#include <QSqlQuery>
+#include <QSqlError>
 
 /*
 ================
@@ -72,7 +91,7 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
         this->ui->taskList->setEnabled( true );
         this->enableView();
     } else {
-        App_TaskEntry *entryPtr = NULL;
+        TaskEntry *taskPtr = NULL;
 
         // disable everything
         this->ui->addEditWidget->show();
@@ -85,7 +104,7 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
         this->ui->clearText->setDisabled( true );
         this->ui->taskList->setDisabled( true );
         this->ui->taskType->setCurrentIndex( 0 );
-        this->changeTaskType( App_TaskEntry::Check );
+        this->changeTaskType( TaskEntry::Check );
 
         switch ( state ) {
         case Add:
@@ -97,27 +116,27 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             break;
 
         case Edit:
-            // match name to be sure
-            entryPtr = m.findTaskByName( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::DisplayRole ).toString());
-            if ( entryPtr == NULL ) {
+            // match by id
+            taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+            if ( taskPtr == NULL ) {
                 this->toggleAddEditWidget( NoState );
                 return;
             }
 
-            this->ui->taskName->setText( entryPtr->name());
-            this->ui->taskPoints->setValue( entryPtr->points());
-            this->ui->taskType->setCurrentIndex( static_cast<int>( entryPtr->type()));
-            this->ui->taskMaxMulti->setValue( entryPtr->maxMulti());
-            this->ui->taskChallenge->setChecked( entryPtr->isChallenge());
+            this->ui->taskName->setText( taskPtr->name());
+            this->ui->taskPoints->setValue( taskPtr->points());
+            this->ui->taskType->setCurrentIndex( static_cast<int>( taskPtr->type()));
+            this->ui->taskMaxMulti->setValue( taskPtr->multi());
+            this->ui->taskChallenge->setChecked( taskPtr->isChallenge());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit task" ));
 
-            /*if ( entryPtr->type() == App_TaskEntry::Check || entryPtr->type() == App_TaskEntry::Special ) {
+            if ( taskPtr->type() == TaskEntry::Check || taskPtr->type() == TaskEntry::Special ) {
                 this->ui->taskMaxMulti->setValue( 0 );
                 this->ui->taskMaxMulti->setDisabled( true );
             }
 
-            if ( entryPtr->type() == App_TaskEntry::Special )
-                this->ui->taskChallenge->setDisabled( true );*/
+            if ( taskPtr->type() == TaskEntry::Special )
+                this->ui->taskChallenge->setDisabled( true );
 
             break;
 
@@ -135,32 +154,32 @@ removeTaskButton->clicked
 ================
 */
 void Gui_TaskEdit::on_removeTaskButton_clicked() {
-    int state;
+    QSqlQuery query;
+    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    int y = 1;
 
-    // match actual names as failsafe
-    App_TaskEntry *entryPtr = m.findTaskByName( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::DisplayRole ).toString());
-    if ( entryPtr != NULL ) {
-        QMessageBox msgBox;
-        msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( entryPtr->name()));
-        msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-        msgBox.setDefaultButton( QMessageBox::Yes );
-        msgBox.setIcon( QMessageBox::Warning );
-        msgBox.setWindowIcon( QIcon( ":/icons/task_remove_22" ));
-        state = msgBox.exec();
-
-        // check options
-        switch ( state ) {
-        case QMessageBox::Yes:
-            m.removeTask( entryPtr );
-            this->listModelPtr->resetModelData();
-            this->currentMatch = 0;
-            break;
-
-        case QMessageBox::No:
-        default:
-            return;
-        }
+    if ( taskPtr == NULL ) {
+        this->toggleAddEditWidget( NoState );
+        return;
     }
+
+    // begin reset
+    this->listModelPtr->beginReset();
+
+    // remove from internal list
+    m.taskList.removeOne( taskPtr );
+
+    // remove from database
+    query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
+
+    // reindex database (yes, it is very unfortunate)
+    foreach ( TaskEntry *reorderPtr, m.taskList ) {
+        reorderPtr->setOrder( y );
+        y++;
+    }
+
+    // end reset
+    this->listModelPtr->endReset();
 }
 
 /*
@@ -169,6 +188,9 @@ doneButton->clicked
 ================
 */
 void Gui_TaskEdit::on_doneButton_clicked() {
+    TaskEntry *taskPtr = NULL;
+
+    // failsafe
     if ( this->ui->taskName->text().isEmpty()) {
         QMessageBox msgBox;
         msgBox.setText( this->tr( "Please specify task name" ));
@@ -177,30 +199,37 @@ void Gui_TaskEdit::on_doneButton_clicked() {
         return;
     }
 
-    if ( this->state() == Add ) {
-        m.addTask( new App_TaskEntry( this->ui->taskName->text(), static_cast<App_TaskEntry::Types>( this->ui->taskType->currentIndex()), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), this->ui->taskChallenge->isChecked()));
-    } else if ( this->state() == Edit ) {
-        // match name to be sure
-        App_TaskEntry *entryPtr = m.findTaskByName( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::DisplayRole ).toString());
+    // begin reset
+    this->listModelPtr->beginReset();
 
-        if ( entryPtr == NULL ) {
+    // alternate between Add/Edit states
+    if ( this->state() == Add ) {
+        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), this->ui->taskChallenge->isChecked(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));
+    } else if ( this->state() == Edit ) {
+        // match by id
+        taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
+
+        if ( taskPtr == NULL ) {
             this->toggleAddEditWidget( NoState );
             return;
         }
 
         // set edited data
-        entryPtr->setName( this->ui->taskName->text());
-        entryPtr->setPoints( this->ui->taskPoints->value());
-        entryPtr->setMaxMulti( this->ui->taskMaxMulti->value());
-        entryPtr->setChallenge( this->ui->taskChallenge->isChecked());
-        entryPtr->setType( static_cast<App_TaskEntry::Types>( this->ui->taskType->currentIndex()));
-
-        // update anyway
-        m.updateTaskList();
+        taskPtr->setName( this->ui->taskName->text());
+        taskPtr->setPoints( this->ui->taskPoints->value());
+        taskPtr->setMulti( this->ui->taskMaxMulti->value());
+        taskPtr->setChallenge( this->ui->taskChallenge->isChecked());
+        taskPtr->setType( static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));;
     }
+
+    // reset view
     this->toggleAddEditWidget( NoState );
-    this->listModelPtr->resetModelData();
     this->currentMatch = 0;
+    this->listModelPtr->endReset();
+
+    // TODO: select last added/edited value (not implemented)
+    //index = this->listModelPtr->index( m.taskList.indexOf( entryPtr ), 0 );
+    //this->ui->taskList->setCurrentIndex( index );
 }
 
 /*
@@ -210,7 +239,7 @@ keyPressEvent
 */
 void Gui_TaskEdit::keyPressEvent( QKeyEvent *ePtr ) {
     // ignore close button to search for a task
-    if ( ePtr->key() == Qt::Key_Return && this->ui->findTask->hasFocus()/* && !this->ui->findTask->text().isEmpty()*/) {
+    if ( ePtr->key() == Qt::Key_Return && this->ui->findTask->hasFocus()) {
         this->findTask();
         return;
     }
@@ -245,7 +274,7 @@ void Gui_TaskEdit::findTask() {
         index = this->listModelPtr->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
-            if ( m.taskList.at( index.row())->name()/*this->listModelPtr->data( index, Qt::DisplayRole ).toString()*/.contains( matchString, Qt::CaseInsensitive )) {
+            if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 currentMatch = y;
                 break;
@@ -259,7 +288,7 @@ void Gui_TaskEdit::findTask() {
             index = this->listModelPtr->index( y, 0 );
             if ( index.isValid()) {
                 // list must be the same as in App_Main, don't match by display role
-                if ( m.taskList.at( index.row())->name()/*this->listModelPtr->data( index, Qt::DisplayRole ).toString()*/.contains( matchString, Qt::CaseInsensitive )) {
+                if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                     match = true;
                     currentMatch = y;
                     break;
@@ -306,21 +335,21 @@ void Gui_TaskEdit::on_findTask_textChanged( const QString & ) {
 changeTaskType
 ================
 */
-void Gui_TaskEdit::changeTaskType( App_TaskEntry::Types type ) {
+void Gui_TaskEdit::changeTaskType( TaskEntry::Types type ) {
     switch ( type ) {
-    case App_TaskEntry::Check:
+    case TaskEntry::Check:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setDisabled( true );
         this->ui->taskChallenge->setEnabled( true );
         break;
 
-    case App_TaskEntry::Multi:
+    case TaskEntry::Multi:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setEnabled( true );
         this->ui->taskChallenge->setEnabled( true );
         break;
 
-    case App_TaskEntry::Special:
+    case TaskEntry::Special:
         this->ui->taskPoints->setDisabled( true );
         this->ui->taskMaxMulti->setDisabled( true );
         this->ui->taskChallenge->setDisabled( true );
@@ -337,6 +366,78 @@ taskType->currentIndexChanged
 ================
 */
 void Gui_TaskEdit::on_taskType_currentIndexChanged( int index ) {
-    App_TaskEntry::Types type = static_cast<App_TaskEntry::Types>( index );
+    TaskEntry::Types type = static_cast<TaskEntry::Types>( index );
     this->changeTaskType( type );
 }
+
+/*
+================
+move
+================
+*/
+void Gui_TaskEdit::move( MoveDirection direction ) {
+    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    QModelIndex index;
+    int y, t0, t1;
+    int k = 0;
+
+    // begin reset
+    this->listModelPtr->beginReset();
+
+    // match name to be sure
+    if ( taskPtr == NULL )
+        return;
+
+    y = m.taskList.indexOf( taskPtr );
+
+    if ( direction == Up && y != 0 ) {
+        k = y - 1;
+
+        // move in database
+        t0 = m.taskList.at( y )->order();
+        t1 = m.taskList.at( k )->order();
+        m.taskList.at( y )->setOrder( t1 );
+        m.taskList.at( k )->setOrder( t0 );
+
+        // move in memory
+        m.taskList.move( y, k );
+    } else if ( direction == Down && y != m.taskList.count() - 1 ) {
+        k = y + 1;
+
+        // move in database
+        t0 = m.taskList.at( y )->order();
+        t1 = m.taskList.at( k )->order();
+        m.taskList.at( y )->setOrder( t1 );
+        m.taskList.at( k )->setOrder( t0 );
+
+        // move in memory
+        m.taskList.move( y, k );
+    }
+
+    // end reset
+    this->listModelPtr->endReset();
+
+    // reselect value
+    index = this->listModelPtr->index( k, 0 );
+    this->ui->taskList->setCurrentIndex( index );
+    this->currentMatch = k;
+}
+
+/*
+================
+upButton->clicked
+================
+*/
+void Gui_TaskEdit::on_upButton_clicked() {
+    this->move( Up );
+}
+
+/*
+================
+downButton->clicked
+================
+*/
+void Gui_TaskEdit::on_downButton_clicked() {
+    this->move( Down );
+}
+

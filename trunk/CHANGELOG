@@ -1,0 +1,7 @@
+-r3:
+  complete rewrite of multiple subsystems, including:
+    data storage: xml->sql
+    settings: yplatform2 cvar->qsettings
+  removed dependency on yplatform2
+  bugfixes, etc.
+  early beta version, rough around the edges

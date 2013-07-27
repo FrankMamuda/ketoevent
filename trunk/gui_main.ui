@@ -6,65 +6,68 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>428</height>
+    <width>400</width>
+    <height>387</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Keto Event Logger v2</string>
+   <string>KetoEvent Logger</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res_main.qrc">
+   <iconset resource="resources.qrc">
     <normaloff>:/icons/keto_48</normaloff>:/icons/keto_48</iconset>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QGridLayout" name="teamLayout">
+     <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0">
-       <widget class="QLabel" name="teamNameLabel">
+       <widget class="QLabel" name="labelTeam">
         <property name="text">
-         <string>Team name</string>
+         <string>Team</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QComboBox" name="teamCombo"/>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboTeams"/>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="finishTimeLabel">
+       <widget class="QLabel" name="labelFinish">
         <property name="text">
          <string>Finish time</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QTimeEdit" name="finishTime">
-        <property name="currentSection">
-         <enum>QDateTimeEdit::HourSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>HH:mm</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <spacer name="teamSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       <layout class="QHBoxLayout" name="layoutTime">
+        <item>
+         <widget class="QTimeEdit" name="timeFinish"/>
+        </item>
+        <item>
+         <spacer name="spacerTime">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
     <item>
      <widget class="QListWidget" name="taskList">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
@@ -91,7 +94,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="res_main.qrc">
+         <iconset>
           <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
         </property>
        </widget>
@@ -101,14 +104,11 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
-   <property name="contextMenuPolicy">
-    <enum>Qt::NoContextMenu</enum>
-   </property>
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
    <property name="movable">
     <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
    </property>
    <property name="iconSize">
     <size>
@@ -128,7 +128,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSave"/>
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
    <addaction name="actionRankings"/>
@@ -138,19 +137,19 @@
   </widget>
   <action name="actionTeams">
    <property name="icon">
-    <iconset resource="res_main.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/teams_48</normaloff>:/icons/teams_48</iconset>
    </property>
    <property name="text">
     <string>Teams</string>
    </property>
    <property name="toolTip">
-    <string>Edit team information</string>
+    <string>Edit teams</string>
    </property>
   </action>
   <action name="actionTasks">
    <property name="icon">
-    <iconset resource="res_main.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/tasks_48</normaloff>:/icons/tasks_48</iconset>
    </property>
    <property name="text">
@@ -162,19 +161,31 @@
   </action>
   <action name="actionRankings">
    <property name="icon">
-    <iconset resource="res_main.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/rankings_48</normaloff>:/icons/rankings_48</iconset>
    </property>
    <property name="text">
     <string>Rankings</string>
    </property>
    <property name="toolTip">
-    <string>View team rankings</string>
+    <string>View rankings</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Change settings</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="res_main.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/about_48</normaloff>:/icons/about_48</iconset>
    </property>
    <property name="text">
@@ -186,7 +197,7 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="res_main.qrc">
+    <iconset resource="resources.qrc">
      <normaloff>:/icons/exit_48</normaloff>:/icons/exit_48</iconset>
    </property>
    <property name="text">
@@ -196,33 +207,10 @@
     <string>Exit applet</string>
    </property>
   </action>
-  <action name="actionSettings">
-   <property name="icon">
-    <iconset resource="res_main.qrc">
-     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
-   </property>
-   <property name="text">
-    <string>Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Change settings</string>
-   </property>
-  </action>
-  <action name="actionSave">
-   <property name="icon">
-    <iconset resource="res_main.qrc">
-     <normaloff>:/icons/save_48</normaloff>:/icons/save_48</iconset>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="toolTip">
-    <string>Save changes</string>
-   </property>
-  </action>
  </widget>
+ <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="res_main.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

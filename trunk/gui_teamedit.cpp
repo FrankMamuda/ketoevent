@@ -1,21 +1,33 @@
+/*
+===========================================================================
+Copyright (C) 2013 Avotu Briezhaudzetava
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see http://www.gnu.org/licenses/.
+
+===========================================================================
+*/
 
 //
 // includes
 //
 #include "gui_teamedit.h"
-#include "app_teamentry.h"
-#include "app_main.h"
+#include "teamentry.h"
+#include "main.h"
 #include "ui_gui_teamedit.h"
 #include <QMessageBox>
-#include "sys_filesystem.h"
-
-//
-// cvars
-//
-extern pCvar *k_eventStartTime;
-extern pCvar *k_eventFinishTime;
-extern pCvar *k_minimumTeamMembers;
-extern pCvar *k_maximumTeamMembers;
+#include <QSqlError>
+#include <QSqlQuery>
 
 /*
 ================
@@ -29,10 +41,10 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->listModelPtr = new Gui_TeamListModel( this );
     this->ui->teamList->setModel( this->listModelPtr );
     this->ui->teamList->setAlternatingRowColors( true );
-    this->ui->startTimeEdit->setMinimumTime( k_eventStartTime->time());
-    this->ui->finishTimeEdit->setMinimumTime( k_eventStartTime->time());
-    this->ui->teamMembersEdit->setMinimum( k_minimumTeamMembers->integer());
-    this->ui->teamMembersEdit->setMaximum( k_maximumTeamMembers->integer());
+    this->ui->startTimeEdit->setMinimumTime( m.var( "time/start" )->time());
+    this->ui->finishTimeEdit->setMinimumTime( m.var( "time/finish" )->time());
+    this->ui->teamMembersEdit->setMinimum( m.var( "members/min" )->integer());
+    this->ui->teamMembersEdit->setMaximum( m.var( "members/max" )->integer());
 
     // hide add/edit widget
     this->toggleAddEditWidget( NoState );
@@ -62,6 +74,7 @@ destruct
 ================
 */
 Gui_TeamEdit::~Gui_TeamEdit() {
+    this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
     delete ui;
     delete this->listModelPtr;
 }
@@ -79,7 +92,7 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
         this->ui->teamList->setEnabled( true );
         this->enableView();
     } else {
-        App_TeamEntry *entryPtr = NULL;
+        TeamEntry *teamPtr = NULL;
 
         // disable everything
         this->ui->addEditWidget->show();
@@ -93,26 +106,27 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
         switch ( state ) {
         case Add:
             this->ui->teamNameEdit->clear();
-            this->ui->startTimeEdit->setTime( k_eventStartTime->time());
-            this->ui->finishTimeEdit->setTime( k_eventStartTime->time());
-            this->ui->teamMembersEdit->setValue( k_minimumTeamMembers->value());
+            this->ui->startTimeEdit->setTime( m.var( "time/start" )->time());
+            this->ui->finishTimeEdit->setTime( m.var( "time/finish" )->time());
+            this->ui->teamMembersEdit->setValue( m.var( "members/min" )->integer());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
             break;
 
         case Edit:
-            // match name to be sure
-            entryPtr = m.findTeamByName( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::DisplayRole ).toString());
+            // match by id
+            teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
-            if ( entryPtr == NULL ) {
+            if ( teamPtr == NULL ) {
                 this->toggleAddEditWidget( NoState );
                 return;
             }
 
-            this->ui->teamNameEdit->setText( entryPtr->name());
-            this->ui->startTimeEdit->setTime( entryPtr->startTime());
-            this->ui->finishTimeEdit->setTime( entryPtr->finishTime());
-            this->ui->teamMembersEdit->setValue( entryPtr->members());
+            this->ui->teamNameEdit->setText( teamPtr->name());
+            this->ui->startTimeEdit->setTime( teamPtr->startTime());
+            this->ui->finishTimeEdit->setTime( teamPtr->finishTime());
+            this->ui->teamMembersEdit->setValue( teamPtr->members());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit team" ));
+
             break;
 
             // bad state
@@ -130,23 +144,33 @@ removeTeamButton->clicked
 */
 void Gui_TeamEdit::on_removeTeamButton_clicked() {
     int state;
+    TeamEntry *teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+    QSqlQuery query;
 
-    // match actual names as failsafe
-    App_TeamEntry *entryPtr = m.findTeamByName( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::DisplayRole ).toString());
-    if ( entryPtr != NULL ) {
+    if ( teamPtr != NULL ) {
         QMessageBox msgBox;
-        msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( entryPtr->name()));
+        msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( teamPtr->name()));
         msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
         msgBox.setDefaultButton( QMessageBox::Yes );
         msgBox.setIcon( QMessageBox::Warning );
-        msgBox.setWindowIcon( QIcon( ":/icons/team_delete_22" ));
+        msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
         state = msgBox.exec();
 
         // check options
         switch ( state ) {
         case QMessageBox::Yes:
-            m.removeTeam( entryPtr );
-            this->listModelPtr->resetModelData();
+            // begin reset
+            this->listModelPtr->beginReset();
+
+            // remove from memory
+            m.teamList.removeOne( teamPtr );
+
+            // remove from database
+            // fortunately teams are listed alphabetically, so there is no need to update order
+            query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id()));
+
+            // end reset
+            this->listModelPtr->endReset();
             break;
 
         case QMessageBox::No:
@@ -154,6 +178,11 @@ void Gui_TeamEdit::on_removeTeamButton_clicked() {
             return;
         }
     }
+
+
+    //
+    // TODO: remove orphaned logs!!!!
+    //
 }
 
 /*
@@ -162,6 +191,9 @@ doneButton->clicked
 ================
 */
 void Gui_TeamEdit::on_doneButton_clicked() {
+    TeamEntry *teamPtr;
+
+    // failsafe
     if ( this->ui->teamNameEdit->text().isEmpty()) {
         QMessageBox msgBox;
         msgBox.setText( this->tr( "Please specify team name" ));
@@ -170,32 +202,29 @@ void Gui_TeamEdit::on_doneButton_clicked() {
         return;
     }
 
-    if ( this->state() == Add ) {
-        App_TeamEntry *teamPtr = new App_TeamEntry( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->startTimeEdit->time(), this->ui->finishTimeEdit->time());
-        teamPtr->setFilename( fs.safeTeamFilename( this->ui->teamNameEdit->text()));
-        m.addTeam( teamPtr );
+    // begin reset
+    this->listModelPtr->beginReset();
 
-        // save just in case
-        teamPtr->save();
+    // alternate between Add/Edit states
+    if ( this->state() == Add ) {
+        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->startTimeEdit->time(), this->ui->finishTimeEdit->time());
     } else if ( this->state() == Edit ) {
         // match name to be sure
-        App_TeamEntry *entryPtr = m.findTeamByName( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::DisplayRole ).toString());
+        teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
-        if ( entryPtr == NULL ) {
+        if ( teamPtr == NULL ) {
             this->toggleAddEditWidget( NoState );
             return;
         }
 
         // set edited data
-        entryPtr->setName( this->ui->teamNameEdit->text());
-        entryPtr->setStartTime( this->ui->startTimeEdit->time());
-        entryPtr->setFinishTime( this->ui->finishTimeEdit->time());
-        entryPtr->setMembers( this->ui->teamMembersEdit->value());
-
-        // save just in case
-        entryPtr->save();
-        m.updateTeamList();
+        teamPtr->setName( this->ui->teamNameEdit->text());
+        teamPtr->setStartTime( this->ui->startTimeEdit->time());
+        teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
+        teamPtr->setMembers( this->ui->teamMembersEdit->value());
     }
+
+    // reset view
     this->toggleAddEditWidget( NoState );
-    this->listModelPtr->resetModelData();
+    this->listModelPtr->endReset();
 }

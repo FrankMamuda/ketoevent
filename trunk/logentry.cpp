@@ -21,27 +21,41 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include "gui_about.h"
-#include "ui_gui_about.h"
+#include "logentry.h"
+#include "main.h"
 
 /*
 ================
-construct
+comboPoints
 ================
 */
-Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), m_ui( new Ui::Gui_About ) {
-    m_ui->setupUi( this );
+int LogEntry::comboPoints() const {
+    switch ( this->combo()) {
+    case Single:
+        return m.var( "combo/single" )->integer();
 
-    // this is a fixed frame
-    this->setSizeGripEnabled( false );
+    case Double:
+        return m.var( "combo/double" )->integer();
+
+    case Triple:
+        return m.var( "combo/triple" )->integer();
+
+    default:
+    case NoCombo:
+        return 0;
+    }
 }
 
 /*
 ================
-destruct
+points
 ================
 */
-Gui_About::~Gui_About() {
-    delete m_ui;
-}
+int LogEntry::points() const {
+    TaskEntry *taskPtr = m.taskForId( this->taskId());
 
+    if ( taskPtr != NULL )
+        return taskPtr->calculate( this->id());
+
+    return 0;
+}

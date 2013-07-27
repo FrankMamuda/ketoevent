@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2012 Edd 'Double Dee' Psycho
+Copyright (C) 2013 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,9 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
-#include "sys_shared.h"
-#include "app_teamentry.h"
-#include "app_main.h"
+#include "main.h"
 
 //
 // namespaces
@@ -38,7 +36,7 @@ namespace Rankings {
 }
 
 //
-// class:Gui_RankingModel
+// class: Gui_RankingModel
 //
 class Gui_RankingModel : public QAbstractTableModel {
     Q_OBJECT
@@ -65,7 +63,7 @@ public:
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
     // this resets whole model
-    void resetModelData() { this->reset(); }
+    void resetModelData() { this->beginResetModel(); this->endResetModel(); }
 };
 
 #endif // GUI_RANKINGMODEL_H
