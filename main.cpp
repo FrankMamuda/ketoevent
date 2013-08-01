@@ -366,7 +366,7 @@ void Main::importDatabase( const QString &path ) {
             // first find the task (it may be imported or already existing)
             QPair<int, QString> taskMatchPtr;
             foreach ( taskMatchPtr, taskMatchList ) {
-                if ( taskMatchPtr.first == query.value( "taskId" ).toInt())
+                if ( taskMatchPtr.first == query.record().value( 2 ).toInt())
                     break;
             }
             TaskEntry *taskPtr = m.taskForName( taskMatchPtr.second );
