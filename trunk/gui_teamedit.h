@@ -24,7 +24,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QtWidgets/QDialog>
+#include <QtGlobal>
+#if ( QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 ))
+#include <QWidgets/QDialog>
+#else
+#include <QDialog>
+#endif
 #include <QCloseEvent>
 #include "gui_teamlistmodel.h"
 
