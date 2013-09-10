@@ -42,8 +42,6 @@ initialize
 ================
 */
 void Gui_Main::initialize() {
-    this->updateView();
-
     // set minimum for time
     this->ui->timeFinish->setMinimumTime( m.var( "time/start" )->time());
 
@@ -51,8 +49,9 @@ void Gui_Main::initialize() {
     this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
     this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
 
-    // fill in task
-    this->fillTaskList();
+    // fill in tasks and teams
+    this->fillTeams();
+    this->fillTasks();
     this->teamIndexChanged( this->ui->comboTeams->currentIndex());
 }
 
@@ -129,10 +128,10 @@ void Gui_Main::closeEvent( QCloseEvent *eventPtr ) {
 
 /*
 ================
-updateView
+fillTeams
 ================
 */
-void Gui_Main::updateView() {
+void Gui_Main::fillTeams() {
     this->ui->comboTeams->clear();
 
     foreach ( TeamEntry *teamPtr, m.teamList )
@@ -141,10 +140,10 @@ void Gui_Main::updateView() {
 
 /*
 ================
-fillTaskList
+fillTasks
 ================
 */
-void Gui_Main::fillTaskList() {
+void Gui_Main::fillTasks() {
     int y;
     QListWidget *lw = this->ui->taskList;
 

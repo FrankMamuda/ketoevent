@@ -24,17 +24,17 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QAbstractListModel>
+#include <QStringListModel>
 #include "main.h"
 
 //
 // class: Gui_TaskListModel
 //
-class Gui_TaskListModel : public QAbstractListModel {
+class Gui_TaskListModel : public QStringListModel {
     Q_OBJECT
 
 public:
-    Gui_TaskListModel( QObject *parentPtr = 0 ) : QAbstractListModel( parentPtr ) {}
+    Gui_TaskListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
     int rowCount( const QModelIndex & = QModelIndex()) const { return m.taskList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;

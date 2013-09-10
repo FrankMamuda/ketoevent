@@ -111,10 +111,6 @@ buttonImport->clicked
 ================
 */
 void Gui_Settings::on_buttonImport_clicked() {
-    //
-    // TODO: update gui!!!!
-    //
-
     // this is somewhat risky
     QString filename = QFileDialog::getOpenFileName( this, this->tr( "Load log database" ), QDir::currentPath(), this->tr( "sqlite database (*.db)" ));
     m.importDatabase( filename );

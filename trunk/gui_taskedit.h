@@ -46,6 +46,8 @@ namespace Ui {
 class Gui_TaskEdit : public QDialog {
     Q_OBJECT
     Q_ENUMS( AddEditState )
+    Q_ENUMS( MoveDirection )
+    Q_ENUMS( ViewState )
     Q_PROPERTY( AddEditState state READ state WRITE setState )
 
 public:
@@ -60,6 +62,11 @@ public:
         Up,
         Down
     };
+    enum ViewState {
+        NoViewState = -1,
+        Enabled,
+        Disabled
+    };
 
     explicit Gui_TaskEdit( QWidget * = 0 );
     ~Gui_TaskEdit();
@@ -73,8 +80,8 @@ private slots:
     void on_editTaskButton_clicked() { this->toggleAddEditWidget( Edit ); }
     void on_cancelButton_clicked() { this->toggleAddEditWidget( NoState ); }
     void setState( AddEditState state ) { this->m_state = state; }
-    void enableView();
-    void on_addEditWidget_visibilityChanged( bool visible ) { if ( !visible ) this->enableView(); }
+    void toggleView( ViewState viewState = Enabled );
+    void on_addEditWidget_visibilityChanged( bool visible ) { if ( !visible ) this->toggleView(); }
     void on_clearText_clicked();
     void findTask();    
     void on_findTask_textChanged(const QString &arg1);

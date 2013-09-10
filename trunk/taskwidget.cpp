@@ -320,8 +320,6 @@ resetLog
 void TaskWidget::resetLog() {
     this->m_log = NULL;
 
-    // TODO: delete it?
-
     // failsafe
     if ( !this->hasTask()) {
         m.error( StrSoftError + this->tr( "task not set\n" ));

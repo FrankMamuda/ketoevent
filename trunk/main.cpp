@@ -34,10 +34,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 class Main m;
 
-//
-// FIXME: does not fill tasks after adding new ones
-//
-
 /*
 ================
 initialize
@@ -50,7 +46,7 @@ void Main::initialize() {
 
     // init cvars
     this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 ));
-    this->addVariable( new ConsoleVariable( "members/max", this->settings, 4 ));
+    this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 ));
     this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 12, 0 )));
     this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 17, 30 )));
     this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 18, 0 )));
@@ -58,6 +54,9 @@ void Main::initialize() {
     this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 ));
     this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 ));
     this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 ));
+#if 0
+    this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
+#endif
 
     // load database entries
     this->loadDatabase();
@@ -129,8 +128,8 @@ void Main::shutdown() {
     this->settings->sync();
     delete this->settings;
 
-    // clear empty logs
-    query.exec( "delete from logs where value=0" );
+    // delete orphaned logs on shutdown
+    this->deleteOrphanedLogs();
 
     // close database
     QSqlDatabase db = QSqlDatabase::database();
@@ -291,10 +290,27 @@ void Main::loadDatabase() {
          ) {
     }
 
+    // delete orphaned logs on init
+    this->deleteOrphanedLogs();
+
     // load entries
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();
+}
+
+/*
+================
+deleteOrphanedLogs
+================
+*/
+void Main::deleteOrphanedLogs() {
+    // create query
+    QSqlQuery query;
+
+    // remove orphaned logs (fixes crash with invalid teamId/taskId)
+    if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
+        m.error( StrSoftError + QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
 }
 
 /*
