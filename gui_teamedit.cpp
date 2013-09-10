@@ -39,10 +39,10 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
 
     // set up view
     this->listModelPtr = new Gui_TeamListModel( this );
-    this->ui->teamList->setModel( this->listModelPtr );
+    this->ui->teamList->setModel( listModelPtr );
     this->ui->teamList->setAlternatingRowColors( true );
     this->ui->startTimeEdit->setMinimumTime( m.var( "time/start" )->time());
-    this->ui->finishTimeEdit->setMinimumTime( m.var( "time/finish" )->time());
+    this->ui->finishTimeEdit->setMinimumTime( m.var( "time/start" )->time());
     this->ui->teamMembersEdit->setMinimum( m.var( "members/min" )->integer());
     this->ui->teamMembersEdit->setMaximum( m.var( "members/max" )->integer());
 
@@ -178,11 +178,6 @@ void Gui_TeamEdit::on_removeTeamButton_clicked() {
             return;
         }
     }
-
-
-    //
-    // TODO: remove orphaned logs!!!!
-    //
 }
 
 /*

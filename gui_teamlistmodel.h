@@ -24,25 +24,24 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QAbstractListModel>
+#include <QStringListModel>
+#include <QSortFilterProxyModel>
 #include "main.h"
 
 //
 // class: Gui_TeamListModel
 //
-class Gui_TeamListModel : public QAbstractListModel {
+class Gui_TeamListModel : public QStringListModel {
     Q_OBJECT
 
 public:
-    Gui_TeamListModel( QObject *parentPtr = 0 ) : QAbstractListModel( parentPtr ) {}
+    Gui_TeamListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
     int rowCount( const QModelIndex & = QModelIndex()) const { return m.teamList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
     // this resets whole model based on data in m.teamList
     void beginReset() { this->beginResetModel(); }
-
-    // TODO: IMPME
     void endReset() { m.sort( Main::Teams ); this->endResetModel(); }
 };
 

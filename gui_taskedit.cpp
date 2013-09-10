@@ -22,6 +22,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include "gui_taskedit.h"
+#include "gui_main.h"
 #include "main.h"
 #include "ui_gui_taskedit.h"
 #include <QMessageBox>
@@ -40,6 +41,8 @@ Gui_TaskEdit::Gui_TaskEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->listModelPtr = new Gui_TaskListModel( this );
     this->ui->taskList->setModel( this->listModelPtr );
     this->ui->taskList->setAlternatingRowColors( true );
+    this->ui->taskList->setSelectionMode( QAbstractItemView::SingleSelection );
+    this->ui->taskMaxMulti->setMinimum( 2 );
 
     // hide add/edit widget
     this->toggleAddEditWidget( NoState );
@@ -63,19 +66,23 @@ Gui_TaskEdit::~Gui_TaskEdit() {
 
 /*
 ================
-enableView
+toggleView
 ================
 */
-void Gui_TaskEdit::enableView() {
-    this->ui->addTaskButton->setEnabled( true );
-    this->ui->removeTaskButton->setEnabled( true );
-    this->ui->editTaskButton->setEnabled( true );
-    this->ui->closeButton->setEnabled( true );
-    this->ui->taskList->setEnabled( true );
-    this->ui->taskList->setSelectionMode( QAbstractItemView::SingleSelection );
-    this->ui->closeButton->setDefault( true );
-    this->ui->findTask->setEnabled( true );
-    this->ui->clearText->setEnabled( true );
+void Gui_TaskEdit::toggleView( ViewState viewState ) {
+    bool state = false;
+
+    if ( viewState == Enabled )
+        state = true;
+
+    this->ui->addTaskButton->setEnabled( state );
+    this->ui->removeTaskButton->setEnabled( state );
+    this->ui->editTaskButton->setEnabled( state );
+    this->ui->closeButton->setEnabled( state );
+    this->ui->taskList->setEnabled( state );
+    this->ui->closeButton->setDefault( state );
+    this->ui->findTask->setEnabled( state );
+    this->ui->clearText->setEnabled( state );
 }
 
 /*
@@ -89,22 +96,16 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
     if ( !this->ui->addEditWidget->isHidden()) {
         this->ui->addEditWidget->close();
         this->ui->taskList->setEnabled( true );
-        this->enableView();
+        this->toggleView();
     } else {
         TaskEntry *taskPtr = NULL;
 
         // disable everything
         this->ui->addEditWidget->show();
-        this->ui->addTaskButton->setDisabled( true );
-        this->ui->removeTaskButton->setDisabled( true );
-        this->ui->editTaskButton->setDisabled( true );
-        this->ui->closeButton->setDisabled( true );
-        this->ui->doneButton->setDefault( true );
-        this->ui->findTask->setDisabled( true );
-        this->ui->clearText->setDisabled( true );
-        this->ui->taskList->setDisabled( true );
+        this->toggleView( Disabled );
         this->ui->taskType->setCurrentIndex( 0 );
         this->changeTaskType( TaskEntry::Check );
+        this->ui->doneButton->setEnabled( true );
 
         switch ( state ) {
         case Add:
@@ -131,7 +132,7 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit task" ));
 
             if ( taskPtr->type() == TaskEntry::Check || taskPtr->type() == TaskEntry::Special ) {
-                this->ui->taskMaxMulti->setValue( 0 );
+                this->ui->taskMaxMulti->setValue( 2 );
                 this->ui->taskMaxMulti->setDisabled( true );
             }
 

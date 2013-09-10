@@ -100,6 +100,9 @@ public slots:
 
 private:
     QSettings *settings;
+
+private slots:
+    void deleteOrphanedLogs();
 };
 
 //

@@ -54,7 +54,8 @@ private:
     Ui::Gui_Main *ui;
 
 public slots:
-    void updateView();
+    void fillTeams();
+    void fillTasks();
     void initialize();
     void teamIndexChanged( int index );
     void updateFinishTime( QTime time );
@@ -63,13 +64,12 @@ protected:
     virtual void closeEvent( QCloseEvent * );
 
 private slots:
-    void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->updateView(); }
-    void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->updateView(); }
+    void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->fillTeams(); }
+    void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->fillTasks(); }
     void on_actionRankings_triggered() { Gui_Rankings rankings( this ); rankings.exec(); }
     void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
-    void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); }
+    void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); this->fillTeams(); this->fillTasks(); }
     void on_actionExit_triggered();
-    void fillTaskList();
 };
 
 #endif // GUI_MAIN_H

@@ -55,3 +55,5 @@ Qt::ItemFlags Gui_TeamListModel::flags( const QModelIndex &index ) const {
 
     return QAbstractItemModel::flags( index );
 }
+
+
