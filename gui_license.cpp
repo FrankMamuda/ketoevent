@@ -31,6 +31,11 @@ construct
 */
 Gui_License::Gui_License( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_License ) {
     ui->setupUi( this );
+
+#ifdef Q_OS_MAC
+    // fixes ugly mac font
+    ui->licenseContainer->setHtml( ui->licenseContainer->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
+#endif
 }
 
 /*
