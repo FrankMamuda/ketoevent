@@ -12,6 +12,7 @@ TARGET = KetoEvent3
 TEMPLATE = app
 
 win32:RC_FILE = icon.rc
+ICON = icon.icns
 
 SOURCES += main.cpp\
         gui_main.cpp \

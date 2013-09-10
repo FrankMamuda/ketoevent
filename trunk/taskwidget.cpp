@@ -47,6 +47,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->grid = new QGridLayout();
     this->taskName = new QLabel( this->task()->name());
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
+#ifdef Q_OS_MAC
+    // fix ugly spinbox on mac
+    this->grid->setMargin( 0 );
+#endif
 
     // set appropriate font
     if ( this->task()->type() == TaskEntry::Special ) {

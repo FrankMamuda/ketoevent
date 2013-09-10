@@ -34,6 +34,11 @@ Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), m_ui( new Ui::Gui_A
 
     // this is a fixed frame
     this->setSizeGripEnabled( false );
+
+#ifdef Q_OS_MAC
+    // fixes ugly mac font
+    m_ui->appInfo->setHtml( m_ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
+#endif
 }
 
 /*
