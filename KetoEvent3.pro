@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = KetoEvent3
 TEMPLATE = app
 
+win32:RC_FILE = icon.rc
 
 SOURCES += main.cpp\
         gui_main.cpp \
