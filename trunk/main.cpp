@@ -28,6 +28,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QDebug>
 #include <QSqlError>
+#include <QMessageBox>
 
 //
 // classes
@@ -349,17 +350,18 @@ void Main::importDatabase( const QString &path ) {
 
     // store entries
     while ( query.next()) {
+        QString teamName = query.record().value( "name" ).toString();
+
         // check for duplicates
-        if ( m.teamForName( query.record().value( "name" ).toString()) != NULL ) {
+        if ( m.teamForName( teamName ) != NULL ) {
             // TODO: messagebox - replace?
-
-
-
+            QMessageBox::question( NULL, "Replace team", QString( "Replace logs for team \"%1\"?" ).arg( teamName ), QMessageBox::Yes, QMessageBox::No );
+            this->removeTeam( teamName );
         }
 
         // store temp value
         QList<QPair<int, QString> > teamMatch;
-        teamMatch.append( qMakePair( query.record().value( "id" ).toInt(), query.record().value( "name" ).toString()));
+        teamMatch.append( qMakePair( query.record().value( "id" ).toInt(), teamName ));
         teamMatchList << teamMatch;
 
         // add to database
@@ -379,6 +381,7 @@ void Main::importDatabase( const QString &path ) {
         taskMatchList << taskMatch;
 
         // add to main database
+        // duplicates are ignored
         this->addTask( query.record().value( "name" ).toString(), query.record().value( "points" ).toInt(), query.record().value( "multi" ).toInt(), query.record().value( "challenge" ).toBool(), static_cast<TaskEntry::Types>( query.record().value( "type" ).toInt()));
     }
 
