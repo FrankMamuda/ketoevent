@@ -103,6 +103,7 @@ private:
 
 private slots:
     void deleteOrphanedLogs();
+    void removeTeam( const QString &teamName );
 };
 
 //

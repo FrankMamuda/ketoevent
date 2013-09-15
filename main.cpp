@@ -150,14 +150,11 @@ addTeam
 ================
 */
 void Main::addTeam( const QString &teamName, int members, QTime startTime, QTime finishTime ) {
-    TeamEntry *teamPtr;
     QSqlQuery query;
 
     // avoid duplicates
-    foreach ( teamPtr, this->teamList ) {
-        if ( !QString::compare( teamPtr->name(), teamName ))
-            return;
-    }
+    if ( m.teamForName( teamName ) != NULL )
+        return;
 
     // perform database update and select last row
     if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4' )" )
@@ -171,10 +168,32 @@ void Main::addTeam( const QString &teamName, int members, QTime startTime, QTime
     query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last entry and construct internal entry
-    while ( query.next()) {
-        teamPtr = new TeamEntry( query.record(), "teams" );
-        this->teamList << teamPtr;
-    }
+    while ( query.next())
+        this->teamList << new TeamEntry( query.record(), "teams" );;
+}
+
+/*
+================
+removeTeam
+================
+*/
+void Main::removeTeam( const QString &teamName ) {
+    TeamEntry *teamPtr = NULL;
+    QSqlQuery query;
+
+    // find team
+    teamPtr = m.teamForName( teamName );
+
+    // failsafe
+    if ( teamPtr == NULL )
+        return;
+
+    // remove team and logs from db
+    query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id()));
+    query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
+
+    // remove from display
+    this->teamList.removeAll( teamPtr );
 }
 
 /*
@@ -183,15 +202,12 @@ addTask
 ================
 */
 void Main::addTask( const QString &taskName, int points, int multi, bool challenge, TaskEntry::Types type ) {
-    TaskEntry *taskPtr;
     QSqlQuery query;
     int max = 0;
 
     // avoid duplicates
-    foreach ( taskPtr, this->taskList ) {
-        if ( !QString::compare( taskPtr->name(), taskName ))
-            return;
-    }
+    if ( m.taskForName( taskName ) != NULL )
+        return;
 
     // make sure we insert value at the bottom of the list
     query.exec( "select max ( parent ) from tasks" );
@@ -212,10 +228,8 @@ void Main::addTask( const QString &taskName, int points, int multi, bool challen
     query.exec( QString( "select * from tasks where id=%1" ).arg( query.lastInsertId().toInt() ));
 
     // get last entry and construct internal entry
-    while ( query.next()) {
-        taskPtr = new TaskEntry( query.record(), "tasks" );
-        this->taskList << taskPtr;
-    }
+    while ( query.next())
+        this->taskList << new TaskEntry( query.record(), "tasks" );
 }
 
 /*
@@ -335,6 +349,14 @@ void Main::importDatabase( const QString &path ) {
 
     // store entries
     while ( query.next()) {
+        // check for duplicates
+        if ( m.teamForName( query.record().value( "name" ).toString()) != NULL ) {
+            // TODO: messagebox - replace?
+
+
+
+        }
+
         // store temp value
         QList<QPair<int, QString> > teamMatch;
         teamMatch.append( qMakePair( query.record().value( "id" ).toInt(), query.record().value( "name" ).toString()));
