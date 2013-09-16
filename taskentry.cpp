@@ -68,10 +68,8 @@ int TaskEntry::calculate( int logId ) const {
 
     // get log parent
     LogEntry *logPtr = m.logForId( logId );
-    if ( logPtr == NULL ) {
-        m.print( "no log\n");
+    if ( logPtr == NULL )
         return 0;
-    }
 
     // get initial points
     switch ( this->type()) {

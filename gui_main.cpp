@@ -52,7 +52,6 @@ void Gui_Main::initialize() {
     // fill in tasks and teams
     this->fillTeams();
     this->fillTasks();
-    this->teamIndexChanged( this->ui->comboTeams->currentIndex());
 }
 
 /*
@@ -160,6 +159,9 @@ void Gui_Main::fillTasks() {
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
     }
+
+    // update
+    this->teamIndexChanged( this->ui->comboTeams->currentIndex());
 }
 
 /*
