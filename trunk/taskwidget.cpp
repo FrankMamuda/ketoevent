@@ -110,11 +110,10 @@ saveLog
 */
 void TaskWidget::saveLog() {
     int value = 0;
-    QSqlQuery query;
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        m.error( StrSoftError + this->tr( "task or team not set\n" ));
+        m.error( StrFatalError + this->tr( "task or team not set\n" ));
         return;
     }
 
@@ -127,15 +126,14 @@ void TaskWidget::saveLog() {
     } else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special ) {
         value = this->multi->value();
     } else {
-        m.error( StrSoftError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        m.error( StrFatalError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
     }
 
-    // no value, abort
-    if ( value <= 0 ) {
-        this->team()->logList.removeOne( this->log());
-        m.logList.removeOne( this->log());
-        return;
+    // set to zero - orphans will be deleted anyway
+    if ( value <= 0 && this->hasLog()) {
+        this->log()->setValue( 0 );
+        this->log()->setCombo( LogEntry::NoCombo );
     }
 
     // no log?, no problem - create one
@@ -324,9 +322,9 @@ resetLog
 void TaskWidget::resetLog() {
     this->m_log = NULL;
 
-    // failsafe
+    // failsafe - this really should not happen
     if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
+        m.error( StrFatalError + this->tr( "task not set\n" ));
         return;
     }
 
