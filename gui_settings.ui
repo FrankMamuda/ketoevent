@@ -37,7 +37,7 @@
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
         <property name="displayFormat">
-         <string>H:mm</string>
+         <string>HH:mm</string>
         </property>
        </widget>
       </item>
@@ -54,7 +54,7 @@
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
         <property name="displayFormat">
-         <string>H:mm</string>
+         <string>HH:mm</string>
         </property>
        </widget>
       </item>
@@ -71,7 +71,7 @@
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
         <property name="displayFormat">
-         <string>H:mm</string>
+         <string>HH:mm</string>
         </property>
        </widget>
       </item>

@@ -29,11 +29,17 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QDebug>
 #include <QSqlError>
 #include <QMessageBox>
+#include <QTranslator>
 
 //
 // classes
 //
 class Main m;
+
+//
+// defines
+//
+#define FORCE_LATVIAN
 
 /*
 ================
@@ -713,6 +719,17 @@ int main( int argc, char *argv[] ) {
     // init app
     QCoreApplication::setOrganizationName( "avoti" );
     QCoreApplication::setApplicationName( "ketoevent3" );
+
+    // i18n
+    QTranslator translator;
+    QString locale;
+#ifndef FORCE_LATVIAN
+    locale = QLocale::system().name();
+#else
+    locale = "lv_LV";
+#endif
+    translator.load( QString( ":/i18n/ketoevent_%1" ).arg( locale ));
+    app.installTranslator( &translator );
 
     // init main window
     Gui_Main gui;
