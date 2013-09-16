@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = KetoEvent3
 TEMPLATE = app
-
+TRANSLATIONS = i18n/ketoevent_lv_LV.ts
 win32:RC_FILE = icon.rc
 ICON = icon.icns
 

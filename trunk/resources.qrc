@@ -22,4 +22,7 @@
         <file alias="exit_48">icons/exit_48.png</file>
         <file alias="import_16">icons/import_16.png</file>
     </qresource>
+    <qresource prefix="/i18n">
+        <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
+    </qresource>
 </RCC>

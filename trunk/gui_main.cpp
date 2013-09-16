@@ -27,6 +27,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QVariant>
 #include "taskwidget.h"
 
+//
+// TODO:
+//  add NOW! button, to log exact time
+//  remove special task grade in rankings (useless)
+//
+
 /*
 ================
 construct
