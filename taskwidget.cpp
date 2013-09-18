@@ -48,8 +48,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->taskName = new QLabel( this->task()->name());
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
 #ifdef Q_OS_MAC
-    // fix ugly spinbox on mac
+    // fix ugly spinbox on mac, win32
     this->grid->setMargin( 0 );
+#elif defined( Q_OS_WIN )
+    this->grid->setMargin( 2 );
 #endif
 
     // set appropriate font
@@ -69,6 +71,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->check->setMaximumWidth( 48 );
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
         this->grid->addWidget( this->check, 0, 3, 1, 1 );
+	
+        // set tooltips
+        this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
+        this->check->setToolTip( this->tr( "Toggle task completion" ));
     } else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special ) {
         this->multi = new QSpinBox();
 
@@ -80,6 +86,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->multi->setMaximumWidth( 48 );
         this->connect( this->multi, SIGNAL( editingFinished()), this, SLOT( saveLog()));
         this->grid->addWidget( this->multi, 0, 3, 1, 1 );
+	
+        // set tooltips
+        this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
+        this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
         m.error( StrSoftError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
@@ -91,6 +101,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->combo->setMaximumWidth( 32 );
         this->setComboState( LogEntry::NoCombo );
         this->grid->addWidget( this->combo, 0, 4, 1, 1 );
+	
+	// set tooltips
+	this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
     }
 
     // add layout to widget

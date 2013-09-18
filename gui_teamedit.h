@@ -49,7 +49,8 @@ public:
     enum AddEditState {
         NoState = -1,
         Add,
-        Edit
+        Edit,
+        AddQuick
     };
 
     explicit Gui_TeamEdit( QWidget * = 0 );
