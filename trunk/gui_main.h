@@ -71,6 +71,7 @@ private slots:
     void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); this->fillTeams(); this->fillTasks(); }
     void on_actionExit_triggered();
     void on_logButton_clicked();
+    void on_quickAddButton_clicked();
 };
 
 #endif // GUI_MAIN_H

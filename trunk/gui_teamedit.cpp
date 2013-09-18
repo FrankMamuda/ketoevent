@@ -105,6 +105,7 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
 
         switch ( state ) {
         case Add:
+        case AddQuick:
             this->ui->teamNameEdit->clear();
             this->ui->startTimeEdit->setTime( m.var( "time/start" )->time());
             this->ui->finishTimeEdit->setTime( m.var( "time/finish" )->time());
@@ -201,7 +202,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
     this->listModelPtr->beginReset();
 
     // alternate between Add/Edit states
-    if ( this->state() == Add ) {
+    if ( this->state() == Add || this->state() == AddQuick ) {
         m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->startTimeEdit->time(), this->ui->finishTimeEdit->time());
     } else if ( this->state() == Edit ) {
         // match name to be sure
@@ -218,6 +219,10 @@ void Gui_TeamEdit::on_doneButton_clicked() {
         teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
         teamPtr->setMembers( this->ui->teamMembersEdit->value());
     }
+
+    // quick add
+    if ( this->state() == AddQuick )
+        this->close();
 
     // reset view
     this->toggleAddEditWidget( NoState );

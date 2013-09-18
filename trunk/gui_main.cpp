@@ -181,3 +181,15 @@ logButton->clicked
 void Gui_Main::on_logButton_clicked() {
     this->ui->timeFinish->setTime( QTime::currentTime());
 }
+
+/*
+================
+quickAddButton->clicked
+================
+*/
+void Gui_Main::on_quickAddButton_clicked() {
+    Gui_TeamEdit teamEdit( this );
+    teamEdit.toggleAddEditWidget( Gui_TeamEdit::AddQuick );
+    teamEdit.exec();
+    this->fillTeams();
+}
