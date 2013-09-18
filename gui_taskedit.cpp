@@ -442,3 +442,26 @@ void Gui_TaskEdit::on_downButton_clicked() {
     this->move( Down );
 }
 
+/*
+================
+sortButton->clicked
+================
+*/
+void Gui_TaskEdit::on_sortButton_clicked() {
+    int y = 0;
+
+    // begin reset
+    this->listModelPtr->beginReset();
+
+    // sort by name
+    m.sort( Main::Tasks );
+
+    // reindex whole list
+    foreach ( TaskEntry *taskPtr, m.taskList ) {
+        taskPtr->setOrder( y );
+        y++;
+    }
+
+    // end reset
+    this->listModelPtr->endReset();
+}

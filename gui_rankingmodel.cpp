@@ -62,10 +62,10 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
 
         case Combos:
             return teamPtr->combos();
-
+#if 0
         case Grade:
             return teamPtr->grade();
-
+#endif
         case Time:
             return teamPtr->timeOnTrack();
 
@@ -119,10 +119,10 @@ QVariant Gui_RankingModel::headerData( int section, Qt::Orientation orientation,
 
         case Combos:
             return this->tr( "Combos" );
-
+#if 0
         case Grade:
             return this->tr( "Grade" );
-
+#endif
         case Time:
             return this->tr( "Time\n(min)" );
 

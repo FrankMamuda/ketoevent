@@ -51,7 +51,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="resources.qrc">
            <normaloff>:/icons/up_16</normaloff>:/icons/up_16</iconset>
          </property>
         </widget>
@@ -62,7 +62,7 @@
           <string>...</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="resources.qrc">
            <normaloff>:/icons/down_16</normaloff>:/icons/down_16</iconset>
          </property>
         </widget>
@@ -157,7 +157,7 @@
      <item row="1" column="3">
       <widget class="QPushButton" name="sortButton">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Sort tasks</string>
