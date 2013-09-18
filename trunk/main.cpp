@@ -54,9 +54,9 @@ void Main::initialize() {
     // init cvars
     this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 ));
     this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 ));
-    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 12, 0 )));
-    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 17, 30 )));
-    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 18, 0 )));
+    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 9, 0 )));
+    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 14, 00 )));
+    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 14, 30 )));
     this->addVariable( new ConsoleVariable( "combo/single", this->settings, 1 ));
     this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 ));
     this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 ));

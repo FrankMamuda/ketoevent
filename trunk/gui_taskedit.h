@@ -86,6 +86,8 @@ private slots:
     void on_upButton_clicked();
     void on_downButton_clicked();
 
+    void on_sortButton_clicked();
+
 private:
     Ui::Gui_TaskEdit *ui;
     AddEditState m_state;

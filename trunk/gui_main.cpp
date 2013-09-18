@@ -27,12 +27,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QVariant>
 #include "taskwidget.h"
 
-//
-// TODO:
-//  add NOW! button, to log exact time
-//  remove special task grade in rankings (useless)
-//
-
 /*
 ================
 construct
@@ -118,7 +112,7 @@ void Gui_Main::updateFinishTime( QTime time ) {
         if ( time == teamPtr->finishTime())
             return;
 
-        teamPtr->setFinishTime( time );
+    teamPtr->setFinishTime( time );
 }
 
 /*
@@ -179,3 +173,11 @@ void Gui_Main::on_actionExit_triggered() {
     m.shutdown();
 }
 
+/*
+================
+logButton->clicked
+================
+*/
+void Gui_Main::on_logButton_clicked() {
+    this->ui->timeFinish->setTime( QTime::currentTime());
+}

@@ -50,10 +50,21 @@
         <item>
          <widget class="QTimeEdit" name="timeFinish">
           <property name="currentSection">
-           <enum>QDateTimeEdit::MinuteSection</enum>
+           <enum>QDateTimeEdit::HourSection</enum>
           </property>
           <property name="displayFormat">
            <string>HH:mm</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="logButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/log_16</normaloff>:/icons/log_16</iconset>
           </property>
          </widget>
         </item>

@@ -21,6 +21,7 @@
         <file alias="down_16">icons/down_16.png</file>
         <file alias="exit_48">icons/exit_48.png</file>
         <file alias="import_16">icons/import_16.png</file>
+        <file alias="log_16">icons/log_16.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
