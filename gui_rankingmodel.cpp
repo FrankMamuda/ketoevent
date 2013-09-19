@@ -25,6 +25,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QFont>
 #include <QColor>
 
+//
+// FIXME: too frequent updates - inefficient
+//
+
 /*
 ================
 data
@@ -47,6 +51,12 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
         }
     }
 
+    if ( role == Qt::ForegroundRole ) {
+        TeamEntry *teamPtr = m.teamList.at( index.row());
+        if ( teamPtr->disqualified())
+            return QColor( Qt::red );
+    }
+
     if ( role == Qt::DisplayRole ) {
         TeamEntry *teamPtr = m.teamList.at( index.row());
 
@@ -57,15 +67,9 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
         case Tasks:
             return teamPtr->logList.count();
 
-        case Challenges:
-            return teamPtr->challenges();
-
         case Combos:
             return teamPtr->combos();
-#if 0
-        case Grade:
-            return teamPtr->grade();
-#endif
+
         case Time:
             return teamPtr->timeOnTrack();
 
@@ -76,12 +80,20 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
             // VERY IMPORTANT: penalty points are only substracted here, for display purposes
             //
         case Points:
+        {
+            TeamEntry *teamPtr = m.teamList.at( index.row());
+
+            if ( teamPtr->disqualified())
+                return -1;
+
             points = teamPtr->points() - teamPtr->penalty();
 
             if ( points <= 0 )
                 points = 0;
 
             return points;
+        }
+            break;
 
         default:
             return QVariant();
@@ -114,15 +126,9 @@ QVariant Gui_RankingModel::headerData( int section, Qt::Orientation orientation,
         case Tasks:
             return this->tr( "Tasks" );
 
-        case Challenges:
-            return this->tr( "Challenges" );
-
         case Combos:
             return this->tr( "Combos" );
-#if 0
-        case Grade:
-            return this->tr( "Grade" );
-#endif
+
         case Time:
             return this->tr( "Time\n(min)" );
 

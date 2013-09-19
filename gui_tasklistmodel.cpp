@@ -43,15 +43,12 @@ QVariant Gui_TaskListModel::data( const QModelIndex &index, int role ) const {
         TaskEntry *taskPtr = m.taskList.at( index.row());
         QFont font;
 
-        if ( taskPtr->isChallenge()) {
+        if ( taskPtr->style() == TaskEntry::Bold )
             font.setBold( true );
-            return font;
-        }
-
-        if  ( taskPtr->type() == TaskEntry::Special ) {
+        else if ( taskPtr->style() == TaskEntry::Italic )
             font.setItalic( true );
-            return font;
-        }
+
+        return font;
     } else if ( role == Qt::UserRole ) {
         return m.taskList.at( index.row())->id();
     }

@@ -54,9 +54,9 @@ void Main::initialize() {
     // init cvars
     this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 ));
     this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 ));
-    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 9, 0 )));
-    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 14, 00 )));
-    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 14, 30 )));
+    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 10, 0 )));
+    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 15, 00 )));
+    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 15, 30 )));
     this->addVariable( new ConsoleVariable( "combo/single", this->settings, 1 ));
     this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 ));
     this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 ));
@@ -156,7 +156,7 @@ void Main::shutdown() {
 addTeam
 ================
 */
-void Main::addTeam( const QString &teamName, int members, QTime startTime, QTime finishTime ) {
+void Main::addTeam( const QString &teamName, int members, QTime finishTime ) {
     QSqlQuery query;
 
     // avoid duplicates
@@ -164,13 +164,12 @@ void Main::addTeam( const QString &teamName, int members, QTime startTime, QTime
         return;
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4' )" )
+    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3' )" )
                       .arg( teamName )
                       .arg( members )
-                      .arg( startTime.toString( "hh:mm" ))
                       .arg( finishTime.toString( "hh:mm" ))
                       )) {
-        this->error( StrSoftError + QString( "could not add team, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError + QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
 
@@ -208,7 +207,7 @@ void Main::removeTeam( const QString &teamName ) {
 addTask
 ================
 */
-void Main::addTask( const QString &taskName, int points, int multi, bool challenge, TaskEntry::Types type ) {
+void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style ) {
     QSqlQuery query;
     int max = 0;
 
@@ -226,7 +225,7 @@ void Main::addTask( const QString &taskName, int points, int multi, bool challen
                       .arg( taskName )
                       .arg( points )
                       .arg( multi )
-                      .arg( challenge )
+                      .arg( static_cast<TaskEntry::Styles>( style ))
                       .arg( static_cast<TaskEntry::Types>( type ))
                       .arg( max + 1 )
                       )) {
@@ -304,8 +303,8 @@ void Main::loadDatabase() {
     QSqlQuery query;
 
     // create initial table structure (if non-existant)
-    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, challenge integer, type integer, parent integer )" ) ||
-         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, start varchar( 5 ), finish varchar( 5 ))" ) ||
+    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
+         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finish varchar( 5 ))" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, taskId integer, teamId integer )" )
          // !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, foreign key( taskId ) references tasks( id ), foreign key( teamId ) references teams( id ))" )
          ) {
@@ -371,7 +370,7 @@ void Main::importDatabase( const QString &path ) {
         teamMatchList << teamMatch;
 
         // add to database
-        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "start" ).toString(), "hh:mm" ), QTime::fromString( query.record().value( "finish" ).toString(), "hh:mm" ));
+        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "finish" ).toString(), "hh:mm" ));
     }
 
     //
@@ -388,7 +387,7 @@ void Main::importDatabase( const QString &path ) {
 
         // add to main database
         // duplicates are ignored
-        this->addTask( query.record().value( "name" ).toString(), query.record().value( "points" ).toInt(), query.record().value( "multi" ).toInt(), query.record().value( "challenge" ).toBool(), static_cast<TaskEntry::Types>( query.record().value( "type" ).toInt()));
+        this->addTask( query.record().value( "name" ).toString(), query.record().value( "points" ).toInt(), query.record().value( "multi" ).toInt(), static_cast<TaskEntry::Types>( query.record().value( "type" ).toInt()), static_cast<TaskEntry::Styles>( query.record().value( "style" ).toInt()));
     }
 
     //

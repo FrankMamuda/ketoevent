@@ -33,6 +33,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QTimeEdit" name="startTime">
+        <property name="toolTip">
+         <string>Start time of the event</string>
+        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
@@ -50,6 +53,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QTimeEdit" name="finishTime">
+        <property name="toolTip">
+         <string>Time from which penalty is being calculated</string>
+        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
@@ -67,6 +73,9 @@
       </item>
       <item row="2" column="1">
        <widget class="QTimeEdit" name="finalTime">
+        <property name="toolTip">
+         <string>Team is disqualified after this time</string>
+        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::HourSection</enum>
         </property>
@@ -80,6 +89,9 @@
    </item>
    <item row="3" column="0" colspan="2">
     <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Close settings dialog</string>
+     </property>
      <property name="text">
       <string>Close</string>
      </property>
@@ -106,7 +118,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QSpinBox" name="penalty"/>
+       <widget class="QSpinBox" name="penalty">
+        <property name="toolTip">
+         <string>Penalty points for every minute past finish time</string>
+        </property>
+       </widget>
       </item>
       <item row="5" column="0">
        <widget class="QLabel" name="tComboLabel">
@@ -124,6 +140,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QSpinBox" name="sCombo">
+        <property name="toolTip">
+         <string>Points for two tasks in one picture</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -138,6 +157,9 @@
       </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="dCombo">
+        <property name="toolTip">
+         <string>Points for three tasks in one picture</string>
+        </property>
         <property name="minimum">
          <number>2</number>
         </property>
@@ -145,6 +167,9 @@
       </item>
       <item row="5" column="1">
        <widget class="QSpinBox" name="tCombo">
+        <property name="toolTip">
+         <string>Points for four or more tasks in one picture</string>
+        </property>
         <property name="minimum">
          <number>3</number>
         </property>
@@ -168,6 +193,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="min">
+        <property name="toolTip">
+         <string>Minimum members in a team</string>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -182,18 +210,11 @@
       </item>
       <item row="1" column="1">
        <widget class="QSpinBox" name="max">
+        <property name="toolTip">
+         <string>Maximum members in a team</string>
+        </property>
         <property name="minimum">
          <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="checkBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Sort tasks alphabetically (main screen)</string>
         </property>
        </widget>
       </item>
@@ -202,6 +223,9 @@
    </item>
    <item row="2" column="0" colspan="2">
     <widget class="QPushButton" name="buttonImport">
+     <property name="toolTip">
+      <string>Import log database from a different machine (beta)</string>
+     </property>
      <property name="text">
       <string>Import database</string>
      </property>

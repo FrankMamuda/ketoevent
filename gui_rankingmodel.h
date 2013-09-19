@@ -32,11 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespaces
 //
 namespace Rankings {
-#if 0
-    const static unsigned int NumRankingColumns = 8;
-#else
-    const static unsigned int NumRankingColumns = 7;
-#endif
+    const static unsigned int NumRankingColumns = 6;
 }
 
 //
@@ -50,11 +46,7 @@ public:
     enum Columns {
         TeamName = 0,
         Tasks,
-        Challenges,
         Combos,
-#if 0
-        Grade,
-#endif
         Time,
         Penalty,
         Points

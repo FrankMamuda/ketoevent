@@ -55,12 +55,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 #endif
 
     // set appropriate font
-    if ( this->task()->type() == TaskEntry::Special ) {
+    if ( this->task()->style() == TaskEntry::Italic ) {
         font.setItalic( true );
         this->taskName->setFont( font );
-    }
-
-    if ( this->task()->isChallenge()) {
+    } else if ( this->task()->style() == TaskEntry::Bold ) {
         font.setBold( true );
         this->taskName->setFont( font );
     }
@@ -71,22 +69,20 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->check->setMaximumWidth( 48 );
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
         this->grid->addWidget( this->check, 0, 3, 1, 1 );
-	
+
         // set tooltips
         this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
         this->check->setToolTip( this->tr( "Toggle task completion" ));
-    } else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special ) {
+    } else if ( this->task()->type() == TaskEntry::Multi ) {
         this->multi = new QSpinBox();
 
         if ( this->task()->type() == TaskEntry::Multi )
             this->multi->setMaximum( this->task()->multi());
-        else if ( this->task()->type() == TaskEntry::Special )
-            this->multi->setMaximum( 10 );
 
         this->multi->setMaximumWidth( 48 );
         this->connect( this->multi, SIGNAL( editingFinished()), this, SLOT( saveLog()));
         this->grid->addWidget( this->multi, 0, 3, 1, 1 );
-	
+
         // set tooltips
         this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
@@ -96,24 +92,20 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     }
 
     // set up combo button
-    if ( this->task()->type() != TaskEntry::Special ) {
-        this->combo = new QPushButton();
-        this->combo->setMaximumWidth( 32 );
-        this->setComboState( LogEntry::NoCombo );
-        this->grid->addWidget( this->combo, 0, 4, 1, 1 );
-	
-	// set tooltips
-	this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
-    }
+    this->combo = new QPushButton();
+    this->combo->setMaximumWidth( 32 );
+    this->setComboState( LogEntry::NoCombo );
+    this->grid->addWidget( this->combo, 0, 4, 1, 1 );
+
+    // set tooltips
+    this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
 
     // add layout to widget
     this->setLayout( grid );
 
     // connect combo button for updates
-    if ( this->task()->type() != TaskEntry::Special ) {
-        this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
-        this->connect( this->combo, SIGNAL( clicked()), this, SLOT( saveLog()));
-    }
+   this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
+   this->connect( this->combo, SIGNAL( clicked()), this, SLOT( saveLog()));
 }
 
 /*
@@ -136,7 +128,7 @@ void TaskWidget::saveLog() {
             value = true;
         else
             value = false;
-    } else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special ) {
+    } else if ( this->task()->type() == TaskEntry::Multi ) {
         value = this->multi->value();
     } else {
         m.error( StrFatalError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
@@ -165,9 +157,7 @@ void TaskWidget::saveLog() {
     }
     this->log()->setValue( value );
     this->team()->logList.last()->setValue( value );
-
-    if ( this->task()->type() != TaskEntry::Special )
-        this->log()->setCombo( this->comboState());
+    this->log()->setCombo( this->comboState());
 }
 
 /*
@@ -176,11 +166,7 @@ setComboState
 ================
 */
 void TaskWidget::setComboState( LogEntry::Combos combo ) {
-    if  ( this->task()->type() == TaskEntry::Special ) {
-        this->m_comboState = LogEntry::NoCombo;
-        return;
-    } else
-        this->m_comboState = combo;
+    this->m_comboState = combo;
 
     // failsafe
     if ( !this->hasTask()) {
@@ -218,9 +204,6 @@ toggleCombo
 ================
 */
 void TaskWidget::toggleCombo() {
-    if ( this->task()->type() == TaskEntry::Special )
-        return;
-
     // failsafe
     if ( !this->hasTask()) {
         m.error( StrSoftError + this->tr( "task not set\n" ));
@@ -265,13 +248,11 @@ TaskWidget::~TaskWidget() {
 
     // clean up
     delete this->taskName;
-
-    if ( this->task()->type() != TaskEntry::Special )
-        delete this->combo;
+    delete this->combo;
 
     if ( this->task()->type() == TaskEntry::Check )
         delete this->check;
-    else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special )
+    else if ( this->task()->type() == TaskEntry::Multi )
         delete this->multi;
 
     //delete this->points;
@@ -319,12 +300,11 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
     // set values
     if ( this->task()->type() == TaskEntry::Check )
         this->check->setChecked( this->log()->check());
-    else if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special )
+    else if ( this->task()->type() == TaskEntry::Multi )
         this->multi->setValue( this->log()->value());
 
     // set combo
-    if ( this->task()->type() != TaskEntry::Special )
-        this->setComboState( this->log()->combo());
+    this->setComboState( this->log()->combo());
 }
 
 /*
@@ -344,7 +324,7 @@ void TaskWidget::resetLog() {
     // reset values
     if ( this->task()->type() == TaskEntry::Check )
         this->check->setChecked( false );
-    if ( this->task()->type() == TaskEntry::Multi || this->task()->type() == TaskEntry::Special )
+    if ( this->task()->type() == TaskEntry::Multi )
         this->multi->setValue( 0 );
 
     // reset combo

@@ -60,17 +60,15 @@ calculateStatistics
 ================
 */
 void Gui_Rankings::calculateStatistics() {
-    int numParcipiants = 0, numTasks = 0, numChallenges = 0;
+    int numParcipiants = 0, numTasks = 0;
 
     this->ui->tTeams->setText( QString( "%1\n" ).arg( m.teamList.count()));
     foreach ( TeamEntry *teamPtr, m.teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
-        numChallenges += teamPtr->challenges();
     }
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
-    this->ui->tCh->setText( QString( "%1\n" ).arg( numChallenges ));
 }
 
 /*

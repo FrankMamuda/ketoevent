@@ -20,6 +20,9 @@
   <layout class="QVBoxLayout" name="centralLayout">
    <item>
     <widget class="QListView" name="teamList">
+     <property name="toolTip">
+      <string>List of all participating teams</string>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -29,6 +32,9 @@
     <layout class="QGridLayout" name="addRemoveTeamLayout">
      <item row="1" column="0">
       <widget class="QPushButton" name="addTeamButton">
+       <property name="toolTip">
+        <string>Click to add a new team</string>
+       </property>
        <property name="text">
         <string>Add team</string>
        </property>
@@ -40,6 +46,9 @@
      </item>
      <item row="1" column="2">
       <widget class="QPushButton" name="removeTeamButton">
+       <property name="toolTip">
+        <string>Click to remove current team</string>
+       </property>
        <property name="text">
         <string>Remove team</string>
        </property>
@@ -51,6 +60,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QPushButton" name="editTeamButton">
+       <property name="toolTip">
+        <string>Click to edit current team</string>
+       </property>
        <property name="text">
         <string>Edit team</string>
        </property>
@@ -86,6 +98,9 @@
          </item>
          <item row="0" column="1" colspan="3">
           <widget class="QLineEdit" name="teamNameEdit">
+           <property name="toolTip">
+            <string>Type in team's name</string>
+           </property>
            <property name="placeholderText">
             <string>Type team name here</string>
            </property>
@@ -93,18 +108,14 @@
          </item>
          <item row="1" column="3">
           <widget class="QTimeEdit" name="finishTimeEdit">
+           <property name="toolTip">
+            <string>Change team's finish time</string>
+           </property>
            <property name="currentSection">
             <enum>QDateTimeEdit::HourSection</enum>
            </property>
            <property name="displayFormat">
             <string>HH:mm</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="teamMembersLabel">
-           <property name="text">
-            <string>Members</string>
            </property>
           </widget>
          </item>
@@ -115,28 +126,11 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="teamMembersEdit"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QTimeEdit" name="startTimeEdit">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="displayFormat">
-            <string>HH:mm</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="startTimeLabel">
-           <property name="text">
-            <string>Start time</string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="0" colspan="2">
           <widget class="QPushButton" name="doneButton">
+           <property name="toolTip">
+            <string>Click when done editing team</string>
+           </property>
            <property name="text">
             <string>Done</string>
            </property>
@@ -148,12 +142,29 @@
          </item>
          <item row="3" column="2" colspan="2">
           <widget class="QPushButton" name="cancelButton">
+           <property name="toolTip">
+            <string>Click to abort editing</string>
+           </property>
            <property name="text">
             <string>Cancel</string>
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
              <normaloff>:/icons/cancel_16</normaloff>:/icons/cancel_16</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="teamMembersLabel">
+           <property name="text">
+            <string>Members</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="teamMembersEdit">
+           <property name="toolTip">
+            <string>Change number of team members</string>
            </property>
           </widget>
          </item>
@@ -165,6 +176,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Click to close team dialog</string>
+     </property>
      <property name="text">
       <string>Close</string>
      </property>

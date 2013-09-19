@@ -112,8 +112,8 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->taskName->clear();
             this->ui->taskPoints->setValue( 1 );
             this->ui->taskMaxMulti->clear();
-            this->ui->taskChallenge->setChecked( false );
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add task" ));
+            this->ui->taskStyle->setCurrentIndex( 0 );
             break;
 
         case Edit:
@@ -127,17 +127,14 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->taskName->setText( taskPtr->name());
             this->ui->taskPoints->setValue( taskPtr->points());
             this->ui->taskType->setCurrentIndex( static_cast<int>( taskPtr->type()));
+            this->ui->taskStyle->setCurrentIndex( static_cast<int>( taskPtr->style()));
             this->ui->taskMaxMulti->setValue( taskPtr->multi());
-            this->ui->taskChallenge->setChecked( taskPtr->isChallenge());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit task" ));
 
-            if ( taskPtr->type() == TaskEntry::Check || taskPtr->type() == TaskEntry::Special ) {
+            if ( taskPtr->type() == TaskEntry::Check ) {
                 this->ui->taskMaxMulti->setValue( 2 );
                 this->ui->taskMaxMulti->setDisabled( true );
             }
-
-            if ( taskPtr->type() == TaskEntry::Special )
-                this->ui->taskChallenge->setDisabled( true );
 
             break;
 
@@ -205,7 +202,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
-        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), this->ui->taskChallenge->isChecked(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));
+        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()), static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));
     } else if ( this->state() == Edit ) {
         // match by id
         taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
@@ -219,8 +216,8 @@ void Gui_TaskEdit::on_doneButton_clicked() {
         taskPtr->setName( this->ui->taskName->text());
         taskPtr->setPoints( this->ui->taskPoints->value());
         taskPtr->setMulti( this->ui->taskMaxMulti->value());
-        taskPtr->setChallenge( this->ui->taskChallenge->isChecked());
         taskPtr->setType( static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));;
+        taskPtr->setStyle( static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));;
     }
 
     // reset view
@@ -341,19 +338,11 @@ void Gui_TaskEdit::changeTaskType( TaskEntry::Types type ) {
     case TaskEntry::Check:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setDisabled( true );
-        this->ui->taskChallenge->setEnabled( true );
         break;
 
     case TaskEntry::Multi:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setEnabled( true );
-        this->ui->taskChallenge->setEnabled( true );
-        break;
-
-    case TaskEntry::Special:
-        this->ui->taskPoints->setDisabled( true );
-        this->ui->taskMaxMulti->setDisabled( true );
-        this->ui->taskChallenge->setDisabled( true );
         break;
 
     default:

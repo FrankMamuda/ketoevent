@@ -193,3 +193,78 @@ void Gui_Main::on_quickAddButton_clicked() {
     teamEdit.exec();
     this->fillTeams();
 }
+
+/*
+================
+clearButton->clicked
+================
+*/
+void Gui_Main::on_clearButton_clicked() {
+    this->ui->findTaskEdit->clear();
+}
+
+/*
+================
+findTaskEdit->textChanged
+================
+*/
+void Gui_Main::on_findTaskEdit_textChanged( const QString & ) {
+    if ( this->ui->findTaskEdit->palette().color( QPalette::Base ) == QColor( 255, 0, 0, 64 )) {
+        QPalette p( this->ui->findTaskEdit->palette());
+        p.setColor( QPalette::Base, Qt::white );
+        this->ui->findTaskEdit->setPalette( p );
+    }
+}
+
+/*
+================
+findTaskEdit->returnPressed
+================
+*/
+void Gui_Main::on_findTaskEdit_returnPressed() {
+    int y;
+    QString matchString;
+    bool match = false;
+
+    matchString = this->ui->findTaskEdit->text();
+
+    // failsafe
+    if ( matchString.isEmpty())
+        return;
+
+    // advance
+    if ( this->currentMatch >= this->ui->taskList->count() - 1 || this->currentMatch <= 0 )
+        this->currentMatch = 0;
+    else
+        this->currentMatch++;
+
+    // find item from current position
+    for ( y = this->currentMatch; y < this->ui->taskList->count(); y++ ) {
+        if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+            match = true;
+            currentMatch = y;
+            break;
+        }
+    }
+
+    // no match, try again from beginning
+    if ( !match ) {
+        for ( y = 0; y < this->ui->taskList->count(); y++ ) {
+            if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+                match = true;
+                currentMatch = y;
+                break;
+            }
+        }
+    }
+
+    // matched?
+    if ( match ) {
+        this->ui->taskList->setCurrentRow( y );
+    } else {
+        this->ui->taskList->clearSelection();
+        QPalette p( this->ui->findTaskEdit->palette());
+        p.setColor( QPalette::Base, QColor( 255, 0, 0, 64 ));
+        this->ui->findTaskEdit->setPalette( p );
+    }
+}

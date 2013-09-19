@@ -78,12 +78,11 @@ public:
     TaskEntry *taskForName( const QString &name );
     TeamEntry *teamForId( int id );
     TeamEntry *teamForName( const QString &name );
-    int minutes( const QTime &time ) const { return time.hour() * 60 + time.minute(); }
     QString transliterate( const QString &path );
     ConsoleVariable *var( const QString &key );
     void addVariable( ConsoleVariable *varPtr );
-    void addTeam( const QString &teamName, int members, QTime startTime, QTime finishTime );
-    void addTask( const QString &taskName, int points, int multi, bool challenge, TaskEntry::Types type );
+    void addTeam( const QString &teamName, int members, QTime finishTime );
+    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
 
 public slots:

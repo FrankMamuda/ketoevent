@@ -41,7 +41,6 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->listModelPtr = new Gui_TeamListModel( this );
     this->ui->teamList->setModel( listModelPtr );
     this->ui->teamList->setAlternatingRowColors( true );
-    this->ui->startTimeEdit->setMinimumTime( m.var( "time/start" )->time());
     this->ui->finishTimeEdit->setMinimumTime( m.var( "time/start" )->time());
     this->ui->teamMembersEdit->setMinimum( m.var( "members/min" )->integer());
     this->ui->teamMembersEdit->setMaximum( m.var( "members/max" )->integer());
@@ -106,11 +105,12 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
         switch ( state ) {
         case Add:
         case AddQuick:
+        {
             this->ui->teamNameEdit->clear();
-            this->ui->startTimeEdit->setTime( m.var( "time/start" )->time());
-            this->ui->finishTimeEdit->setTime( m.var( "time/finish" )->time());
+            this->ui->finishTimeEdit->setTime( m.var( "time/finish" )->time().addSecs( -60 ));
             this->ui->teamMembersEdit->setValue( m.var( "members/min" )->integer());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
+        }
             break;
 
         case Edit:
@@ -123,7 +123,6 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
             }
 
             this->ui->teamNameEdit->setText( teamPtr->name());
-            this->ui->startTimeEdit->setTime( teamPtr->startTime());
             this->ui->finishTimeEdit->setTime( teamPtr->finishTime());
             this->ui->teamMembersEdit->setValue( teamPtr->members());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit team" ));
@@ -203,7 +202,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add || this->state() == AddQuick ) {
-        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->startTimeEdit->time(), this->ui->finishTimeEdit->time());
+        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time());
     } else if ( this->state() == Edit ) {
         // match name to be sure
         teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
@@ -215,7 +214,6 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
         // set edited data
         teamPtr->setName( this->ui->teamNameEdit->text());
-        teamPtr->setStartTime( this->ui->startTimeEdit->time());
         teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
         teamPtr->setMembers( this->ui->teamMembersEdit->value());
     }

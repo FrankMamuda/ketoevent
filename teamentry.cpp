@@ -63,37 +63,15 @@ points
 ================
 */
 int TeamEntry::points() const {
-    int points = 0, finalTime, timeOnTrack, startTime;
+    int points = 0;
 
-    finalTime = m.minutes( m.var( "time/final" )->time());
-    timeOnTrack = this->timeOnTrack();
-    startTime = m.minutes( m.var( "time/start" )->time());
-
-    if ( startTime + timeOnTrack > finalTime )
+    if ( this->disqualified())
         return 0;
 
     foreach ( LogEntry *logPtr, this->logList )
         points += logPtr->points();
 
     return points;
-}
-
-/*
-================
-challenges
-================
-*/
-int TeamEntry::challenges() const {
-    int challenges = 0;
-
-    foreach ( LogEntry *logPtr, this->logList ) {
-        TaskEntry *taskPtr = m.taskForId( logPtr->taskId());
-
-        if ( taskPtr != NULL )
-            challenges += static_cast<int>( taskPtr->isChallenge());
-    }
-
-    return challenges;
 }
 
 /*
@@ -112,42 +90,11 @@ int TeamEntry::combos() const {
 
 /*
 ================
-grade
-================
-*/
-float TeamEntry::grade() const {
-    float totalGrade = 0.0f;
-    int numSubjects = 0;
-
-    foreach ( TaskEntry *taskPtr, m.taskList ) {
-        if ( taskPtr->type() == TaskEntry::Special )
-            numSubjects++;
-    }
-
-    if ( !numSubjects )
-        return 0.0f;
-
-    foreach ( LogEntry *logPtr, this->logList ) {
-        TaskEntry *taskPtr = m.taskForId( logPtr->taskId());
-
-        if ( taskPtr == NULL )
-            continue;
-
-        if ( taskPtr->type() == TaskEntry::Special )
-            totalGrade += logPtr->points();
-    }
-
-    // round it
-    return floorf(( totalGrade / static_cast<float>( numSubjects )) * 100 + 0.5 ) / 100;
-}
-
-/*
-================
 timeOnTrack
 ================
 */
 int TeamEntry::timeOnTrack() const {
-    return m.minutes( this->finishTime()) - m.minutes( m.var( "time/start" )->time()) + 1;
+    return m.var( "time/start" )->time().secsTo( this->finishTime()) / 60;
 }
 
 /*
@@ -156,12 +103,21 @@ penalty
 ================
 */
 int TeamEntry::penalty() const {
-    int startTime = m.minutes( m.var( "time/start" )->time());
-    int finishTime = m.minutes( m.var( "time/finish" )->time());
-    int timeOnTrack = this->timeOnTrack();
+    int overTime = m.var( "time/finish" )->time().secsTo( this->finishTime()) / 60 + 1;
+    if ( overTime > 0 )
+        return overTime * m.var( "penaltyMultiplier" )->integer();
 
-    if ( startTime + timeOnTrack > finishTime )
-        return (( startTime + timeOnTrack ) - finishTime ) * m.var( "penaltyMultiplier" )->integer();
-    else
-        return 0;
+    return 0;
+}
+
+/*
+================
+disqualified
+================
+*/
+bool TeamEntry::disqualified() const {
+    if (( m.var( "time/final" )->time().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
+        return true;
+
+    return false;
 }
