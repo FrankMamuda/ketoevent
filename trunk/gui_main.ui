@@ -42,6 +42,9 @@
        <layout class="QHBoxLayout" name="layoutTime">
         <item>
          <widget class="QTimeEdit" name="timeFinish">
+          <property name="toolTip">
+           <string>Enter team's finish time here</string>
+          </property>
           <property name="currentSection">
            <enum>QDateTimeEdit::HourSection</enum>
           </property>
@@ -52,6 +55,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="logButton">
+          <property name="toolTip">
+           <string>Set current time</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -86,6 +92,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>Select team from the list</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -114,6 +123,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="toolTip">
+       <string>Log team's accomplished tasks here</string>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
@@ -128,7 +140,10 @@
     <item>
      <layout class="QGridLayout" name="findTaskLayout">
       <item row="0" column="0">
-       <widget class="QLineEdit" name="findTaskButton">
+       <widget class="QLineEdit" name="findTaskEdit">
+        <property name="toolTip">
+         <string>Enter task's name and press ENTER</string>
+        </property>
         <property name="placeholderText">
          <string>Find task by name</string>
         </property>
@@ -136,11 +151,14 @@
       </item>
       <item row="0" column="1">
        <widget class="QToolButton" name="clearButton">
+        <property name="toolTip">
+         <string>Clear task name</string>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="resources.qrc">
           <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
         </property>
        </widget>

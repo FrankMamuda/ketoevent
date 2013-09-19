@@ -49,10 +49,6 @@ TaskEntry::TaskEntry( const QSqlRecord &record, const QString &table ) {
     case Multi:
         break;
 
-    case Special:
-        this->setChallenge( false );
-        break;
-
     default:
         this->setType();
     }
@@ -83,10 +79,6 @@ int TaskEntry::calculate( int logId ) const {
             value += this->points() * this->multi();
         else
             value += this->points() * logPtr->value();
-        break;
-
-    case Special:
-        value += logPtr->value();
         break;
 
     default:

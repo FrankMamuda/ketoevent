@@ -95,6 +95,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QTextEdit" name="appInfo">
+     <property name="toolTip">
+      <string>Comments on the development</string>
+     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -116,6 +119,9 @@ p, li { white-space: pre-wrap; }
     <layout class="QGridLayout" name="buttonLayout">
      <item row="0" column="0">
       <widget class="QPushButton" name="licenseButton">
+       <property name="toolTip">
+        <string>Click to see license data</string>
+       </property>
        <property name="text">
         <string>License</string>
        </property>
@@ -133,6 +139,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="exitButton">
+       <property name="toolTip">
+        <string>Close about dialog</string>
+       </property>
        <property name="text">
         <string>Close</string>
        </property>

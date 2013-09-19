@@ -25,6 +25,9 @@
      </property>
      <item>
       <widget class="QListView" name="taskList">
+       <property name="toolTip">
+        <string>List of all event tasks</string>
+       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
@@ -47,6 +50,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="upButton">
+         <property name="toolTip">
+          <string>Move task up</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -58,6 +64,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="downButton">
+         <property name="toolTip">
+          <string>Move task down</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -85,19 +94,12 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="sortCheck">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Display alphabetically</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QGridLayout" name="findLayout">
      <item row="0" column="0">
       <widget class="QLineEdit" name="findTask">
+       <property name="toolTip">
+        <string>Enter task's name and press ENTER</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -108,11 +110,14 @@
      </item>
      <item row="0" column="1">
       <widget class="QToolButton" name="clearText">
+       <property name="toolTip">
+        <string>Clear task name</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="resources.qrc">
          <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
        </property>
       </widget>
@@ -123,6 +128,9 @@
     <layout class="QGridLayout" name="addRemoveTaskLayout">
      <item row="1" column="0">
       <widget class="QPushButton" name="addTaskButton">
+       <property name="toolTip">
+        <string>Click to add a new task</string>
+       </property>
        <property name="text">
         <string>Add task</string>
        </property>
@@ -134,6 +142,9 @@
      </item>
      <item row="1" column="2">
       <widget class="QPushButton" name="removeTaskButton">
+       <property name="toolTip">
+        <string>Click to remove current task</string>
+       </property>
        <property name="text">
         <string>Remove task</string>
        </property>
@@ -145,6 +156,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QPushButton" name="editTaskButton">
+       <property name="toolTip">
+        <string>Click to edit current task</string>
+       </property>
        <property name="text">
         <string>Edit task</string>
        </property>
@@ -159,8 +173,15 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="toolTip">
+        <string>Sort tasks alphabetically (irreversible)</string>
+       </property>
        <property name="text">
         <string>Sort tasks</string>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/sort_16</normaloff>:/icons/sort_16</iconset>
        </property>
       </widget>
      </item>
@@ -190,6 +211,9 @@
          </item>
          <item row="0" column="1" colspan="3">
           <widget class="QLineEdit" name="taskName">
+           <property name="toolTip">
+            <string>Type in short task description</string>
+           </property>
            <property name="placeholderText">
             <string>Type task name here</string>
            </property>
@@ -218,6 +242,9 @@
          </item>
          <item row="3" column="0" colspan="2">
           <widget class="QPushButton" name="doneButton">
+           <property name="toolTip">
+            <string>Click when done editing task</string>
+           </property>
            <property name="text">
             <string>Done</string>
            </property>
@@ -229,6 +256,9 @@
          </item>
          <item row="3" column="2" colspan="2">
           <widget class="QPushButton" name="cancelButton">
+           <property name="toolTip">
+            <string>Click to abort editing</string>
+           </property>
            <property name="text">
             <string>Cancel</string>
            </property>
@@ -238,18 +268,18 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="2" colspan="2">
-          <widget class="QCheckBox" name="taskChallenge">
-           <property name="text">
-            <string>Challenge</string>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="taskPoints">
+           <property name="toolTip">
+            <string>Points for completion</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="taskPoints"/>
-         </item>
          <item row="1" column="3">
           <widget class="QSpinBox" name="taskMaxMulti">
+           <property name="toolTip">
+            <string>Maximum point multiplier</string>
+           </property>
            <property name="minimum">
             <number>2</number>
            </property>
@@ -257,6 +287,9 @@
          </item>
          <item row="2" column="1">
           <widget class="QComboBox" name="taskType">
+           <property name="toolTip">
+            <string>Task type (either checkbox or a multiplier task)</string>
+           </property>
            <property name="maxCount">
             <number>10</number>
            </property>
@@ -270,9 +303,33 @@
              <string>Multi</string>
             </property>
            </item>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLabel" name="styleLabel">
+           <property name="text">
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QComboBox" name="taskStyle">
+           <property name="toolTip">
+            <string>Style to hilight special tasks</string>
+           </property>
            <item>
             <property name="text">
-             <string>Special</string>
+             <string>Regular</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Bold</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Italic</string>
             </property>
            </item>
           </widget>
@@ -285,6 +342,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Close task dialog</string>
+     </property>
      <property name="text">
       <string>Close</string>
      </property>

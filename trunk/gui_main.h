@@ -52,6 +52,7 @@ public:
     
 private:
     Ui::Gui_Main *ui;
+    int currentMatch;
 
 public slots:
     void fillTeams();
@@ -72,6 +73,9 @@ private slots:
     void on_actionExit_triggered();
     void on_logButton_clicked();
     void on_quickAddButton_clicked();
+    void on_clearButton_clicked();
+    void on_findTaskEdit_textChanged(const QString &arg1);
+    void on_findTaskEdit_returnPressed();
 };
 
 #endif // GUI_MAIN_H

@@ -20,7 +20,7 @@
    <string>Rankings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res_main.qrc">
+   <iconset resource="resources.qrc">
     <normaloff>:/icons/rankings_48</normaloff>:/icons/rankings_48</iconset>
   </property>
   <layout class="QVBoxLayout" name="rankingLayout">
@@ -37,7 +37,11 @@
      </property>
      <layout class="QVBoxLayout" name="layoutTeamRankings">
       <item>
-       <widget class="QTableView" name="rankingView"/>
+       <widget class="QTableView" name="rankingView">
+        <property name="toolTip">
+         <string>Click on column headers, to sort by category</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -71,31 +75,8 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="tchLabel">
-          <property name="text">
-           <string>Total challenges completed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="tCh">
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>16777215</height>
-           </size>
+          <property name="toolTip">
+           <string>Sum of all completed tasks from all teams</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -118,7 +99,7 @@
         <item row="1" column="0">
          <widget class="QLabel" name="tparcLabel">
           <property name="text">
-           <string>Total parcipiants</string>
+           <string>Total participiants</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -132,6 +113,9 @@
             <width>64</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Total number of participiants</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -149,6 +133,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Total number of teams participated in this event</string>
+          </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
@@ -164,11 +151,14 @@
    </item>
    <item>
     <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Close rankings dialog</string>
+     </property>
      <property name="text">
       <string>Close</string>
      </property>
      <property name="icon">
-      <iconset resource="res_main.qrc">
+      <iconset resource="resources.qrc">
        <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
      </property>
     </widget>
@@ -176,7 +166,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="res_main.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections>
   <connection>
