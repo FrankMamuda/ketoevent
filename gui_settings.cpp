@@ -24,6 +24,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_settings.h"
 #include "ui_gui_settings.h"
 #include <QFileDialog>
+#include <QTextStream>
 
 /*
 ================
@@ -114,4 +115,29 @@ void Gui_Settings::on_buttonImport_clicked() {
     // this is somewhat risky
     QString filename = QFileDialog::getOpenFileName( this, this->tr( "Load log database" ), QDir::currentPath(), this->tr( "sqlite database (*.db)" ));
     m.importDatabase( filename );
+}
+
+/*
+================
+buttonExportCSV->clicked
+================
+*/
+void Gui_Settings::on_buttonExportCSV_clicked() {
+    QString path( QDir::currentPath() + "/tasks.csv" );
+    QFile csv( path );
+
+    if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
+        QTextStream out( &csv );
+        out.setCodec( "UTF-8" );
+        out << this->tr( "name;type;style;points;multi\n" );
+        foreach ( TaskEntry *taskPtr, m.taskList ) {
+            out << QString( "%1;%2;%3;%4;%5\n" )
+                   .arg( taskPtr->name())
+                   .arg( taskPtr->type())
+                   .arg( taskPtr->style())
+                   .arg( taskPtr->points())
+                   .arg( taskPtr->multi());
+        }
+    }
+    csv.close();
 }

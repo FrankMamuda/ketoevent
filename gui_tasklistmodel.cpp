@@ -38,7 +38,12 @@ QVariant Gui_TaskListModel::data( const QModelIndex &index, int role ) const {
 
     // just supply view with team names from global list
     if ( role == Qt::DisplayRole ) {
-        return m.taskList.at( index.row())->name();
+        TaskEntry *taskPtr = m.taskList.at( index.row());
+
+        if ( taskPtr->type() == TaskEntry::Multi )
+            return QString( "%1 (%2x%3)" ).arg( taskPtr->name()).arg( taskPtr->points()).arg( taskPtr->multi());
+        else
+            return QString( "%1 (%2)" ).arg( taskPtr->name()).arg( taskPtr->points());
     } else if ( role == Qt::FontRole ) {
         TaskEntry *taskPtr = m.taskList.at( index.row());
         QFont font;
