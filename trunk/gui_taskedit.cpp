@@ -78,6 +78,7 @@ void Gui_TaskEdit::toggleView( ViewState viewState ) {
     this->ui->addTaskButton->setEnabled( state );
     this->ui->removeTaskButton->setEnabled( state );
     this->ui->editTaskButton->setEnabled( state );
+    this->ui->sortButton->setEnabled( state );
     this->ui->closeButton->setEnabled( state );
     this->ui->taskList->setEnabled( state );
     this->ui->closeButton->setDefault( state );

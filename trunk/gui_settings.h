@@ -62,6 +62,8 @@ private slots:
     void on_buttonImport_clicked();
     void updateDrunkMode( const QString &, const QString & );
 
+    void on_buttonExportCSV_clicked();
+
 private:
     Ui::Gui_Settings *ui;
     bool m_variablesLocked;

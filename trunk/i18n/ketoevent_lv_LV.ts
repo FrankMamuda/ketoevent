@@ -473,87 +473,102 @@ kopā</translation>
         <translation>Komanda tiek diskvalificēta pēc šī laika</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="93"/>
+        <location filename="../gui_settings.ui" line="230"/>
+        <source>Export task list in CSV format</source>
+        <translation>Eksportēt uzdevumus CSV formātā</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="233"/>
+        <source>Export tasks as &quot;.CSV&quot;</source>
+        <translation>Uzdevumi uz &quot;.CSV&quot;</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="250"/>
         <source>Close settings dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="96"/>
+        <location filename="../gui_settings.ui" line="253"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="110"/>
+        <location filename="../gui_settings.ui" line="93"/>
         <source>Points</source>
         <translation>Punkti</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="116"/>
+        <location filename="../gui_settings.ui" line="99"/>
         <source>Penalty mutiplier</source>
         <translation>Sods (min)</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="123"/>
+        <location filename="../gui_settings.ui" line="106"/>
         <source>Penalty points for every minute past finish time</source>
         <translation>Soda punkti par katru minūti pēc finiša laika</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="130"/>
+        <location filename="../gui_settings.ui" line="113"/>
         <source>Triple combo</source>
         <translation>3x kombinācija</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="137"/>
+        <location filename="../gui_settings.ui" line="120"/>
         <source>Single combo</source>
         <translation>1x kombinācija</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="144"/>
+        <location filename="../gui_settings.ui" line="127"/>
         <source>Points for two tasks in one picture</source>
         <translation>Punkti par diviem uzdevumiem vienā bildē</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="154"/>
+        <location filename="../gui_settings.ui" line="137"/>
         <source>Double combo</source>
         <translation>2x kombinācija</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="161"/>
+        <location filename="../gui_settings.ui" line="144"/>
         <source>Points for three tasks in one picture</source>
         <translation>Punkti par trīs uzdevumiem vienā bildē</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="171"/>
+        <location filename="../gui_settings.ui" line="154"/>
         <source>Points for four or more tasks in one picture</source>
         <translation>Punkti par četriem uzdevumiem vienā bildē</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="184"/>
+        <location filename="../gui_settings.ui" line="167"/>
         <source>Misc</source>
         <translation>Papildus uzstādījumi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="190"/>
+        <location filename="../gui_settings.ui" line="173"/>
         <source>Minimum members</source>
         <translation>Minimālais dalībnieku skaits</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="197"/>
+        <location filename="../gui_settings.ui" line="180"/>
         <source>Minimum members in a team</source>
         <translation>Minimālais dalībnieku skaits komandā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="207"/>
+        <location filename="../gui_settings.ui" line="190"/>
         <source>Maximum members</source>
         <translation>Maksimālais dalībnieku skaits</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="214"/>
+        <location filename="../gui_settings.ui" line="197"/>
         <source>Maximum members in a team</source>
         <translation>Maksimālais dalībnieku skaits komandā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="227"/>
+        <location filename="../gui_settings.ui" line="210"/>
+        <source>Data</source>
+        <translation>Dati</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="216"/>
         <source>Import log database from a different machine (beta)</source>
         <translation>Importēt datubāzi no cita datora (beta)</translation>
     </message>
@@ -562,19 +577,25 @@ kopā</translation>
         <translation type="obsolete">Kārtot uzdevumus alfabētiski</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="230"/>
+        <location filename="../gui_settings.ui" line="219"/>
         <source>Import database</source>
         <translation>Importēt datubāzi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="115"/>
+        <location filename="../gui_settings.cpp" line="116"/>
         <source>Load log database</source>
         <translation>Importēt sprunguļu datubāzi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="115"/>
+        <location filename="../gui_settings.cpp" line="116"/>
         <source>sqlite database (*.db)</source>
         <translation>sqlite datubāze (*.db)</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.cpp" line="132"/>
+        <source>name;type;style;points;multi
+</source>
+        <translation>nosaukums;tips;stils;punkti;multi</translation>
     </message>
 </context>
 <context>
@@ -632,7 +653,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_taskedit.ui" line="135"/>
-        <location filename="../gui_taskedit.cpp" line="115"/>
+        <location filename="../gui_taskedit.cpp" line="116"/>
         <source>Add task</source>
         <translation>Pievienot</translation>
     </message>
@@ -653,7 +674,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_taskedit.ui" line="163"/>
-        <location filename="../gui_taskedit.cpp" line="132"/>
+        <location filename="../gui_taskedit.cpp" line="133"/>
         <source>Edit task</source>
         <translation>Labot</translation>
     </message>
@@ -791,7 +812,7 @@ kopā</translation>
         <translation>Aizvērt</translation>
     </message>
     <message>
-        <location filename="../gui_taskedit.cpp" line="194"/>
+        <location filename="../gui_taskedit.cpp" line="195"/>
         <source>Please specify task name</source>
         <translation>Norādiet uzdevuma nosaukumu</translation>
     </message>
