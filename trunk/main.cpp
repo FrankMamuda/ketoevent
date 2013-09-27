@@ -118,7 +118,7 @@ error
 void Main::error( ErrorTypes type, const QString &msg ) {
     if ( type == FatalError ) {
         this->print( this->tr( "FATAL ERROR: %1" ).arg( msg ));
-        this->shutdown();
+        this->shutdown( true );
     } else
         this->print( this->tr( "ERROR: %1" ).arg( msg ));
 }
@@ -128,7 +128,7 @@ void Main::error( ErrorTypes type, const QString &msg ) {
 shutdown
 ================
 */
-void Main::shutdown() {
+void Main::shutdown( bool ignoreDatabase ) {
     QSqlQuery query;
 
     // save settings
@@ -136,11 +136,13 @@ void Main::shutdown() {
     delete this->settings;
 
     // delete orphaned logs on shutdown
-    this->deleteOrphanedLogs();
+    if ( !ignoreDatabase ) {
+        this->deleteOrphanedLogs();
 
-    // close database
-    QSqlDatabase db = QSqlDatabase::database();
-    db.close();
+        // close database
+        QSqlDatabase db = QSqlDatabase::database();
+        db.close();
+    }
 
     // clear console vars
     foreach ( ConsoleVariable *varPtr, this->varList )
@@ -278,26 +280,32 @@ loadDatabase
 ================
 */
 void Main::loadDatabase() {
-    QString path( QDir::currentPath() + "/ketoevent.db" );
-    QFile database( path );
+#ifdef Q_OS_UNIX
+    // use homepath on unices since app can be executed from /usr/bin
+    this->databasePath = QString( QDir::homePath() + "/.ketoevent/ketoevent.db" );
+#else
+    this->databasePath = QString( QDir::currentPath() + "/ketoevent.db" );
+#endif
+    QFile database( this->databasePath );
+    QSqlDatabase db;
+
+    // failsafe
+    if ( !db.isDriverAvailable( "QSQLITE" ))
+        m.error( StrFatalError + this->tr( "sqlite not present on the system\n" ));
 
     // set sqlite driver
-    QSqlDatabase db;
     db = QSqlDatabase::addDatabase( "QSQLITE" );
 
     // touch file if empty
     if ( !database.exists()) {
         database.open( QFile::WriteOnly );
-        qDebug() << "touch" << path;
         database.close();
     }
 
     // set path and open
-    db.setDatabaseName( path );
-    if ( !db.open()) {
-        qDebug() << "bad db";
+    db.setDatabaseName( this->databasePath );
+    if ( !db.open())
         m.error( StrFatalError + this->tr( "could not load task database\n" ));
-    }
 
     // create query
     QSqlQuery query;
@@ -306,8 +314,8 @@ void Main::loadDatabase() {
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finish varchar( 5 ))" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, taskId integer, teamId integer )" )
-         // !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, foreign key( taskId ) references tasks( id ), foreign key( teamId ) references teams( id ))" )
          ) {
+        m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
     }
 
     // delete orphaned logs on init

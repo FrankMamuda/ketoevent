@@ -64,6 +64,8 @@ private slots:
 
     void on_buttonExportCSV_clicked();
 
+    void on_buttonExport_clicked();
+
 private:
     Ui::Gui_Settings *ui;
     bool m_variablesLocked;

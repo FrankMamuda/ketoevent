@@ -84,10 +84,11 @@ public:
     void addTeam( const QString &teamName, int members, QTime finishTime );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
+    QString databasePath;
 
 public slots:
     void initialize();
-    void shutdown();
+    void shutdown( bool ignoreDatabase = false );
     void loadDatabase();
     void importDatabase( const QString &path );
     void loadTasks();

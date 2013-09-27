@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>331</height>
+    <width>341</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupTime">
      <property name="title">
       <string>Event schedule</string>
@@ -87,7 +87,7 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="0" column="2">
     <widget class="QGroupBox" name="groupPoints">
      <property name="title">
       <string>Points</string>
@@ -161,7 +161,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0" colspan="3">
     <widget class="QGroupBox" name="groupMisc">
      <property name="title">
       <string>Misc</string>
@@ -204,12 +204,12 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0" rowspan="3" colspan="3">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Data</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QPushButton" name="buttonImport">
         <property name="toolTip">
@@ -221,6 +221,20 @@
         <property name="icon">
          <iconset resource="resources.qrc">
           <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonExport">
+        <property name="toolTip">
+         <string>Make a copy of the current database</string>
+        </property>
+        <property name="text">
+         <string>Export database</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
         </property>
        </widget>
       </item>
@@ -239,12 +253,9 @@
        </widget>
       </item>
      </layout>
-     <zorder>buttonExportCSV</zorder>
-     <zorder>buttonExportCSV</zorder>
-     <zorder>buttonImport</zorder>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="5" column="0" colspan="3">
     <widget class="QPushButton" name="closeButton">
      <property name="toolTip">
       <string>Close settings dialog</string>
