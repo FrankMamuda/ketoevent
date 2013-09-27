@@ -474,21 +474,31 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_settings.ui" line="230"/>
+        <source>Make a copy of the current database</source>
+        <translation>Izveidot datubāzes kopiju</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="233"/>
+        <source>Export database</source>
+        <translation>Eksportēt datubāzi</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="244"/>
         <source>Export task list in CSV format</source>
         <translation>Eksportēt uzdevumus CSV formātā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="233"/>
+        <location filename="../gui_settings.ui" line="247"/>
         <source>Export tasks as &quot;.CSV&quot;</source>
         <translation>Uzdevumi uz &quot;.CSV&quot;</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="250"/>
+        <location filename="../gui_settings.ui" line="261"/>
         <source>Close settings dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="253"/>
+        <location filename="../gui_settings.ui" line="264"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
@@ -596,6 +606,11 @@ kopā</translation>
         <source>name;type;style;points;multi
 </source>
         <translation>nosaukums;tips;stils;punkti;multi</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.cpp" line="151"/>
+        <source>Database (*.db)</source>
+        <translation>Datubāze (*.db)</translation>
     </message>
 </context>
 <context>
@@ -964,16 +979,32 @@ kopā</translation>
         <translation>ZIVS: %1</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="299"/>
-        <source>could not load task database
+        <location filename="../main.cpp" line="294"/>
+        <source>sqlite not present on the system
 </source>
-        <translation>nebija iespējams ielādēt datubāzi</translation>
+        <translation>sqlite nav pieejams
+</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="705"/>
+        <location filename="../main.cpp" line="308"/>
+        <source>could not load task database
+</source>
+        <translation>nebija iespējams ielādēt datubāzi
+</translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="318"/>
+        <source>could not create internal database structure
+</source>
+        <translation>nevarēja izveidot datubāzes struktūru
+</translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="713"/>
         <source>unknown list type &quot;%1&quot;
 </source>
-        <translation>nezināms  saraksta veids - &quot;%1&quot;</translation>
+        <translation>nezināms  saraksta veids - &quot;%1&quot;
+</translation>
     </message>
 </context>
 <context>

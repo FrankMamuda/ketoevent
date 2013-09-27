@@ -141,3 +141,13 @@ void Gui_Settings::on_buttonExportCSV_clicked() {
     }
     csv.close();
 }
+
+/*
+================
+buttonExport->clicked
+================
+*/
+void Gui_Settings::on_buttonExport_clicked() {
+    QString path = QFileDialog::getSaveFileName( this, "Export databsae", QDir::homePath(), this->tr( "Database (*.db)" ));
+    QFile::copy( m.databasePath, path );
+}
