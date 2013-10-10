@@ -54,7 +54,7 @@ public:
     explicit TaskEntry( const QSqlRecord &record, const QString &table );
     QString name() const { return this->record().value( "name" ).toString(); }
     int points() const { return this->record().value( "points" ).toInt(); }
-    int multi() const { return this->record().value( "multi" ).toInt(); }
+    int multi() const { if ( this->type() == Multi ) return this->record().value( "multi" ).toInt(); else return 0; }
     Types type() const { return static_cast<Types>( this->record().value( "type" ).toInt()); }
     Styles style() const { return static_cast<Styles>( this->record().value( "style" ).toInt()); }
     int order() const { return this->record().value( "parent" ).toInt(); }
@@ -63,7 +63,7 @@ public slots:
     int calculate( int logId ) const;
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setPoints( int points = 0 ) { this->setValue( "points", points ); }
-    void setMulti( int multi = 0 ) { this->setValue( "multi", multi ); }
+    void setMulti( int multi = 2 ) { if ( this->type() == Multi ) this->setValue( "multi", multi ); else this->setValue( "multi", 0 ); }
     void setType( Types type = Check ) { this->setValue( "type", static_cast<int>( type )); }
     void setStyle( Styles style = NoStyle ) { this->setValue( "style", static_cast<int>( style )); }
     void setOrder( int order = 0 ) { if ( order >= 0 ) this->setValue( "parent", order ); }

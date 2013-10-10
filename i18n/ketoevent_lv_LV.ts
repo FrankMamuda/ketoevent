@@ -23,7 +23,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:16pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;Ketonu kausat&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;Ketonu kausa&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;sprunguļotājs&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;sqlite versija&lt;/span&gt;&lt;/p&gt;
@@ -34,7 +34,7 @@ p, li { white-space: pre-wrap; }
         <source>Comments on the development</source>
         <translation>Komentāri par programmas izstrādi</translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../gui_about.ui" line="105"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -602,13 +602,22 @@ kopā</translation>
         <translation>sqlite datubāze (*.db)</translation>
     </message>
     <message>
+        <location filename="../gui_settings.cpp" line="126"/>
+        <source>CSV file (*.csv)</source>
+        <translation>CSV fails (*.csv)</translation>
+    </message>
+    <message>
         <location filename="../gui_settings.cpp" line="132"/>
-        <source>name;type;style;points;multi
-</source>
+        <source>name;type;style;points;multi</source>
         <translation>nosaukums;tips;stils;punkti;multi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="151"/>
+        <source>name;type;style;points;multi
+</source>
+        <translation type="obsolete">nosaukums;tips;stils;punkti;multi</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.cpp" line="160"/>
         <source>Database (*.db)</source>
         <translation>Datubāze (*.db)</translation>
     </message>
