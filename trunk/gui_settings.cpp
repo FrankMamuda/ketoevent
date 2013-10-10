@@ -123,20 +123,29 @@ buttonExportCSV->clicked
 ================
 */
 void Gui_Settings::on_buttonExportCSV_clicked() {
-    QString path( QDir::currentPath() + "/tasks.csv" );
+    QString path = QFileDialog::getSaveFileName( this, "Export tasks to csv format", QDir::homePath(), this->tr( "CSV file (*.csv)" ));
     QFile csv( path );
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &csv );
         out.setCodec( "UTF-8" );
-        out << this->tr( "name;type;style;points;multi\n" );
+        out << this->tr( "name;type;style;points;multi" )
+#ifdef Q_OS_WIN
+               .append( "\r" )
+#endif
+               .append( "\n" );
         foreach ( TaskEntry *taskPtr, m.taskList ) {
-            out << QString( "%1;%2;%3;%4;%5\n" )
+            out << QString( "%1;%2;%3;%4;%5%6" )
                    .arg( taskPtr->name())
                    .arg( taskPtr->type())
                    .arg( taskPtr->style())
                    .arg( taskPtr->points())
-                   .arg( taskPtr->multi());
+                   .arg( taskPtr->multi())
+#ifdef Q_OS_WIN
+                   .arg( "\r\n" );
+#else
+                   .arg( "\n" );
+#endif
         }
     }
     csv.close();
@@ -148,6 +157,6 @@ buttonExport->clicked
 ================
 */
 void Gui_Settings::on_buttonExport_clicked() {
-    QString path = QFileDialog::getSaveFileName( this, "Export databsae", QDir::homePath(), this->tr( "Database (*.db)" ));
+    QString path = QFileDialog::getSaveFileName( this, "Export database", QDir::homePath(), this->tr( "Database (*.db)" ));
     QFile::copy( m.databasePath, path );
 }

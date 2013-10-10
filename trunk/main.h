@@ -34,7 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "consolevariable.h"
 
 // message macro
-#if ( _MSC_VER >= 1500 && _MSC_VER < 1600 )
+#ifdef Q_CC_MSVC
 #define ClassFunc QString( "%1::%2: " ).arg( this->metaObject()->className()).arg( __FUNCTION__ )
 #else
 #define ClassFunc QString( "%1::%2: " ).arg( this->metaObject()->className()).arg( __func__ )
