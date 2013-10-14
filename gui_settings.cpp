@@ -34,6 +34,12 @@ construct
 Gui_Settings::Gui_Settings( QWidget *parent ) : QDialog(parent), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
     this->intializeVariables();
+
+#ifdef Q_OS_ANDROID
+    // android fullscreen fix
+    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
+    this->setGeometry( wPtr->geometry());
+#endif
 }
 
 /*
@@ -112,9 +118,16 @@ buttonImport->clicked
 ================
 */
 void Gui_Settings::on_buttonImport_clicked() {
+    QString path;
+
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getOpenFileName( this, this->tr( "Load log database" ), "/sdcard/", this->tr( "sqlite database (*.db)" ));
+#else
+    path = QFileDialog::getOpenFileName( this, this->tr( "Load log database" ), QDir::currentPath(), this->tr( "sqlite database (*.db)" ));
+#endif
+
     // this is somewhat risky
-    QString filename = QFileDialog::getOpenFileName( this, this->tr( "Load log database" ), QDir::currentPath(), this->tr( "sqlite database (*.db)" ));
-    m.importDatabase( filename );
+    m.importDatabase( path );
 }
 
 /*
@@ -123,7 +136,12 @@ buttonExportCSV->clicked
 ================
 */
 void Gui_Settings::on_buttonExportCSV_clicked() {
-    QString path = QFileDialog::getSaveFileName( this, "Export tasks to csv format", QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+    QString path;
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export tasks to csv format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
+#else
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export tasks to csv format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+#endif
     QFile csv( path );
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
@@ -157,6 +175,11 @@ buttonExport->clicked
 ================
 */
 void Gui_Settings::on_buttonExport_clicked() {
-    QString path = QFileDialog::getSaveFileName( this, "Export database", QDir::homePath(), this->tr( "Database (*.db)" ));
+    QString path;
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export database" ), "/sdcard/", this->tr( "Database (*.db)" ));
+#else
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export database" ), QDir::homePath(), this->tr( "Database (*.db)" ));
+#endif
     QFile::copy( m.databasePath, path );
 }

@@ -52,6 +52,12 @@ void Gui_Main::initialize() {
     // fill in tasks and teams
     this->fillTeams();
     this->fillTasks();
+
+    // no icon text for android
+#ifdef Q_OS_ANDROID
+    this->ui->mainToolBar->setToolButtonStyle( Qt::ToolButtonIconOnly );
+    this->ui->mainToolBar->removeAction( this->ui->actionExit );
+#endif
 }
 
 /*
@@ -108,11 +114,12 @@ updateFinishTime
 */
 void Gui_Main::updateFinishTime( QTime time ) {
     TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr != NULL )
+    if ( teamPtr != NULL ) {
         if ( time == teamPtr->finishTime())
             return;
 
-    teamPtr->setFinishTime( time );
+        teamPtr->setFinishTime( time );
+    }
 }
 
 /*

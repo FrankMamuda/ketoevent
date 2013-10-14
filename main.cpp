@@ -280,12 +280,30 @@ loadDatabase
 ================
 */
 void Main::loadDatabase() {
+    QString path;
+
 #ifdef Q_OS_UNIX
-    // use homepath on unices since app can be executed from /usr/bin
-    this->databasePath = QString( QDir::homePath() + "/.ketoevent/ketoevent.db" );
+#ifdef Q_OS_ANDROID
+    path = QString( "/sdcard/data/org.factory12.ketoevent3/" );
 #else
-    this->databasePath = QString( QDir::currentPath() + "/ketoevent.db" );
+    path = QString( QDir::homePath() + "/.ketoevent/" );
 #endif
+#else
+    path = QString( QDir::currentPath() + "/" );
+#endif
+
+    // make path id nonexistant
+    QDir dir( path );
+    if ( !dir.exists()) {
+        dir.mkpath( path );
+        if ( !dir.exists()) {
+            m.error( StrFatalError + this->tr( "could not create database path\n" ));
+            return;
+        }
+    }
+
+    // create database
+    this->databasePath = path + "ketoevent.db";
     QFile database( this->databasePath );
     QSqlDatabase db;
 
@@ -298,22 +316,9 @@ void Main::loadDatabase() {
 
     // touch file if empty
     if ( !database.exists()) {
-        QFileInfo fi( database );
-        QDir dir = fi.absoluteDir();
-
-        if ( !dir.exists()) {
-            dir.mkpath( dir.absolutePath());
-            if ( !dir.exists()) {
-                m.error( StrFatalError + this->tr( "could not create database path\n" ));
-                return;
-            }
-        }
-
         database.open( QFile::WriteOnly );
         database.close();
     }
-
-
 
     // set path and open
     db.setDatabaseName( this->databasePath );
@@ -753,7 +758,11 @@ int main( int argc, char *argv[] ) {
 
     // init main window
     Gui_Main gui;
+#ifdef Q_OS_ANDROID
+    gui.showMaximized();
+#else
     gui.show();
+#endif
 
     // initialize application
     m.initialize();

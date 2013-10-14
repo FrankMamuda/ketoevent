@@ -23,7 +23,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "gui_license.h"
 #include "ui_gui_license.h"
-#include <QDialog>
 
 /*
 ================
@@ -36,6 +35,15 @@ Gui_License::Gui_License( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui
 #ifdef Q_OS_MAC
     // fixes ugly mac font
     ui->licenseContainer->setHtml( ui->licenseContainer->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
+#endif
+
+#ifdef Q_OS_ANDROID
+    // android fullscreen fix
+    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
+    this->setGeometry( wPtr->geometry());
+
+    // this does not work on android
+    this->ui->aboutQtButton->setDisabled( true );
 #endif
 }
 
