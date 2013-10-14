@@ -23,6 +23,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "gui_license.h"
 #include "ui_gui_license.h"
+#include <QDialog>
 
 /*
 ================
