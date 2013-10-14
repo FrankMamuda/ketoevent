@@ -298,9 +298,22 @@ void Main::loadDatabase() {
 
     // touch file if empty
     if ( !database.exists()) {
+        QFileInfo fi( database );
+        QDir dir = fi.absoluteDir();
+
+        if ( !dir.exists()) {
+            dir.mkpath( dir.absolutePath());
+            if ( !dir.exists()) {
+                m.error( StrFatalError + this->tr( "could not create database path\n" ));
+                return;
+            }
+        }
+
         database.open( QFile::WriteOnly );
         database.close();
     }
+
+
 
     // set path and open
     db.setDatabaseName( this->databasePath );
