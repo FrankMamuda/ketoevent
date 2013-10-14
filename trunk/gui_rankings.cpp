@@ -45,13 +45,21 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->ui->rankingView->setModel( proxyModel );
     this->proxyModel->sort( Gui_RankingModel::Points, Qt::DescendingOrder );
     this->ui->rankingView->resizeColumnsToContents();
-    this->ui->rankingView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     // set stats
     this->calculateStatistics();
 
+#ifdef Q_OS_ANDROID
+    // android fullscreen fix
+    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
+    this->setGeometry( wPtr->geometry());
+#else
     // scale window to contents
     this->rescaleWindow();
+
+    // disable horizontal scrollbar
+    this->ui->rankingView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+#endif
 }
 
 /*

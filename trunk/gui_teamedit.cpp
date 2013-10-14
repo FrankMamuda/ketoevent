@@ -50,6 +50,12 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
 
     // connect
     this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));
+
+#ifdef Q_OS_ANDROID
+    // android fullscreen fix
+    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
+    this->setGeometry( wPtr->geometry());
+#endif
 }
 
 /*

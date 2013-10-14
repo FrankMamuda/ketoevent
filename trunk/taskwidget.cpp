@@ -47,12 +47,12 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->grid = new QGridLayout();
     this->taskName = new QLabel( this->task()->name());
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
-#ifdef Q_OS_MAC
-    // fix ugly spinbox on mac, win32
+
+    // fix ugly spinbox on mac, win32 (and systems with DPI!=96)
     this->grid->setMargin( 0 );
-#elif defined( Q_OS_WIN )
-    this->grid->setMargin( 2 );
-#endif
+
+    // get font
+    font = this->taskName->font();
 
     // set appropriate font
     if ( this->task()->style() == TaskEntry::Italic ) {
@@ -60,13 +60,20 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->taskName->setFont( font );
     } else if ( this->task()->style() == TaskEntry::Bold ) {
         font.setBold( true );
-        this->taskName->setFont( font );
     }
+
+    // set font
+    this->taskName->setFont( font );
 
     // determine type
     if ( this->task()->type() == TaskEntry::Check ) {
-        this->check = new QCheckBox();
+        this->check = new QCheckBox();        
         this->check->setMaximumWidth( 48 );
+#ifdef Q_OS_ANDROID
+        this->check->setStyleSheet( "QCheckBox::indicator { width: 32px; height: 32px; }" );
+#endif
+        this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2);
+
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
         this->grid->addWidget( this->check, 0, 3, 1, 1 );
 
@@ -79,7 +86,12 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         if ( this->task()->type() == TaskEntry::Multi )
             this->multi->setMaximum( this->task()->multi());
 
+#ifdef Q_OS_ANDROID
+        this->multi->setMaximumWidth( 96 );
+        this->multi->setStyleSheet( "QSpinBox::up-button { subcontrol-position: right; width: 32px; height: 32px; } QSpinBox::down-button { subcontrol-position: left; width: 32px; height: 32px; }" );
+#else
         this->multi->setMaximumWidth( 48 );
+#endif
         this->connect( this->multi, SIGNAL( editingFinished()), this, SLOT( saveLog()));
         this->grid->addWidget( this->multi, 0, 3, 1, 1 );
 
@@ -93,7 +105,12 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // set up combo button
     this->combo = new QPushButton();
+#ifdef Q_OS_ANDROID
+    // make it larger for easier hits
+    this->combo->setMaximumWidth( 96 );
+#else
     this->combo->setMaximumWidth( 32 );
+#endif
     this->setComboState( LogEntry::NoCombo );
     this->grid->addWidget( this->combo, 0, 4, 1, 1 );
 

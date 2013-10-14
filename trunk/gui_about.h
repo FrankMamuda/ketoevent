@@ -32,7 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespaces
 //
 namespace Ui {
-    class Gui_About;
+class Gui_About;
 }
 
 //
@@ -50,7 +50,10 @@ private:
     Ui::Gui_About *m_ui;
 
 private slots:
-    void on_licenseButton_clicked() { Gui_License license; license.exec(); }
+    void on_licenseButton_clicked() {
+        Gui_License license( this );
+        license.exec();
+    }
 };
 
 #endif // GUI_ABOUT_H
