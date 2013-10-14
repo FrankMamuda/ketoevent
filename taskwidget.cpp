@@ -69,9 +69,6 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     if ( this->task()->type() == TaskEntry::Check ) {
         this->check = new QCheckBox();        
         this->check->setMaximumWidth( 48 );
-#ifdef Q_OS_ANDROID
-        this->check->setStyleSheet( "QCheckBox::indicator { width: 32px; height: 32px; }" );
-#endif
         this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2);
 
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
@@ -86,10 +83,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         if ( this->task()->type() == TaskEntry::Multi )
             this->multi->setMaximum( this->task()->multi());
 
-#ifdef Q_OS_ANDROID
-        this->multi->setMaximumWidth( 96 );
-        this->multi->setStyleSheet( "QSpinBox::up-button { subcontrol-position: right; width: 32px; height: 32px; } QSpinBox::down-button { subcontrol-position: left; width: 32px; height: 32px; }" );
-#else
+#ifndef Q_OS_ANDROID
         this->multi->setMaximumWidth( 48 );
 #endif
         this->connect( this->multi, SIGNAL( editingFinished()), this, SLOT( saveLog()));

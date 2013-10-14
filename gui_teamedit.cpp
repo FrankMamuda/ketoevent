@@ -198,8 +198,12 @@ void Gui_TeamEdit::on_doneButton_clicked() {
     if ( this->ui->teamNameEdit->text().isEmpty()) {
         QMessageBox msgBox;
         msgBox.setText( this->tr( "Please specify team name" ));
-        msgBox.setIcon( QMessageBox::Information );
+        msgBox.setIcon( QMessageBox::Information );  
         msgBox.exec();
+
+#ifdef Q_OS_ANDROID
+        msgBox.setGeometry( this->geometry());
+#endif
         return;
     }
 

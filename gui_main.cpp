@@ -57,8 +57,45 @@ void Gui_Main::initialize() {
 #ifdef Q_OS_ANDROID
     this->ui->mainToolBar->setToolButtonStyle( Qt::ToolButtonIconOnly );
     this->ui->mainToolBar->removeAction( this->ui->actionExit );
+
+    // moving through teamlist is complicated on android
+    // since QComboBox is somewhat fucked up
+    QPushButton *upPtr = new QPushButton( QIcon( ":/icons/up_16" ), " " );
+    QPushButton *dwPtr = new QPushButton( QIcon( ":/icons/down_16" ), " " );
+    this->ui->teamLayout->insertWidget( 1, upPtr );
+    this->ui->teamLayout->insertWidget( 2, dwPtr );
+    this->connect( upPtr, SIGNAL( clicked()), this, SLOT( on_upButton_clicked()));
+    this->connect( dwPtr, SIGNAL( clicked()), this, SLOT( on_downButton_clicked()));
 #endif
 }
+
+/*
+================
+on_downButton_clicked
+================
+*/
+#ifdef Q_OS_ANDROID
+void Gui_Main::on_upButton_clicked() {
+    int index = this->ui->comboTeams->currentIndex();
+    index--;
+    if ( index >= 0 && index < this->ui->comboTeams->count())
+        this->ui->comboTeams->setCurrentIndex( index );
+}
+#endif
+
+/*
+================
+on_downButton_clicked
+================
+*/
+#ifdef Q_OS_ANDROID
+void Gui_Main::on_downButton_clicked() {
+    int index = this->ui->comboTeams->currentIndex();
+    index++;
+    if ( index >= 0 && index < this->ui->comboTeams->count())
+        this->ui->comboTeams->setCurrentIndex( index );
+}
+#endif
 
 /*
 ================

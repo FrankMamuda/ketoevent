@@ -76,6 +76,10 @@ private slots:
     void on_clearButton_clicked();
     void on_findTaskEdit_textChanged(const QString &arg1);
     void on_findTaskEdit_returnPressed();
+#ifdef Q_OS_ANDROID
+    void on_upButton_clicked();
+    void on_downButton_clicked();
+#endif
 };
 
 #endif // GUI_MAIN_H

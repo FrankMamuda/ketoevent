@@ -759,6 +759,7 @@ int main( int argc, char *argv[] ) {
     // init main window
     Gui_Main gui;
 #ifdef Q_OS_ANDROID
+    app.setStyleSheet( "QTimeEdit { width: 128px; } QTimeEdit::up-button { subcontrol-position: right; width: 32px; height: 32px; } QTimeEdit::down-button { subcontrol-position: left; width: 32px; height: 32px; } QSpinBox { width: 96px; } QSpinBox::up-button { subcontrol-position: right; width: 32px; height: 32px; } QSpinBox::down-button { subcontrol-position: left; width: 32px; height: 32px; } QCheckBox::indicator { width: 32px; height: 32px; }" );
     gui.showMaximized();
 #else
     gui.show();
