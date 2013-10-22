@@ -60,11 +60,9 @@ private slots:
     void lockVariables( bool lock = true ) { this->m_variablesLocked = lock; }
     void intializeVariables();
     void on_buttonImport_clicked();
-    void updateDrunkMode( const QString &, const QString & );
-
     void on_buttonExportCSV_clicked();
-
     void on_buttonExport_clicked();
+    void on_backupPerform_stateChanged(int arg1);
 
 private:
     Ui::Gui_Settings *ui;

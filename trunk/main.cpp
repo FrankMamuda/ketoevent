@@ -47,6 +47,9 @@ initialize
 ================
 */
 void Main::initialize() {
+    // init counters
+    this->changesCounter = 0;
+
     // initialize settings
     this->settings = new QSettings( "avoti", "ketoevent3" );
     this->settings->setDefaultFormat( QSettings::NativeFormat );
@@ -61,6 +64,9 @@ void Main::initialize() {
     this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 ));
     this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 ));
     this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 ));
+    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true ));
+    this->addVariable( new ConsoleVariable( "backup/changes", this->settings, 25 ));
+
 #if 0
     this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
 #endif
@@ -177,7 +183,7 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime ) {
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->teamList << new TeamEntry( query.record(), "teams" );;
+        this->teamList << new TeamEntry( query.record(), "teams" );
 }
 
 /*
@@ -731,6 +737,15 @@ void Main::sort( ListTypes type ) {
         m.error( StrSoftError + this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
         return;
     }
+}
+
+/*
+================
+entry point
+================
+*/
+void Main::update() {
+    this->changesCounter++;
 }
 
 /*

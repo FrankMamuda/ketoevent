@@ -42,6 +42,9 @@ TeamEntry::TeamEntry( const QSqlRecord &record, const QString &table ) {
     // failsafe members (max)
     if ( this->members() > m.var( "members/max" )->integer())
         this->setMembers( m.var( "members/max" )->integer());
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
 }
 
 /*

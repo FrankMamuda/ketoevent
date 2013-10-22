@@ -49,7 +49,7 @@ public:
     QVariant defaultValue() const { return this->m_defaultValue; }
     QVariant value() const { if ( this->s == NULL ) return QVariant(); return this->s->value( this->key(), this->defaultValue()); }
     int integer() const { return this->value().toInt(); }
-    bool isEnabled() const { return this->value().toInt(); }
+    bool isEnabled() const { return this->value().toBool(); }
     bool isDisabled() const { return !this->isEnabled(); }
     float floatValue() const { return this->value().toFloat(); }
     QString string() const { return this->value().toString(); }

@@ -40,6 +40,9 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
     if ( this->record().value( name ) == update )
         return;
 
+    // update counters
+    emit this->changed();
+
     // store local value
     this->m_record.setValue( name, update );
 

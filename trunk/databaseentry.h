@@ -52,6 +52,9 @@ public slots:
 private:
     QString m_table;
     QSqlRecord m_record;
+
+signals:
+    void changed();
 };
 
 #endif // DATABASEENTRY_H

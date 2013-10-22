@@ -70,6 +70,8 @@ void Gui_Settings::intializeVariables() {
     this->addVariable( "combo/triple", SettingsVariable::SpinBox, this->ui->tCombo );
     this->addVariable( "members/min", SettingsVariable::SpinBox, this->ui->min );
     this->addVariable( "members/max", SettingsVariable::SpinBox, this->ui->max );
+    this->addVariable( "backup/changes", SettingsVariable::SpinBox, this->ui->backupChanges );
+    this->addVariable( "backup/perform", SettingsVariable::CheckBox, this->ui->backupPerform );
 
     // set state
     foreach ( SettingsVariable *scPtr, this->varList )
@@ -77,39 +79,6 @@ void Gui_Settings::intializeVariables() {
 
     // unlock cvars
     this->lockVariables( false );
-}
-
-/*
-================
-updateDrunkMode
-================
-*/
-void Gui_Settings::updateDrunkMode( const QString &, const QString &value ) {
-    if ( static_cast<bool>( value.toInt())) {
-        this->ui->startTime->setDisabled( true );
-        this->ui->finishTime->setDisabled( true );
-        this->ui->finalTime->setDisabled( true );
-        this->ui->penalty->setDisabled( true );
-        this->ui->sCombo->setDisabled( true );
-        this->ui->dCombo->setDisabled( true );
-        this->ui->tCombo->setDisabled( true );
-        this->ui->min->setDisabled( true );
-        this->ui->max->setDisabled( true );
-        this->ui->buttonImport->setDisabled( true );
-        //this->ui->buttonExport->setDisabled( true );
-    } else {
-        this->ui->startTime->setEnabled( true );
-        this->ui->finishTime->setEnabled( true );
-        this->ui->finalTime->setEnabled( true );
-        this->ui->penalty->setEnabled( true );
-        this->ui->sCombo->setEnabled( true );
-        this->ui->dCombo->setEnabled( true );
-        this->ui->tCombo->setEnabled( true );
-        this->ui->min->setEnabled( true );
-        this->ui->max->setEnabled( true );
-        this->ui->buttonImport->setEnabled( true );
-        //this->ui->buttonExport->setEnabled( true );
-    }
 }
 
 /*
@@ -182,4 +151,16 @@ void Gui_Settings::on_buttonExport_clicked() {
     path = QFileDialog::getSaveFileName( this, this->tr( "Export database" ), QDir::homePath(), this->tr( "Database (*.db)" ));
 #endif
     QFile::copy( m.databasePath, path );
+}
+
+/*
+================
+backupPerform->stateChanged
+================
+*/
+void Gui_Settings::on_backupPerform_stateChanged( int state ) {
+    if ( state == Qt::Checked )
+        this->ui->backupChanges->setEnabled( true );
+    else
+        this->ui->backupChanges->setDisabled( true );
 }
