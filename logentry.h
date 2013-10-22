@@ -46,7 +46,7 @@ public:
         Double = 2,
         Triple = 3
     };
-    explicit LogEntry( const QSqlRecord &record, const QString &table ) { this->setRecord( record ); this->setTable( table ); }
+    LogEntry( const QSqlRecord &record, const QString &table );
     int value() const { return this->record().value( "value" ).toInt(); }
     bool check() const { return static_cast<bool>( this->value()); }
     Combos combo() const { return static_cast<Combos>( this->record().value( "combo" ).toInt()); }

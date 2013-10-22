@@ -85,6 +85,7 @@ public:
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     QString databasePath;
+    int changesCounter;
 
 public slots:
     void initialize();
@@ -97,6 +98,7 @@ public slots:
     void sort( ListTypes type );
     void print( const QString &msg );
     void error( ErrorTypes type, const QString &msg );
+    void update();
 
 private:
     QSettings *settings;

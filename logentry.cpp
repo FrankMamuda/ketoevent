@@ -26,6 +26,19 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 
 /*
 ================
+construct
+================
+*/
+LogEntry::LogEntry( const QSqlRecord &record, const QString &table ) {
+    this->setRecord( record );
+    this->setTable( table );
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+}
+
+/*
+================
 comboPoints
 ================
 */

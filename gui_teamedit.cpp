@@ -55,7 +55,7 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     // android fullscreen fix
     QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
     this->setGeometry( wPtr->geometry());
-#endif
+#endif    
 }
 
 /*

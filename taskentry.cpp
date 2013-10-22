@@ -52,6 +52,9 @@ TaskEntry::TaskEntry( const QSqlRecord &record, const QString &table ) {
     default:
         this->setType();
     }
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
 }
 
 /*
