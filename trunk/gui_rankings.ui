@@ -43,6 +43,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="exportButton">
+        <property name="text">
+         <string>Export statistics as &quot;.CSV&quot;</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -160,6 +167,9 @@
      <property name="icon">
       <iconset resource="resources.qrc">
        <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+     </property>
+     <property name="default">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

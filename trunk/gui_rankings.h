@@ -51,6 +51,8 @@ public slots:
 private slots:
     void calculateStatistics();
 
+    void on_exportButton_clicked();
+
 private:
     Ui::Gui_Rankings *ui;
     Gui_RankingModel *modelPtr;
