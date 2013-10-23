@@ -286,22 +286,20 @@ loadDatabase
 ================
 */
 void Main::loadDatabase() {
-    QString path;
-
 #ifdef Q_OS_UNIX
 #ifdef Q_OS_ANDROID
-    path = QString( "/sdcard/data/org.factory12.ketoevent3/" );
+    this->path = QString( "/sdcard/data/org.factory12.ketoevent3/" );
 #else
-    path = QString( QDir::homePath() + "/.ketoevent/" );
+    this->path = QString( QDir::homePath() + "/.ketoevent/" );
 #endif
 #else
-    path = QString( QDir::currentPath() + "/" );
+    this->path = QString( QDir::currentPath() + "/" );
 #endif
 
     // make path id nonexistant
-    QDir dir( path );
+    QDir dir( this->path );
     if ( !dir.exists()) {
-        dir.mkpath( path );
+        dir.mkpath( this->path );
         if ( !dir.exists()) {
             m.error( StrFatalError + this->tr( "could not create database path\n" ));
             return;
@@ -309,7 +307,8 @@ void Main::loadDatabase() {
     }
 
     // create database
-    this->databasePath = path + "ketoevent.db";
+
+    this->databasePath = this->path + "ketoevent.db";
     QFile database( this->databasePath );
     QSqlDatabase db;
 
@@ -741,11 +740,37 @@ void Main::sort( ListTypes type ) {
 
 /*
 ================
-entry point
+writeBackup
+================
+*/
+void Main::writeBackup() {
+    QString backupPath;
+
+    // make path id nonexistant
+    backupPath = this->path + "backups/";
+    QDir dir( backupPath );
+    if ( !dir.exists()) {
+        dir.mkpath( backupPath );
+        if ( !dir.exists()) {
+            m.error( StrFatalError + this->tr( "could not create backup path\n" ));
+            return;
+        }
+    }
+    QFile::copy( this->databasePath, QString( "%1%2.db" ).arg( backupPath ).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+}
+
+/*
+================
+update
 ================
 */
 void Main::update() {
     this->changesCounter++;
+
+    if ( this->changesCounter == this->var( "backup/changes" )->value().toInt() && this->var( "backup/perform" )->value().toBool()) {
+        this->writeBackup();
+        this->changesCounter = 0;
+    }
 }
 
 /*
