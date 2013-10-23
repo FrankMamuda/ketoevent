@@ -66,10 +66,7 @@ void Main::initialize() {
     this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 ));
     this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addVariable( new ConsoleVariable( "backup/changes", this->settings, 25 ));
-
-#if 0
     this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
-#endif
 
     // load database entries
     this->loadDatabase();
@@ -736,6 +733,22 @@ void Main::sort( ListTypes type ) {
         m.error( StrSoftError + this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
         return;
     }
+}
+
+/*
+================
+taskListSorted
+================
+*/
+QList<TaskEntry*> Main::taskListSorted() {
+    QList <TaskEntry*>sortedList;
+
+    // make a local copy and sort it alphabetically
+    sortedList = this->taskList;
+    qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
+
+    // return sorted list
+    return sortedList;
 }
 
 /*
