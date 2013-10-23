@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>341</width>
-    <height>409</height>
+    <width>342</width>
+    <height>459</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,127 @@
     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0" colspan="3">
+    <widget class="QGroupBox" name="groupMisc">
+     <property name="title">
+      <string>Misc</string>
+     </property>
+     <layout class="QGridLayout" name="miscLayout">
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="backupChanges">
+        <property name="suffix">
+         <string> changes</string>
+        </property>
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="backupPerform">
+        <property name="text">
+         <string>Perform backups after</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="max">
+        <property name="toolTip">
+         <string>Maximum members in a team</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="min">
+        <property name="toolTip">
+         <string>Minimum members in a team</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="minLabel">
+        <property name="text">
+         <string>Minimum members</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="maxLabel">
+        <property name="text">
+         <string>Maximum members</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="sort">
+        <property name="text">
+         <string>Sort tasks alphabetically (main screen)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" rowspan="3" colspan="3">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="buttonImport">
+        <property name="toolTip">
+         <string>Import log database from a different machine (beta)</string>
+        </property>
+        <property name="text">
+         <string>Import database</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonExport">
+        <property name="toolTip">
+         <string>Make a copy of the current database</string>
+        </property>
+        <property name="text">
+         <string>Export database</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonExportCSV">
+        <property name="toolTip">
+         <string>Export task list in CSV format</string>
+        </property>
+        <property name="text">
+         <string>Export tasks as &quot;.CSV&quot;</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupTime">
      <property name="title">
@@ -85,6 +206,23 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="3">
+    <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Close settings dialog</string>
+     </property>
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="0" column="2">
@@ -159,137 +297,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupMisc">
-     <property name="title">
-      <string>Misc</string>
-     </property>
-     <layout class="QGridLayout" name="miscLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="minLabel">
-        <property name="text">
-         <string>Minimum members</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="min">
-        <property name="toolTip">
-         <string>Minimum members in a team</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="max">
-        <property name="toolTip">
-         <string>Maximum members in a team</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="maxLabel">
-        <property name="text">
-         <string>Maximum members</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="backupChanges">
-        <property name="suffix">
-         <string> changes</string>
-        </property>
-        <property name="minimum">
-         <number>10</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="backupPerform">
-        <property name="text">
-         <string>Perform backups after</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" rowspan="3" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Data</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QPushButton" name="buttonImport">
-        <property name="toolTip">
-         <string>Import log database from a different machine (beta)</string>
-        </property>
-        <property name="text">
-         <string>Import database</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="buttonExport">
-        <property name="toolTip">
-         <string>Make a copy of the current database</string>
-        </property>
-        <property name="text">
-         <string>Export database</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="buttonExportCSV">
-        <property name="toolTip">
-         <string>Export task list in CSV format</string>
-        </property>
-        <property name="text">
-         <string>Export tasks as &quot;.CSV&quot;</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="3">
-    <widget class="QPushButton" name="closeButton">
-     <property name="toolTip">
-      <string>Close settings dialog</string>
-     </property>
-     <property name="text">
-      <string>Close</string>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
   </layout>

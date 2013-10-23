@@ -68,6 +68,7 @@ public:
     // lists
     QList <TeamEntry*> teamList;
     QList <TaskEntry*> taskList;
+    QList<TaskEntry*> taskListSorted();
     QList <LogEntry*> logList;
     QList <ConsoleVariable*> varList;
 
@@ -86,7 +87,6 @@ public:
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     QString path;
     QString databasePath;
-    int changesCounter;
 
 public slots:
     void initialize();
@@ -104,6 +104,7 @@ public slots:
 private:
     QSettings *settings;
     void writeBackup();
+    int changesCounter;
 
 private slots:
     void deleteOrphanedLogs();

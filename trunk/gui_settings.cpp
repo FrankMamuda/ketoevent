@@ -72,6 +72,7 @@ void Gui_Settings::intializeVariables() {
     this->addVariable( "members/max", SettingsVariable::SpinBox, this->ui->max );
     this->addVariable( "backup/changes", SettingsVariable::SpinBox, this->ui->backupChanges );
     this->addVariable( "backup/perform", SettingsVariable::CheckBox, this->ui->backupPerform );
+    this->addVariable( "misc/sortTasks", SettingsVariable::CheckBox, this->ui->sort );
 
     // set state
     foreach ( SettingsVariable *scPtr, this->varList )

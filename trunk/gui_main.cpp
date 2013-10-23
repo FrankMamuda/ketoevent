@@ -189,6 +189,7 @@ fillTasks
 void Gui_Main::fillTasks() {
     int y;
     QListWidget *lw = this->ui->taskList;
+    QList <TaskEntry*>taskList;
 
     for ( y = 0; y < lw->count(); y++ ) {
         TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
@@ -196,7 +197,13 @@ void Gui_Main::fillTasks() {
         delete lw->item( y );
     }
     lw->clear();
-    foreach ( TaskEntry *taskPtr, m.taskList ) {
+
+    if ( m.var( "misc/sortTasks" )->isEnabled())
+        taskList = m.taskListSorted();
+    else
+        taskList = m.taskList;
+
+    foreach ( TaskEntry *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
         lw->addItem( itemPtr );
