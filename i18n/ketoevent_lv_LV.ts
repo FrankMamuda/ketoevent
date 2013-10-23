@@ -4,12 +4,12 @@
 <context>
     <name>Gui_About</name>
     <message>
-        <location filename="../gui_about.ui" line="26"/>
+        <location filename="../gui_about.ui" line="20"/>
         <source>About</source>
         <translation>Par</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="45"/>
+        <location filename="../gui_about.ui" line="39"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -30,12 +30,11 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="99"/>
+        <location filename="../gui_about.ui" line="93"/>
         <source>Comments on the development</source>
         <translation>Komentāri par programmas izstrādi</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="105"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -46,7 +45,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Project hosted at&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://code.google.com/p/ketoevent/&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#0000ff;&quot;&gt;code.google.com/p/ketoevent/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Additional comments&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;: 246766&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -58,22 +57,36 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Komentāri&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;: 246766&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="123"/>
+        <location filename="../gui_about.ui" line="99"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;DejaVu Sans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:600;&quot;&gt;Developer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;: Cikliskais Triketons&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:600;&quot;&gt;Thanks to&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;: Acetons, Bindons, Parametrs, Booze, Soxhlet extractor&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:600;&quot;&gt;Beers consumed during development&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;: Brenguļu, Tērvetes, Bauskas and occasional cheap ones from the store&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:600;&quot;&gt;Project hosted at&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://code.google.com/p/ketoevent/&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; text-decoration: underline; color:#0000ff;&quot;&gt;code.google.com/p/ketoevent/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:600;&quot;&gt;Additional comments&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;: 246766&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../gui_about.ui" line="117"/>
         <source>Click to see license data</source>
         <translation>Nospied, lai apskatītos licenzes informāciju</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="126"/>
+        <location filename="../gui_about.ui" line="120"/>
         <source>License</source>
         <translation>Licenze</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="143"/>
+        <location filename="../gui_about.ui" line="137"/>
         <source>Close about dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
     <message>
-        <location filename="../gui_about.ui" line="146"/>
+        <location filename="../gui_about.ui" line="140"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
@@ -370,37 +383,42 @@ kopā</translation>
         <translation>Klikšķini, lai šķirotu pēc kategorijām</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="52"/>
+        <location filename="../gui_rankings.ui" line="49"/>
+        <source>Export statistics as &quot;.CSV&quot;</source>
+        <translation>Statistika uz &quot;.CSV&quot;</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.ui" line="59"/>
         <source>Event statistics</source>
         <translation>Pasākuma statistika</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="63"/>
+        <location filename="../gui_rankings.ui" line="70"/>
         <source>Total tasks completed</source>
         <translation>Izpildīto uzdevumu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="79"/>
+        <location filename="../gui_rankings.ui" line="86"/>
         <source>Sum of all completed tasks from all teams</source>
         <translation>Visu komandu visu paveikto uzdevumu kopsumma</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="102"/>
+        <location filename="../gui_rankings.ui" line="109"/>
         <source>Total participiants</source>
         <translation>Dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="118"/>
+        <location filename="../gui_rankings.ui" line="125"/>
         <source>Total number of participiants</source>
         <translation>Visu komandu dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="137"/>
+        <location filename="../gui_rankings.ui" line="144"/>
         <source>Total number of teams participated in this event</source>
         <translation>Visu piedalījušos komandu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="155"/>
+        <location filename="../gui_rankings.ui" line="162"/>
         <source>Close rankings dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
@@ -409,7 +427,7 @@ kopā</translation>
         <translation type="obsolete">Grūto uzdevumu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="92"/>
+        <location filename="../gui_rankings.ui" line="99"/>
         <source>Total teams</source>
         <translation>Komandu kopskaits</translation>
     </message>
@@ -418,9 +436,26 @@ kopā</translation>
         <translation type="obsolete">Dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="158"/>
+        <location filename="../gui_rankings.ui" line="165"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="128"/>
+        <location filename="../gui_rankings.cpp" line="130"/>
+        <source>Export statistics to csv format</source>
+        <translation>Ekspoertēt statistiku csv formātā </translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="128"/>
+        <location filename="../gui_rankings.cpp" line="130"/>
+        <source>CSV file (*.csv)</source>
+        <translation>CSV fails (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="137"/>
+        <source>Team name;Tasks;Combos;Time;Penalty points;Total points</source>
+        <translation>Nosaukums;Uzdevumi;Kombinācijas;Laiks;Soda punkti;Punkti kopā</translation>
     </message>
 </context>
 <context>
@@ -473,32 +508,44 @@ kopā</translation>
         <translation>Komanda tiek diskvalificēta pēc šī laika</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="230"/>
+        <location filename="../gui_settings.ui" line="207"/>
+        <source> changes</source>
+        <translation> izmaiņām</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="220"/>
+        <source>Perform backups after</source>
+        <translation>Dublēt pēc</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.ui" line="250"/>
         <source>Make a copy of the current database</source>
         <translation>Izveidot datubāzes kopiju</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="233"/>
+        <location filename="../gui_settings.ui" line="253"/>
+        <location filename="../gui_settings.cpp" line="149"/>
+        <location filename="../gui_settings.cpp" line="151"/>
         <source>Export database</source>
         <translation>Eksportēt datubāzi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="244"/>
+        <location filename="../gui_settings.ui" line="264"/>
         <source>Export task list in CSV format</source>
         <translation>Eksportēt uzdevumus CSV formātā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="247"/>
+        <location filename="../gui_settings.ui" line="267"/>
         <source>Export tasks as &quot;.CSV&quot;</source>
         <translation>Uzdevumi uz &quot;.CSV&quot;</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="261"/>
+        <location filename="../gui_settings.ui" line="281"/>
         <source>Close settings dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="264"/>
+        <location filename="../gui_settings.ui" line="284"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
@@ -563,22 +610,22 @@ kopā</translation>
         <translation>Minimālais dalībnieku skaits komandā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="190"/>
+        <location filename="../gui_settings.ui" line="200"/>
         <source>Maximum members</source>
         <translation>Maksimālais dalībnieku skaits</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="197"/>
+        <location filename="../gui_settings.ui" line="190"/>
         <source>Maximum members in a team</source>
         <translation>Maksimālais dalībnieku skaits komandā</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="210"/>
+        <location filename="../gui_settings.ui" line="230"/>
         <source>Data</source>
         <translation>Dati</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="216"/>
+        <location filename="../gui_settings.ui" line="236"/>
         <source>Import log database from a different machine (beta)</source>
         <translation>Importēt datubāzi no cita datora (beta)</translation>
     </message>
@@ -587,27 +634,36 @@ kopā</translation>
         <translation type="obsolete">Kārtot uzdevumus alfabētiski</translation>
     </message>
     <message>
-        <location filename="../gui_settings.ui" line="219"/>
+        <location filename="../gui_settings.ui" line="239"/>
         <source>Import database</source>
         <translation>Importēt datubāzi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="116"/>
+        <location filename="../gui_settings.cpp" line="93"/>
+        <location filename="../gui_settings.cpp" line="95"/>
         <source>Load log database</source>
         <translation>Importēt sprunguļu datubāzi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="116"/>
+        <location filename="../gui_settings.cpp" line="93"/>
+        <location filename="../gui_settings.cpp" line="95"/>
         <source>sqlite database (*.db)</source>
         <translation>sqlite datubāze (*.db)</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="126"/>
+        <location filename="../gui_settings.cpp" line="110"/>
+        <location filename="../gui_settings.cpp" line="112"/>
         <source>CSV file (*.csv)</source>
         <translation>CSV fails (*.csv)</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="132"/>
+        <location filename="../gui_settings.cpp" line="110"/>
+        <location filename="../gui_settings.cpp" line="112"/>
+        <source>Export tasks to csv format</source>
+        <translation>Exportēt uzdevumus csv formātā</translation>
+    </message>
+    <message>
+        <location filename="../gui_settings.cpp" line="119"/>
         <source>name;type;style;points;multi</source>
         <translation>nosaukums;tips;stils;punkti;multi</translation>
     </message>
@@ -617,7 +673,8 @@ kopā</translation>
         <translation type="obsolete">nosaukums;tips;stils;punkti;multi</translation>
     </message>
     <message>
-        <location filename="../gui_settings.cpp" line="160"/>
+        <location filename="../gui_settings.cpp" line="149"/>
+        <location filename="../gui_settings.cpp" line="151"/>
         <source>Database (*.db)</source>
         <translation>Datubāze (*.db)</translation>
     </message>
@@ -677,7 +734,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_taskedit.ui" line="135"/>
-        <location filename="../gui_taskedit.cpp" line="116"/>
+        <location filename="../gui_taskedit.cpp" line="122"/>
         <source>Add task</source>
         <translation>Pievienot</translation>
     </message>
@@ -698,7 +755,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_taskedit.ui" line="163"/>
-        <location filename="../gui_taskedit.cpp" line="133"/>
+        <location filename="../gui_taskedit.cpp" line="139"/>
         <source>Edit task</source>
         <translation>Labot</translation>
     </message>
@@ -836,7 +893,7 @@ kopā</translation>
         <translation>Aizvērt</translation>
     </message>
     <message>
-        <location filename="../gui_taskedit.cpp" line="195"/>
+        <location filename="../gui_taskedit.cpp" line="201"/>
         <source>Please specify task name</source>
         <translation>Norādiet uzdevuma nosaukumu</translation>
     </message>
@@ -860,7 +917,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_teamedit.ui" line="39"/>
-        <location filename="../gui_teamedit.cpp" line="112"/>
+        <location filename="../gui_teamedit.cpp" line="118"/>
         <source>Add team</source>
         <translation>Pievienot</translation>
     </message>
@@ -881,7 +938,7 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_teamedit.ui" line="67"/>
-        <location filename="../gui_teamedit.cpp" line="128"/>
+        <location filename="../gui_teamedit.cpp" line="134"/>
         <source>Edit team</source>
         <translation>Labot</translation>
     </message>
@@ -965,12 +1022,12 @@ kopā</translation>
         <translation>Aizvērt</translation>
     </message>
     <message>
-        <location filename="../gui_teamedit.cpp" line="152"/>
+        <location filename="../gui_teamedit.cpp" line="158"/>
         <source>Do you really want to remove &quot;%1&quot;?</source>
         <translation>Vai tiešām vēlaties dzēst &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../gui_teamedit.cpp" line="194"/>
+        <location filename="../gui_teamedit.cpp" line="200"/>
         <source>Please specify team name</source>
         <translation>Norādiet komandas nosaukumu</translation>
     </message>
@@ -978,42 +1035,54 @@ kopā</translation>
 <context>
     <name>Main</name>
     <message>
-        <location filename="../main.cpp" line="120"/>
+        <location filename="../main.cpp" line="126"/>
         <source>FATAL ERROR: %1</source>
         <translation>PILNĪGA ZIVS: %1</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="123"/>
+        <location filename="../main.cpp" line="129"/>
         <source>ERROR: %1</source>
         <translation>ZIVS: %1</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="294"/>
+        <location filename="../main.cpp" line="304"/>
+        <source>could not create database path
+</source>
+        <translation>nebija iespējams izveidot datubāzes mapi</translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="317"/>
         <source>sqlite not present on the system
 </source>
         <translation>sqlite nav pieejams
 </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="308"/>
+        <location filename="../main.cpp" line="331"/>
         <source>could not load task database
 </source>
         <translation>nebija iespējams ielādēt datubāzi
 </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="318"/>
+        <location filename="../main.cpp" line="341"/>
         <source>could not create internal database structure
 </source>
         <translation>nevarēja izveidot datubāzes struktūru
 </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="713"/>
+        <location filename="../main.cpp" line="736"/>
         <source>unknown list type &quot;%1&quot;
 </source>
         <translation>nezināms  saraksta veids - &quot;%1&quot;
 </translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="755"/>
+        <source>could not create backup path
+</source>
+        <translation>nebija iespējams izveidot dublēšanas mapi</translation>
     </message>
 </context>
 <context>
@@ -1038,74 +1107,74 @@ kopā</translation>
     <name>TaskWidget</name>
     <message>
         <location filename="../taskwidget.cpp" line="42"/>
-        <location filename="../taskwidget.cpp" line="173"/>
-        <location filename="../taskwidget.cpp" line="209"/>
-        <location filename="../taskwidget.cpp" line="245"/>
-        <location filename="../taskwidget.cpp" line="272"/>
-        <location filename="../taskwidget.cpp" line="320"/>
+        <location filename="../taskwidget.cpp" line="184"/>
+        <location filename="../taskwidget.cpp" line="220"/>
+        <location filename="../taskwidget.cpp" line="256"/>
+        <location filename="../taskwidget.cpp" line="283"/>
+        <location filename="../taskwidget.cpp" line="331"/>
         <source>task not set
 </source>
         <translation>uzdevums nav uzstādīts\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="74"/>
+        <location filename="../taskwidget.cpp" line="78"/>
         <source>%1 points, click checkbox to enable/disable</source>
         <translation>%1 punkti; atķeksē, lai ieskaitītu uzdevumu</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="75"/>
+        <location filename="../taskwidget.cpp" line="79"/>
         <source>Toggle task completion</source>
         <translation>Atķeksē uzdevuma izpildi</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="87"/>
+        <location filename="../taskwidget.cpp" line="93"/>
         <source>%1 points (max %2), multiplied by value</source>
         <translation>%1 punkti (lielākais rezinātājs %2)</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="88"/>
+        <location filename="../taskwidget.cpp" line="94"/>
         <source>Change task multiplier</source>
         <translation>Izmaini rezinātāju</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="90"/>
-        <location filename="../taskwidget.cpp" line="134"/>
+        <location filename="../taskwidget.cpp" line="96"/>
+        <location filename="../taskwidget.cpp" line="145"/>
         <source>invalid task type &quot;%1&quot;
 </source>
         <translation>nederīgs uzdevuma tips &quot;%1&quot;\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="101"/>
+        <location filename="../taskwidget.cpp" line="112"/>
         <source>Click here to toggle combo state</source>
         <translation>Šeit klikšķini, lai izmainītu kombināciju</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="121"/>
+        <location filename="../taskwidget.cpp" line="132"/>
         <source>task or team not set
 </source>
         <translation>uzdevums vai komanda nav uzstādīta\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="196"/>
-        <location filename="../taskwidget.cpp" line="232"/>
+        <location filename="../taskwidget.cpp" line="207"/>
+        <location filename="../taskwidget.cpp" line="243"/>
         <source>invalid combo state &quot;%1&quot;
 </source>
         <translation>nederīga kombinācija &quot;%1&quot;\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="278"/>
+        <location filename="../taskwidget.cpp" line="289"/>
         <source>log not set
 </source>
         <translation>sprungulis nav uzstādīts\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="284"/>
+        <location filename="../taskwidget.cpp" line="295"/>
         <source>team not set
 </source>
         <translation>komanda nav uzstādīta\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="344"/>
+        <location filename="../taskwidget.cpp" line="355"/>
         <source>task, team or log not set
 </source>
         <translation>uzdevums, sprungulis vai komanda nav uzstādīta\n</translation>

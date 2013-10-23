@@ -23,6 +23,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "gui_rankings.h"
 #include "ui_gui_rankings.h"
+#include <QFileDialog>
+#include <QTextStream>
 
 /*
 ================
@@ -113,4 +115,55 @@ Gui_Rankings::~Gui_Rankings() {
     delete ui;
     delete this->modelPtr;
     delete this->proxyModel;
+}
+
+/*
+================
+exportButton
+================
+*/
+void Gui_Rankings::on_exportButton_clicked() {
+    QString path;
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to csv format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
+#else
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to csv format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+#endif
+    QFile csv( path );
+
+    if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
+        QTextStream out( &csv );
+        out.setCodec( "UTF-8" );
+        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" )
+#ifdef Q_OS_WIN
+               .append( "\r" )
+#endif
+               .append( "\n" );
+        foreach ( TeamEntry *teamPtr, m.teamList ) {
+            int points;
+
+
+            if ( teamPtr->disqualified())
+                points = -1;
+
+            points = teamPtr->points() - teamPtr->penalty();
+
+            if ( points <= 0 )
+                points = 0;
+
+            out << QString( "%1;%2;%3;%4;%5;%6%7" )
+                   .arg( teamPtr->name())
+                   .arg( teamPtr->logList.count())
+                   .arg( teamPtr->combos())
+                   .arg( teamPtr->timeOnTrack())
+                   .arg( teamPtr->penalty())
+                   .arg( points )
+#ifdef Q_OS_WIN
+                   .arg( "\r\n" );
+#else
+                   .arg( "\n" );
+#endif
+        }
+    }
+    csv.close();
 }
