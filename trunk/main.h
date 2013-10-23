@@ -84,6 +84,7 @@ public:
     void addTeam( const QString &teamName, int members, QTime finishTime );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
+    QString path;
     QString databasePath;
     int changesCounter;
 
@@ -102,6 +103,7 @@ public slots:
 
 private:
     QSettings *settings;
+    void writeBackup();
 
 private slots:
     void deleteOrphanedLogs();
