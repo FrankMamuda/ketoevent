@@ -721,7 +721,40 @@ sort
 void Main::sort( ListTypes type ) {
     switch ( type ) {
     case Tasks:
-        qSort( this->taskList.begin(), this->taskList.end(), listToAscending<TaskEntry> );
+    {
+        QList <TaskEntry*>regularList;
+        QList <TaskEntry*>boldList;
+        QList <TaskEntry*>italicList;
+
+        foreach ( TaskEntry *taskPtr, this->taskList ) {
+            if ( taskPtr->style() == TaskEntry::Regular )
+                regularList << taskPtr;
+        }
+        qSort( regularList.begin(), regularList.end(), listToAscending<TaskEntry> );
+
+        foreach ( TaskEntry *taskPtr, this->taskList ) {
+            if ( taskPtr->style() == TaskEntry::Bold )
+                boldList << taskPtr;
+        }
+        qSort( boldList.begin(), boldList.end(), listToAscending<TaskEntry> );
+
+        foreach ( TaskEntry *taskPtr, this->taskList ) {
+            if ( taskPtr->style() == TaskEntry::Italic )
+                italicList << taskPtr;
+        }
+        qSort( italicList.begin(), italicList.end(), listToAscending<TaskEntry> );
+
+        this->taskList.clear();
+        this->taskList.append( regularList );
+        this->taskList.append( boldList );
+        this->taskList.append( italicList );
+
+
+        regularList.clear();
+        boldList.clear();
+        italicList.clear();
+        //qSort( this->taskList.begin(), this->taskList.end(), listToAscending<TaskEntry> );
+    }
         break;
 
     case Teams:
