@@ -80,6 +80,7 @@ private slots:
     void on_upButton_clicked();
     void on_downButton_clicked();
 #endif
+    void on_lockButton_clicked();
 };
 
 #endif // GUI_MAIN_H

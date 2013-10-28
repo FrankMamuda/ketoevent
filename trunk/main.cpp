@@ -161,7 +161,7 @@ void Main::shutdown( bool ignoreDatabase ) {
 addTeam
 ================
 */
-void Main::addTeam( const QString &teamName, int members, QTime finishTime ) {
+void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool lockState ) {
     QSqlQuery query;
 
     // avoid duplicates
@@ -169,10 +169,11 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime ) {
         return;
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3' )" )
+    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4' )" )
                       .arg( teamName )
                       .arg( members )
                       .arg( finishTime.toString( "hh:mm" ))
+                      .arg( static_cast<int>( lockState ))
                       )) {
         this->error( StrSoftError + QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
     }
@@ -331,8 +332,11 @@ void Main::loadDatabase() {
     QSqlQuery query;
 
     // create initial table structure (if non-existant)
+    //
+    // TODO: must add API compatibility, move event start/end time to db
+    //
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
-         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finish varchar( 5 ))" ) ||
+         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finish varchar( 5 ), lock integer )" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, taskId integer, teamId integer )" )
          ) {
         m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
@@ -398,7 +402,7 @@ void Main::importDatabase( const QString &path ) {
         teamMatchList << teamMatch;
 
         // add to database
-        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "finish" ).toString(), "hh:mm" ));
+        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "finish" ).toString(), "hh:mm" ), query.record().value( "lock" ).toBool());
     }
 
     //

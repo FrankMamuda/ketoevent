@@ -80,6 +80,17 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="lockButton">
+          <property name="text">
+           <string>Lock/Unlock</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/unlocked_16</normaloff>:/icons/unlocked_16</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="0" column="1">

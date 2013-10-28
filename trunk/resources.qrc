@@ -25,6 +25,8 @@
         <file alias="clear_22">icons/clear_22.png</file>
         <file alias="sort_16">icons/sort_16.png</file>
         <file alias="export_16">icons/export_16.png</file>
+        <file alias="locked_16">icons/locked_16.png</file>
+        <file alias="unlocked_16">icons/unlocked_16.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
