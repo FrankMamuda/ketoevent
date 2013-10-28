@@ -82,7 +82,7 @@ public:
     QString transliterate( const QString &path );
     ConsoleVariable *var( const QString &key );
     void addVariable( ConsoleVariable *varPtr );
-    void addTeam( const QString &teamName, int members, QTime finishTime );
+    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     QString path;

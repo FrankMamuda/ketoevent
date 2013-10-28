@@ -33,7 +33,7 @@ construct
 ================
 */
 Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_Main ) {
-    ui->setupUi(this);
+    ui->setupUi( this );
 }
 
 /*
@@ -119,9 +119,8 @@ void Gui_Main::teamIndexChanged( int index ) {
     int y;
 
     if ( teamPtr != NULL ) {
-        this->ui->timeFinish->setEnabled( true );
-        this->ui->taskList->setEnabled( true );
         this->ui->comboTeams->setEnabled( true );
+        this->ui->lockButton->setEnabled( true );
 
         // set time
         this->ui->timeFinish->setTime( teamPtr->finishTime());
@@ -137,10 +136,26 @@ void Gui_Main::teamIndexChanged( int index ) {
             TaskWidget *taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
             taskLogPtr->setTeam( teamPtr );
         }
+
+        if ( teamPtr->isLocked()) {
+            this->ui->lockButton->setIcon( QIcon( ":/icons/unlocked_16" ));
+            this->ui->lockButton->setText( this->tr( "Unlock" ));
+            this->ui->taskList->setDisabled( true );
+            this->ui->timeFinish->setDisabled( true );
+            this->ui->logButton->setDisabled( true );
+        } else {
+            this->ui->lockButton->setIcon( QIcon( ":/icons/locked_16" ));
+            this->ui->lockButton->setText( this->tr( "Lock" ));
+            this->ui->taskList->setEnabled( true );
+            this->ui->timeFinish->setEnabled( true );
+            this->ui->logButton->setEnabled( true );
+        }
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
         this->ui->comboTeams->setDisabled( true );
+        this->ui->lockButton->setDisabled( true );
+        this->ui->logButton->setDisabled( true );
     }
 }
 
@@ -317,5 +332,32 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         QPalette p( this->ui->findTaskEdit->palette());
         p.setColor( QPalette::Base, QColor( 255, 0, 0, 64 ));
         this->ui->findTaskEdit->setPalette( p );
+    }
+}
+
+/*
+================
+lockButton->clicked
+================
+*/
+void Gui_Main::on_lockButton_clicked() {
+    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( teamPtr == NULL )
+        return;
+
+    if ( teamPtr->isLocked()) {
+        teamPtr->unlock();
+        this->ui->lockButton->setIcon( QIcon( ":/icons/locked_16" ));
+        this->ui->lockButton->setText( this->tr( "Lock" ));
+        this->ui->timeFinish->setEnabled( true );
+        this->ui->taskList->setEnabled( true );
+        this->ui->logButton->setEnabled( true );
+    } else {
+        teamPtr->lock();
+        this->ui->lockButton->setIcon( QIcon( ":/icons/unlocked_16" ));
+        this->ui->lockButton->setText( this->tr( "Unlock" ));
+        this->ui->taskList->setDisabled( true );
+        this->ui->timeFinish->setDisabled( true );
+        this->ui->logButton->setDisabled( true );
     }
 }
