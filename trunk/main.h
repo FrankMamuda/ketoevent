@@ -32,6 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "teamentry.h"
 #include "taskentry.h"
 #include "consolevariable.h"
+#include "evententry.h"
 
 // message macro
 #ifdef Q_CC_MSVC
@@ -45,6 +46,19 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define StrFatalError Main::FatalError, ClassFunc
 #define StrSoftError Main::SoftError, ClassFunc
 #define StrWarn QObject::trUtf8( "WARNING:" ) + ClassFunc
+
+//
+// namespace: Common
+//
+namespace Common {
+    const static unsigned int API = 1;
+    const static unsigned int defaultMinMembers = 1;
+    const static unsigned int defaultMaxMembers = 3;
+    const static unsigned int defaultSingleCombo = 1;
+    const static unsigned int defaultDoubleCombo = 2;
+    const static unsigned int defaultTripleCombo = 3;
+    const static unsigned int defaultPenaltyPoints = 5;
+}
 
 //
 // class:Main
@@ -87,6 +101,9 @@ public:
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     QString path;
     QString databasePath;
+
+    // event
+    EventEntry *event;
 
 public slots:
     void initialize();
