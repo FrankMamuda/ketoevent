@@ -189,11 +189,27 @@ void Gui_Main::closeEvent( QCloseEvent *eventPtr ) {
 fillTeams
 ================
 */
-void Gui_Main::fillTeams() {
+void Gui_Main::fillTeams( int forcedId ) {
+    int lastId = forcedId;
+
+    // store last team id
+    if ( this->ui->comboTeams->count() && forcedId == -1 ) {
+        TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        if ( teamPtr != NULL )
+            lastId = teamPtr->id();
+    }
+
+    // clear list
     this->ui->comboTeams->clear();
 
-    foreach ( TeamEntry *teamPtr, m.teamList )
+    // repopulate list
+    foreach ( TeamEntry *teamPtr, m.teamList ) {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
+
+        // resore last id if any
+        if ( lastId != -1 && lastId == teamPtr->id())
+            this->ui->comboTeams->setCurrentIndex( this->ui->comboTeams->count()-1 );
+    }
 }
 
 /*
@@ -257,7 +273,7 @@ void Gui_Main::on_quickAddButton_clicked() {
     Gui_TeamEdit teamEdit( this );
     teamEdit.toggleAddEditWidget( Gui_TeamEdit::AddQuick );
     teamEdit.exec();
-    this->fillTeams();
+    this->fillTeams( teamEdit.lastId );
 }
 
 /*
