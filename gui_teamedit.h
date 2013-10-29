@@ -57,6 +57,7 @@ public:
     ~Gui_TeamEdit();
     void toggleAddEditWidget( AddEditState state );
     AddEditState state() const { return this->m_state; }
+    int lastId;
 
 private slots:
     void on_removeTeamButton_clicked();

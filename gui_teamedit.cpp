@@ -56,6 +56,9 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
     this->setGeometry( wPtr->geometry());
 #endif    
+
+    // reset team id
+    this->lastId = -1;
 }
 
 /*
@@ -229,8 +232,10 @@ void Gui_TeamEdit::on_doneButton_clicked() {
     }
 
     // quick add
-    if ( this->state() == AddQuick )
+    if ( this->state() == AddQuick ) {
+        this->lastId = m.teamList.last()->id();
         this->close();
+    }
 
     // reset view
     this->toggleAddEditWidget( NoState );

@@ -55,7 +55,7 @@ private:
     int currentMatch;
 
 public slots:
-    void fillTeams();
+    void fillTeams( int focedId = -1 );
     void fillTasks();
     void initialize();
     void teamIndexChanged( int index );
