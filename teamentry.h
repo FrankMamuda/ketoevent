@@ -48,7 +48,7 @@ public:
     // for rankings
     QString name() const { return this->record().value( "name" ).toString(); }
     int members() const { return this->record().value( "members" ).toInt(); }
-    QTime finishTime() const { return QTime::fromString( this->record().value( "finish" ).toString(), "hh:mm" ); }
+    QTime finishTime() const { return QTime::fromString( this->record().value( "finishTime" ).toString(), "hh:mm" ); }
     bool isLocked() const { return this->record().value( "lock" ).toBool(); }
     bool isUnlocked() const { return !this->isLocked(); }
     int points() const;
@@ -61,7 +61,7 @@ public:
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setMembers( int members ) { this->setValue( "members", members ); }
-    void setFinishTime( QTime time ) { this->setValue( "finish", time.toString( "hh:mm" )); }
+    void setFinishTime( QTime time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
     void lock( bool lock = true ) { this->setValue( "lock", static_cast<int>( lock )); }
     void unlock( bool lock = true ) { this->setValue( "lock", static_cast<int>( !lock )); }
 };

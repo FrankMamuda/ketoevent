@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     gui_license.cpp \
     taskwidget.cpp \
     settingsvariable.cpp \
-    gui_settings.cpp
+    gui_settings.cpp \
+    evententry.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -49,7 +50,8 @@ HEADERS  += gui_main.h \
     taskwidget.h \
     consolevariable.h \
     settingsvariable.h \
-    gui_settings.h
+    gui_settings.h \
+    evententry.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
