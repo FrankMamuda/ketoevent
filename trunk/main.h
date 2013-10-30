@@ -51,13 +51,17 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 1;
+    const static unsigned int API = 2;
+    const static unsigned int MinimumAPI = 1;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
     const static unsigned int defaultSingleCombo = 1;
-    const static unsigned int defaultDoubleCombo = 2;
-    const static unsigned int defaultTripleCombo = 3;
+    const static unsigned int defaultDoubleCombo = 3;
+    const static unsigned int defaultTripleCombo = 5;
     const static unsigned int defaultPenaltyPoints = 5;
+    const static QString defaultStartTime( "10:00" );
+    const static QString defaultFinishTime( "15:00" );
+    const static QString defaultFinalTime( "15:30" );
 }
 
 //
@@ -113,10 +117,12 @@ public slots:
     void loadTasks();
     void loadTeams();
     void loadLogs();
+    void loadEvent();
     void sort( ListTypes type );
     void print( const QString &msg );
     void error( ErrorTypes type, const QString &msg );
     void update();
+    void addEvent();
 
 private:
     QSettings *settings;

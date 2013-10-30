@@ -55,21 +55,24 @@ void Main::initialize() {
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
     // init cvars
-    this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 ));
-    this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 ));
-    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 10, 0 )));
-    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 15, 00 )));
-    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 15, 30 )));
-    this->addVariable( new ConsoleVariable( "combo/single", this->settings, 1 ));
-    this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 ));
-    this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 ));
-    this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 ));
-    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true ));
+    this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 )); // replaceme
+    this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 )); // replaceme
+    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 10, 0 ))); // replaceme
+    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 15, 00 ))); // replaceme
+    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 15, 30 ))); // replaceme
+    this->addVariable( new ConsoleVariable( "combo/single", this->settings, 1 )); // replaceme
+    this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 )); // replaceme
+    this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 )); // replaceme
+    this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 )); // replaceme
+    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true )); // no change
     this->addVariable( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
 
     // load database entries
     this->loadDatabase();
+
+    // reset event entry
+    this->event = NULL;
 }
 
 /*
@@ -280,6 +283,59 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos comb
 
 /*
 ================
+addEvent
+================
+*/
+void Main::addEvent() {
+    QSqlQuery query;
+    QString comboString;
+    QString timeString;
+    int count = 0;
+
+    // currenly we have only one entry
+    // in future use multiple databases for multiple events
+    if ( this->event != NULL ) {
+        m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
+        return;
+    }
+
+    // compile strings
+    comboString = QString( "%1, %2, %3" )
+            .arg( Common::defaultSingleCombo )
+            .arg( Common::defaultDoubleCombo )
+            .arg( Common::defaultTripleCombo );
+    timeString = QString( "'%1', '%2', '%3'" )
+            .arg( Common::defaultStartTime )
+            .arg( Common::defaultFinishTime )
+            .arg( Common::defaultFinalTime );
+
+    // add new log
+    if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7 )" )
+                      .arg( Common::API )
+                      .arg( this->tr( "unnamed event" ))
+                      .arg( Common::defaultMinMembers )
+                      .arg( Common::defaultMaxMembers )
+                      .arg( timeString )
+                      .arg( Common::defaultPenaltyPoints )
+                      .arg( comboString ))) {
+        this->error( StrSoftError + QString( "could not add event, reason: %1\n" ).arg( query.lastError().text()));
+    }
+    query.exec( QString( "select * from events where id=1" ));
+
+    // get last entry and construct internal entry
+    while ( query.next()) {
+        this->event = new EventEntry( query.record(), "events" );
+        count++;
+        break;
+    }
+
+    // fail
+    if ( count == 0 )
+        m.error( StrFatalError + "could not create event\n" );
+}
+
+/*
+================
 loadDatabase
 ================
 */
@@ -334,11 +390,12 @@ void Main::loadDatabase() {
     // create initial table structure (if non-existant)
     //
     // TODO: must add API compatibility, move event start/end time to db
+    //       ultimately allow multiple event templates
     //
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, evaluatorId integer )" ) ||
          !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
-         !query.exec( "create table if not exists event ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer )" ) ||
+         !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer )" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, taskId integer, teamId integer )" )
          ) {
         m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
@@ -348,6 +405,7 @@ void Main::loadDatabase() {
     this->deleteOrphanedLogs();
 
     // load entries
+    this->loadEvent();
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();
@@ -514,6 +572,39 @@ void Main::loadLogs() {
         this->teamForId( logPtr->teamId())->logList << logPtr;
         this->logList << logPtr;
     }
+}
+
+/*
+================
+loadEvent
+================
+*/
+void Main::loadEvent() {
+    QSqlQuery query;
+    int count = 0;
+
+    // currently read the first entry
+    query.exec( "select * from events where id=1" );
+
+    // store entries
+    while ( query.next()) {
+        this->event = new EventEntry( query.record(), "events" );
+
+        // failsafe - api check
+        // add compatibility in future if needed (unlikely)
+        // TODO: add dialog to create new database (rename old one)
+        if ( static_cast<unsigned int>( event->api()) < Common::MinimumAPI ) {
+            m.error( StrFatalError +
+                     QString( "incompatible API - '%1', minimum supported %2\n" )
+                     .arg( event->api())
+                     .arg( Common::MinimumAPI ));
+        }
+        count++;
+    }
+
+    // no event entry? - create one
+    if ( count == 0 )
+        this->addEvent();
 }
 
 /*

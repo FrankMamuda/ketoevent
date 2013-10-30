@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>342</width>
-    <height>459</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,10 +21,20 @@
    <item row="1" column="0" colspan="3">
     <widget class="QGroupBox" name="groupMisc">
      <property name="title">
-      <string>Misc</string>
+      <string>Event</string>
      </property>
      <layout class="QGridLayout" name="miscLayout">
       <item row="2" column="1">
+       <widget class="QSpinBox" name="max">
+        <property name="toolTip">
+         <string>Maximum members in a team</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
        <widget class="QSpinBox" name="backupChanges">
         <property name="suffix">
          <string> changes</string>
@@ -37,24 +47,35 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="4" column="0" colspan="2">
+       <widget class="QCheckBox" name="sort">
+        <property name="text">
+         <string>Sort tasks alphabetically (main screen)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
        <widget class="QCheckBox" name="backupPerform">
         <property name="text">
          <string>Perform backups after</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="max">
-        <property name="toolTip">
-         <string>Maximum members in a team</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
+      <item row="1" column="0">
+       <widget class="QLabel" name="minLabel">
+        <property name="text">
+         <string>Minimum members</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="2" column="0">
+       <widget class="QLabel" name="maxLabel">
+        <property name="text">
+         <string>Maximum members</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
        <widget class="QSpinBox" name="min">
         <property name="toolTip">
          <string>Minimum members in a team</string>
@@ -65,25 +86,14 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="minLabel">
+       <widget class="QLabel" name="titleLabel">
         <property name="text">
-         <string>Minimum members</string>
+         <string>Event title</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="maxLabel">
-        <property name="text">
-         <string>Maximum members</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QCheckBox" name="sort">
-        <property name="text">
-         <string>Sort tasks alphabetically (main screen)</string>
-        </property>
-       </widget>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="titleEdit"/>
       </item>
      </layout>
     </widget>

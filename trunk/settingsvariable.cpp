@@ -29,7 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent ) {
+SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent, SettingsVariable::Class varClass ) {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
@@ -37,6 +37,7 @@ SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, Settin
     // set data, type and object
     this->objPtr = bObjPtr;
     this->setType( bType );
+    this->setClass( varClass );
     this->setParent( parent );
     this->setKey( key );
 
@@ -76,8 +77,15 @@ void SettingsVariable::setState() {
     // set values to GUI
     switch ( this->type()) {
     case CheckBox:
+        bool state;
+
+        if ( this->varClass() == ConsoleVar )
+            state = m.var( this->key())->isEnabled();
+        else
+            state = m.event->record().value( this->key()).toBool();
+
         cPtr = qobject_cast<QCheckBox*>( this->objPtr );
-        if ( m.var( this->key())->isEnabled())
+        if ( state )
             cPtr->setCheckState( Qt::Checked );
         else
             cPtr->setCheckState( Qt::Unchecked );
