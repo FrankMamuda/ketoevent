@@ -45,11 +45,17 @@ public:
         SpinBox,
         TimeEdit
     };
+    // currently supported types
+    enum Class {
+        ConsoleVar = 0,
+        EventVar
+    };
     QString key() const { return this->m_key; }
     Types type () const { return this->m_type; }
+    Class varClass() const { return this->m_class; }
 
     // constructor
-    SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent );
+    SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent, SettingsVariable::Class varClass = ConsoleVar );
 
     // set initial values from cvars
     void setState();
@@ -60,6 +66,7 @@ public:
 public slots:
     void setKey( const QString &key ) { this->m_key = key; }
     void setType( Types bType ) { this->m_type = bType; }
+    void setClass( Class varClass ) { this->m_class = varClass; }
 
     // checkBox
     void stateChanged( int state );
@@ -72,6 +79,7 @@ public slots:
 
 private:
     Types m_type;
+    Class m_class;
     QString m_key;
     QObject *objPtr;
 };
