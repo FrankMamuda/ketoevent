@@ -31,7 +31,14 @@ SOURCES += main.cpp\
     taskwidget.cpp \
     settingsvariable.cpp \
     gui_settings.cpp \
-    evententry.cpp
+    evententry.cpp \
+    database.cpp \
+    team.cpp \
+    log.cpp \
+    task.cpp \
+    event.cpp \
+    variable.cpp \
+    sort.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \

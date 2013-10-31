@@ -28,7 +28,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QCheckBox>
 #include <QTimeEdit>
 #include <QLineEdit>
-#include "main.h"
 
 //
 // class:pSettingsCvar
@@ -42,14 +41,16 @@ class SettingsVariable : public QObject {
 public:
     // currently supported types
     enum Types {
-        CheckBox = 0,
+        NoType = -1,
+        CheckBox,
         SpinBox,
         TimeEdit,
         LineEdit
     };
     // currently supported types
     enum Class {
-        ConsoleVar = 0,
+        NoClass = -1,
+        ConsoleVar,
         EventVar
     };
     QString key() const { return this->m_key; }
@@ -57,13 +58,17 @@ public:
     Class varClass() const { return this->m_class; }
 
     // constructor
-    SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent, SettingsVariable::Class varClass = ConsoleVar );
+    SettingsVariable( const QString &key, SettingsVariable::Types bType, SettingsVariable::Class varClass = ConsoleVar );
 
     // set initial values from cvars
     void setState();
 
     // save value
     void save();
+
+    // bind/unbind
+    void unbind();
+    void bind( QObject *objPtr, QObject *parentPtr );
 
 public slots:
     void setKey( const QString &key ) { this->m_key = key; }
@@ -81,9 +86,6 @@ public slots:
 
     // textChanged
     void textChanged( const QString &text );
-
-    // disconnect vars
-    void disconnectVars();
 
 private:
     Types m_type;

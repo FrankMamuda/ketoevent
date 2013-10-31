@@ -32,6 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_rankings.h"
 #include "gui_about.h"
 #include "gui_settings.h"
+#include "settingsvariable.h"
 
 //
 // namespace: Ui
@@ -49,7 +50,7 @@ class Gui_Main : public QMainWindow {
 public:
     explicit Gui_Main( QWidget *parent = 0 );
     ~Gui_Main();
-    
+
 private:
     Ui::Gui_Main *ui;
     int currentMatch;
@@ -74,7 +75,7 @@ private slots:
     void on_logButton_clicked();
     void on_quickAddButton_clicked();
     void on_clearButton_clicked();
-    void on_findTaskEdit_textChanged(const QString &arg1);
+    void on_findTaskEdit_textChanged( const QString & );
     void on_findTaskEdit_returnPressed();
 #ifdef Q_OS_ANDROID
     void on_upButton_clicked();

@@ -33,6 +33,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskentry.h"
 #include "consolevariable.h"
 #include "evententry.h"
+#include "settingsvariable.h"
 
 // message macro
 #ifdef Q_CC_MSVC
@@ -88,7 +89,8 @@ public:
     QList <TaskEntry*> taskList;
     QList<TaskEntry*> taskListSorted();
     QList <LogEntry*> logList;
-    QList <ConsoleVariable*> varList;
+    QList <ConsoleVariable*>  cvarList;
+    QList <SettingsVariable*> svarList;
 
     // other funcs
     LogEntry *logForId( int id );
@@ -98,8 +100,10 @@ public:
     TeamEntry *teamForId( int id );
     TeamEntry *teamForName( const QString &name );
     QString transliterate( const QString &path );
-    ConsoleVariable *var( const QString &key );
-    void addVariable( ConsoleVariable *varPtr );
+    ConsoleVariable *cvar( const QString &key );
+    SettingsVariable *svar( const QString &key );
+    void addCvar( ConsoleVariable *varPtr );
+    void addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
@@ -111,6 +115,7 @@ public:
 
     // empty cvar
     ConsoleVariable *defaultCvar;
+    SettingsVariable *defaultSvar;
 
 public slots:
     void initialize();
