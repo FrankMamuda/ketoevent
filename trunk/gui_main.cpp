@@ -103,8 +103,11 @@ destruct
 ================
 */
 Gui_Main::~Gui_Main() {
+    // disconnect ui elements
     this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
     this->disconnect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )));
+
+    // get rid of ui
     delete ui;
 }
 
@@ -229,7 +232,7 @@ void Gui_Main::fillTasks() {
     }
     lw->clear();
 
-    if ( m.var( "misc/sortTasks" )->isEnabled())
+    if ( m.cvar( "misc/sortTasks" )->isEnabled())
         taskList = m.taskListSorted();
     else
         taskList = m.taskList;

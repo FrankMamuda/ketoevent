@@ -25,13 +25,14 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "ui_gui_settings.h"
 #include <QFileDialog>
 #include <QTextStream>
+#include "main.h"
 
 /*
 ================
 construct
 ================
 */
-Gui_Settings::Gui_Settings( QWidget *parent ) : QDialog(parent), ui( new Ui::Gui_Settings ) {
+Gui_Settings::Gui_Settings( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
     this->intializeVariables();
 
@@ -48,12 +49,9 @@ destruct
 ================
 */
 Gui_Settings::~Gui_Settings() {
-    // garbage collection
-    foreach ( SettingsVariable *scPtr, this->varList ) {
-        scPtr->disconnectVars();
-        delete scPtr;
-    }
-    this->varList.clear();
+    foreach ( SettingsVariable *varPtr, m.svarList )
+        varPtr->unbind();
+
     delete ui;
 }
 
@@ -63,30 +61,25 @@ intializeVariables
 ================
 */
 void Gui_Settings::intializeVariables() {
-    // lock cvars
+    // lock vars
     this->lockVariables();
 
-    // set default values
-    // TODO: add bind mechanism, creating new vars on every settings instance is too memory consuming
-    this->addVariable( "startTime", SettingsVariable::TimeEdit, this->ui->startTime, SettingsVariable::EventVar );
-    this->addVariable( "finishTime", SettingsVariable::TimeEdit, this->ui->finishTime, SettingsVariable::EventVar );
-    this->addVariable( "finalTime", SettingsVariable::TimeEdit, this->ui->finalTime, SettingsVariable::EventVar );
-    this->addVariable( "penalty", SettingsVariable::SpinBox, this->ui->penalty, SettingsVariable::EventVar );
-    this->addVariable( "singleCombo", SettingsVariable::SpinBox, this->ui->sCombo, SettingsVariable::EventVar );
-    this->addVariable( "doubleCombo", SettingsVariable::SpinBox, this->ui->dCombo, SettingsVariable::EventVar );
-    this->addVariable( "tripleCombo", SettingsVariable::SpinBox, this->ui->tCombo, SettingsVariable::EventVar );
-    this->addVariable( "minMembers", SettingsVariable::SpinBox, this->ui->min, SettingsVariable::EventVar );
-    this->addVariable( "maxMembers", SettingsVariable::SpinBox, this->ui->max, SettingsVariable::EventVar );
-    this->addVariable( "backup/changes", SettingsVariable::SpinBox, this->ui->backupChanges, SettingsVariable::ConsoleVar );
-    this->addVariable( "backup/perform", SettingsVariable::CheckBox, this->ui->backupPerform, SettingsVariable::ConsoleVar );
-    this->addVariable( "misc/sortTasks", SettingsVariable::CheckBox, this->ui->sort, SettingsVariable::ConsoleVar );
-    this->addVariable( "name", SettingsVariable::LineEdit, this->ui->titleEdit, SettingsVariable::EventVar );
+    // bind vars
+    m.svar( "startTime" )->bind( this->ui->startTime, qobject_cast<QObject*>( this ));
+    m.svar( "finishTime" )->bind( this->ui->finishTime, qobject_cast<QObject*>( this ));
+    m.svar( "finalTime" )->bind( this->ui->finalTime, qobject_cast<QObject*>( this ));
+    m.svar( "penalty" )->bind( this->ui->penalty, qobject_cast<QObject*>( this ));
+    m.svar( "singleCombo" )->bind( this->ui->sCombo, qobject_cast<QObject*>( this ));
+    m.svar( "doubleCombo" )->bind( this->ui->dCombo, qobject_cast<QObject*>( this ));
+    m.svar( "tripleCombo" )->bind( this->ui->tCombo, qobject_cast<QObject*>( this ));
+    m.svar( "minMembers" )->bind( this->ui->min, qobject_cast<QObject*>( this ));
+    m.svar( "maxMembers" )->bind( this->ui->max, qobject_cast<QObject*>( this ));
+    m.svar( "backup/changes" )->bind( this->ui->backupChanges, qobject_cast<QObject*>( this ));
+    m.svar( "backup/perform" )->bind( this->ui->backupPerform, qobject_cast<QObject*>( this ));
+    m.svar( "misc/sortTasks" )->bind( this->ui->sort, qobject_cast<QObject*>( this ));
+    m.svar( "name" )->bind( this->ui->titleEdit, qobject_cast<QObject*>( this ));
 
-    // set state
-    foreach ( SettingsVariable *scPtr, this->varList )
-        scPtr->setState();
-
-    // unlock cvars
+    // unlock vars
     this->lockVariables( false );
 }
 

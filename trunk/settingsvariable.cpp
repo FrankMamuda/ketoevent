@@ -23,24 +23,40 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "settingsvariable.h"
 #include "gui_settings.h"
+#include "main.h"
 
 /*
 ================
 construct
 ================
 */
-SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, SettingsVariable::Types bType, QObject *parent, SettingsVariable::Class varClass ) {
+SettingsVariable::SettingsVariable( const QString &key, SettingsVariable::Types bType, SettingsVariable::Class varClass ) {
+    // set data and type
+    this->setType( bType );
+    this->setClass( varClass );
+    this->setKey( key );
+}
+
+/*
+================
+bind
+================
+*/
+void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
     QLineEdit *lPtr;
 
-    // set data, type and object
-    this->objPtr = bObjPtr;
-    this->setType( bType );
-    this->setClass( varClass );
-    this->setParent( parent );
-    this->setKey( key );
+    // set object and parent
+    this->objPtr = objPtr;
+    this->setParent( parentPtr );
+
+    // failsafe
+    if ( this->parent() == NULL || this->objPtr == NULL ) {
+        m.error( StrSoftError + QString( this->tr( "unable to bind settings var '%1\n" )).arg( this->key()));
+        return;
+    }
 
     // connect slots
     switch ( this->type()) {
@@ -68,14 +84,17 @@ SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, Settin
         m.error( StrSoftError + this->tr( "unknown type\n" ));
         return;
     }
+
+    // set state to current value
+    this->setState();
 }
 
 /*
 ================
-disconnectVars
+unbind
 ================
 */
-void SettingsVariable::disconnectVars() {
+void SettingsVariable::unbind() {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
@@ -102,7 +121,15 @@ void SettingsVariable::disconnectVars() {
         lPtr = qobject_cast<QLineEdit*>( this->objPtr );
         lPtr->disconnect( lPtr, SIGNAL( textChanged( QString )));
         break;
+
+    case NoType:
+    default:
+        break;
     }
+
+    // reset object
+    this->objPtr = NULL;
+    this->setParent( NULL );
 }
 
 /*
@@ -123,7 +150,7 @@ void SettingsVariable::setState() {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
-            state = m.var( this->key())->isEnabled();
+            state = m.cvar( this->key())->isEnabled();
         else
             state = m.event->record().value( this->key()).toBool();
 
@@ -140,7 +167,7 @@ void SettingsVariable::setState() {
         int value;
 
         if ( this->varClass() == ConsoleVar )
-            value = m.var( this->key())->integer();
+            value = m.cvar( this->key())->integer();
         else
             value = m.event->record().value( this->key()).toInt();
 
@@ -154,7 +181,7 @@ void SettingsVariable::setState() {
         QTime time;
 
         if ( this->varClass() == ConsoleVar )
-            time = m.var( this->key())->time();
+            time = m.cvar( this->key())->time();
         else
             time = QTime::fromString( m.event->record().value( this->key()).toString(), "hh:mm" );
 
@@ -168,7 +195,7 @@ void SettingsVariable::setState() {
         QString text;
 
         if ( this->varClass() == ConsoleVar )
-            text = m.var( this->key())->string();
+            text = m.cvar( this->key())->string();
         else
             text = m.event->record().value( this->key()).toString();
 
@@ -177,6 +204,7 @@ void SettingsVariable::setState() {
     }
         break;
 
+    case NoType:
     default:
         m.error( StrSoftError + this->tr( "unknown type\n" ));
         return;
@@ -196,9 +224,9 @@ void SettingsVariable::stateChanged( int state ) {
 
     if ( this->varClass() == ConsoleVar ) {
         if ( state == Qt::Checked )
-            m.var( this->key())->setValue( true );
+            m.cvar( this->key())->setValue( true );
         else
-            m.var( this->key())->setValue( false );
+            m.cvar( this->key())->setValue( false );
     } else {
         if ( state == Qt::Checked )
             m.event->setValue( this->key(), true );
@@ -219,7 +247,7 @@ void SettingsVariable::integerValueChanged( int integer ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.var( this->key())->setValue( integer );
+        m.cvar( this->key())->setValue( integer );
     else
         m.event->setValue( this->key(), integer );
 }
@@ -236,7 +264,7 @@ void SettingsVariable::timeChanged( const QTime &time ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.var( this->key())->setValue( time );
+        m.cvar( this->key())->setValue( time );
     else
         m.event->setValue( this->key(), time.toString( "hh:mm" ));
 }
@@ -253,7 +281,7 @@ void SettingsVariable::textChanged( const QString &text ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.var( this->key())->setValue( text );
+        m.cvar( this->key())->setValue( text );
     else
         m.event->setValue( this->key(), text );
 }

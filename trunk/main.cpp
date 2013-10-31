@@ -41,6 +41,12 @@ class Main m;
 //
 //#define FORCE_LATVIAN
 
+//
+// TODO: check private/public funcs
+//       check includes
+//       add more props
+//
+
 /*
 ================
 initialize
@@ -56,46 +62,34 @@ void Main::initialize() {
 
     // init cvars
     // TODO: restore actual console (enable debugging mode)
-    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true ));
-    this->addVariable( new ConsoleVariable( "backup/changes", this->settings, 25 ));
-    this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
+    this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
+    this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
+    this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
 
     // reset event entry
     this->event = NULL;
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
+    this->defaultSvar = new SettingsVariable( "default", SettingsVariable::NoType, SettingsVariable::NoClass );
 
     // load database entries
     this->loadDatabase();
-}
 
-/*
-================
-var
-================
-*/
-ConsoleVariable *Main::var( const QString &key ) {
-    foreach ( ConsoleVariable *varPtr, this->varList ) {
-        if ( !QString::compare( varPtr->key(), key ))
-            return varPtr;
-    }
-    return this->defaultCvar;
-}
-
-/*
-================
-addVariable
-================
-*/
-void Main::addVariable( ConsoleVariable *varPtr ) {
-    // avoid duplicates
-    if ( this->var( varPtr->key())) {
-        delete varPtr;
-        return;
-    }
-
-    this->varList << varPtr;
+    // create settings variables
+    this->addSvar( "startTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
+    this->addSvar( "finishTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
+    this->addSvar( "finalTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
+    this->addSvar( "penalty", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "singleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "doubleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "tripleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "minMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "maxMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "backup/changes", SettingsVariable::SpinBox, SettingsVariable::ConsoleVar );
+    this->addSvar( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
+    this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
+    this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
 }
 
 /*
@@ -130,8 +124,6 @@ shutdown
 ================
 */
 void Main::shutdown( bool ignoreDatabase ) {
-    QSqlQuery query;
-
     // save settings
     this->settings->sync();
     delete this->settings;
@@ -146,736 +138,21 @@ void Main::shutdown( bool ignoreDatabase ) {
     }
 
     // clear console vars
-    foreach ( ConsoleVariable *varPtr, this->varList )
+    foreach ( ConsoleVariable *varPtr, this->cvarList )
         delete varPtr;
-    this->varList.clear();
+    this->cvarList.clear();
     delete this->defaultCvar;
+
+    // garbage collection
+    foreach ( SettingsVariable *varPtr, this->svarList )
+        delete varPtr;
+    this->svarList.clear();
+    delete this->defaultSvar;
 
     // close applet
     QApplication::quit();
 }
 
-/*
-================
-addTeam
-================
-*/
-void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool lockState ) {
-    QSqlQuery query;
-
-    // avoid duplicates
-    if ( m.teamForName( teamName ) != NULL )
-        return;
-
-    // perform database update and select last row
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', null )" )
-                      .arg( teamName )
-                      .arg( members )
-                      .arg( finishTime.toString( "hh:mm" ))
-                      .arg( static_cast<int>( lockState ))
-                      )) {
-        this->error( StrSoftError + QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
-    }
-    query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
-
-    // get last entry and construct internal entry
-    while ( query.next())
-        this->teamList << new TeamEntry( query.record(), "teams" );
-}
-
-/*
-================
-removeTeam
-================
-*/
-void Main::removeTeam( const QString &teamName ) {
-    TeamEntry *teamPtr = NULL;
-    QSqlQuery query;
-
-    // find team
-    teamPtr = m.teamForName( teamName );
-
-    // failsafe
-    if ( teamPtr == NULL )
-        return;
-
-    // remove team and logs from db
-    query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id()));
-    query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
-
-    // remove from display
-    this->teamList.removeAll( teamPtr );
-}
-
-/*
-================
-addTask
-================
-*/
-void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style ) {
-    QSqlQuery query;
-    int max = 0;
-
-    // avoid duplicates
-    if ( m.taskForName( taskName ) != NULL )
-        return;
-
-    // make sure we insert value at the bottom of the list
-    query.exec( "select max ( parent ) from tasks" );
-    while ( query.next())
-        max = query.value( 0 ).toInt();
-
-    // perform database update and select last row
-    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6 )" )
-                      .arg( taskName )
-                      .arg( points )
-                      .arg( multi )
-                      .arg( static_cast<TaskEntry::Styles>( style ))
-                      .arg( static_cast<TaskEntry::Types>( type ))
-                      .arg( max + 1 )
-                      )) {
-        this->error( StrSoftError + QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
-    }
-    query.exec( QString( "select * from tasks where id=%1" ).arg( query.lastInsertId().toInt() ));
-
-    // get last entry and construct internal entry
-    while ( query.next())
-        this->taskList << new TaskEntry( query.record(), "tasks" );
-}
-
-/*
-================
-addLog
-================
-*/
-LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos combo ) {
-    LogEntry *logPtr = NULL;
-    QSqlQuery query;
-
-    // avoid duplicates
-    foreach ( logPtr, this->logList ) {
-        if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
-            return logPtr;
-    }
-
-    // add new log
-    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3, %4 )" )
-                      .arg( value )
-                      .arg( static_cast<int>( combo ))
-                      .arg( taskId )
-                      .arg( teamId )
-                      )) {
-        this->error( StrSoftError + QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
-    }
-    query.exec( QString( "select * from logs where id=%1" ).arg( query.lastInsertId().toInt() ));
-
-    // get last entry and construct internal entry
-    while ( query.next()) {
-        logPtr = new LogEntry( query.record(), "logs" );
-        this->logList << logPtr;
-    }
-    return logPtr;
-}
-
-/*
-================
-addEvent
-================
-*/
-void Main::addEvent() {
-    QSqlQuery query;
-    QString comboString;
-    QString timeString;
-    int count = 0;
-
-    // currenly we have only one entry
-    // in future use multiple databases for multiple events
-    if ( this->event != NULL ) {
-        m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
-        return;
-    }
-
-    // compile strings
-    comboString = QString( "%1, %2, %3" )
-            .arg( Common::defaultSingleCombo )
-            .arg( Common::defaultDoubleCombo )
-            .arg( Common::defaultTripleCombo );
-    timeString = QString( "'%1', '%2', '%3'" )
-            .arg( Common::defaultStartTime )
-            .arg( Common::defaultFinishTime )
-            .arg( Common::defaultFinalTime );
-
-    // add new log
-    if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7 )" )
-                      .arg( Common::API )
-                      .arg( this->tr( "unnamed event" ))
-                      .arg( Common::defaultMinMembers )
-                      .arg( Common::defaultMaxMembers )
-                      .arg( timeString )
-                      .arg( Common::defaultPenaltyPoints )
-                      .arg( comboString ))) {
-        this->error( StrSoftError + QString( "could not add event, reason: %1\n" ).arg( query.lastError().text()));
-    }
-    query.exec( QString( "select * from events where id=1" ));
-
-    // get last entry and construct internal entry
-    while ( query.next()) {
-        this->event = new EventEntry( query.record(), "events" );
-        count++;
-        break;
-    }
-
-    // fail
-    if ( count == 0 )
-        m.error( StrFatalError + "could not create event\n" );
-}
-
-/*
-================
-loadDatabase
-================
-*/
-void Main::loadDatabase() {
-#ifdef Q_OS_UNIX
-#ifdef Q_OS_ANDROID
-    this->path = QString( "/sdcard/data/org.factory12.ketoevent3/" );
-#else
-    this->path = QString( QDir::homePath() + "/.ketoevent/" );
-#endif
-#else
-    this->path = QString( QDir::currentPath() + "/" );
-#endif
-
-    // make path id nonexistant
-    QDir dir( this->path );
-    if ( !dir.exists()) {
-        dir.mkpath( this->path );
-        if ( !dir.exists()) {
-            m.error( StrFatalError + this->tr( "could not create database path\n" ));
-            return;
-        }
-    }
-
-    // create database
-
-    this->databasePath = this->path + "ketoevent.db";
-    QFile database( this->databasePath );
-    QSqlDatabase db;
-
-    // failsafe
-    if ( !db.isDriverAvailable( "QSQLITE" ))
-        m.error( StrFatalError + this->tr( "sqlite not present on the system\n" ));
-
-    // set sqlite driver
-    db = QSqlDatabase::addDatabase( "QSQLITE" );
-
-    // touch file if empty
-    if ( !database.exists()) {
-        database.open( QFile::WriteOnly );
-        database.close();
-    }
-
-    // set path and open
-    db.setDatabaseName( this->databasePath );
-    if ( !db.open())
-        m.error( StrFatalError + this->tr( "could not load task database\n" ));
-
-    // create query
-    QSqlQuery query;
-
-    // create initial table structure (if non-existant)
-    //
-    // TODO: must add API compatibility, move event start/end time to db
-    //       ultimately allow multiple event templates
-    //
-    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
-         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, evaluatorId integer )" ) ||
-         !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
-         !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer )" ) ||
-         !query.exec( "create table if not exists logs ( id integer primary key, value integer, combo integer, taskId integer, teamId integer )" )
-         ) {
-        m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
-    }
-
-    // delete orphaned logs on init
-    this->deleteOrphanedLogs();
-
-    // load entries
-    this->loadEvent();
-    this->loadTasks();
-    this->loadTeams();
-    this->loadLogs();
-}
-
-/*
-================
-deleteOrphanedLogs
-================
-*/
-void Main::deleteOrphanedLogs() {
-    // create query
-    QSqlQuery query;
-
-    // remove orphaned logs (fixes crash with invalid teamId/taskId)
-    if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
-        m.error( StrSoftError + QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
-}
-
-/*
-================
-importDatabase (testing)
-================
-*/
-void Main::importDatabase( const QString &path ) {
-    QList<QPair<int, QString> > teamMatchList;
-    QList<QPair<int, QString> > taskMatchList;
-
-    // create query
-    QSqlQuery query;
-
-    // attach the new database
-    query.exec( QString( "attach '%1' as toMerge" ).arg( path ));
-
-    //
-    // first add teams
-    //
-    query.exec( "select * from toMerge.teams" );
-
-    // store entries
-    while ( query.next()) {
-        QString teamName = query.record().value( "name" ).toString();
-
-        // check for duplicates
-        if ( m.teamForName( teamName ) != NULL ) {
-            // TODO: messagebox - replace?
-            QMessageBox::question( NULL, "Replace team", QString( "Replace logs for team \"%1\"?" ).arg( teamName ), QMessageBox::Yes, QMessageBox::No );
-            this->removeTeam( teamName );
-        }
-
-        // store temp value
-        QList<QPair<int, QString> > teamMatch;
-        teamMatch.append( qMakePair( query.record().value( "id" ).toInt(), teamName ));
-        teamMatchList << teamMatch;
-
-        // add to database
-        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "finishTime" ).toString(), "hh:mm" ), query.record().value( "lock" ).toBool());
-    }
-
-    //
-    // then add tasks
-    //
-    query.exec( "select * from toMerge.tasks" );
-
-    // store entries
-    while ( query.next()) {
-        // store temp value
-        QList<QPair<int, QString> > taskMatch;
-        taskMatch.append( qMakePair( query.record().value( "id" ).toInt(), query.record().value( "name" ).toString()));
-        taskMatchList << taskMatch;
-
-        // add to main database
-        // duplicates are ignored
-        this->addTask( query.record().value( "name" ).toString(), query.record().value( "points" ).toInt(), query.record().value( "multi" ).toInt(), static_cast<TaskEntry::Types>( query.record().value( "type" ).toInt()), static_cast<TaskEntry::Styles>( query.record().value( "style" ).toInt()));
-    }
-
-    //
-    // next part is tricky one:
-    // we have to match log by old taskId and teamId
-    // I'm sure it can be done more efficiently
-    //
-    QPair<int, QString> teamMatchPtr;
-    foreach ( teamMatchPtr, teamMatchList ) {
-        TeamEntry *teamPtr;
-
-        // first find the new team (if none, don't bother)
-        teamPtr = m.teamForName( teamMatchPtr.second );
-        if ( teamPtr == NULL )
-            return;
-
-        // then get all logs for the team
-        query.exec( QString( "select * from toMerge.logs where teamId=%1" ).arg( teamMatchPtr.first ));
-
-        // cycle through logs
-        while ( query.next()) {
-            // first find the task (it may be imported or already existing)
-            QPair<int, QString> taskMatchPtr;
-            foreach ( taskMatchPtr, taskMatchList ) {
-                if ( taskMatchPtr.first == query.record().value( 2 ).toInt())
-                    break;
-            }
-            TaskEntry *taskPtr = m.taskForName( taskMatchPtr.second );
-            if ( taskPtr == NULL )
-                return;
-
-            // then add log
-            this->addLog( taskPtr->id(), teamPtr->id(), query.record().value( "value" ).toInt(), static_cast<LogEntry::Combos>( query.record().value( "combo" ).toInt()));
-        }
-    }
-
-    // detach the new database
-    query.exec( "detach toMerge" );
-}
-
-/*
-================
-loadTasks
-================
-*/
-void Main::loadTasks() {
-    QSqlQuery query;
-
-    // read stuff
-    query.exec( "select * from tasks order by parent asc" );
-
-    // store entries
-    while ( query.next())
-        this->taskList << new TaskEntry( query.record(), "tasks" );
-}
-
-/*
-================
-loadTeams
-================
-*/
-void Main::loadTeams() {
-    QSqlQuery query;
-
-    // read stuff
-    query.exec( "select * from teams" );
-
-    // store entries
-    while ( query.next())
-        this->teamList << new TeamEntry( query.record(), "teams" );
-
-    // sort alphabetically
-    this->sort( Main::Teams );
-}
-
-/*
-================
-loadLogs
-================
-*/
-void Main::loadLogs() {
-    QSqlQuery query;
-
-    // read stuff
-    query.exec( "select * from logs" );
-
-    // store entries
-    while ( query.next()) {
-        LogEntry *logPtr = new LogEntry( query.record(), "logs" );
-        this->teamForId( logPtr->teamId())->logList << logPtr;
-        this->logList << logPtr;
-    }
-}
-
-/*
-================
-loadEvent
-================
-*/
-void Main::loadEvent() {
-    QSqlQuery query;
-    int count = 0;
-
-    // currently read the first entry
-    query.exec( "select * from events where id=1" );
-
-    // store entries
-    while ( query.next()) {
-        this->event = new EventEntry( query.record(), "events" );
-
-        // failsafe - api check
-        // add compatibility in future if needed (unlikely)
-        // TODO: add dialog to create new database (rename old one)
-        if ( static_cast<unsigned int>( event->api()) < Common::MinimumAPI ) {
-            m.error( StrFatalError +
-                     QString( "incompatible API - '%1', minimum supported %2\n" )
-                     .arg( event->api())
-                     .arg( Common::MinimumAPI ));
-        }
-        count++;
-    }
-
-    // no event entry? - create one
-    if ( count == 0 )
-        this->addEvent();
-}
-
-/*
-================
-logForId
-================
-*/
-LogEntry *Main::logForId( int id ) {
-    foreach ( LogEntry *logPtr, this->logList ) {
-        if ( logPtr->id() == id )
-            return logPtr;
-    }
-    return NULL;
-}
-
-/*
-================
-logForIds
-================
-*/
-LogEntry *Main::logForIds( int teamId, int taskId ) {
-    TeamEntry *teamPtr = this->teamForId( teamId );
-    if ( teamPtr == NULL )
-        return NULL;
-
-    foreach ( LogEntry *logPtr, teamPtr->logList ) {
-        if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
-            return logPtr;
-    }
-    return NULL;
-}
-
-/*
-================
-taskForId
-================
-*/
-TaskEntry *Main::taskForId( int id ) {
-    foreach ( TaskEntry *taskPtr, this->taskList ) {
-        if ( taskPtr->id() == id )
-            return taskPtr;
-    }
-    return NULL;
-}
-
-/*
-================
-taskForName
-================
-*/
-TaskEntry *Main::taskForName( const QString &name ) {
-    foreach ( TaskEntry *taskPtr, this->taskList ) {
-        if ( !QString::compare( name, taskPtr->name()))
-            return taskPtr;
-    }
-    return NULL;
-}
-
-/*
-================
-teamForId
-================
-*/
-TeamEntry *Main::teamForId( int id ) {
-    foreach ( TeamEntry *teamPtr, this->teamList ) {
-        if ( teamPtr->id() == id )
-            return teamPtr;
-    }
-    return NULL;
-}
-
-/*
-================
-teamForName
-================
-*/
-TeamEntry *Main::teamForName( const QString &name ) {
-    foreach ( TeamEntry *teamPtr, this->teamList ) {
-        if ( !QString::compare( name, teamPtr->name()))
-            return teamPtr;
-    }
-    return NULL;
-}
-
-// latin4 chars
-static unsigned int latin4Array[] = {
-    224, // aa
-    232, // ch
-    186, // ee
-    187, // gj
-    239, // ii
-    243, // kj
-    182, // lj
-    241, // nj
-    242, // oo
-    179, // rj
-    185, // sh
-    254, // uu
-    190, // zh
-    192, // AA
-    200, // CH
-    170, // EE
-    171, // GJ
-    207, // II
-    211, // KJ
-    166, // LJ
-    209, // NJ
-    210, // OO
-    163, // RJ
-    169, // SH
-    222, // UU
-    174  // ZH
-};
-static int latin4ArraySize = sizeof( latin4Array ) / sizeof( int );
-
-
-// latin4 chars
-static unsigned int latin4ArrayB[] = {
-    257, // aa
-    269, // ch
-    275, // ee
-    291, // gj
-    299, // ii
-    311, // kj
-    316, // lj
-    326, // nj
-    333, // oo
-    343, // rj
-    353, // sh
-    363, // uu
-    382, // zh
-    256, // AA
-    268, // CH
-    274, // EE
-    290, // GJ
-    298, // II
-    310, // KJ
-    315, // LJ
-    325, // NJ
-    332, // OO
-    342, // RJ
-    352, // SH
-    362, // UU
-    381  // ZH
-};
-
-// latin1 corresponding chars
-static char latin1Array[] = {
-    'a', // aa
-    'c', // ch
-    'e', // ee
-    'g', // gj
-    'i', // ii
-    'k', // kj
-    'l', // lj
-    'n', // nj
-    'o', // oo
-    'r', // rj
-    's', // sh
-    'u', // uu
-    'z', // zh
-    'A', // AA
-    'C', // CH
-    'E', // EE
-    'G', // GJ
-    'I', // II
-    'K', // KJ
-    'L', // LJ
-    'N', // NJ
-    'O', // OO
-    'R', // RJ
-    'S', // SH
-    'U', // UU
-    'Z'  // ZH
-};
-
-/*
-============
-transliterate
-============
-*/
-QString Main::transliterate( const QString &path ) {
-    int y;
-    QString out;
-
-    foreach ( QChar ch, path ) {
-        for ( y = 0; y < latin4ArraySize; y++ ) {
-            if ( ch == QChar( latin4Array[y] ) || ch == QChar( latin4ArrayB[y] ))
-                ch = latin1Array[y];
-        }
-        out.append( ch );
-    }
-    return out;
-}
-
-/*
-================
-listToAscending
-================
-*/
-template <class T>
-bool listToAscending( T *ePtr0, T *ePtr1 ) {
-    return m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
-}
-
-/*
-================
-sort
-================
-*/
-void Main::sort( ListTypes type ) {
-    switch ( type ) {
-    case Tasks:
-    {
-        QList <TaskEntry*>regularList;
-        QList <TaskEntry*>boldList;
-        QList <TaskEntry*>italicList;
-
-        foreach ( TaskEntry *taskPtr, this->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Regular )
-                regularList << taskPtr;
-        }
-        qSort( regularList.begin(), regularList.end(), listToAscending<TaskEntry> );
-
-        foreach ( TaskEntry *taskPtr, this->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Bold )
-                boldList << taskPtr;
-        }
-        qSort( boldList.begin(), boldList.end(), listToAscending<TaskEntry> );
-
-        foreach ( TaskEntry *taskPtr, this->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Italic )
-                italicList << taskPtr;
-        }
-        qSort( italicList.begin(), italicList.end(), listToAscending<TaskEntry> );
-
-        this->taskList.clear();
-        this->taskList.append( regularList );
-        this->taskList.append( boldList );
-        this->taskList.append( italicList );
-
-
-        regularList.clear();
-        boldList.clear();
-        italicList.clear();
-        //qSort( this->taskList.begin(), this->taskList.end(), listToAscending<TaskEntry> );
-    }
-        break;
-
-    case Teams:
-        qSort( this->teamList.begin(), this->teamList.end(), listToAscending<TeamEntry> );
-        break;
-
-    case NoType:
-    default:
-        m.error( StrSoftError + this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
-        return;
-    }
-}
-
-/*
-================
-taskListSorted
-================
-*/
-QList<TaskEntry*> Main::taskListSorted() {
-    QList <TaskEntry*>sortedList;
-
-    // make a local copy and sort it alphabetically
-    sortedList = this->taskList;
-    qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
-
-    // return sorted list
-    return sortedList;
-}
 
 /*
 ================
@@ -906,7 +183,7 @@ update
 void Main::update() {
     this->changesCounter++;
 
-    if ( this->changesCounter == this->var( "backup/changes" )->value().toInt() && this->var( "backup/perform" )->value().toBool()) {
+    if ( this->changesCounter == this->cvar( "backup/changes" )->value().toInt() && this->cvar( "backup/perform" )->value().toBool()) {
         this->writeBackup();
         this->changesCounter = 0;
     }
