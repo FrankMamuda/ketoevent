@@ -27,6 +27,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QTimeEdit>
+#include <QLineEdit>
 #include "main.h"
 
 //
@@ -43,7 +44,8 @@ public:
     enum Types {
         CheckBox = 0,
         SpinBox,
-        TimeEdit
+        TimeEdit,
+        LineEdit
     };
     // currently supported types
     enum Class {
@@ -76,6 +78,12 @@ public slots:
 
     // timeEdit
     void timeChanged( const QTime &time );
+
+    // textChanged
+    void textChanged( const QString &text );
+
+    // disconnect vars
+    void disconnectVars();
 
 private:
     Types m_type;
