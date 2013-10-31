@@ -39,7 +39,7 @@ class Main m;
 //
 // defines
 //
-#define FORCE_LATVIAN
+//#define FORCE_LATVIAN
 
 /*
 ================
@@ -55,24 +55,19 @@ void Main::initialize() {
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
     // init cvars
-    this->addVariable( new ConsoleVariable( "members/min", this->settings, 2 )); // replaceme
-    this->addVariable( new ConsoleVariable( "members/max", this->settings, 3 )); // replaceme
-    this->addVariable( new ConsoleVariable( "time/start", this->settings, QTime( 10, 0 ))); // replaceme
-    this->addVariable( new ConsoleVariable( "time/finish", this->settings, QTime( 15, 00 ))); // replaceme
-    this->addVariable( new ConsoleVariable( "time/final", this->settings, QTime( 15, 30 ))); // replaceme
-    this->addVariable( new ConsoleVariable( "combo/single", this->settings, 1 )); // replaceme
-    this->addVariable( new ConsoleVariable( "combo/double", this->settings, 3 )); // replaceme
-    this->addVariable( new ConsoleVariable( "combo/triple", this->settings, 5 )); // replaceme
-    this->addVariable( new ConsoleVariable( "penaltyMultiplier", this->settings, 5 )); // replaceme
-    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true )); // no change
+    // TODO: restore actual console (enable debugging mode)
+    this->addVariable( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addVariable( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addVariable( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
 
-    // load database entries
-    this->loadDatabase();
-
     // reset event entry
     this->event = NULL;
+
+    // add an empty car
+    this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
+
+    // load database entries
+    this->loadDatabase();
 }
 
 /*
@@ -85,7 +80,7 @@ ConsoleVariable *Main::var( const QString &key ) {
         if ( !QString::compare( varPtr->key(), key ))
             return varPtr;
     }
-    return NULL;
+    return this->defaultCvar;
 }
 
 /*
@@ -154,6 +149,7 @@ void Main::shutdown( bool ignoreDatabase ) {
     foreach ( ConsoleVariable *varPtr, this->varList )
         delete varPtr;
     this->varList.clear();
+    delete this->defaultCvar;
 
     // close applet
     QApplication::quit();

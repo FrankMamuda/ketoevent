@@ -43,7 +43,7 @@ initialize
 */
 void Gui_Main::initialize() {
     // set minimum for time
-    this->ui->timeFinish->setMinimumTime( m.var( "time/start" )->time());
+    this->ui->timeFinish->setMinimumTime( m.event->startTime());
 
     // connect team switcher and finish time editor
     this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
@@ -59,7 +59,7 @@ void Gui_Main::initialize() {
     this->ui->mainToolBar->removeAction( this->ui->actionExit );
 
     // moving through teamlist is complicated on android
-    // since QComboBox is somewhat fucked up
+    // since QComboBox is somewhat f'd up
     QPushButton *upPtr = new QPushButton( QIcon( ":/icons/up_16" ), " " );
     QPushButton *dwPtr = new QPushButton( QIcon( ":/icons/down_16" ), " " );
     this->ui->teamLayout->insertWidget( 1, upPtr );

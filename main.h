@@ -109,6 +109,9 @@ public:
     // event
     EventEntry *event;
 
+    // empty cvar
+    ConsoleVariable *defaultCvar;
+
 public slots:
     void initialize();
     void shutdown( bool ignoreDatabase = false );

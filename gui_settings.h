@@ -52,8 +52,8 @@ public:
     explicit Gui_Settings( QWidget *parent = 0 );
     ~Gui_Settings();
     bool variablesLocked() const { return this->m_variablesLocked; }
-    void addVariable( const QString &key, SettingsVariable::Types type, QObject *objPtr ) {
-        this->varList << new SettingsVariable( key, objPtr, type, qobject_cast<QObject*>( this ));
+    void addVariable( const QString &key, SettingsVariable::Types type, QObject *objPtr, SettingsVariable::Class varClass ) {
+        this->varList << new SettingsVariable( key, objPtr, type, qobject_cast<QObject*>( this ), varClass );
     }
 
 private slots:

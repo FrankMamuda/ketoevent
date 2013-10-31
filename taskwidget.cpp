@@ -188,15 +188,15 @@ void TaskWidget::setComboState( LogEntry::Combos combo ) {
     // set text according to combo points
     switch ( this->comboState()) {
     case LogEntry::Single:
-        this->combo->setText( QString( "+%1" ).arg( m.var( "combo/single" )->integer()));
+        this->combo->setText( QString( "+%1" ).arg( m.event->singleCombo()));
         break;
 
     case LogEntry::Double:
-        this->combo->setText( QString( "+%1" ).arg( m.var( "combo/double" )->integer()));
+        this->combo->setText( QString( "+%1" ).arg( m.event->doubleCombo()));
         break;
 
     case LogEntry::Triple:
-        this->combo->setText( QString( "+%1" ).arg( m.var( "combo/triple" )->integer()));
+        this->combo->setText( QString( "+%1" ).arg( m.event->tripleCombo()));
         break;
 
     case LogEntry::NoCombo:

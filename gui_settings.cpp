@@ -48,6 +48,12 @@ destruct
 ================
 */
 Gui_Settings::~Gui_Settings() {
+    // garbage collection
+    foreach ( SettingsVariable *scPtr, this->varList ) {
+        scPtr->disconnectVars();
+        delete scPtr;
+    }
+    this->varList.clear();
     delete ui;
 }
 
@@ -61,18 +67,20 @@ void Gui_Settings::intializeVariables() {
     this->lockVariables();
 
     // set default values
-    this->addVariable( "time/start", SettingsVariable::TimeEdit, this->ui->startTime );
-    this->addVariable( "time/finish", SettingsVariable::TimeEdit, this->ui->finishTime );
-    this->addVariable( "time/final", SettingsVariable::TimeEdit, this->ui->finalTime );
-    this->addVariable( "penaltyMultiplier", SettingsVariable::SpinBox, this->ui->penalty );
-    this->addVariable( "combo/single", SettingsVariable::SpinBox, this->ui->sCombo );
-    this->addVariable( "combo/double", SettingsVariable::SpinBox, this->ui->dCombo );
-    this->addVariable( "combo/triple", SettingsVariable::SpinBox, this->ui->tCombo );
-    this->addVariable( "members/min", SettingsVariable::SpinBox, this->ui->min );
-    this->addVariable( "members/max", SettingsVariable::SpinBox, this->ui->max );
-    this->addVariable( "backup/changes", SettingsVariable::SpinBox, this->ui->backupChanges );
-    this->addVariable( "backup/perform", SettingsVariable::CheckBox, this->ui->backupPerform );
-    this->addVariable( "misc/sortTasks", SettingsVariable::CheckBox, this->ui->sort );
+    // TODO: add bind mechanism, creating new vars on every settings instance is too memory consuming
+    this->addVariable( "startTime", SettingsVariable::TimeEdit, this->ui->startTime, SettingsVariable::EventVar );
+    this->addVariable( "finishTime", SettingsVariable::TimeEdit, this->ui->finishTime, SettingsVariable::EventVar );
+    this->addVariable( "finalTime", SettingsVariable::TimeEdit, this->ui->finalTime, SettingsVariable::EventVar );
+    this->addVariable( "penalty", SettingsVariable::SpinBox, this->ui->penalty, SettingsVariable::EventVar );
+    this->addVariable( "singleCombo", SettingsVariable::SpinBox, this->ui->sCombo, SettingsVariable::EventVar );
+    this->addVariable( "doubleCombo", SettingsVariable::SpinBox, this->ui->dCombo, SettingsVariable::EventVar );
+    this->addVariable( "tripleCombo", SettingsVariable::SpinBox, this->ui->tCombo, SettingsVariable::EventVar );
+    this->addVariable( "minMembers", SettingsVariable::SpinBox, this->ui->min, SettingsVariable::EventVar );
+    this->addVariable( "maxMembers", SettingsVariable::SpinBox, this->ui->max, SettingsVariable::EventVar );
+    this->addVariable( "backup/changes", SettingsVariable::SpinBox, this->ui->backupChanges, SettingsVariable::ConsoleVar );
+    this->addVariable( "backup/perform", SettingsVariable::CheckBox, this->ui->backupPerform, SettingsVariable::ConsoleVar );
+    this->addVariable( "misc/sortTasks", SettingsVariable::CheckBox, this->ui->sort, SettingsVariable::ConsoleVar );
+    this->addVariable( "name", SettingsVariable::LineEdit, this->ui->titleEdit, SettingsVariable::EventVar );
 
     // set state
     foreach ( SettingsVariable *scPtr, this->varList )

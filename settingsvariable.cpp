@@ -33,6 +33,7 @@ SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, Settin
     QSpinBox *sPtr;
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
+    QLineEdit *lPtr;
 
     // set data, type and object
     this->objPtr = bObjPtr;
@@ -58,9 +59,49 @@ SettingsVariable::SettingsVariable( const QString &key, QObject *bObjPtr, Settin
         tPtr->connect( tPtr, SIGNAL( timeChanged( QTime )), this, SLOT( timeChanged( QTime )));
         break;
 
+    case LineEdit:
+        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
+        lPtr->connect( lPtr, SIGNAL( textChanged( QString )), this, SLOT( textChanged( QString )));
+        break;
+
     default:
         m.error( StrSoftError + this->tr( "unknown type\n" ));
         return;
+    }
+}
+
+/*
+================
+disconnectVars
+================
+*/
+void SettingsVariable::disconnectVars() {
+    QSpinBox *sPtr;
+    QCheckBox *cPtr;
+    QTimeEdit *tPtr;
+    QLineEdit *lPtr;
+
+    // connect slots
+    switch ( this->type()) {
+    case CheckBox:
+        cPtr = qobject_cast<QCheckBox*>( this->objPtr );
+        cPtr->disconnect( cPtr, SIGNAL( stateChanged( int )));
+        break;
+
+    case SpinBox:
+        sPtr = qobject_cast<QSpinBox*>( this->objPtr );
+        sPtr->disconnect( sPtr, SIGNAL( valueChanged( int )));
+        break;
+
+    case TimeEdit:
+        tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
+        tPtr->disconnect( tPtr, SIGNAL( timeChanged( QTime )));
+        break;
+
+    case LineEdit:
+        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
+        lPtr->disconnect( lPtr, SIGNAL( textChanged( QString )));
+        break;
     }
 }
 
@@ -73,10 +114,12 @@ void SettingsVariable::setState() {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
+    QLineEdit *lPtr;
 
     // set values to GUI
     switch ( this->type()) {
     case CheckBox:
+    {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
@@ -89,16 +132,49 @@ void SettingsVariable::setState() {
             cPtr->setCheckState( Qt::Checked );
         else
             cPtr->setCheckState( Qt::Unchecked );
+    }
         break;
 
     case SpinBox:
+    {
+        int value;
+
+        if ( this->varClass() == ConsoleVar )
+            value = m.var( this->key())->integer();
+        else
+            value = m.event->record().value( this->key()).toInt();
+
         sPtr = qobject_cast<QSpinBox*>( this->objPtr );
-        sPtr->setValue( m.var( this->key())->integer());
+        sPtr->setValue( value );
+    }
         break;
 
     case TimeEdit:
+    {
+        QTime time;
+
+        if ( this->varClass() == ConsoleVar )
+            time = m.var( this->key())->time();
+        else
+            time = QTime::fromString( m.event->record().value( this->key()).toString(), "hh:mm" );
+
         tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
-        tPtr->setTime( m.var( this->key())->time());
+        tPtr->setTime( time );
+    }
+        break;
+
+    case LineEdit:
+    {
+        QString text;
+
+        if ( this->varClass() == ConsoleVar )
+            text = m.var( this->key())->string();
+        else
+            text = m.event->record().value( this->key()).toString();
+
+        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
+        lPtr->setText( text );
+    }
         break;
 
     default:
@@ -118,10 +194,17 @@ void SettingsVariable::stateChanged( int state ) {
     if ( sParent->variablesLocked())
         return;
 
-    if ( state == Qt::Checked )
-        m.var( this->key())->setValue( true );
-    else
-        m.var( this->key())->setValue( false );
+    if ( this->varClass() == ConsoleVar ) {
+        if ( state == Qt::Checked )
+            m.var( this->key())->setValue( true );
+        else
+            m.var( this->key())->setValue( false );
+    } else {
+        if ( state == Qt::Checked )
+            m.event->setValue( this->key(), true );
+        else
+            m.event->setValue( this->key(), false );
+    }
 }
 
 /*
@@ -135,7 +218,10 @@ void SettingsVariable::integerValueChanged( int integer ) {
     if ( sParent->variablesLocked())
         return;
 
-    m.var( this->key())->setValue( integer );
+    if ( this->varClass() == ConsoleVar )
+        m.var( this->key())->setValue( integer );
+    else
+        m.event->setValue( this->key(), integer );
 }
 
 /*
@@ -149,5 +235,25 @@ void SettingsVariable::timeChanged( const QTime &time ) {
     if ( sParent->variablesLocked())
         return;
 
-    m.var( this->key())->setValue( time );
+    if ( this->varClass() == ConsoleVar )
+        m.var( this->key())->setValue( time );
+    else
+        m.event->setValue( this->key(), time.toString( "hh:mm" ));
+}
+
+/*
+================
+textChanged
+================
+*/
+void SettingsVariable::textChanged( const QString &text ) {
+    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
+
+    if ( sParent->variablesLocked())
+        return;
+
+    if ( this->varClass() == ConsoleVar )
+        m.var( this->key())->setValue( text );
+    else
+        m.event->setValue( this->key(), text );
 }
