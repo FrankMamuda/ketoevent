@@ -115,10 +115,10 @@ LogEntry *Main::logForIds( int teamId, int taskId ) {
 
 /*
 ================
-deleteOrphanedLogs
+removeOrphanedLogs
 ================
 */
-void Main::deleteOrphanedLogs() {
+void Main::removeOrphanedLogs() {
     // create query
     QSqlQuery query;
 

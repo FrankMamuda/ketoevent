@@ -29,8 +29,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), m_ui( new Ui::Gui_About ) {
-    m_ui->setupUi( this );
+Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_About ) {
+    ui->setupUi( this );
 
 #ifdef Q_OS_MAC
     // fixes ugly mac font
@@ -50,6 +50,6 @@ destruct
 ================
 */
 Gui_About::~Gui_About() {
-    delete m_ui;
+    delete ui;
 }
 

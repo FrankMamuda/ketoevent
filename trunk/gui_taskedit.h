@@ -85,7 +85,6 @@ private slots:
     void changeTaskType( TaskEntry::Types type );
     void on_upButton_clicked();
     void on_downButton_clicked();
-
     void on_sortButton_clicked();
 
 private:

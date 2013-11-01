@@ -99,7 +99,7 @@ void Main::loadDatabase() {
     }
 
     // delete orphaned logs on init
-    this->deleteOrphanedLogs();
+    this->removeOrphanedLogs();
 
     // load entries
     this->loadEvent();

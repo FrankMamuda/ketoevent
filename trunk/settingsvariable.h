@@ -37,6 +37,7 @@ class SettingsVariable : public QObject {
     Q_PROPERTY( QString key READ key WRITE setKey )
     Q_PROPERTY( Types type READ type WRITE setType )
     Q_ENUMS( Types )
+    Q_ENUMS( Class )
 
 public:
     // currently supported types

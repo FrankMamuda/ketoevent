@@ -47,13 +47,10 @@ public:
     ~Gui_About();
 
 private:
-    Ui::Gui_About *m_ui;
+    Ui::Gui_About *ui;
 
 private slots:
-    void on_licenseButton_clicked() {
-        Gui_License license( this );
-        license.exec();
-    }
+    void on_licenseButton_clicked() { Gui_License license( this ); license.exec(); }
 };
 
 #endif // GUI_ABOUT_H
