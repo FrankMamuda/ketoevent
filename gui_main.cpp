@@ -21,10 +21,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
+#include <QVariant>
 #include "main.h"
 #include "gui_main.h"
 #include "ui_gui_main.h"
-#include <QVariant>
 #include "taskwidget.h"
 
 /*
@@ -179,16 +179,6 @@ void Gui_Main::updateFinishTime( QTime time ) {
 
 /*
 ================
-closeEvent
-================
-*/
-void Gui_Main::closeEvent( QCloseEvent *eventPtr ) {
-    m.shutdown();
-    QWidget::closeEvent( eventPtr );
-}
-
-/*
-================
 fillTeams
 ================
 */
@@ -247,15 +237,6 @@ void Gui_Main::fillTasks() {
 
     // update
     this->teamIndexChanged( this->ui->comboTeams->currentIndex());
-}
-
-/*
-================
-actionExit->triggered
-================
-*/
-void Gui_Main::on_actionExit_triggered() {
-    m.shutdown();
 }
 
 /*

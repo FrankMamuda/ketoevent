@@ -130,7 +130,7 @@ void Main::shutdown( bool ignoreDatabase ) {
 
     // delete orphaned logs on shutdown
     if ( !ignoreDatabase ) {
-        this->deleteOrphanedLogs();
+        this->removeOrphanedLogs();
 
         // close database
         QSqlDatabase db = QSqlDatabase::database();

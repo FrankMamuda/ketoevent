@@ -74,72 +74,85 @@ class Main : public QObject {
     Q_ENUMS( ErrorTypes )
 
 public:
+    // sorting types
     enum ListTypes {
         NoType = -1,
         Teams,
         Tasks
     };
+
+    // error types
     enum ErrorTypes {
         SoftError = 0,
         FatalError
     };
 
-    // lists
-    QList <TeamEntry*> teamList;
-    QList <TaskEntry*> taskList;
-    QList<TaskEntry*> taskListSorted();
-    QList <LogEntry*> logList;
-    QList <ConsoleVariable*>  cvarList;
-    QList <SettingsVariable*> svarList;
-
-    // other funcs
+    // database related
+    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
+    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
+    LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     LogEntry *logForId( int id );
     LogEntry *logForIds( int teamId, int taskId );
     TaskEntry *taskForId( int id );
     TaskEntry *taskForName( const QString &name );
     TeamEntry *teamForId( int id );
     TeamEntry *teamForName( const QString &name );
-    QString transliterate( const QString &path );
-    ConsoleVariable *cvar( const QString &key );
-    SettingsVariable *svar( const QString &key );
-    void addCvar( ConsoleVariable *varPtr );
-    void addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
-    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
-    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
-    LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
     QString path;
     QString databasePath;
 
     // event
     EventEntry *event;
 
-    // empty cvar
+    // console/settings variables
+    ConsoleVariable *cvar( const QString &key );
+    SettingsVariable *svar( const QString &key );
     ConsoleVariable *defaultCvar;
     SettingsVariable *defaultSvar;
 
+    // lists
+    QList <TeamEntry*> teamList;
+    QList <TaskEntry*> taskList;
+    QList <TaskEntry*> taskListSorted();
+    QList <LogEntry*>  logList;
+    QList <ConsoleVariable*>  cvarList;
+    QList <SettingsVariable*> svarList;
+
+    // misc
+    QString transliterate( const QString &path );
+
 public slots:
+    // init/shutdown
     void initialize();
     void shutdown( bool ignoreDatabase = false );
-    void loadDatabase();
+
+    // console io
+    void error( ErrorTypes type, const QString &msg );
+    void print( const QString &msg );
+
+    // misc
     void importDatabase( const QString &path );
+    void sort( ListTypes type );
+    void update();
+
+private:
+    QSettings *settings;
+    int changesCounter;
+
+private slots:
+    // console/settings variables
+    void addCvar( ConsoleVariable *varPtr );
+    void addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
+
+    // database related
+    void addEvent();
+    void loadDatabase();
     void loadTasks();
     void loadTeams();
     void loadLogs();
     void loadEvent();
-    void sort( ListTypes type );
-    void print( const QString &msg );
-    void error( ErrorTypes type, const QString &msg );
-    void update();
-    void addEvent();
-
-private:
-    QSettings *settings;
-    void writeBackup();
-    int changesCounter;
-
-private slots:
-    void deleteOrphanedLogs();
     void removeTeam( const QString &teamName );
+    void removeOrphanedLogs();
+    void writeBackup();
 };
 
 //
