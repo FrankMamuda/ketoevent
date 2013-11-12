@@ -102,7 +102,7 @@ void Main::loadDatabase() {
     this->removeOrphanedLogs();
 
     // load entries
-    this->loadEvent();
+    this->loadEvents();
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();

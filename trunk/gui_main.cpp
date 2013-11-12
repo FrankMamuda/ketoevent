@@ -43,7 +43,7 @@ initialize
 */
 void Gui_Main::initialize() {
     // set minimum for time
-    this->ui->timeFinish->setMinimumTime( m.event->startTime());
+    this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
 
     // connect team switcher and finish time editor
     this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));

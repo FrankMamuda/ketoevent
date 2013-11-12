@@ -41,9 +41,9 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->listModelPtr = new Gui_TeamListModel( this );
     this->ui->teamList->setModel( listModelPtr );
     this->ui->teamList->setAlternatingRowColors( true );
-    this->ui->finishTimeEdit->setMinimumTime( m.event->startTime());
-    this->ui->teamMembersEdit->setMinimum( m.event->minMembers());
-    this->ui->teamMembersEdit->setMaximum( m.event->maxMembers());
+    this->ui->finishTimeEdit->setMinimumTime( m.currentEvent()->startTime());
+    this->ui->teamMembersEdit->setMinimum( m.currentEvent()->minMembers());
+    this->ui->teamMembersEdit->setMaximum( m.currentEvent()->maxMembers());
 
     // hide add/edit widget
     this->toggleAddEditWidget( NoState );
@@ -116,8 +116,8 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
         case AddQuick:
         {
             this->ui->teamNameEdit->clear();
-            this->ui->finishTimeEdit->setTime( m.event->finishTime().addSecs( -60 ));
-            this->ui->teamMembersEdit->setValue( m.event->minMembers());
+            this->ui->finishTimeEdit->setTime( m.currentEvent()->finishTime().addSecs( -60 ));
+            this->ui->teamMembersEdit->setValue( m.currentEvent()->minMembers());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
         }
             break;

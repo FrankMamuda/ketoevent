@@ -36,12 +36,12 @@ TeamEntry::TeamEntry( const QSqlRecord &record, const QString &table ) {
     this->setTable( table );
 
     // failsafe members (min)
-    if ( this->members() < m.event->minMembers())
-        this->setMembers( m.event->minMembers());
+    if ( this->members() < m.currentEvent()->minMembers())
+        this->setMembers( m.currentEvent()->minMembers());
 
     // failsafe members (max)
-    if ( this->members() > m.event->maxMembers())
-        this->setMembers( m.event->maxMembers());
+    if ( this->members() > m.currentEvent()->maxMembers())
+        this->setMembers( m.currentEvent()->maxMembers());
 
     // perform updates
     this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
@@ -97,7 +97,7 @@ timeOnTrack
 ================
 */
 int TeamEntry::timeOnTrack() const {
-    return m.event->startTime().secsTo( this->finishTime()) / 60;
+    return m.currentEvent()->startTime().secsTo( this->finishTime()) / 60;
 }
 
 /*
@@ -106,9 +106,9 @@ penalty
 ================
 */
 int TeamEntry::penalty() const {
-    int overTime = m.event->finishTime().secsTo( this->finishTime()) / 60 + 1;
+    int overTime = m.currentEvent()->finishTime().secsTo( this->finishTime()) / 60 + 1;
     if ( overTime > 0 )
-        return overTime * m.event->penalty();
+        return overTime * m.currentEvent()->penalty();
 
     return 0;
 }
@@ -119,7 +119,7 @@ disqualified
 ================
 */
 bool TeamEntry::disqualified() const {
-    if (( m.event->finalTime().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
+    if (( m.currentEvent()->finalTime().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
         return true;
 
     return false;

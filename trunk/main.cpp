@@ -65,9 +65,7 @@ void Main::initialize() {
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
-
-    // reset event entry
-    this->event = NULL;
+    this->addCvar( new ConsoleVariable( "lastEventId", this->settings, -1 ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -230,3 +228,14 @@ int main( int argc, char *argv[] ) {
     // exec app
     return app.exec();
 }
+
+
+//
+// TODO:
+//
+// preload events
+// set name in titlebar
+// allow locking whole events
+//
+//
+//

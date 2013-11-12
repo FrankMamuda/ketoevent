@@ -92,15 +92,15 @@ int TaskEntry::calculate( int logId ) const {
     // get combo points
     switch ( logPtr->combo()) {
     case LogEntry::Single:
-        value += m.event->singleCombo();
+        value += m.currentEvent()->singleCombo();
         break;
 
     case LogEntry::Double:
-        value += m.event->doubleCombo();
+        value += m.currentEvent()->doubleCombo();
         break;
 
     case LogEntry::Triple:
-        value += m.event->tripleCombo();
+        value += m.currentEvent()->tripleCombo();
         break;
 
     default:
