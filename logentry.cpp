@@ -45,13 +45,13 @@ comboPoints
 int LogEntry::comboPoints() const {
     switch ( this->combo()) {
     case Single:
-        return m.event->singleCombo();
+        return m.currentEvent()->singleCombo();
 
     case Double:
-        return m.event->doubleCombo();
+        return m.currentEvent()->doubleCombo();
 
     case Triple:
-        return m.event->tripleCombo();
+        return m.currentEvent()->tripleCombo();
 
     default:
     case NoCombo:

@@ -79,6 +79,7 @@ private:
     TeamEntry *m_team;
     LogEntry::Combos m_comboState;
     bool m_changed;
+    bool m_active;
 };
 
 #endif // GUI_TASKWIDGET_H

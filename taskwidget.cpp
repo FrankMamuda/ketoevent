@@ -26,6 +26,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 
+//
+// FIXME: does not save COMBO anymore!
+//
+
 /*
 ================
 construct
@@ -86,7 +90,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 #ifndef Q_OS_ANDROID
         this->multi->setMaximumWidth( 48 );
 #endif
-        this->connect( this->multi, SIGNAL( editingFinished()), this, SLOT( saveLog()));
+        this->connect( this->multi, SIGNAL( valueChanged( int )), this, SLOT( saveLog()));
         this->grid->addWidget( this->multi, 0, 3, 1, 1 );
 
         // set tooltips
@@ -116,7 +120,6 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // connect combo button for updates
    this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
-   this->connect( this->combo, SIGNAL( clicked()), this, SLOT( saveLog()));
 }
 
 /*
@@ -126,6 +129,12 @@ saveLog
 */
 void TaskWidget::saveLog() {
     int value = 0;
+
+
+    if ( !this->m_active ) {
+        m.print( "log inactive, ignoring save\n" );
+        return;
+    }
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
@@ -188,15 +197,15 @@ void TaskWidget::setComboState( LogEntry::Combos combo ) {
     // set text according to combo points
     switch ( this->comboState()) {
     case LogEntry::Single:
-        this->combo->setText( QString( "+%1" ).arg( m.event->singleCombo()));
+        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->singleCombo()));
         break;
 
     case LogEntry::Double:
-        this->combo->setText( QString( "+%1" ).arg( m.event->doubleCombo()));
+        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->doubleCombo()));
         break;
 
     case LogEntry::Triple:
-        this->combo->setText( QString( "+%1" ).arg( m.event->tripleCombo()));
+        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->tripleCombo()));
         break;
 
     case LogEntry::NoCombo:
@@ -220,6 +229,9 @@ void TaskWidget::toggleCombo() {
         m.error( StrSoftError + this->tr( "task not set\n" ));
         return;
     }
+
+
+    m.print( "combo change\n" );
 
     // cycle through combo points
     switch ( this->comboState()) {
@@ -251,6 +263,8 @@ destruct
 ================
 */
 TaskWidget::~TaskWidget() {
+    m.print( "destroy\n" );
+
     // failsafe
     if ( !this->hasTask()) {
         m.error( StrSoftError + this->tr( "task not set\n" ));
@@ -260,6 +274,7 @@ TaskWidget::~TaskWidget() {
     // clean up
     delete this->taskName;
     delete this->combo;
+    // TODO: disconnect all
 
     if ( this->task()->type() == TaskEntry::Check )
         delete this->check;
@@ -368,6 +383,9 @@ void TaskWidget::setTeam( TeamEntry *teamPtr ) {
             break;
         }
     }
+
+    // enable - TODO: props!!!
+    this->m_active = true;
 }
 
 /*
@@ -377,5 +395,6 @@ resetTeam
 */
 void TaskWidget::resetTeam() {
     this->m_team = NULL;
+    this->m_active = false;
     this->resetLog();
 }

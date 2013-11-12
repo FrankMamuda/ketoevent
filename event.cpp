@@ -38,14 +38,13 @@ void Main::addEvent() {
     QSqlQuery query;
     QString comboString;
     QString timeString;
-    int count = 0;
 
     // currenly we have only one entry
     // in future use multiple databases for multiple events
-    if ( this->event != NULL ) {
-        m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
-        return;
-    }
+    //if ( this->event != NULL ) {
+    //    m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
+    //    return;
+    //}
 
     // compile strings
     comboString = QString( "%1, %2, %3" )
@@ -72,46 +71,66 @@ void Main::addEvent() {
 
     // get last entry and construct internal entry
     while ( query.next()) {
-        this->event = new EventEntry( query.record(), "events" );
-        count++;
+        this->eventList << new EventEntry( query.record(), "events" );
         break;
     }
-
-    // fail
-    if ( count == 0 )
-        m.error( StrFatalError + "could not create event\n" );
 }
-
 
 /*
 ================
 loadEvent
 ================
 */
-void Main::loadEvent() {
+void Main::loadEvents() {
     QSqlQuery query;
-    int count = 0;
 
     // currently read the first entry
     query.exec( "select * from events where id=1" );
 
     // store entries
     while ( query.next()) {
-        this->event = new EventEntry( query.record(), "events" );
+        this->eventList << new EventEntry( query.record(), "events" );
 
         // failsafe - api check
         // add compatibility in future if needed (unlikely)
         // TODO: add dialog to create new database (rename old one)
-        if ( static_cast<unsigned int>( event->api()) < Common::MinimumAPI ) {
-            m.error( StrFatalError +
+        if ( static_cast<unsigned int>( this->eventList.last()->api()) < Common::MinimumAPI ) {
+            m.error( StrSoftError +
                      QString( "incompatible API - '%1', minimum supported %2\n" )
-                     .arg( event->api())
+                     .arg( this->eventList.last()->api())
                      .arg( Common::MinimumAPI ));
+            this->eventList.removeLast();
         }
-        count++;
     }
 
     // no event entry? - create one
-    if ( count == 0 )
+    if ( this->eventList.isEmpty())
         this->addEvent();
+
+    // for now - resort to indexes?? (use list indexof)
+    this->setCurrentEvent( this->eventList.last());
+}
+
+/*
+================
+currentEvent
+================
+*/
+EventEntry *Main::currentEvent() {
+    return this->m_event;
+}
+
+/*
+================
+setCurrentEvent
+================
+*/
+bool Main::setCurrentEvent( EventEntry *eventPtr ) {
+    foreach ( EventEntry *entry, this->eventList ) {
+        if ( entry == eventPtr ) {
+            this->m_event = entry;
+            return true;
+        }
+    }
+    return false;
 }

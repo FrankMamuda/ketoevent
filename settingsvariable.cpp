@@ -152,7 +152,7 @@ void SettingsVariable::setState() {
         if ( this->varClass() == ConsoleVar )
             state = m.cvar( this->key())->isEnabled();
         else
-            state = m.event->record().value( this->key()).toBool();
+            state = m.currentEvent()->record().value( this->key()).toBool();
 
         cPtr = qobject_cast<QCheckBox*>( this->objPtr );
         if ( state )
@@ -169,7 +169,7 @@ void SettingsVariable::setState() {
         if ( this->varClass() == ConsoleVar )
             value = m.cvar( this->key())->integer();
         else
-            value = m.event->record().value( this->key()).toInt();
+            value = m.currentEvent()->record().value( this->key()).toInt();
 
         sPtr = qobject_cast<QSpinBox*>( this->objPtr );
         sPtr->setValue( value );
@@ -183,7 +183,7 @@ void SettingsVariable::setState() {
         if ( this->varClass() == ConsoleVar )
             time = m.cvar( this->key())->time();
         else
-            time = QTime::fromString( m.event->record().value( this->key()).toString(), "hh:mm" );
+            time = QTime::fromString( m.currentEvent()->record().value( this->key()).toString(), "hh:mm" );
 
         tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
         tPtr->setTime( time );
@@ -197,7 +197,7 @@ void SettingsVariable::setState() {
         if ( this->varClass() == ConsoleVar )
             text = m.cvar( this->key())->string();
         else
-            text = m.event->record().value( this->key()).toString();
+            text = m.currentEvent()->record().value( this->key()).toString();
 
         lPtr = qobject_cast<QLineEdit*>( this->objPtr );
         lPtr->setText( text );
@@ -229,9 +229,9 @@ void SettingsVariable::stateChanged( int state ) {
             m.cvar( this->key())->setValue( false );
     } else {
         if ( state == Qt::Checked )
-            m.event->setValue( this->key(), true );
+            m.currentEvent()->setValue( this->key(), true );
         else
-            m.event->setValue( this->key(), false );
+            m.currentEvent()->setValue( this->key(), false );
     }
 }
 
@@ -249,7 +249,7 @@ void SettingsVariable::integerValueChanged( int integer ) {
     if ( this->varClass() == ConsoleVar )
         m.cvar( this->key())->setValue( integer );
     else
-        m.event->setValue( this->key(), integer );
+        m.currentEvent()->setValue( this->key(), integer );
 }
 
 /*
@@ -266,7 +266,7 @@ void SettingsVariable::timeChanged( const QTime &time ) {
     if ( this->varClass() == ConsoleVar )
         m.cvar( this->key())->setValue( time );
     else
-        m.event->setValue( this->key(), time.toString( "hh:mm" ));
+        m.currentEvent()->setValue( this->key(), time.toString( "hh:mm" ));
 }
 
 /*
@@ -283,5 +283,5 @@ void SettingsVariable::textChanged( const QString &text ) {
     if ( this->varClass() == ConsoleVar )
         m.cvar( this->key())->setValue( text );
     else
-        m.event->setValue( this->key(), text );
+        m.currentEvent()->setValue( this->key(), text );
 }

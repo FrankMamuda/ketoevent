@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>450</height>
+    <width>600</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -143,6 +143,10 @@
       <property name="toolTip">
        <string>Log team's accomplished tasks here</string>
       </property>
+      <property name="styleSheet">
+       <string notr="true">QListWidget::item { border-bottom: 1px solid black; }
+</string>
+      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
@@ -209,8 +213,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionEvents"/>
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
+   <addaction name="actionEvaluators"/>
    <addaction name="actionRankings"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -286,6 +292,16 @@
    </property>
    <property name="toolTip">
     <string>Exit applet</string>
+   </property>
+  </action>
+  <action name="actionEvaluators">
+   <property name="text">
+    <string>Evaluators</string>
+   </property>
+  </action>
+  <action name="actionEvents">
+   <property name="text">
+    <string>Events</string>
    </property>
   </action>
  </widget>

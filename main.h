@@ -100,20 +100,21 @@ public:
     QString path;
     QString databasePath;
 
-    // event
-    EventEntry *event;
-
     // console/settings variables
     ConsoleVariable *cvar( const QString &key );
     SettingsVariable *svar( const QString &key );
     ConsoleVariable *defaultCvar;
     SettingsVariable *defaultSvar;
 
+    // event
+    EventEntry *currentEvent();
+
     // lists
-    QList <TeamEntry*> teamList;
-    QList <TaskEntry*> taskList;
-    QList <TaskEntry*> taskListSorted();
-    QList <LogEntry*>  logList;
+    QList <TeamEntry*>  teamList;
+    QList <TaskEntry*>  taskList;
+    QList <TaskEntry*>  taskListSorted();
+    QList <LogEntry*>   logList;
+    QList <EventEntry*> eventList;
     QList <ConsoleVariable*>  cvarList;
     QList <SettingsVariable*> svarList;
 
@@ -137,6 +138,7 @@ public slots:
 private:
     QSettings *settings;
     int changesCounter;
+    EventEntry *m_event;
 
 private slots:
     // console/settings variables
@@ -149,10 +151,11 @@ private slots:
     void loadTasks();
     void loadTeams();
     void loadLogs();
-    void loadEvent();
+    void loadEvents();
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();
+    bool setCurrentEvent( EventEntry *eventPtr );
 };
 
 //
