@@ -19,60 +19,58 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
 //
-// variable.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
-#include "main.h"
+#include "gui_console.h"
+#include "ui_gui_console.h"
+
 
 /*
 ================
-addCvar
+construct
 ================
 */
-void Main::addCvar( ConsoleVariable *varPtr ) {
-    // avoid duplicates
-    if ( this->cvar( varPtr->key())) {
-        delete varPtr;
-        return;
-    }
-
-    this->cvarList << varPtr;
+Gui_Console::Gui_Console( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Console ) {
+    ui->setupUi( this );
+    this->setWindowFlags( Qt::CustomizeWindowHint );
+    this->ui->screen->clear();
 }
 
 /*
 ================
-addSvar
+destruct
 ================
 */
-void Main::addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass ) {
-    this->svarList << new SettingsVariable( key, type, varClass );
+Gui_Console::~Gui_Console() {
+    delete ui;
 }
 
 /*
 ================
-cvar
+mousePressEvent
 ================
 */
-ConsoleVariable *Main::cvar( const QString &key ) {
-    foreach ( ConsoleVariable *varPtr, this->cvarList ) {
-        if ( !QString::compare( varPtr->key(), key ))
-            return varPtr;
-    }
-    return this->defaultCvar;
+void Gui_Console::mousePressEvent( QMouseEvent *eventPtr ){
+   this->m_windowPos = eventPtr->pos();
 }
 
 /*
 ================
-svar
+mouseMoveEvent
 ================
 */
-SettingsVariable *Main::svar( const QString &key ) {
-    foreach ( SettingsVariable *varPtr, this->svarList ) {
-        if ( !QString::compare( varPtr->key(), key ))
-            return varPtr;
-    }
-    return this->defaultSvar;
+void Gui_Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
+    QPoint out;
+
+    if ( eventPtr->buttons() && Qt::LeftButton )
+        this->move( this->pos() + eventPtr->pos() - this->m_windowPos );
+}
+
+/*
+================
+print
+================
+*/
+void Gui_Console::print( QString msg ) {
+    this->ui->screen->append( msg );
 }

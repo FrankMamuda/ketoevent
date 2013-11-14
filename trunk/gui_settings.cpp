@@ -27,6 +27,11 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QTextStream>
 #include "main.h"
 
+//
+// TODO: move most stuff to event dialog
+//       leave things like backup, sorting and display here
+//
+
 /*
 ================
 construct
@@ -34,7 +39,15 @@ construct
 */
 Gui_Settings::Gui_Settings( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
-    this->intializeVariables();
+
+    if ( m.isInitialized())
+         this->intializeVariables();
+    else {
+        this->ui->groupMisc->setDisabled( true );
+        this->ui->groupPoints->setDisabled( true );
+        this->ui->groupTime->setDisabled( true );
+        this->ui->groupData->setDisabled( true );
+    }
 
 #ifdef Q_OS_ANDROID
     // android fullscreen fix
@@ -49,8 +62,10 @@ destruct
 ================
 */
 Gui_Settings::~Gui_Settings() {
-    foreach ( SettingsVariable *varPtr, m.svarList )
-        varPtr->unbind();
+    if ( m.isInitialized()) {
+        foreach ( SettingsVariable *varPtr, m.svarList )
+            varPtr->unbind();
+    }
 
     delete ui;
 }

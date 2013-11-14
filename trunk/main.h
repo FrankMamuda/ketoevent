@@ -34,6 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "consolevariable.h"
 #include "evententry.h"
 #include "settingsvariable.h"
+#include "gui_console.h"
 
 // message macro
 #ifdef Q_CC_MSVC
@@ -72,6 +73,7 @@ class Main : public QObject {
     Q_OBJECT
     Q_ENUMS( ListTypes )
     Q_ENUMS( ErrorTypes )
+    Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
 
 public:
     // sorting types
@@ -120,10 +122,12 @@ public:
 
     // misc
     QString transliterate( const QString &path );
+    bool isInitialized() const { return this->m_init; }
 
 public slots:
     // init/shutdown
     void initialize();
+    void setInitialized( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
     // console io
@@ -134,11 +138,14 @@ public slots:
     void importDatabase( const QString &path );
     void sort( ListTypes type );
     void update();
+    void initConsole();
 
 private:
     QSettings *settings;
     int changesCounter;
     EventEntry *m_event;
+    bool m_init;
+    Gui_Console *console;
 
 private slots:
     // console/settings variables

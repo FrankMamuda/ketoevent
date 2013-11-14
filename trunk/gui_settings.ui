@@ -88,7 +88,7 @@
     </widget>
    </item>
    <item row="3" column="0" rowspan="3" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupData">
      <property name="title">
       <string>Data</string>
      </property>
