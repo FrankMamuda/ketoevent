@@ -73,8 +73,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     if ( this->task()->type() == TaskEntry::Check ) {
         this->check = new QCheckBox();        
         this->check->setMaximumWidth( 48 );
-        this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2);
-
+        this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2 );
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
         this->grid->addWidget( this->check, 0, 3, 1, 1 );
 
@@ -119,7 +118,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->setLayout( grid );
 
     // connect combo button for updates
-   this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
+    this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
 }
 
 /*
@@ -129,7 +128,6 @@ saveLog
 */
 void TaskWidget::saveLog() {
     int value = 0;
-
 
     if ( !this->m_active ) {
         m.print( "log inactive, ignoring save\n" );
@@ -230,9 +228,6 @@ void TaskWidget::toggleCombo() {
         return;
     }
 
-
-    m.print( "combo change\n" );
-
     // cycle through combo points
     switch ( this->comboState()) {
     case LogEntry::Single:
@@ -255,6 +250,9 @@ void TaskWidget::toggleCombo() {
         m.error( StrSoftError + this->tr( "invalid combo state \"%1\"\n" ).arg( static_cast<int>( this->comboState())));
         return;
     }
+
+    // store value
+    this->saveLog();
 }
 
 /*
@@ -263,25 +261,26 @@ destruct
 ================
 */
 TaskWidget::~TaskWidget() {
-    m.print( "destroy\n" );
-
     // failsafe
     if ( !this->hasTask()) {
         m.error( StrSoftError + this->tr( "task not set\n" ));
         return;
     }
 
+    // disconnect buttons and spinboxes
+    this->disconnect( this->combo, SIGNAL( clicked()));
+
+    if ( this->task()->type() == TaskEntry::Check && this->check != NULL ) {
+        this->disconnect( this->check, SIGNAL( clicked()));
+        delete this->check;   
+    } else if ( this->task()->type() == TaskEntry::Multi && this->multi != NULL ) {
+        this->disconnect( this->multi, SIGNAL( valueChanged( int )));
+        delete this->multi;
+    }
+
     // clean up
     delete this->taskName;
     delete this->combo;
-    // TODO: disconnect all
-
-    if ( this->task()->type() == TaskEntry::Check )
-        delete this->check;
-    else if ( this->task()->type() == TaskEntry::Multi )
-        delete this->multi;
-
-    //delete this->points;
     delete this->grid;
 }
 

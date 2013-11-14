@@ -42,16 +42,29 @@ initialize
 ================
 */
 void Gui_Main::initialize() {
-    // set minimum for time
-    this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
+    // disable actions on partial initialization (debug)
+    if ( !m.isInitialized()) {
+        this->ui->actionTeams->setDisabled( true );
+        this->ui->actionTasks->setDisabled( true );
+        this->ui->actionEvents->setDisabled( true );
+        this->ui->actionRankings->setDisabled( true );
+        this->ui->comboTeams->setDisabled( true );
+        this->ui->quickAddButton->setDisabled( true );
+        this->ui->timeFinish->setDisabled( true );
+        this->ui->lockButton->setDisabled( true );
+        this->ui->logButton->setDisabled( true );
+    } else {
+        // set minimum for time
+        this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
 
-    // connect team switcher and finish time editor
-    this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
-    this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
+        // connect team switcher and finish time editor
+        this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
+        this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
 
-    // fill in tasks and teams
-    this->fillTeams();
-    this->fillTasks();
+        // fill in tasks and teams
+        this->fillTeams();
+        this->fillTasks();
+    }
 
     // no icon text for android
 #ifdef Q_OS_ANDROID
@@ -67,6 +80,9 @@ void Gui_Main::initialize() {
     this->connect( upPtr, SIGNAL( clicked()), this, SLOT( on_upButton_clicked()));
     this->connect( dwPtr, SIGNAL( clicked()), this, SLOT( on_downButton_clicked()));
 #endif
+
+    // announce
+    m.print( StrMsg + this->tr( "initialization complete\n" ));
 }
 
 /*
@@ -185,6 +201,10 @@ fillTeams
 void Gui_Main::fillTeams( int forcedId ) {
     int lastId = forcedId;
 
+    // abort if partially initialized
+    if ( !m.isInitialized())
+        return;
+
     // store last team id
     if ( this->ui->comboTeams->count() && forcedId == -1 ) {
         TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
@@ -214,6 +234,10 @@ void Gui_Main::fillTasks() {
     int y;
     QListWidget *lw = this->ui->taskList;
     QList <TaskEntry*>taskList;
+
+    // abort if partially initialized
+    if ( !m.isInitialized())
+        return;
 
     for ( y = 0; y < lw->count(); y++ ) {
         TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));

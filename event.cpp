@@ -95,8 +95,8 @@ void Main::loadEvents() {
         // add compatibility in future if needed (unlikely)
         // TODO: add dialog to create new database (rename old one)
         if ( static_cast<unsigned int>( this->eventList.last()->api()) < Common::MinimumAPI ) {
-            m.error( StrSoftError +
-                     QString( "incompatible API - '%1', minimum supported %2\n" )
+            this->error( StrSoftError +
+                     this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
                      .arg( this->eventList.last()->api())
                      .arg( Common::MinimumAPI ));
             this->eventList.removeLast();
@@ -106,6 +106,11 @@ void Main::loadEvents() {
     // no event entry? - create one
     if ( this->eventList.isEmpty())
         this->addEvent();
+
+    // still nothing?
+    if ( this->eventList.isEmpty()) {
+        this->error( StrFatalError + this->tr( "could not create event\n" ));
+    }
 
     // for now - resort to indexes?? (use list indexof)
     this->setCurrentEvent( this->eventList.last());
@@ -117,6 +122,9 @@ currentEvent
 ================
 */
 EventEntry *Main::currentEvent() {
+    if ( m_event == NULL )
+        this->error( StrFatalError + this->tr( "no valid events\n" ));
+
     return this->m_event;
 }
 

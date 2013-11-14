@@ -26,10 +26,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QApplication>
 #include <QDir>
 #include <QSqlQuery>
-#include <QDebug>
 #include <QSqlError>
 #include <QMessageBox>
 #include <QTranslator>
+#include "gui_console.h"
 
 //
 // classes
@@ -40,11 +40,20 @@ class Main m;
 // defines
 //
 //#define FORCE_LATVIAN
+#define APPLET_DEBUG
 
 //
-// TODO: check private/public funcs
-//       check includes
-//       add more props
+// TODO:
+//
+// preload events
+// set name in titlebar
+// allow locking whole events
+// db paths in settings
+// statistics - import void teams from csv (just to see the results)
+// check private/public funcs
+// check includes
+// add more props
+// verbocity for console Regular Verbose PrintEverything
 //
 
 /*
@@ -55,13 +64,13 @@ initialize
 void Main::initialize() {
     // init counters
     this->changesCounter = 0;
+    this->setInitialized( false );
 
     // initialize settings
     this->settings = new QSettings( "avoti", "ketoevent3" );
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
     // init cvars
-    // TODO: restore actual console (enable debugging mode)
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
@@ -72,6 +81,7 @@ void Main::initialize() {
     this->defaultSvar = new SettingsVariable( "default", SettingsVariable::NoType, SettingsVariable::NoClass );
 
     // load database entries
+    // skip this for now
     this->loadDatabase();
 
     // create settings variables
@@ -88,6 +98,9 @@ void Main::initialize() {
     this->addSvar( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
+
+    // we're up
+    this->setInitialized();
 }
 
 /*
@@ -96,11 +109,13 @@ print
 ============
 */
 void Main::print( const QString &msg ) {
-    // for debugging
-    if ( msg.endsWith( "\n" ))
-        qDebug() << msg.left( msg.length()-1 );
-    else
-        qDebug() << msg;
+    // print to console
+    if ( this->console != NULL ) {
+        if ( msg.endsWith( "\n" ))
+            this->console->print( msg.left( msg.length()-1 ));
+        else
+            this->console->print( msg );
+    }
 }
 
 /*
@@ -123,29 +138,42 @@ shutdown
 */
 void Main::shutdown( bool ignoreDatabase ) {
     // save settings
-    this->settings->sync();
-    delete this->settings;
+    if ( this->settings != NULL ) {
+        this->settings->sync();
+        delete this->settings;
+    }
 
     // delete orphaned logs on shutdown
     if ( !ignoreDatabase ) {
-        this->removeOrphanedLogs();
-
-        // close database
+        // close database if open
         QSqlDatabase db = QSqlDatabase::database();
-        db.close();
+        if ( db.open()) {
+            this->removeOrphanedLogs();
+            db.close();
+        }
     }
 
     // clear console vars
     foreach ( ConsoleVariable *varPtr, this->cvarList )
         delete varPtr;
     this->cvarList.clear();
-    delete this->defaultCvar;
+
+    if ( this->defaultCvar != NULL )
+        delete this->defaultCvar;
 
     // garbage collection
     foreach ( SettingsVariable *varPtr, this->svarList )
         delete varPtr;
     this->svarList.clear();
-    delete this->defaultSvar;
+
+    if ( this->defaultSvar != NULL )
+        delete this->defaultSvar;
+
+    if ( this->console != NULL )
+        delete this->console;
+
+    // reset initialization state
+    this->setInitialized( false );
 
     // close applet
     QApplication::quit();
@@ -189,6 +217,19 @@ void Main::update() {
 
 /*
 ================
+initConsole
+================
+*/
+void Main::initConsole() {
+    if ( this->console != NULL )
+        return;
+
+    this->console = new Gui_Console();
+    this->console->show();
+}
+
+/*
+================
 entry point
 ================
 */
@@ -210,6 +251,11 @@ int main( int argc, char *argv[] ) {
     translator.load( QString( ":/i18n/ketoevent_%1" ).arg( locale ));
     app.installTranslator( &translator );
 
+    // init console (for debugging)
+#ifdef APPLET_DEBUG
+    m.initConsole();
+#endif
+
     // init main window
     Gui_Main gui;
 #ifdef Q_OS_ANDROID
@@ -220,7 +266,9 @@ int main( int argc, char *argv[] ) {
 #endif
 
     // initialize application
+//#ifndef APPLET_DEBUG
     m.initialize();
+//#endif
 
     // add teams
     gui.initialize();
@@ -228,14 +276,3 @@ int main( int argc, char *argv[] ) {
     // exec app
     return app.exec();
 }
-
-
-//
-// TODO:
-//
-// preload events
-// set name in titlebar
-// allow locking whole events
-//
-//
-//

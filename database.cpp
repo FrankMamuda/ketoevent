@@ -85,10 +85,7 @@ void Main::loadDatabase() {
     QSqlQuery query;
 
     // create initial table structure (if non-existant)
-    //
-    // TODO: must add API compatibility, move event start/end time to db
-    //       ultimately allow multiple event templates
-    //
+    // TODO: add compatibility layer for the 2013 event
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, evaluatorId integer )" ) ||
          !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
@@ -133,10 +130,10 @@ void Main::importDatabase( const QString &path ) {
         QString teamName = query.record().value( "name" ).toString();
 
         // check for duplicates
-        if ( m.teamForName( teamName ) != NULL ) {
+        if ( this->teamForName( teamName ) != NULL ) {
             // TODO: messagebox - replace?
-            QMessageBox::question( NULL, "Replace team", QString( "Replace logs for team \"%1\"?" ).arg( teamName ), QMessageBox::Yes, QMessageBox::No );
-            this->removeTeam( teamName );
+            if ( QMessageBox::question( NULL, this->tr( "Replace team" ), this->tr( "Replace logs for team \"%1\"?" ).arg( teamName ), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+                this->removeTeam( teamName );
         }
 
         // store temp value
