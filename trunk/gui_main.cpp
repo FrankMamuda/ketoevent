@@ -26,6 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_main.h"
 #include "ui_gui_main.h"
 #include "taskwidget.h"
+#include "gui_event.h"
 
 /*
 ================
@@ -384,4 +385,14 @@ void Gui_Main::on_lockButton_clicked() {
         this->ui->timeFinish->setDisabled( true );
         this->ui->logButton->setDisabled( true );
     }
+}
+
+/*
+================
+actionEvents->triggered
+================
+*/
+void Gui_Main::on_actionEvents_triggered() {
+    Gui_Event events;
+    events.exec();
 }

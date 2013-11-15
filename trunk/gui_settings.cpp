@@ -37,16 +37,17 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-Gui_Settings::Gui_Settings( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Settings ) {
+Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
 
     if ( m.isInitialized())
-         this->intializeVariables();
+         this->bindVars();
     else {
-        this->ui->groupMisc->setDisabled( true );
-        this->ui->groupPoints->setDisabled( true );
-        this->ui->groupTime->setDisabled( true );
-        this->ui->groupData->setDisabled( true );
+        // TODO: disable stuff
+        //this->ui->groupMisc->setDisabled( true );
+        //this->ui->groupPoints->setDisabled( true );
+        //this->ui->groupTime->setDisabled( true );
+        //this->ui->groupData->setDisabled( true );
     }
 
 #ifdef Q_OS_ANDROID
@@ -62,37 +63,23 @@ destruct
 ================
 */
 Gui_Settings::~Gui_Settings() {
-    if ( m.isInitialized()) {
-        foreach ( SettingsVariable *varPtr, m.svarList )
-            varPtr->unbind();
-    }
-
+    this->unbindVars();
     delete ui;
 }
 
 /*
 ================
-intializeVariables
+bindVars
 ================
 */
-void Gui_Settings::intializeVariables() {
+void Gui_Settings::bindVars() {
     // lock vars
     this->lockVariables();
 
     // bind vars
-    m.svar( "startTime" )->bind( this->ui->startTime, qobject_cast<QObject*>( this ));
-    m.svar( "finishTime" )->bind( this->ui->finishTime, qobject_cast<QObject*>( this ));
-    m.svar( "finalTime" )->bind( this->ui->finalTime, qobject_cast<QObject*>( this ));
-    m.svar( "penalty" )->bind( this->ui->penalty, qobject_cast<QObject*>( this ));
-    m.svar( "singleCombo" )->bind( this->ui->sCombo, qobject_cast<QObject*>( this ));
-    m.svar( "doubleCombo" )->bind( this->ui->dCombo, qobject_cast<QObject*>( this ));
-    m.svar( "tripleCombo" )->bind( this->ui->tCombo, qobject_cast<QObject*>( this ));
-    m.svar( "minMembers" )->bind( this->ui->min, qobject_cast<QObject*>( this ));
-    m.svar( "maxMembers" )->bind( this->ui->max, qobject_cast<QObject*>( this ));
-    m.svar( "backup/changes" )->bind( this->ui->backupChanges, qobject_cast<QObject*>( this ));
-    m.svar( "backup/perform" )->bind( this->ui->backupPerform, qobject_cast<QObject*>( this ));
-    m.svar( "misc/sortTasks" )->bind( this->ui->sort, qobject_cast<QObject*>( this ));
-    m.svar( "name" )->bind( this->ui->titleEdit, qobject_cast<QObject*>( this ));
+    this->bindVariable( "backup/changes", this->ui->backupChanges );
+    this->bindVariable( "backup/perform", this->ui->backupPerform );
+    this->bindVariable( "misc/sortTasks", this->ui->sort );
 
     // unlock vars
     this->lockVariables( false );

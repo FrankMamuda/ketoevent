@@ -18,8 +18,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifndef GUI_SETTINGS_H
-#define GUI_SETTINGS_H
+#ifndef GUI_SETTINGSDIALOG_H
+#define GUI_SETTINGSDIALOG_H
 
 //
 // includes
@@ -27,40 +27,30 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QtGlobal>
 #include <QDialog>
 #include "settingsvariable.h"
-#include "gui_settingsdialog.h"
+#include <main.h>
 
 //
-// namespaces
+// class: Gui_SettingsDialog
 //
-namespace Ui {
-    class Gui_Settings;
-}
-
-//
-// class: Gui_Settings
-//
-class Gui_Settings : public Gui_SettingsDialog {
+class Gui_SettingsDialog : public QDialog {
     Q_OBJECT
-    Q_CLASSINFO( "description", "Settings dialog" )
-    Q_ENUMS( FileDialog )
+    Q_PROPERTY( bool variablesLocked READ variablesLocked WRITE lockVariables )
 
 public:
-    enum FileDialog {
-        Open = 0,
-        Save
-    };
-    explicit Gui_Settings( QWidget *parent = 0 );
-    ~Gui_Settings();
+    Gui_SettingsDialog( QWidget *parent ) : QDialog( parent ) {}
+    bool variablesLocked() const { return this->m_variablesLocked; }
 
-private slots:
-    void bindVars();
-    void on_buttonImport_clicked();
-    void on_buttonExportCSV_clicked();
-    void on_buttonExport_clicked();
-    void on_backupPerform_stateChanged(int arg1);
+public slots:
+    void lockVariables( bool lock = true ) { this->m_variablesLocked = lock; }
+    void unbindVars() { if ( !m.isInitialized()) return; foreach ( SettingsVariable* svar, this->svars ) svar->unbind(); svars.clear(); }
+    void bindVariable( const QString &key, QObject *object ) {
+        this->svars << m.svar( key );
+        m.svar( key )->bind( object, qobject_cast<QObject*>( this ));
+    }
 
 private:
-    Ui::Gui_Settings *ui;
+    bool m_variablesLocked;
+    QList <SettingsVariable*> svars;
 };
 
-#endif // GUI_SETTINGS_H
+#endif // GUI_SETTINGSDIALOG_H

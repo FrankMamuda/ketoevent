@@ -19,6 +19,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
 //
+// defines
+//
+//#define FORCE_LATVIAN
+#define APPLET_DEBUG
+
+//
 // includes
 //
 #include "main.h"
@@ -30,17 +36,14 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMessageBox>
 #include <QTranslator>
 #include "gui_console.h"
+#ifdef APPLET_DEBUG
+#include <QDebug>
+#endif
 
 //
 // classes
 //
 class Main m;
-
-//
-// defines
-//
-//#define FORCE_LATVIAN
-#define APPLET_DEBUG
 
 //
 // TODO:
@@ -54,6 +57,8 @@ class Main m;
 // check includes
 // add more props
 // verbocity for console Regular Verbose PrintEverything
+// advanced combos
+// replace event with bad API
 //
 
 /*
@@ -116,6 +121,10 @@ void Main::print( const QString &msg ) {
         else
             this->console->print( msg );
     }
+
+#ifdef APPLET_DEBUG
+    qDebug() << msg;
+#endif
 }
 
 /*
