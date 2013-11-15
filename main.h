@@ -53,7 +53,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 2;
+    const static unsigned int API = 3;
     const static unsigned int MinimumAPI = 1;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;

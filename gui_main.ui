@@ -59,7 +59,7 @@
            <string>Set current time</string>
           </property>
           <property name="text">
-           <string/>
+           <string>Log current time</string>
           </property>
           <property name="icon">
            <iconset resource="resources.qrc">
@@ -120,7 +120,7 @@
            <string>Quickly add a team</string>
           </property>
           <property name="text">
-           <string/>
+           <string>Add team quickly</string>
           </property>
           <property name="icon">
            <iconset resource="resources.qrc">
@@ -216,7 +216,7 @@
    <addaction name="actionEvents"/>
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
-   <addaction name="actionEvaluators"/>
+   <addaction name="actionReviewers"/>
    <addaction name="actionRankings"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -294,12 +294,23 @@
     <string>Exit applet</string>
    </property>
   </action>
-  <action name="actionEvaluators">
+  <action name="actionReviewers">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/reviewers_48</normaloff>:/icons/reviewers_48</iconset>
+   </property>
    <property name="text">
-    <string>Evaluators</string>
+    <string>Reviewers</string>
+   </property>
+   <property name="toolTip">
+    <string>Reviewers</string>
    </property>
   </action>
   <action name="actionEvents">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/events_48</normaloff>:/icons/events_48</iconset>
+   </property>
    <property name="text">
     <string>Events</string>
    </property>

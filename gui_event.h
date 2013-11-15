@@ -18,49 +18,37 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifndef GUI_SETTINGS_H
-#define GUI_SETTINGS_H
+#ifndef GUI_EVENT_H
+#define GUI_EVENT_H
 
 //
 // includes
 //
-#include <QtGlobal>
-#include <QDialog>
-#include "settingsvariable.h"
 #include "gui_settingsdialog.h"
 
+
 //
-// namespaces
+// namespace: Ui
 //
 namespace Ui {
-    class Gui_Settings;
+class Gui_Event;
 }
 
 //
-// class: Gui_Settings
+// class: Gui_Event
 //
-class Gui_Settings : public Gui_SettingsDialog {
+class Gui_Event : public Gui_SettingsDialog {
     Q_OBJECT
-    Q_CLASSINFO( "description", "Settings dialog" )
-    Q_ENUMS( FileDialog )
 
 public:
-    enum FileDialog {
-        Open = 0,
-        Save
-    };
-    explicit Gui_Settings( QWidget *parent = 0 );
-    ~Gui_Settings();
+    explicit Gui_Event( QWidget *parent = 0 );
+    ~Gui_Event();
 
 private slots:
     void bindVars();
-    void on_buttonImport_clicked();
-    void on_buttonExportCSV_clicked();
-    void on_buttonExport_clicked();
-    void on_backupPerform_stateChanged(int arg1);
 
 private:
-    Ui::Gui_Settings *ui;
+    Ui::Gui_Event *ui;
 };
 
-#endif // GUI_SETTINGS_H
+#endif // GUI_EVENT_H
