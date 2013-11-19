@@ -130,7 +130,7 @@ void TaskWidget::saveLog() {
     int value = 0;
 
     if ( !this->m_active ) {
-        m.print( "log inactive, ignoring save\n" );
+        //m.print( "log inactive, ignoring save\n" );
         return;
     }
 

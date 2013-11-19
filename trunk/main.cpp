@@ -59,6 +59,8 @@ class Main m;
 // verbocity for console Regular Verbose PrintEverything
 // advanced combos
 // replace event with bad API
+// allow debugging of components:
+//       Tasks, Teams, Gui as flags (prints out if enabled)
 //
 
 /*

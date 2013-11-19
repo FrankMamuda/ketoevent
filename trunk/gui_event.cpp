@@ -51,28 +51,24 @@ Gui_Event::~Gui_Event() {
 bindVars
 ================
 */
+
 void Gui_Event::bindVars() {
     // lock vars
     this->lockVariables();
 
     // bind vars
     //this->bindVariable( "key", object );
-    //this->bindVariable( "name", this->ui->titleEdit );
+    this->bindVariable( "startTime", this->ui->startTime );
+    this->bindVariable( "finishTime", this->ui->finishTime );
+    this->bindVariable( "finalTime", this->ui->finalTime );
+    this->bindVariable( "penalty", this->ui->penalty );
+    this->bindVariable( "singleCombo", this->ui->sCombo );
+    this->bindVariable( "doubleCombo", this->ui->dCombo );
+    this->bindVariable( "tripleCombo", this->ui->tCombo );
+    this->bindVariable( "minMembers", this->ui->min );
+    this->bindVariable( "maxMembers", this->ui->max );
+    this->bindVariable( "name", this->ui->titleEdit );
 
     // unlock vars
     this->lockVariables( false );
 }
-
-// bind vars
-#if 0
-m.svar( "startTime" )->bind( this->ui->startTime, qobject_cast<QObject*>( this ));
-m.svar( "finishTime" )->bind( this->ui->finishTime, qobject_cast<QObject*>( this ));
-m.svar( "finalTime" )->bind( this->ui->finalTime, qobject_cast<QObject*>( this ));
-m.svar( "penalty" )->bind( this->ui->penalty, qobject_cast<QObject*>( this ));
-m.svar( "singleCombo" )->bind( this->ui->sCombo, qobject_cast<QObject*>( this ));
-m.svar( "doubleCombo" )->bind( this->ui->dCombo, qobject_cast<QObject*>( this ));
-m.svar( "tripleCombo" )->bind( this->ui->tCombo, qobject_cast<QObject*>( this ));
-m.svar( "minMembers" )->bind( this->ui->min, qobject_cast<QObject*>( this ));
-m.svar( "maxMembers" )->bind( this->ui->max, qobject_cast<QObject*>( this ));
-m.svar( "name" )->bind( this->ui->titleEdit, qobject_cast<QObject*>( this ));
-#endif

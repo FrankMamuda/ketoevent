@@ -43,10 +43,7 @@ public:
 public slots:
     void lockVariables( bool lock = true ) { this->m_variablesLocked = lock; }
     void unbindVars() { if ( !m.isInitialized()) return; foreach ( SettingsVariable* svar, this->svars ) svar->unbind(); svars.clear(); }
-    void bindVariable( const QString &key, QObject *object ) {
-        this->svars << m.svar( key );
-        m.svar( key )->bind( object, qobject_cast<QObject*>( this ));
-    }
+    void bindVariable( const QString &key, QObject *object ) { this->svars << m.svar( key ); m.svar( key )->bind( object, qobject_cast<QObject*>( this )); }
 
 private:
     bool m_variablesLocked;
