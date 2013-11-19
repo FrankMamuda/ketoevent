@@ -100,8 +100,6 @@ void SettingsVariable::unbind() {
     QTimeEdit *tPtr;
     QLineEdit *lPtr;
 
-    m.print( QString( "unbind %1\n" ).arg( this->key()));
-
     // connect slots
     switch ( this->type()) {
     case CheckBox:
@@ -221,6 +219,9 @@ stateChanged
 void SettingsVariable::stateChanged( int state ) {
     Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
 
+    if ( sParent == NULL )
+        return;
+
     if ( sParent->variablesLocked())
         return;
 
@@ -243,7 +244,10 @@ integerValueChanged
 ================
 */
 void SettingsVariable::integerValueChanged( int integer ) {
-    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
+    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+
+    if ( sParent == NULL )
+        return;
 
     if ( sParent->variablesLocked())
         return;
@@ -260,7 +264,10 @@ timeChanged
 ================
 */
 void SettingsVariable::timeChanged( const QTime &time ) {
-    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
+    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+
+    if ( sParent == NULL )
+        return;
 
     if ( sParent->variablesLocked())
         return;
@@ -277,7 +284,10 @@ textChanged
 ================
 */
 void SettingsVariable::textChanged( const QString &text ) {
-    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
+    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+
+    if ( sParent == NULL )
+        return;
 
     if ( sParent->variablesLocked())
         return;
