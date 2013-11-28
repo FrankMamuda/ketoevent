@@ -57,6 +57,8 @@ public:
     ~Gui_TeamEdit();
     void toggleAddEditWidget( AddEditState state );
     AddEditState state() const { return this->m_state; }
+
+    // TODO: prop!!!
     int lastId;
 
 private slots:

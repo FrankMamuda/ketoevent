@@ -43,6 +43,7 @@ comboPoints
 ================
 */
 int LogEntry::comboPoints() const {
+#if 0
     switch ( this->combo()) {
     case Single:
         return m.currentEvent()->singleCombo();
@@ -57,6 +58,9 @@ int LogEntry::comboPoints() const {
     case NoCombo:
         return 0;
     }
+#else
+    return 0;
+#endif
 }
 
 /*

@@ -49,7 +49,7 @@ public:
     LogEntry( const QSqlRecord &record, const QString &table );
     int value() const { return this->record().value( "value" ).toInt(); }
     bool check() const { return static_cast<bool>( this->value()); }
-    Combos combo() const { return static_cast<Combos>( this->record().value( "combo" ).toInt()); }
+    Combos combo() const { return NoCombo; /*static_cast<Combos>( this->record().value( "combo" ).toInt());*/ }
     int comboPoints() const;
     int points() const;
     int teamId() const { return this->record().value( "teamId" ).toInt(); }
@@ -57,7 +57,7 @@ public:
 
 public slots:
     void setValue( int value ) { this->DatabaseEntry::setValue( "value", value ); }
-    void setCombo( Combos combo ) { this->DatabaseEntry::setValue( "combo", static_cast<int>( combo )); }
+    void setCombo( Combos combo ) { /*this->DatabaseEntry::setValue( "combo", static_cast<int>( combo ));*/ }
     void setTeamId( int id ) { this->DatabaseEntry::setValue( "teamId", id ); }
     void setTaskId( int id ) { this->DatabaseEntry::setValue( "taskId", id ); }
 };
