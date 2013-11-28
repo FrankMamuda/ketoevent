@@ -184,6 +184,8 @@ setComboState
 ================
 */
 void TaskWidget::setComboState( LogEntry::Combos combo ) {
+
+#if 0
     this->m_comboState = combo;
 
     // failsafe
@@ -214,6 +216,7 @@ void TaskWidget::setComboState( LogEntry::Combos combo ) {
         m.error( StrSoftError + this->tr( "invalid combo state \"%1\"\n" ).arg( static_cast<int>( combo )));
         return;
     }
+#endif
 }
 
 /*
@@ -222,6 +225,8 @@ toggleCombo
 ================
 */
 void TaskWidget::toggleCombo() {
+
+#if 0
     // failsafe
     if ( !this->hasTask()) {
         m.error( StrSoftError + this->tr( "task not set\n" ));
@@ -252,7 +257,8 @@ void TaskWidget::toggleCombo() {
     }
 
     // store value
-    this->saveLog();
+    this->saveLog();   
+#endif
 }
 
 /*

@@ -27,6 +27,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "ui_gui_main.h"
 #include "taskwidget.h"
 #include "gui_event.h"
+#include "gui_combos.h"
 
 /*
 ================
@@ -170,12 +171,16 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->timeFinish->setEnabled( true );
             this->ui->logButton->setEnabled( true );
         }
+
+        this->m_currentTeamIndex = index;
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
         this->ui->comboTeams->setDisabled( true );
         this->ui->lockButton->setDisabled( true );
         this->ui->logButton->setDisabled( true );
+
+        this->m_currentTeamIndex = -1;
     }
 }
 
@@ -255,6 +260,7 @@ void Gui_Main::fillTasks() {
     foreach ( TaskEntry *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
+        itemPtr->setBackgroundColor( Qt::green );
         lw->addItem( itemPtr );
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
@@ -393,6 +399,16 @@ actionEvents->triggered
 ================
 */
 void Gui_Main::on_actionEvents_triggered() {
-    Gui_Event events;
+    Gui_Event events( this );
     events.exec();
+}
+
+/*
+================
+actionCombos->triggered
+================
+*/
+void Gui_Main::on_actionCombos_triggered() {
+    Gui_Combos combos( this );
+    combos.exec();
 }

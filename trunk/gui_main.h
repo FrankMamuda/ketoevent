@@ -44,13 +44,15 @@ class Gui_Main;
 //
 class Gui_Main : public QMainWindow {
     Q_OBJECT
-    
+    Q_PROPERTY( int currentTeamIndex READ currentTeamIndex )
+
 public:
     explicit Gui_Main( QWidget *parent = 0 );
     ~Gui_Main();
 
 public slots:
     void initialize();
+    int currentTeamIndex() const { return this->m_currentTeamIndex; }
 
 private slots:
     // team/task fill
@@ -74,18 +76,19 @@ private slots:
     void on_findTaskEdit_textChanged( const QString & );
     void on_findTaskEdit_returnPressed();
     void on_lockButton_clicked();
+    void on_actionEvents_triggered();
+    void on_actionCombos_triggered();
 #ifdef Q_OS_ANDROID
     void on_upButton_clicked();
     void on_downButton_clicked();
 #endif
-
-    void on_actionEvents_triggered();
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
 
 private:
     Ui::Gui_Main *ui;
+    int m_currentTeamIndex;
     int currentMatch;
 };
 

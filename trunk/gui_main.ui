@@ -216,6 +216,7 @@
    <addaction name="actionEvents"/>
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
+   <addaction name="actionCombos"/>
    <addaction name="actionReviewers"/>
    <addaction name="actionRankings"/>
    <addaction name="actionSettings"/>
@@ -313,6 +314,15 @@
    </property>
    <property name="text">
     <string>Events</string>
+   </property>
+  </action>
+  <action name="actionCombos">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/combos_48</normaloff>:/icons/combos_48</iconset>
+   </property>
+   <property name="text">
+    <string>Combos</string>
    </property>
   </action>
  </widget>

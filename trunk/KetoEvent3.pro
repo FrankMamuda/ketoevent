@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     variable.cpp \
     sort.cpp \
     gui_console.cpp \
-    gui_event.cpp
+    gui_event.cpp \
+    gui_combos.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -63,7 +64,8 @@ HEADERS  += gui_main.h \
     evententry.h \
     gui_console.h \
     gui_event.h \
-    gui_settingsdialog.h
+    gui_settingsdialog.h \
+    gui_combos.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
@@ -73,7 +75,8 @@ FORMS    += gui_main.ui \
     gui_license.ui \
     gui_settings.ui \
     gui_console.ui \
-    gui_event.ui
+    gui_event.ui \
+    gui_combos.ui
 
 RESOURCES += \
     resources.qrc
