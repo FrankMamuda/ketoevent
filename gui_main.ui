@@ -296,6 +296,9 @@
    </property>
   </action>
   <action name="actionReviewers">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/reviewers_48</normaloff>:/icons/reviewers_48</iconset>
