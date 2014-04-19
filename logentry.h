@@ -57,7 +57,7 @@ public:
 
 public slots:
     void setValue( int value ) { this->DatabaseEntry::setValue( "value", value ); }
-    void setCombo( Combos combo ) { /*this->DatabaseEntry::setValue( "combo", static_cast<int>( combo ));*/ }
+    void setCombo( Combos combo ) { Q_UNUSED( combo );/*this->DatabaseEntry::setValue( "combo", static_cast<int>( combo ));*/ }
     void setTeamId( int id ) { this->DatabaseEntry::setValue( "teamId", id ); }
     void setTaskId( int id ) { this->DatabaseEntry::setValue( "taskId", id ); }
 };

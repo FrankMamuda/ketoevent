@@ -5,6 +5,11 @@
 Gui_Combos::Gui_Combos( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Combos ) {
     ui->setupUi(this);
     this->fillTeams();
+
+    // set up view
+    this->comboModelPtr = new Gui_ComboModel( this );
+    this->ui->listAvailable->setModel( this->comboModelPtr );
+    this->ui->listAvailable->setAlternatingRowColors( true );
 }
 
 Gui_Combos::~Gui_Combos() {

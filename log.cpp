@@ -44,10 +44,13 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos comb
             return logPtr;
     }
 
+//    !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer )" ) ||
+
+
     // add new log
-    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3, %4 )" )
+    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3 )" )
                       .arg( value )
-                      .arg( static_cast<int>( combo ))
+                     // .arg( static_cast<int>( combo ))
                       .arg( taskId )
                       .arg( teamId )
                       )) {

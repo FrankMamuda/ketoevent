@@ -92,7 +92,7 @@
      <item>
       <widget class="QLabel" name="labelAvailable">
        <property name="text">
-        <string>Available tasks:</string>
+        <string>Recently logged tasks:</string>
        </property>
       </widget>
      </item>

@@ -114,11 +114,22 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     // set tooltips
     this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
 
+    // disable combo button by default
+    this->combo->hide();
+    this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
+    this->combo->setCheckable( true );
+
     // add layout to widget
     this->setLayout( grid );
 
     // connect combo button for updates
-    this->connect( this->combo, SIGNAL( clicked()), this, SLOT( toggleCombo()));
+    this->connect( this->combo, SIGNAL( toggled( bool )) /*SIGNAL( clicked())*/, this, SLOT( toggleCombo( bool )));
+
+
+
+
+
+
 }
 
 /*
@@ -184,6 +195,7 @@ setComboState
 ================
 */
 void TaskWidget::setComboState( LogEntry::Combos combo ) {
+    Q_UNUSED( combo );
 
 #if 0
     this->m_comboState = combo;
@@ -224,7 +236,12 @@ void TaskWidget::setComboState( LogEntry::Combos combo ) {
 toggleCombo
 ================
 */
-void TaskWidget::toggleCombo() {
+void TaskWidget::toggleCombo( bool checked ) {
+    // TODO: change to different icons
+    if ( checked )
+        this->combo->setIcon( QIcon( ":/icons/task_remove_16" ));
+    else
+        this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
 
 #if 0
     // failsafe

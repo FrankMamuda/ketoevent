@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     sort.cpp \
     gui_console.cpp \
     gui_event.cpp \
-    gui_combos.cpp
+    gui_combos.cpp \
+    gui_combomodel.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -65,7 +66,8 @@ HEADERS  += gui_main.h \
     gui_console.h \
     gui_event.h \
     gui_settingsdialog.h \
-    gui_combos.h
+    gui_combos.h \
+    gui_combomodel.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \

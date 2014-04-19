@@ -59,7 +59,7 @@ public:
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
     void setComboState( LogEntry::Combos combo );
-    void toggleCombo();
+    void toggleCombo( bool checked );
     void resetLog();
 
 public slots:
@@ -68,7 +68,9 @@ public slots:
     void saveLog();
     void setLog( LogEntry *logPtr, bool fromDatabase = false );
 
-private:
+//private:
+// TODO: disabler function
+public:
     QGridLayout *grid;
     QLabel *taskName;
     QCheckBox *check;
