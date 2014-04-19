@@ -57,7 +57,11 @@ void Main::addEvent() {
             .arg( Common::defaultFinalTime );
 
     // add new log
-    if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7 )" )
+    // id integer primary key, api integer, name varchar( 64 ) unique,
+    // minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ),
+    // finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer, lock integer
+
+    if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
                       .arg( Common::API )
                       .arg( this->tr( "unnamed event" ))
                       .arg( Common::defaultMinMembers )
