@@ -412,3 +412,80 @@ void Gui_Main::on_actionCombos_triggered() {
     Gui_Combos combos( this );
     combos.exec();
 }
+
+/*
+================
+actionCombos->triggered
+================
+*/
+#include <QDebug>
+void Gui_Main::on_combineButton_clicked() {
+    // disable everything except combo buttons on tasks (tasks that are LOGGED)
+    // must create semi-universal UI disabler
+    //foreach ( QListWidget *wPtr, this->ui->taskList->items() ) {
+
+#if 0
+    for ( int y = 0; y < this->ui->taskList->count(); y++ ) {
+        QListWidgetItem *wPtr = this->ui->taskList->item( y );
+
+        if ( wPtr == NULL )
+            continue;
+
+        LogEntry *lPtr = m.logForId( wPtr->data( Qt::UserRole ).toInt());
+        if ( lPtr == NULL )
+            continue;
+
+        if ( !lPtr->value())
+            wPtr->setText( "fish");
+
+
+        //     teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+
+    }
+#endif
+
+}
+
+void Gui_Main::on_combineButton_toggled(bool checked)
+{
+
+    qDebug() << checked;
+
+    int y;
+    QListWidget *lw = this->ui->taskList;
+    for ( y = 0; y < lw->count(); y++ ) {
+        TaskWidget *taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+
+        if ( taskLogPtr == NULL )
+            continue;
+
+        if ( !checked ) {
+            qDebug() << " enable";
+
+            taskLogPtr->taskName->setEnabled( true );
+            taskLogPtr->combo->hide();
+
+
+            if ( taskLogPtr->check != NULL )
+                taskLogPtr->check->setEnabled( true );
+
+            if ( taskLogPtr->multi != NULL )
+                taskLogPtr->multi->setEnabled( true );
+        } else {
+            LogEntry *lPtr = taskLogPtr->log();
+            if ( lPtr == NULL || !lPtr->value()) {
+                taskLogPtr->taskName->setDisabled( true );
+
+                if ( taskLogPtr->check != NULL )
+                    taskLogPtr->check->setDisabled( true );
+
+                if ( taskLogPtr->multi != NULL )
+                    taskLogPtr->multi->setDisabled( true );
+
+            } else {
+                taskLogPtr->combo->show();
+            }
+        }
+    }
+
+}

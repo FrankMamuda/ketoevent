@@ -83,6 +83,10 @@ private slots:
     void on_downButton_clicked();
 #endif
 
+    void on_combineButton_clicked();
+
+    void on_combineButton_toggled(bool checked);
+
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
 

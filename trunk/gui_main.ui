@@ -81,6 +81,20 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="combineButton">
+          <property name="text">
+           <string>Combine</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/combos_48</normaloff>:/icons/combos_48</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="lockButton">
           <property name="text">
            <string>Lock/Unlock</string>
