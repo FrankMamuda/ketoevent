@@ -32,34 +32,26 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 class LogEntry : public DatabaseEntry {
     Q_PROPERTY( int value READ value WRITE setValue )
     Q_PROPERTY( int check READ check )
-    Q_PROPERTY( Combos combo READ combo WRITE setCombo )
     Q_PROPERTY( int comboPoints READ comboPoints )
     Q_PROPERTY( int points READ points )
     Q_PROPERTY( int teamId READ teamId WRITE setTeamId )
     Q_PROPERTY( int taskId READ taskId WRITE setTaskId )
-    Q_ENUMS( Combos )
+    Q_PROPERTY( int comboId READ comboId WRITE setComboId )
 
 public:
-    enum Combos {
-        NoCombo = 0,
-        Single = 1,
-        Double = 2,
-        Triple = 3
-    };
     LogEntry( const QSqlRecord &record, const QString &table );
     int value() const { return this->record().value( "value" ).toInt(); }
     bool check() const { return static_cast<bool>( this->value()); }
-    Combos combo() const { return NoCombo; /*static_cast<Combos>( this->record().value( "combo" ).toInt());*/ }
-    int comboPoints() const;
     int points() const;
     int teamId() const { return this->record().value( "teamId" ).toInt(); }
     int taskId() const { return this->record().value( "taskId" ).toInt(); }
+    int comboId() const { return this->record().value( "comboId" ).toInt(); }
 
 public slots:
     void setValue( int value ) { this->DatabaseEntry::setValue( "value", value ); }
-    void setCombo( Combos combo ) { Q_UNUSED( combo );/*this->DatabaseEntry::setValue( "combo", static_cast<int>( combo ));*/ }
     void setTeamId( int id ) { this->DatabaseEntry::setValue( "teamId", id ); }
     void setTaskId( int id ) { this->DatabaseEntry::setValue( "taskId", id ); }
+    void setComboId( int id ) { this->DatabaseEntry::setValue( "comboId", id ); }
 };
 
 #endif // LOGENTRY_H

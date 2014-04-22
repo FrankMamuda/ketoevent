@@ -90,20 +90,22 @@ void Main::loadDatabase() {
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, reviewerId integer )" ) ||
          !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
          !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer, lock integer )" ) ||
-         !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer )" ) ||
-         !query.exec( "create table if not exists combos ( id integer primary key, teamId integer, combos varchar( 64 ))" )
+         !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" ) //||
+         // !query.exec( "create table if not exists combos ( id integer primary key, teamId integer, idString varchar( 64 ))" )
          ) {
         m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
     }
 
-    // delete orphaned logs on init
+    // delete orphaned combos/logs on init
     this->removeOrphanedLogs();
+    this->removeOrphanedCombos();
 
     // load entries
     this->loadEvents();
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();
+    //this->loadCombos();
 }
 
 /*

@@ -69,6 +69,7 @@ namespace Common {
 //
 // class:Main
 //
+
 class Main : public QObject {
     Q_OBJECT
     Q_ENUMS( ListTypes )
@@ -92,7 +93,7 @@ public:
     // database related
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
-    LogEntry *addLog( int taskId, int teamId, int value = 0, LogEntry::Combos combo = LogEntry::NoCombo );
+    LogEntry *addLog( int taskId, int teamId, int value = 0, int comboId = -1 );
     LogEntry *logForId( int id );
     LogEntry *logForIds( int teamId, int taskId );
     TaskEntry *taskForId( int id );
@@ -123,10 +124,11 @@ public:
     // misc
     QString transliterate( const QString &path );
     bool isInitialized() const { return this->m_init; }
+    QObject *parent;
 
 public slots:
     // init/shutdown
-    void initialize();
+    void initialize( QObject *parent );
     void setInitialized( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
@@ -139,6 +141,9 @@ public slots:
     void sort( ListTypes type );
     void update();
     void initConsole();
+
+    // combos
+    int getFreeComboId();
 
 private:
     QSettings *settings;
@@ -161,6 +166,7 @@ private slots:
     void loadEvents();
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
+    void removeOrphanedCombos();
     void writeBackup();
     bool setCurrentEvent( EventEntry *eventPtr );
 };

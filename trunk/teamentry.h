@@ -61,7 +61,7 @@ public:
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setMembers( int members ) { this->setValue( "members", members ); }
-    void setFinishTime( QTime time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
+    void setFinishTime( const QTime &time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
     void lock( bool lock = true ) { this->setValue( "lock", static_cast<int>( lock )); }
     void unlock( bool lock = true ) { this->setValue( "lock", static_cast<int>( !lock )); }
 };

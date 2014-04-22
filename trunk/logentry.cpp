@@ -39,32 +39,6 @@ LogEntry::LogEntry( const QSqlRecord &record, const QString &table ) {
 
 /*
 ================
-comboPoints
-================
-*/
-int LogEntry::comboPoints() const {
-#if 0
-    switch ( this->combo()) {
-    case Single:
-        return m.currentEvent()->singleCombo();
-
-    case Double:
-        return m.currentEvent()->doubleCombo();
-
-    case Triple:
-        return m.currentEvent()->tripleCombo();
-
-    default:
-    case NoCombo:
-        return 0;
-    }
-#else
-    return 0;
-#endif
-}
-
-/*
-================
 points
 ================
 */
