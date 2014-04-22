@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     gui_console.cpp \
     gui_event.cpp \
     gui_combos.cpp \
-    gui_combomodel.cpp
+    gui_combomodel.cpp \
+    combo.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \

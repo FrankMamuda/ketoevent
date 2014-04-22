@@ -90,6 +90,10 @@ int TaskEntry::calculate( int logId ) const {
     }
 
     // get combo points
+    // TODO/FIXME: MUST COUNT COMBO POINTS ELSEWHERE
+    // ALSO CHECK FOR TOOLTIPS (correct points)
+  //  foreach ( ComboEntry *cPtr, )
+#if 0
     switch ( logPtr->combo()) {
     case LogEntry::Single:
         value += m.currentEvent()->singleCombo();
@@ -107,6 +111,7 @@ int TaskEntry::calculate( int logId ) const {
     case LogEntry::NoCombo:
         break;
     }
+#endif
 
     // we're done
     return value;

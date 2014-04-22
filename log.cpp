@@ -34,7 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 addLog
 ================
 */
-LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos combo ) {
+LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     LogEntry *logPtr = NULL;
     QSqlQuery query;
 
@@ -44,15 +44,12 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos comb
             return logPtr;
     }
 
-//    !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer )" ) ||
-
-
     // add new log
-    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3 )" )
+    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3, %4 )" )
                       .arg( value )
-                     // .arg( static_cast<int>( combo ))
                       .arg( taskId )
                       .arg( teamId )
+                      .arg( comboId )
                       )) {
         this->error( StrSoftError + QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
     }
@@ -65,7 +62,6 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, LogEntry::Combos comb
     }
     return logPtr;
 }
-
 
 /*
 ================

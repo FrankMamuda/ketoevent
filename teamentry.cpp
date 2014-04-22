@@ -83,12 +83,7 @@ combos
 ================
 */
 int TeamEntry::combos() const {
-    int combos = 0;
-
-    foreach ( LogEntry *logPtr, this->logList )
-        combos += static_cast<int>( logPtr->combo());
-
-    return combos;
+    return 0;//return this->comboList.count();
 }
 
 /*

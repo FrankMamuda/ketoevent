@@ -29,6 +29,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_event.h"
 #include "gui_combos.h"
 
+// FIXME: fix hilight colours
+
 /*
 ================
 construct
@@ -36,6 +38,7 @@ construct
 */
 Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_Main ) {
     ui->setupUi( this );
+    this->m_currentComboIndex = -1;
 }
 
 /*
@@ -247,6 +250,7 @@ void Gui_Main::fillTasks() {
 
     for ( y = 0; y < lw->count(); y++ ) {
         TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
         delete taskPtr;
         delete lw->item( y );
     }
@@ -260,10 +264,14 @@ void Gui_Main::fillTasks() {
     foreach ( TaskEntry *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
-        itemPtr->setBackgroundColor( Qt::green );
+       // itemPtr->setBackgroundColor( Qt::green );
         lw->addItem( itemPtr );
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
+        widgetPtr->combo->hide();
+
+        // make connections
+        //this->connect( widgetPtr->combo, SIGNAL( toggled( bool )), this, SLOT( toggleCombo( bool )));
     }
 
     // update
@@ -306,11 +314,13 @@ findTaskEdit->textChanged
 ================
 */
 void Gui_Main::on_findTaskEdit_textChanged( const QString & ) {
+#if 1
     if ( this->ui->findTaskEdit->palette().color( QPalette::Base ) == QColor( 255, 0, 0, 64 )) {
         QPalette p( this->ui->findTaskEdit->palette());
         p.setColor( QPalette::Base, Qt::white );
         this->ui->findTaskEdit->setPalette( p );
     }
+#endif
 }
 
 /*
@@ -319,6 +329,7 @@ findTaskEdit->returnPressed
 ================
 */
 void Gui_Main::on_findTaskEdit_returnPressed() {
+#if 1
     int y;
     QString matchString;
     bool match = false;
@@ -364,6 +375,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         p.setColor( QPalette::Base, QColor( 255, 0, 0, 64 ));
         this->ui->findTaskEdit->setPalette( p );
     }
+#endif
 }
 
 /*
@@ -415,77 +427,175 @@ void Gui_Main::on_actionCombos_triggered() {
 
 /*
 ================
-actionCombos->triggered
+combineButton->toggled
 ================
 */
-#include <QDebug>
-void Gui_Main::on_combineButton_clicked() {
-    // disable everything except combo buttons on tasks (tasks that are LOGGED)
-    // must create semi-universal UI disabler
-    //foreach ( QListWidget *wPtr, this->ui->taskList->items() ) {
+void Gui_Main::on_combineButton_toggled( bool checked ) {
+    QListWidget *lw;
+    TeamEntry *teamPtr;
+    TaskWidget *tw;
+    QList<int> indexList;
+    bool valueSet;
+    int y, k;
 
-#if 0
-    for ( int y = 0; y < this->ui->taskList->count(); y++ ) {
-        QListWidgetItem *wPtr = this->ui->taskList->item( y );
+    // get task list (gui)
+    lw = this->ui->taskList;
+    tw = qobject_cast<TaskWidget *>( lw->itemWidget( lw->currentItem()));
+    k = 0;
 
-        if ( wPtr == NULL )
-            continue;
-
-        LogEntry *lPtr = m.logForId( wPtr->data( Qt::UserRole ).toInt());
-        if ( lPtr == NULL )
-            continue;
-
-        if ( !lPtr->value())
-            wPtr->setText( "fish");
-
-
-        //     teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
-
+    // failsafe
+    if ( tw == NULL ) {
+        this->ui->combineButton->setChecked( false );
+        this->m_currentComboIndex = -1;
+        return;
     }
-#endif
 
-}
+    // check if any reason to combine (>= logged tasks & active task is logged)
+    if ( checked ) {
+        LogEntry *logPtr = NULL;
 
-void Gui_Main::on_combineButton_toggled(bool checked)
-{
+        // check if the active task is logged
+        if ( !tw->hasLog()) {
+            this->ui->combineButton->setChecked( false );
+            this->m_currentComboIndex = -1;
+            return;
+        }
 
-    qDebug() << checked;
+        // check if it has a combo asigned, if not get the next free index
+        if ( tw->hasCombo())
+            tw->log()->setComboId( m.getFreeComboId());
+        this->m_currentComboIndex = tw->log()->comboId();
 
-    int y;
-    QListWidget *lw = this->ui->taskList;
+        // hilight entry (setCombo or smth?)
+        tw->combo->setChecked( true );
+
+        // check for the total number of logs
+        teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        if ( teamPtr != NULL ) {
+            int count = 0;
+
+            // cannot use list->count(), since team might have orphaned logs
+            foreach ( logPtr, teamPtr->logList ) {
+                if ( logPtr->value())
+                    count++;
+            }
+
+            // less than two tasks - abort!
+            if ( count < 2 ) {
+                this->ui->combineButton->setChecked( false );
+                this->m_currentComboIndex = -1;
+                return;
+            }
+        }
+
+    } else if ( !checked ) {
+        // just refill the whole list on reset
+        this->fillTasks();
+        this->m_currentComboIndex = -1;
+        return;
+    }
+
+    // find combo, if none, add one
+    /* NO CODE */
+
+    // go through items one by one
     for ( y = 0; y < lw->count(); y++ ) {
-        TaskWidget *taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        TaskWidget *taskLogPtr;
 
+        // get task widget
+        taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
         if ( taskLogPtr == NULL )
             continue;
 
-        if ( !checked ) {
-            qDebug() << " enable";
+        // hilight combined entries
+      // if ( )
+#if 0
+        foreach ( int task, comboPtr->taskList ) {
+            if ( task == taskLogPtr->task()->id())
+                taskLogPtr->combo->setChecked( true );
+        }
+#endif
 
-            taskLogPtr->taskName->setEnabled( true );
-            taskLogPtr->combo->hide();
+        // reset value check
+        valueSet = true;
 
+        // get log
+        LogEntry *lPtr = taskLogPtr->log();
+        if ( lPtr == NULL )
+            valueSet = false;
+        else {
+            if ( !lPtr->value())
+                valueSet = false;
+        }
 
-            if ( taskLogPtr->check != NULL )
-                taskLogPtr->check->setEnabled( true );
+        // for now, remove only widgets with no or empty logs
+        // in future check combo conflicts
+        if ( !valueSet )
+            indexList << y;
+        else {
+            // enable combo button
+            taskLogPtr->combo->show();
 
-            if ( taskLogPtr->multi != NULL )
-                taskLogPtr->multi->setEnabled( true );
-        } else {
-            LogEntry *lPtr = taskLogPtr->log();
-            if ( lPtr == NULL || !lPtr->value()) {
-                taskLogPtr->taskName->setDisabled( true );
-
+            // disallow modifications
+            if ( taskLogPtr->task()->type() == TaskEntry::Check ) {
                 if ( taskLogPtr->check != NULL )
                     taskLogPtr->check->setDisabled( true );
-
+            } else if ( taskLogPtr->task()->type() == TaskEntry::Multi ) {
                 if ( taskLogPtr->multi != NULL )
                     taskLogPtr->multi->setDisabled( true );
-
-            } else {
-                taskLogPtr->combo->show();
             }
+            if ( taskLogPtr->hasCombo())
+                taskLogPtr->combo->setChecked( true );
         }
     }
 
+    // remove items that cannot be combined
+    for ( y = 0; y < indexList.count(); y++ ) {
+        lw->takeItem( indexList.at( y ) - k );
+        k++;
+    }
+
+    // one task cannot be combined, so disable the button
+    if ( lw->count() == 1 ) {
+        TaskWidget *taskLogPtr;
+
+        // get the first item
+        taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
+        if ( taskLogPtr != NULL )
+            taskLogPtr->combo->setDisabled( true );
+    }
+}
+
+/*
+================
+toggleCombo
+================
+*/
+void Gui_Main::toggleCombo( bool checked ) {
+    Q_UNUSED( checked )
+#if 0
+    if ( this->currentComboIndex() == -1 )
+        return;
+
+    QListWidget *lw;
+    TaskWidget *tw;
+
+    m.print( "button press\n");
+
+    // get task list (gui)
+    lw = this->ui->taskList;
+    tw = qobject_cast<TaskWidget *>( lw->itemWidget( lw->currentItem()));
+
+    if ( tw == NULL )
+        return;
+
+    if ( !tw->hasLog() || tw->hasCombo())
+        return;
+
+    if ( checked ) {
+        tw->log()->setComboId( this->currentComboIndex());
+    } else {
+        tw->log()->setComboId( -1 );
+    }
+#endif
 }

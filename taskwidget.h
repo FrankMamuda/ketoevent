@@ -43,7 +43,6 @@ class TaskWidget : public QWidget {
     Q_PROPERTY( LogEntry *log READ log WRITE setLog RESET resetLog )
     Q_PROPERTY( TaskEntry *task READ task WRITE setTask )
     Q_PROPERTY( TeamEntry *team READ team WRITE setTeam RESET resetTeam )
-    Q_PROPERTY( LogEntry::Combos comboState READ comboState WRITE setComboState )
 
 public:
     explicit TaskWidget( TaskEntry *parentPtr );
@@ -51,15 +50,13 @@ public:
     LogEntry *log() const { return this->m_log; }
     TaskEntry *task() const { return this->m_task; }
     TeamEntry *team() const { return this->m_team; }
-    LogEntry::Combos comboState() const { return this->m_comboState; }
     bool hasLog() const { return this->log() != NULL; }
+    bool hasCombo() const { if ( this->hasLog()) if ( this->log()->comboId() != -1 ) return true; return false; }
     bool hasTeam() const { return this->team() != NULL; }
     bool hasTask() const { return this->task() != NULL; }
 
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
-    void setComboState( LogEntry::Combos combo );
-    void toggleCombo( bool checked );
     void resetLog();
 
 public slots:
@@ -67,6 +64,7 @@ public slots:
     void resetTeam();
     void saveLog();
     void setLog( LogEntry *logPtr, bool fromDatabase = false );
+    void toggleCombo( bool );
 
 //private:
 // TODO: disabler function
@@ -79,7 +77,6 @@ public:
     LogEntry *m_log;
     TaskEntry *m_task;
     TeamEntry *m_team;
-    LogEntry::Combos m_comboState;
     bool m_changed;
     bool m_active;
 };

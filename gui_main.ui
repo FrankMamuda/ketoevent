@@ -158,8 +158,7 @@
        <string>Log team's accomplished tasks here</string>
       </property>
       <property name="styleSheet">
-       <string notr="true">QListWidget::item { border-bottom: 1px solid black; }
-</string>
+       <string notr="true"/>
       </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>

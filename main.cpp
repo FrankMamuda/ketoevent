@@ -68,7 +68,7 @@ class Main m;
 initialize
 ================
 */
-void Main::initialize() {
+void Main::initialize( QObject *parent ) {
     // init counters
     this->changesCounter = 0;
     this->setInitialized( false );
@@ -105,6 +105,9 @@ void Main::initialize() {
     this->addSvar( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
+
+    // set parent
+    this->parent = parent;
 
     // we're up
     this->setInitialized();
@@ -160,6 +163,7 @@ void Main::shutdown( bool ignoreDatabase ) {
         QSqlDatabase db = QSqlDatabase::database();
         if ( db.open()) {
             this->removeOrphanedLogs();
+            this->removeOrphanedCombos();
             db.close();
         }
     }
@@ -278,7 +282,7 @@ int main( int argc, char *argv[] ) {
 
     // initialize application
 //#ifndef APPLET_DEBUG
-    m.initialize();
+    m.initialize( qobject_cast<QObject*>( &gui ));
 //#endif
 
     // add teams

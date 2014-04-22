@@ -25,6 +25,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include "gui_main.h"
 
 //
 // FIXME: does not save COMBO anymore!
@@ -71,7 +72,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // determine type
     if ( this->task()->type() == TaskEntry::Check ) {
-        this->check = new QCheckBox();        
+        this->check = new QCheckBox();
         this->check->setMaximumWidth( 48 );
         this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2 );
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
@@ -108,7 +109,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 #else
     this->combo->setMaximumWidth( 32 );
 #endif
-    this->setComboState( LogEntry::NoCombo );
+    //this->setComboState( LogEntry::NoCombo );
     this->grid->addWidget( this->combo, 0, 4, 1, 1 );
 
     // set tooltips
@@ -122,14 +123,11 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     // add layout to widget
     this->setLayout( grid );
 
+    // set default stylesheet
+    this->taskName->setStyleSheet( "padding: 6px;" );
+
     // connect combo button for updates
     this->connect( this->combo, SIGNAL( toggled( bool )) /*SIGNAL( clicked())*/, this, SLOT( toggleCombo( bool )));
-
-
-
-
-
-
 }
 
 /*
@@ -167,7 +165,7 @@ void TaskWidget::saveLog() {
     // set to zero - orphans will be deleted anyway
     if ( value <= 0 && this->hasLog()) {
         this->log()->setValue( 0 );
-        this->log()->setCombo( LogEntry::NoCombo );
+        //this->log()->setCombo( LogEntry::NoCombo );
     }
 
     // no log?, no problem - create one
@@ -186,96 +184,7 @@ void TaskWidget::saveLog() {
     }
     this->log()->setValue( value );
     this->team()->logList.last()->setValue( value );
-    this->log()->setCombo( this->comboState());
-}
-
-/*
-================
-setComboState
-================
-*/
-void TaskWidget::setComboState( LogEntry::Combos combo ) {
-    Q_UNUSED( combo );
-
-#if 0
-    this->m_comboState = combo;
-
-    // failsafe
-    if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
-        return;
-    }
-
-    // set text according to combo points
-    switch ( this->comboState()) {
-    case LogEntry::Single:
-        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->singleCombo()));
-        break;
-
-    case LogEntry::Double:
-        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->doubleCombo()));
-        break;
-
-    case LogEntry::Triple:
-        this->combo->setText( QString( "+%1" ).arg( m.currentEvent()->tripleCombo()));
-        break;
-
-    case LogEntry::NoCombo:
-        this->combo->setText( "+0" );
-        break;
-
-    default:
-        m.error( StrSoftError + this->tr( "invalid combo state \"%1\"\n" ).arg( static_cast<int>( combo )));
-        return;
-    }
-#endif
-}
-
-/*
-================
-toggleCombo
-================
-*/
-void TaskWidget::toggleCombo( bool checked ) {
-    // TODO: change to different icons
-    if ( checked )
-        this->combo->setIcon( QIcon( ":/icons/task_remove_16" ));
-    else
-        this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
-
-#if 0
-    // failsafe
-    if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
-        return;
-    }
-
-    // cycle through combo points
-    switch ( this->comboState()) {
-    case LogEntry::Single:
-        this->setComboState( LogEntry::Double );
-        break;
-
-    case LogEntry::Double:
-        this->setComboState( LogEntry::Triple );
-        break;
-
-    case LogEntry::Triple:
-        this->setComboState( LogEntry::NoCombo );
-        break;
-
-    case LogEntry::NoCombo:
-        this->setComboState( LogEntry::Single );
-        break;
-
-    default:
-        m.error( StrSoftError + this->tr( "invalid combo state \"%1\"\n" ).arg( static_cast<int>( this->comboState())));
-        return;
-    }
-
-    // store value
-    this->saveLog();   
-#endif
+    //this->log()->setCombo( this->comboState());
 }
 
 /*
@@ -291,11 +200,11 @@ TaskWidget::~TaskWidget() {
     }
 
     // disconnect buttons and spinboxes
-    this->disconnect( this->combo, SIGNAL( clicked()));
+    //this->disconnect( this->combo, SIGNAL( clicked()));
 
     if ( this->task()->type() == TaskEntry::Check && this->check != NULL ) {
         this->disconnect( this->check, SIGNAL( clicked()));
-        delete this->check;   
+        delete this->check;
     } else if ( this->task()->type() == TaskEntry::Multi && this->multi != NULL ) {
         this->disconnect( this->multi, SIGNAL( valueChanged( int )));
         delete this->multi;
@@ -352,7 +261,7 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         this->multi->setValue( this->log()->value());
 
     // set combo
-    this->setComboState( this->log()->combo());
+    //this->setComboState( this->log()->combo());
 }
 
 /*
@@ -376,7 +285,7 @@ void TaskWidget::resetLog() {
         this->multi->setValue( 0 );
 
     // reset combo
-    this->setComboState( LogEntry::NoCombo );
+    //this->setComboState( LogEntry::NoCombo );
 }
 
 /*
@@ -419,4 +328,38 @@ void TaskWidget::resetTeam() {
     this->m_team = NULL;
     this->m_active = false;
     this->resetLog();
+}
+
+/*
+================
+toggleCombo
+================
+*/
+void TaskWidget::toggleCombo( bool checked ) {    
+    // TODO: change to different icons
+    if ( checked ) {
+        this->taskName->setStyleSheet( "background-color: rgba( 0, 200, 0, 128 ); border-style: outset; border-width: 2px; border-radius: 10px; border-color: beige; font: bold; padding: 6px;" );
+        this->combo->setIcon( QIcon( ":/icons/task_remove_16" ));
+
+        if ( !this->hasLog() && this->hasCombo())
+            return;
+
+        Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
+        if ( gui == NULL )
+            return;
+
+        this->log()->setComboId( gui->currentComboIndex());
+    } else {
+        this->taskName->setStyleSheet( "padding: 6px;" );
+        this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
+
+
+        if ( !this->hasLog() && this->hasCombo())
+            return;
+
+        this->log()->setComboId( -1 );
+
+        //if ( this->hasCombo() && this->hasLog())
+        //    this->log->setComboId();
+    }
 }

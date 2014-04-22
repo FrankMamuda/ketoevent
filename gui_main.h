@@ -32,6 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_rankings.h"
 #include "gui_about.h"
 #include "gui_settings.h"
+
 //
 // namespace: Ui
 //
@@ -45,6 +46,7 @@ class Gui_Main;
 class Gui_Main : public QMainWindow {
     Q_OBJECT
     Q_PROPERTY( int currentTeamIndex READ currentTeamIndex )
+    Q_PROPERTY( int currentComboIndex READ currentComboIndex )
 
 public:
     explicit Gui_Main( QWidget *parent = 0 );
@@ -53,6 +55,7 @@ public:
 public slots:
     void initialize();
     int currentTeamIndex() const { return this->m_currentTeamIndex; }
+    int currentComboIndex() const { return this->m_currentComboIndex; }
 
 private slots:
     // team/task fill
@@ -82,10 +85,8 @@ private slots:
     void on_upButton_clicked();
     void on_downButton_clicked();
 #endif
-
-    void on_combineButton_clicked();
-
     void on_combineButton_toggled(bool checked);
+    void toggleCombo( bool );
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
@@ -93,6 +94,7 @@ protected:
 private:
     Ui::Gui_Main *ui;
     int m_currentTeamIndex;
+    int m_currentComboIndex;
     int currentMatch;
 };
 
