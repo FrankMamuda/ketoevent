@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013 Avotu Briezhaudzetava
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,10 +57,6 @@ void Main::addEvent() {
             .arg( Common::defaultFinalTime );
 
     // add new log
-    // id integer primary key, api integer, name varchar( 64 ) unique,
-    // minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ),
-    // finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer, lock integer
-
     if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
                       .arg( Common::API )
                       .arg( this->tr( "unnamed event" ))

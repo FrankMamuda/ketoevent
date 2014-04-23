@@ -19,7 +19,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="layoutCombos" stretch="0,0,0,0,0,1,0,5,0">
+    <layout class="QVBoxLayout" name="layoutCombos" stretch="0,0,0,0,0,1,0,0">
      <item>
       <layout class="QHBoxLayout" name="teamLayout" stretch="1,2">
        <item>
@@ -95,9 +95,6 @@
         <string>Recently logged tasks:</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QListView" name="listAvailable"/>
      </item>
      <item>
       <layout class="QGridLayout" name="statsLayout">

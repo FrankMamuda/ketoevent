@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013 Avotu Briezhaudzetava
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,11 @@ class Gui_Combos;
 }
 
 //
+// classes
+//
+class Gui_ComboModel;
+
+//
 // class: Combos (gui)
 //
 class Gui_Combos : public QDialog {
@@ -43,6 +48,7 @@ class Gui_Combos : public QDialog {
 public:
     explicit Gui_Combos( QWidget *parent = 0 );
     ~Gui_Combos();
+    QList <LogEntry *>logListSorted;
 
 private slots:
     void fillTeams();

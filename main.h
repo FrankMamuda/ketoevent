@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013 Avotu Briezhaudzetava
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 4;
+    const static unsigned int API = 5;
     const static unsigned int MinimumAPI = 1;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
@@ -69,7 +69,6 @@ namespace Common {
 //
 // class:Main
 //
-
 class Main : public QObject {
     Q_OBJECT
     Q_ENUMS( ListTypes )
@@ -144,7 +143,6 @@ public slots:
 
     // combos
     int getFreeComboId();
-    void removeOrphanedCombos();
 
 private:
     QSettings *settings;
