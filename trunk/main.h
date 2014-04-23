@@ -144,6 +144,7 @@ public slots:
 
     // combos
     int getFreeComboId();
+    void removeOrphanedCombos();
 
 private:
     QSettings *settings;
@@ -166,7 +167,6 @@ private slots:
     void loadEvents();
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
-    void removeOrphanedCombos();
     void writeBackup();
     bool setCurrentEvent( EventEntry *eventPtr );
 };

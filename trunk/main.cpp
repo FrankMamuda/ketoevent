@@ -163,7 +163,7 @@ void Main::shutdown( bool ignoreDatabase ) {
         QSqlDatabase db = QSqlDatabase::database();
         if ( db.open()) {
             this->removeOrphanedLogs();
-            this->removeOrphanedCombos();
+            //this->removeOrphanedCombos();
             db.close();
         }
     }

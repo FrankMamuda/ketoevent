@@ -85,6 +85,7 @@ void Gui_Settings::bindVars() {
     this->lockVariables( false );
 }
 
+#if 0
 /*
 ================
 buttonImport->clicked
@@ -102,12 +103,14 @@ void Gui_Settings::on_buttonImport_clicked() {
     // this is somewhat risky
     m.importDatabase( path );
 }
+#endif
 
 /*
 ================
 buttonExportCSV->clicked
 ================
 */
+#if 0
 void Gui_Settings::on_buttonExportCSV_clicked() {
     QString path;
 #ifdef Q_OS_ANDROID
@@ -141,7 +144,9 @@ void Gui_Settings::on_buttonExportCSV_clicked() {
     }
     csv.close();
 }
+#endif
 
+#if 0
 /*
 ================
 buttonExport->clicked
@@ -156,6 +161,7 @@ void Gui_Settings::on_buttonExport_clicked() {
 #endif
     QFile::copy( m.databasePath, path );
 }
+#endif
 
 /*
 ================

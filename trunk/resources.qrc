@@ -30,6 +30,7 @@
         <file alias="events_48">icons/events_48.png</file>
         <file alias="reviewers_48">icons/reviewers_48.png</file>
         <file alias="combos_48">icons/combos_48.png</file>
+        <file alias="star_16">icons/star_16.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>

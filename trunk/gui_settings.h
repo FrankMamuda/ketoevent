@@ -54,9 +54,6 @@ public:
 
 private slots:
     void bindVars();
-    void on_buttonImport_clicked();
-    void on_buttonExportCSV_clicked();
-    void on_buttonExport_clicked();
     void on_backupPerform_stateChanged(int arg1);
 
 private:

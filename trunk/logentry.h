@@ -30,9 +30,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // class: LogEntry
 //
 class LogEntry : public DatabaseEntry {
+    Q_OBJECT
     Q_PROPERTY( int value READ value WRITE setValue )
     Q_PROPERTY( int check READ check )
-    Q_PROPERTY( int comboPoints READ comboPoints )
     Q_PROPERTY( int points READ points )
     Q_PROPERTY( int teamId READ teamId WRITE setTeamId )
     Q_PROPERTY( int taskId READ taskId WRITE setTaskId )
@@ -47,11 +47,14 @@ public:
     int taskId() const { return this->record().value( "taskId" ).toInt(); }
     int comboId() const { return this->record().value( "comboId" ).toInt(); }
 
+signals:
+    void comboIdChanged();
+
 public slots:
     void setValue( int value ) { this->DatabaseEntry::setValue( "value", value ); }
     void setTeamId( int id ) { this->DatabaseEntry::setValue( "teamId", id ); }
     void setTaskId( int id ) { this->DatabaseEntry::setValue( "taskId", id ); }
-    void setComboId( int id ) { this->DatabaseEntry::setValue( "comboId", id ); }
+    void setComboId( int id ) { this->DatabaseEntry::setValue( "comboId", id ); emit this->comboIdChanged(); }
 };
 
 #endif // LOGENTRY_H

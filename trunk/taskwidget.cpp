@@ -26,6 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 #include "gui_main.h"
+#include <QPainter>
 
 //
 // FIXME: does not save COMBO anymore!
@@ -51,6 +52,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     // create widget
     this->grid = new QGridLayout();
     this->taskName = new QLabel( this->task()->name());
+    this->comboIcon = new QLabel();
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
 
     // fix ugly spinbox on mac, win32 (and systems with DPI!=96)
@@ -111,6 +113,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 #endif
     //this->setComboState( LogEntry::NoCombo );
     this->grid->addWidget( this->combo, 0, 4, 1, 1 );
+
+    // add icon
+    this->grid->addWidget( this->comboIcon, 0, 5, 1, 1 );
+    this->comboIcon->setMaximumSize( 16, 16 );
 
     // set tooltips
     this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
@@ -210,8 +216,15 @@ TaskWidget::~TaskWidget() {
         delete this->multi;
     }
 
+    //
+   // if  ( this->hasLog()) {
+   //     m.print( "disconnect\n");
+   //     this->disconnect( this->log(), SIGNAL( comboIdChanged()));
+   // }
+
     // clean up
     delete this->taskName;
+    delete this->comboIcon;
     delete this->combo;
     delete this->grid;
 }
@@ -250,6 +263,14 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
     if ( taskPtr != this->task())
         return;
 
+
+    // set combo
+    //this->setComboState( this->log()->combo());
+    this->connect( this->log(), SIGNAL( comboIdChanged()), this, SLOT( comboIdChanged()));
+
+    //if ( this->hasCombo())
+        this->comboIdChanged();
+
     // just initial addition
     if ( fromDatabase )
         return;
@@ -259,9 +280,47 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         this->check->setChecked( this->log()->check());
     else if ( this->task()->type() == TaskEntry::Multi )
         this->multi->setValue( this->log()->value());
+}
 
-    // set combo
-    //this->setComboState( this->log()->combo());
+/*
+================
+getRelativeComboId
+
+  this is kind of stupid, maybe we should assign team combos staring from 0,
+  since in no way they should overlap...i think...or not
+================
+*/
+int TaskWidget::getRelativeComboId( int comboId ) {
+    if ( !this->hasTeam())
+        return -1;
+
+    if ( !this->hasCombo())
+        return -1;
+
+    QList <int>combos;
+    foreach ( LogEntry *logPtr, this->team()->logList ) {
+        if ( !combos.contains( logPtr->comboId()))
+            combos << logPtr->comboId();
+    }
+    return combos.indexOf( comboId ) + 1;
+}
+
+/*
+================
+comboIdChanged
+================
+*/
+void TaskWidget::comboIdChanged() {
+    //m.print(QString( "idch %1\n" ).arg( comboId ));
+
+    if ( this->hasCombo()) {
+        QPixmap px( ":/icons/star_16" );
+        QPainter painter( &px );
+        painter.setFont( QFont("Arial") );
+        painter.drawText( px.rect(), Qt::AlignCenter, QString( "%1" ).arg( this->getRelativeComboId( this->log()->comboId())));
+        this->comboIcon->setPixmap( px );
+    } else
+        this->comboIcon->setPixmap( QPixmap());
 }
 
 /*
@@ -270,6 +329,10 @@ resetLog
 ================
 */
 void TaskWidget::resetLog() {
+   // if ( this->hasLog())
+   //     this->disconnect( this->log(), SIGNAL( comboIdChanged( int )));
+
+
     this->m_log = NULL;
 
     // failsafe - this really should not happen
@@ -336,28 +399,35 @@ toggleCombo
 ================
 */
 void TaskWidget::toggleCombo( bool checked ) {    
+    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
+    if ( gui == NULL )
+        return;
+
     // TODO: change to different icons
     if ( checked ) {
+        this->comboIcon->hide();
+
         this->taskName->setStyleSheet( "background-color: rgba( 0, 200, 0, 128 ); border-style: outset; border-width: 2px; border-radius: 10px; border-color: beige; font: bold; padding: 6px;" );
         this->combo->setIcon( QIcon( ":/icons/task_remove_16" ));
 
-        if ( !this->hasLog() && this->hasCombo())
-            return;
-
-        Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
-        if ( gui == NULL )
+        if ( !this->hasLog() || this->hasCombo())
             return;
 
         this->log()->setComboId( gui->currentComboIndex());
     } else {
+        this->comboIcon->show();
+
+
         this->taskName->setStyleSheet( "padding: 6px;" );
         this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
 
-
-        if ( !this->hasLog() && this->hasCombo())
+        if ( !this->hasLog()/* || this->hasCombo()*/ && gui->currentComboIndex() != -1 )
             return;
 
         this->log()->setComboId( -1 );
+
+        this->disconnect( this->log(), SIGNAL( comboIdChanged()));
+      //  this->comboIcon->setPixmap( QPixmap());
 
         //if ( this->hasCombo() && this->hasLog())
         //    this->log->setComboId();

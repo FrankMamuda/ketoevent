@@ -98,7 +98,7 @@ void Main::loadDatabase() {
 
     // delete orphaned combos/logs on init
     this->removeOrphanedLogs();
-    this->removeOrphanedCombos();
+    //this->removeOrphanedCombos();
 
     // load entries
     this->loadEvents();
@@ -114,6 +114,8 @@ importDatabase (testing)
 ================
 */
 void Main::importDatabase( const QString &path ) {
+    Q_UNUSED( path );
+
     // non-functional for now
 #if 0
     QList<QPair<int, QString> > teamMatchList;
