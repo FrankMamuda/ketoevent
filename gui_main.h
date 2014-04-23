@@ -64,6 +64,7 @@ private slots:
 
     // misc
     void teamIndexChanged( int index );
+    void taskIndexChanged( int row );
     void updateFinishTime( QTime time );
 
     // ui elements
@@ -86,7 +87,6 @@ private slots:
     void on_downButton_clicked();
 #endif
     void on_combineButton_toggled(bool checked);
-    void toggleCombo( bool );
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }

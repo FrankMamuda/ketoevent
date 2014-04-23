@@ -51,9 +51,10 @@ public:
     TaskEntry *task() const { return this->m_task; }
     TeamEntry *team() const { return this->m_team; }
     bool hasLog() const { return this->log() != NULL; }
-    bool hasCombo() const { if ( this->hasLog()) if ( this->log()->comboId() != -1 ) return true; return false; }
+    bool hasCombo() const { if ( this->hasLog()) { if ( this->log()->comboId() != -1 ) return true; } return false; }
     bool hasTeam() const { return this->team() != NULL; }
     bool hasTask() const { return this->task() != NULL; }
+    int getRelativeComboId( int comboId );
 
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
@@ -65,12 +66,14 @@ public slots:
     void saveLog();
     void setLog( LogEntry *logPtr, bool fromDatabase = false );
     void toggleCombo( bool );
+    void comboIdChanged();
 
 //private:
 // TODO: disabler function
 public:
     QGridLayout *grid;
     QLabel *taskName;
+    QLabel *comboIcon;
     QCheckBox *check;
     QPushButton *combo;
     QSpinBox *multi;
