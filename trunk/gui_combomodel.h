@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013 Avotu Briezhaudzetava
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,14 +35,16 @@ class Gui_ComboModel : public QStringListModel {
     Q_OBJECT
 
 public:
-    Gui_ComboModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return m.taskList.count(); }
+    Gui_ComboModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) { this->listParent = parentPtr; }
+    int rowCount( const QModelIndex & = QModelIndex()) const;// { return m.taskList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
     // this resets whole model based on data in m.teamList
     void beginReset() { this->beginResetModel(); }
     void endReset() { this->endResetModel(); }
+
+    QObject *listParent;
 };
 
 #endif // GUI_COMBOMODEL_H

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013 Avotu Briezhaudzetava
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,10 +51,8 @@ void Main::loadDatabase() {
     QDir dir( this->path );
     if ( !dir.exists()) {
         dir.mkpath( this->path );
-        if ( !dir.exists()) {
-            m.error( StrFatalError + this->tr( "could not create database path\n" ));
-            return;
-        }
+        if ( !dir.exists())
+            this->error( StrFatalError + this->tr( "could not create database path\n" ));
     }
 
     // create database
@@ -65,7 +63,7 @@ void Main::loadDatabase() {
 
     // failsafe
     if ( !db.isDriverAvailable( "QSQLITE" ))
-        m.error( StrFatalError + this->tr( "sqlite not present on the system\n" ));
+        this->error( StrFatalError + this->tr( "sqlite not present on the system\n" ));
 
     // set sqlite driver
     db = QSqlDatabase::addDatabase( "QSQLITE" );
@@ -79,7 +77,7 @@ void Main::loadDatabase() {
     // set path and open
     db.setDatabaseName( this->databasePath );
     if ( !db.open())
-        m.error( StrFatalError + this->tr( "could not load task database\n" ));
+        this->error( StrFatalError + this->tr( "could not load task database\n" ));
 
     // create query
     QSqlQuery query;
@@ -90,22 +88,18 @@ void Main::loadDatabase() {
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, reviewerId integer )" ) ||
          !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
          !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, singleCombo integer, doubleCombo integer, tripleCombo integer, lock integer )" ) ||
-         !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" ) //||
-         // !query.exec( "create table if not exists combos ( id integer primary key, teamId integer, idString varchar( 64 ))" )
-         ) {
-        m.error( StrFatalError + this->tr( "could not create internal database structure\n" ));
+         !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" )) {
+        this->error( StrFatalError + this->tr( "could not create internal database structure\n" ));
     }
 
-    // delete orphaned combos/logs on init
+    // delete orphaned logs on init
     this->removeOrphanedLogs();
-    //this->removeOrphanedCombos();
 
     // load entries
     this->loadEvents();
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();
-    //this->loadCombos();
 }
 
 /*
