@@ -23,6 +23,44 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "gui_combomodel.h"
 #include "gui_combos.h"
+#include <QColor>
+#include "taskwidget.h"
+
+//
+// comboColour_t
+//
+typedef struct comboColour_s {
+    int r;
+    int g;
+    int b;
+} comboColour_t;
+
+// colour table
+static comboColour_t colours[] = {
+    { 0,  128,    0 },
+    { 128, 255,   0 },
+    { 128, 128,   0 },
+    { 255,   0, 128 },
+    { 128,   0, 255 },
+    {   0, 128, 128 },
+    {   0, 255, 128 },
+};
+static int numColors = sizeof( colours ) / sizeof( comboColour_t );
+
+/*
+================
+colourForId
+================
+*/
+static comboColour_t colourForId( int id ) {
+    if ( id < 0 )
+        return colours[0];
+
+    if ( id >= numColors )
+        return colourForId( id - numColors );
+
+    return colours[id];
+}
 
 /*
 ================
@@ -33,13 +71,10 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
-    Gui_Combos *cPtr = qobject_cast<Gui_Combos *>( this->listParent );
-    if ( cPtr == NULL )
-        return 0;
+    // get dialog parent
+    GetPtr( Gui_Combos *, cPtr, this->listParent ); TestPtr( cPtr ) return 0;
 
-    // must have taskListfiltered or smth
-    // preferrably unsorted from recently logged
-    // +search
+    // get row count from parent
     if ( index.row() >= cPtr->logListSorted.count())
         return QVariant();
 
@@ -47,9 +82,11 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
         return m.taskForId( cPtr->logListSorted.at( index.row())->taskId())->name();
     else if ( role == Qt::UserRole )
         return cPtr->logListSorted.at( index.row())->id();
-    else if ( role == Qt::BackgroundColorRole )
-        return QVariant();//QColor::red();
-    else
+    else if ( role == Qt::BackgroundColorRole ) {
+        // make sets of combos **colourful**
+        comboColour_t colour = colourForId( TaskWidget::getRelativeComboId( cPtr->logListSorted.at( index.row())->comboId(), cPtr->currentTeamId()));
+        return QColor( colour.r, colour.g, colour.b, 64 );
+    } else
         return QVariant();
 }
 
@@ -65,12 +102,15 @@ Qt::ItemFlags Gui_ComboModel::flags( const QModelIndex &index ) const {
     return QAbstractItemModel::flags( index );
 }
 
-
+/*
+================
+rowCount
+================
+*/
 int Gui_ComboModel::rowCount( const QModelIndex & ) const {
-    Gui_Combos *cPtr = qobject_cast<Gui_Combos *>( this->listParent );
-    if ( cPtr == NULL )
-        return 0;
+    // get dialog parent
+    GetPtr( Gui_Combos *, cPtr, this->listParent ); TestPtr( cPtr ) return 0;
 
+    // get row count from parent
     return cPtr->logListSorted.count();
 }
-

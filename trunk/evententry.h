@@ -35,9 +35,9 @@ class EventEntry : public DatabaseEntry {
     Q_PROPERTY( int minMembers READ minMembers WRITE setMinMembers )
     Q_PROPERTY( int maxMembers READ maxMembers WRITE setMaxMembers )
     Q_PROPERTY( int api READ api WRITE setAPIversion )
-    Q_PROPERTY( int singleCombo READ singleCombo WRITE setSingleCombo )
-    Q_PROPERTY( int doubleCombo READ doubleCombo WRITE setDoubleCombo )
-    Q_PROPERTY( int tripleCombo READ tripleCombo WRITE setTripleCombo )
+    Q_PROPERTY( int comboOfTwo READ comboOfTwo WRITE setComboOfTwo )
+    Q_PROPERTY( int comboOfThree READ comboOfThree WRITE setComboOfThree )
+    Q_PROPERTY( int comboOfFourAndMore READ comboOfFourAndMore WRITE setComboOfFourAndMore )
     Q_PROPERTY( int penalty READ penalty WRITE setPenaltyPoints )
     Q_PROPERTY( QTime startTime READ startTime WRITE setStartTime )
     Q_PROPERTY( QTime finishTime READ finishTime WRITE setFinishTime )
@@ -49,9 +49,9 @@ public:
     int minMembers() const { return this->record().value( "minMembers" ).toInt(); }
     int maxMembers() const { return this->record().value( "maxMembers" ).toInt(); }
     int api() const { return this->record().value( "api" ).toInt(); }
-    int singleCombo() const { return this->record().value( "singleCombo" ).toInt(); }
-    int doubleCombo() const { return this->record().value( "doubleCombo" ).toInt(); }
-    int tripleCombo() const { return this->record().value( "tripleCombo" ).toInt(); }
+    int comboOfTwo() const { return this->record().value( "comboOfTwo" ).toInt(); }
+    int comboOfThree() const { return this->record().value( "comboOfThree" ).toInt(); }
+    int comboOfFourAndMore() const { return this->record().value( "comboOfFourAndMore" ).toInt(); }
     int penalty() const { return this->record().value( "penalty" ).toInt(); }
     QTime startTime() const { return QTime::fromString( this->record().value( "startTime" ).toString(), "hh:mm" ); }
     QTime finishTime() const { return QTime::fromString( this->record().value( "finishTime" ).toString(), "hh:mm" ); }
@@ -62,9 +62,9 @@ public slots:
     void setMinMembers( int minMembers ) { this->setValue( "minMembers", minMembers ); }
     void setMaxMembers( int maxMembers ) { this->setValue( "maxMembers", maxMembers ); }
     void setAPIversion( int api ) { this->setValue( "api", api ); }
-    void setSingleCombo( int points ) { this->setValue( "singleCombo", points ); }
-    void setDoubleCombo( int points ) { this->setValue( "doubleCombo", points ); }
-    void setTripleCombo( int points ) { this->setValue( "tripleCombo", points ); }
+    void setComboOfTwo( int points ) { this->setValue( "comboOfTwo", points ); }
+    void setComboOfThree( int points ) { this->setValue( "comboOfThree", points ); }
+    void setComboOfFourAndMore( int points ) { this->setValue( "comboOfFourAndMore", points ); }
     void setPenaltyPoints( int points ) { this->setValue( "penalty", points ); }
     void setStartTime( QTime time ) { this->setValue( "startTime", time.toString( "hh:mm" )); }
     void setFinishTime( QTime time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }

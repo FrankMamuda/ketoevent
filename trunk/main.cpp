@@ -96,9 +96,9 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "finishTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
     this->addSvar( "finalTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
     this->addSvar( "penalty", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    this->addSvar( "singleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    this->addSvar( "doubleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    this->addSvar( "tripleCombo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "comboOfTwo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "comboOfThree", SettingsVariable::SpinBox, SettingsVariable::EventVar );
+    this->addSvar( "comboOfFourAndMore", SettingsVariable::SpinBox, SettingsVariable::EventVar );
     this->addSvar( "minMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
     this->addSvar( "maxMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
     this->addSvar( "backup/changes", SettingsVariable::SpinBox, SettingsVariable::ConsoleVar );
@@ -194,7 +194,6 @@ void Main::shutdown( bool ignoreDatabase ) {
     QApplication::quit();
 }
 
-
 /*
 ================
 writeBackup
@@ -281,9 +280,7 @@ int main( int argc, char *argv[] ) {
 #endif
 
     // initialize application
-//#ifndef APPLET_DEBUG
     m.initialize( qobject_cast<QObject*>( &gui ));
-//#endif
 
     // add teams
     gui.initialize();

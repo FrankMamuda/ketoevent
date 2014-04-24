@@ -37,6 +37,7 @@ class TeamEntry : public DatabaseEntry {
     Q_PROPERTY( QTime finishTime READ finishTime WRITE setFinishTime )
     Q_PROPERTY( int points READ points )
     Q_PROPERTY( int combos READ combos )
+    Q_PROPERTY( int total READ total )
     Q_PROPERTY( int penalty READ penalty )
     Q_PROPERTY( int timeOnTrack READ timeOnTrack )
 
@@ -53,6 +54,7 @@ public:
     bool isUnlocked() const { return !this->isLocked(); }
     int points() const;
     int combos() const;
+    int total() const;
     int penalty() const;
     float grade() const;
     int timeOnTrack() const;

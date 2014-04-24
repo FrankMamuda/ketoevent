@@ -56,6 +56,7 @@ public slots:
     void initialize();
     int currentTeamIndex() const { return this->m_currentTeamIndex; }
     int currentComboIndex() const { return this->m_currentComboIndex; }
+    void taskIndexChanged( int row );
 
 private slots:
     // team/task fill
@@ -64,7 +65,6 @@ private slots:
 
     // misc
     void teamIndexChanged( int index );
-    void taskIndexChanged( int row );
     void updateFinishTime( QTime time );
 
     // ui elements

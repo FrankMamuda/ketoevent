@@ -23,6 +23,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "databaseentry.h"
 #include <QSqlQuery>
+#include <QSqlError>
+#include "main.h"
 
 /*
 ================
@@ -51,6 +53,8 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
         update.setValue( QString( "'%1'" ).arg( value.toString()));
 
     // update database value
-    if ( !this->table().isNull())
-        query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( this->table()).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt()));
+    if ( !this->table().isNull()) {
+        if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( this->table()).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
+            m.error( StrSoftError + this->tr( "could not store value, reason - %1\n" ).arg( query.lastError().text()));
+    }
 }

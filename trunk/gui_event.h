@@ -47,6 +47,8 @@ public:
 private slots:
     void bindVars();
 
+    void on_buttonClose_clicked();
+
 private:
     Ui::Gui_Event *ui;
 };

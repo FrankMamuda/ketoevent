@@ -49,6 +49,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define StrSoftError Main::SoftError, ClassFunc
 #define StrWarn QObject::trUtf8( "WARNING:" ) + ClassFunc
 
+// pointer macro
+#define GetPtr( type, name, container ) type name = qobject_cast<type>( container );
+#define TestPtr( name ) if ( name == NULL )
+
 //
 // namespace: Common
 //
@@ -57,9 +61,9 @@ namespace Common {
     const static unsigned int MinimumAPI = 1;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
-    const static unsigned int defaultSingleCombo = 1;
-    const static unsigned int defaultDoubleCombo = 3;
-    const static unsigned int defaultTripleCombo = 5;
+    const static unsigned int defaultComboOfTwo = 1;
+    const static unsigned int defaultComboOfThree = 3;
+    const static unsigned int defaultComboOfFourAndMore = 5;
     const static unsigned int defaultPenaltyPoints = 5;
     const static QString defaultStartTime( "10:00" );
     const static QString defaultFinishTime( "15:00" );
@@ -125,6 +129,14 @@ public:
     bool isInitialized() const { return this->m_init; }
     QObject *parent;
 
+    // combination statistics
+    typedef struct stats_s {
+        int points;
+        int combos;
+        int total;
+    } stats_t;
+    stats_t getComboStats( int id ) const;
+
 public slots:
     // init/shutdown
     void initialize( QObject *parent );
@@ -142,7 +154,7 @@ public slots:
     void initConsole();
 
     // combos
-    int getFreeComboId();
+    int getFreeComboId() const;
 
 private:
     QSettings *settings;

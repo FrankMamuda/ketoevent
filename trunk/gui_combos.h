@@ -49,13 +49,17 @@ public:
     explicit Gui_Combos( QWidget *parent = 0 );
     ~Gui_Combos();
     QList <LogEntry *>logListSorted;
+    int currentTeamId() const { return this->m_currentTeamId; }
 
 private slots:
     void fillTeams();
+    void on_buttonClose_clicked();
+    void teamIndexChanged( int );
 
 private:
     Ui::Gui_Combos *ui;
     Gui_ComboModel *comboModelPtr;
+    int m_currentTeamId;
 };
 
 #endif // GUI_COMBOS_H

@@ -144,7 +144,7 @@ listToAscending
 ================
 */
 template <class T>
-bool listToAscending( T *ePtr0, T *ePtr1 ) {
+static bool listToAscending( T *ePtr0, T *ePtr1 ) {
     return m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
 }
 

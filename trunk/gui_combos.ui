@@ -19,7 +19,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="layoutCombos" stretch="0,0,0,0,0,1,0,0">
+    <layout class="QVBoxLayout" name="layoutCombos" stretch="0,0,0,1,0">
      <item>
       <layout class="QHBoxLayout" name="teamLayout" stretch="1,2">
        <item>
@@ -42,44 +42,6 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>Previous combo</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="text">
-          <string>Next combo</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="labelCombined">
        <property name="text">
         <string>Combined tasks:</string>
@@ -88,13 +50,6 @@
      </item>
      <item>
       <widget class="QListView" name="listCombined"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelAvailable">
-       <property name="text">
-        <string>Recently logged tasks:</string>
-       </property>
-      </widget>
      </item>
      <item>
       <layout class="QGridLayout" name="statsLayout">
@@ -108,7 +63,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="labelCombos">
          <property name="text">
-          <string>Tasks combined:</string>
+          <string>Combinations</string>
          </property>
         </widget>
        </item>
