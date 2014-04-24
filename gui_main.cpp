@@ -64,7 +64,7 @@ void Gui_Main::initialize() {
 
         // connect team switcher and finish time editor
         this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
-        this->connect( this->ui->taskList, SIGNAL( currentRowChanged(int)), this, SLOT( taskIndexChanged( int )));
+        this->connect( this->ui->taskList, SIGNAL( currentRowChanged( int )), this, SLOT( taskIndexChanged( int )));
         this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
 
         // fill in tasks and teams
@@ -154,19 +154,17 @@ void Gui_Main::teamIndexChanged( int index ) {
 
         // clean up values
         for ( y = 0; y < lw->count(); y++ ) {
-            TaskWidget *taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-            taskLogPtr->resetTeam();
+            GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
+            taskPtr->resetTeam();
         }
 
         // display new values
         for ( y = 0; y < lw->count(); y++ ) {
-            TaskWidget *taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-            taskLogPtr->setTeam( teamPtr );
+            GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
+            taskPtr->setTeam( teamPtr );
 
-            //if ( taskLogPtr->hasCombo())
-            //    taskLogPtr->comboIdChanged( taskLogPtr->log()->comboId());
-            //else
-                taskLogPtr->comboIdChanged();
+            // trigger id change
+            taskPtr->comboIdChanged();
         }
 
         if ( teamPtr->isLocked()) {
@@ -198,25 +196,34 @@ void Gui_Main::teamIndexChanged( int index ) {
 /*
 ================
 taskIndexChanged
+
+  checks if selected task/log can be combined and
+  enables/disables the "combine button"
 ================
 */
 void Gui_Main::taskIndexChanged( int row ) {
     QListWidget *lw = this->ui->taskList;
-    TaskWidget *taskLogPtr;
+
+    // hack to allow triggering outside class
+    if ( row == -1 && this->ui->taskList->currentRow() != -1 )
+        row = this->ui->taskList->currentRow();
 
     // get task widget
-    taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( row )));
-    if ( taskLogPtr != NULL ) {
-        // get log
-        LogEntry *lPtr = taskLogPtr->log();
-        // check for value
-        if ( taskLogPtr->hasLog()) {
-            if ( lPtr->value()) {
-                this->ui->combineButton->setEnabled( true );
-                return;
-            }
+    GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( row ))); TestPtr( taskPtr ) return;
+
+    // get log
+    LogEntry *lPtr = taskPtr->log();
+
+    // check for value
+    if ( taskPtr->hasLog()) {
+        if ( lPtr->value()) {
+            // is logged - can be combined
+            this->ui->combineButton->setEnabled( true );
+            return;
         }
     }
+
+    // not logged - cannot be combined
     this->ui->combineButton->setDisabled( true );
 }
 
@@ -282,7 +289,7 @@ void Gui_Main::fillTasks() {
         return;
 
     for ( y = 0; y < lw->count(); y++ ) {
-        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
         this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
         delete taskPtr;
         delete lw->item( y );
@@ -297,7 +304,6 @@ void Gui_Main::fillTasks() {
     foreach ( TaskEntry *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
-        // itemPtr->setBackgroundColor( Qt::green );
         lw->addItem( itemPtr );
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
@@ -421,6 +427,7 @@ void Gui_Main::on_lockButton_clicked() {
         this->ui->timeFinish->setEnabled( true );
         this->ui->taskList->setEnabled( true );
         this->ui->logButton->setEnabled( true );
+        //this->ui->combineButton->setEnabled( true );
     } else {
         teamPtr->lock();
         this->ui->lockButton->setIcon( QIcon( ":/icons/unlocked_16" ));
@@ -428,6 +435,7 @@ void Gui_Main::on_lockButton_clicked() {
         this->ui->taskList->setDisabled( true );
         this->ui->timeFinish->setDisabled( true );
         this->ui->logButton->setDisabled( true );
+        this->ui->combineButton->setDisabled( true );
     }
 }
 
@@ -521,18 +529,18 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
     // go through items one by one
     for ( y = 0; y < lw->count(); y++ ) {
-        TaskWidget *taskLogPtr;
+        TaskWidget *taskPtr;
 
         // get task widget
-        taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-        if ( taskLogPtr == NULL )
+        taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        if ( taskPtr == NULL )
             continue;
 
         // reset value check
         valueSet = true;
 
         // get log
-        LogEntry *lPtr = taskLogPtr->log();
+        LogEntry *lPtr = taskPtr->log();
         // check for value
         if ( lPtr == NULL )
             valueSet = false;
@@ -554,21 +562,21 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
             indexList << y;
         else {
             // enable combo button
-            taskLogPtr->combo->show();
+            taskPtr->combo->show();
 
             // disallow modifications
-            if ( taskLogPtr->task()->type() == TaskEntry::Check ) {
-                if ( taskLogPtr->check != NULL )
-                    taskLogPtr->check->setDisabled( true );
-            } else if ( taskLogPtr->task()->type() == TaskEntry::Multi ) {
-                if ( taskLogPtr->multi != NULL )
-                    taskLogPtr->multi->setDisabled( true );
+            if ( taskPtr->task()->type() == TaskEntry::Check ) {
+                if ( taskPtr->check != NULL )
+                    taskPtr->check->setDisabled( true );
+            } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+                if ( taskPtr->multi != NULL )
+                    taskPtr->multi->setDisabled( true );
             }
 
             // hilight combined entries
-            if ( taskLogPtr->hasCombo()) {
-                if ( taskLogPtr->log()->comboId() == this->currentComboIndex())
-                    taskLogPtr->combo->setChecked( true );
+            if ( taskPtr->hasCombo()) {
+                if ( taskPtr->log()->comboId() == this->currentComboIndex())
+                    taskPtr->combo->setChecked( true );
                 else
                     indexList << y;
             }
@@ -578,15 +586,15 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
     if ( !checked ) {
         if ( count < 2 ) {
             for ( y = 0; y < lw->count(); y++ ) {
-                TaskWidget *taskLogPtr;
+                TaskWidget *taskPtr;
 
                 // get task widget
-                taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-                if ( taskLogPtr == NULL )
+                taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+                if ( taskPtr == NULL )
                     continue;
 
                 // get log
-                LogEntry *lPtr = taskLogPtr->log();
+                LogEntry *lPtr = taskPtr->log();
                 // check for value
                 if ( lPtr == NULL )
                     continue;
@@ -610,11 +618,11 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
     // one task cannot be combined, so disable the button
     if ( lw->count() == 1 ) {
-        TaskWidget *taskLogPtr;
+        TaskWidget *taskPtr;
 
         // get the first item
-        taskLogPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
-        if ( taskLogPtr != NULL )
-            taskLogPtr->combo->setDisabled( true );
+        taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
+        if ( taskPtr != NULL )
+            taskPtr->combo->setDisabled( true );
     }
 }

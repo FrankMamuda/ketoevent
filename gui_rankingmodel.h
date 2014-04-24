@@ -32,7 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespaces
 //
 namespace Rankings {
-    const static unsigned int NumRankingColumns = 6;
+    const static unsigned int NumRankingColumns = 7;
 }
 
 //
@@ -47,6 +47,7 @@ public:
         TeamName = 0,
         Tasks,
         Combos,
+        Total,
         Time,
         Penalty,
         Points

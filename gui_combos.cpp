@@ -2,84 +2,85 @@
 #include "ui_gui_combos.h"
 #include "gui_main.h"
 
-
-
 /*
 ================
-listToAscending
+listByCombos
 ================
 */
-bool listByCombos( LogEntry *lPtr0, LogEntry *lPtr1 ) {
+static bool listByCombos( LogEntry *lPtr0, LogEntry *lPtr1 ) {
     return lPtr0->comboId() < lPtr1->comboId();
 }
 
-
-//rgba( 0, 200, 0, 128 )
-// table for colours?
-//
-// some 5-10 shades and a function to assign
-// colour by comboId (relative)
-//
-
-
-
+/*
+================
+construct
+================
+*/
 Gui_Combos::Gui_Combos( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Combos ) {
-    ui->setupUi(this);
-    this->fillTeams();
+    ui->setupUi( this );
 
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    // connect for updates
+    this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
+
+    // set up view
+    this->comboModelPtr = new Gui_ComboModel( this );
+    this->ui->listCombined->setModel( this->comboModelPtr );
+
+    // fill combobox with team names & trigger change
+    this->fillTeams();
+}
+
+/*
+================
+destruct
+================
+*/
+Gui_Combos::~Gui_Combos() {
+    // clean up
+    this->logListSorted.clear();
+    this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
+    delete this->comboModelPtr;
+    delete ui;
+}
+
+/*
+================
+teamIndexChanged
+================
+*/
+void Gui_Combos::teamIndexChanged( int index ) {
+    TeamEntry *teamPtr;
+
+    // abort on invalid indexes
+    if ( index == -1 )
+        return;
+
+    // get current team
+    this->m_currentTeamId = this->ui->comboTeams->itemData( index ).toInt();
+    teamPtr = m.teamForId( this->m_currentTeamId );
     if ( teamPtr == NULL )
         return;
 
+    // begin reset
+    this->comboModelPtr->beginReset();
 
-    // make a local copy and sort it alphabetically
+    // make a local copy and sort it by comboId
     this->logListSorted = teamPtr->logList;
     qSort( this->logListSorted.begin(), this->logListSorted.end(), listByCombos );
-    //this->logListSorted.removeAll( -1 );
+
+    //QList<QPair<int, int> >combos;
     foreach ( LogEntry *logPtr, this->logListSorted ) {
         if ( logPtr->comboId() == -1 )
             this->logListSorted.removeOne( logPtr );
     }
 
-    //this->ui->listCombined->add
+    //int points, combos, total;
+    Main::stats_t stats = m.getComboStats( teamPtr->id());
+    this->ui->combos->setText( this->tr( "%1 (%2 tasks)" ).arg( stats.combos ).arg( stats.total ));
+    this->ui->points->setText( QString( "%1" ).arg( stats.points ));
 
-    //logListSorted = m.
-
-
-    // set up view
-    this->comboModelPtr = new Gui_ComboModel( this );
-    m.print( QString( "num combo tasks %1\n" ).arg( this->logListSorted.count()));
-    this->ui->listCombined->setModel( this->comboModelPtr );
-
-
-   /* TODO: next draw these as a rainbow as in
-        task1 \
-        task2 - combo 1 - green
-        task3 /
-        task4 - combo 2 - red
-        task5 /
-        etc.
-
-        to visualize all combos in distinct (pre-coded?) colours
-    */
-
-    // set up view
-    /*this->listModelPtr = new Gui_TaskListModel( this );
-    this->ui->taskList->setModel( this->listModelPtr );
-    this->ui->taskList->setAlternatingRowColors( true );
-    this->ui->taskList->setSelectionMode( QAbstractItemView::SingleSelection );
-    this->ui->taskMaxMulti->setMinimum( 2 );*/
-
-    //this->ui->listAvailable->setModel( this->comboModelPtr );
-    //this->ui->listAvailable->setAlternatingRowColors( true );
-
-    // current team
-}
-
-Gui_Combos::~Gui_Combos() {
-    this->logListSorted.clear();
-    delete this->comboModelPtr;
-    delete ui;
+    // end reset
+    this->comboModelPtr->endReset();
 }
 
 /*
@@ -88,11 +89,6 @@ fillTeams
 ================
 */
 void Gui_Combos::fillTeams() {
-#if 1
-    // abort if partially initialized
-    if ( !m.isInitialized())
-        return;
-
     // clear list
     this->ui->comboTeams->clear();
 
@@ -101,7 +97,15 @@ void Gui_Combos::fillTeams() {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
     // set to current team
-    Gui_Main *mPtr = qobject_cast<Gui_Main*>( this->parent());
+    GetPtr( Gui_Main *, mPtr, this->parent()); TestPtr( mPtr ) return;
     this->ui->comboTeams->setCurrentIndex( mPtr->currentTeamIndex());
-#endif
+}
+
+/*
+================
+buttonClose->clicked
+================
+*/
+void Gui_Combos::on_buttonClose_clicked() {
+    this->accept();
 }

@@ -54,7 +54,7 @@ public:
     bool hasCombo() const { if ( this->hasLog()) { if ( this->log()->comboId() != -1 ) return true; } return false; }
     bool hasTeam() const { return this->team() != NULL; }
     bool hasTask() const { return this->task() != NULL; }
-    int getRelativeComboId( int comboId );
+    static int getRelativeComboId( int comboId, int teamId );
 
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
@@ -67,6 +67,9 @@ public slots:
     void setLog( LogEntry *logPtr, bool fromDatabase = false );
     void toggleCombo( bool );
     void comboIdChanged();
+
+//signals:
+//    void valueChanged;
 
 //private:
 // TODO: disabler function

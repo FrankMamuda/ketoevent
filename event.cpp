@@ -48,9 +48,9 @@ void Main::addEvent() {
 
     // compile strings
     comboString = QString( "%1, %2, %3" )
-            .arg( Common::defaultSingleCombo )
-            .arg( Common::defaultDoubleCombo )
-            .arg( Common::defaultTripleCombo );
+            .arg( Common::defaultComboOfTwo )
+            .arg( Common::defaultComboOfThree )
+            .arg( Common::defaultComboOfFourAndMore );
     timeString = QString( "'%1', '%2', '%3'" )
             .arg( Common::defaultStartTime )
             .arg( Common::defaultFinishTime )

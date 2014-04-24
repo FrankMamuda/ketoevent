@@ -70,6 +70,9 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
         case Combos:
             return teamPtr->combos();
 
+        case Total:
+            return teamPtr->total();
+
         case Time:
             return teamPtr->timeOnTrack();
 
@@ -128,6 +131,9 @@ QVariant Gui_RankingModel::headerData( int section, Qt::Orientation orientation,
 
         case Combos:
             return this->tr( "Combos" );
+
+        case Total:
+            return this->tr( "Combined\ntasks" );
 
         case Time:
             return this->tr( "Time\n(min)" );

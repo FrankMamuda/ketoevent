@@ -51,7 +51,6 @@ Gui_Event::~Gui_Event() {
 bindVars
 ================
 */
-
 void Gui_Event::bindVars() {
     // lock vars
     this->lockVariables();
@@ -62,13 +61,22 @@ void Gui_Event::bindVars() {
     this->bindVariable( "finishTime", this->ui->finishTime );
     this->bindVariable( "finalTime", this->ui->finalTime );
     this->bindVariable( "penalty", this->ui->penalty );
-    this->bindVariable( "singleCombo", this->ui->sCombo );
-    this->bindVariable( "doubleCombo", this->ui->dCombo );
-    this->bindVariable( "tripleCombo", this->ui->tCombo );
+    this->bindVariable( "comboOfTwo", this->ui->sCombo );
+    this->bindVariable( "comboOfThree", this->ui->dCombo );
+    this->bindVariable( "comboOfFourAndMore", this->ui->tCombo );
     this->bindVariable( "minMembers", this->ui->min );
     this->bindVariable( "maxMembers", this->ui->max );
     this->bindVariable( "name", this->ui->titleEdit );
 
     // unlock vars
     this->lockVariables( false );
+}
+
+/*
+================
+buttonClose->clicked
+================
+*/
+void Gui_Event::on_buttonClose_clicked() {
+    this->accept();
 }

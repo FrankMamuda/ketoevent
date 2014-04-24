@@ -67,6 +67,7 @@ points
 */
 int TeamEntry::points() const {
     int points = 0;
+    Main::stats_t stats = m.getComboStats( this->id());
 
     if ( this->disqualified())
         return 0;
@@ -74,7 +75,7 @@ int TeamEntry::points() const {
     foreach ( LogEntry *logPtr, this->logList )
         points += logPtr->points();
 
-    return points;
+    return points + stats.points;
 }
 
 /*
@@ -83,7 +84,19 @@ combos
 ================
 */
 int TeamEntry::combos() const {
-    return 0;//return this->comboList.count();
+    Main::stats_t stats = m.getComboStats( this->id());
+    //m.print( QString( "%1 %2\n" ).arg( this->name()).arg( stats.points ));
+    return stats.combos;
+}
+
+/*
+================
+total
+================
+*/
+int TeamEntry::total() const {
+    Main::stats_t stats = m.getComboStats( this->id());
+    return stats.total;
 }
 
 /*

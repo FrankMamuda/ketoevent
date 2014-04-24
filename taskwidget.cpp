@@ -28,10 +28,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_main.h"
 #include <QPainter>
 
-//
-// FIXME: does not save COMBO anymore!
-//
-
 /*
 ================
 construct
@@ -191,6 +187,11 @@ void TaskWidget::saveLog() {
     this->log()->setValue( value );
     this->team()->logList.last()->setValue( value );
     //this->log()->setCombo( this->comboState());
+
+    //Gui_Main *this->parent()
+    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
+    if ( gui != NULL )
+        gui->taskIndexChanged( -1 );
 }
 
 /*
@@ -263,13 +264,11 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
     if ( taskPtr != this->task())
         return;
 
-
-    // set combo
-    //this->setComboState( this->log()->combo());
+    // connect for id updates
     this->connect( this->log(), SIGNAL( comboIdChanged()), this, SLOT( comboIdChanged()));
 
-    //if ( this->hasCombo())
-        this->comboIdChanged();
+    // trigger id change
+    this->comboIdChanged();
 
     // just initial addition
     if ( fromDatabase )
@@ -285,22 +284,34 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
 /*
 ================
 getRelativeComboId
-
-  this is kind of stupid, maybe we should assign team combos staring from 0,
-  since in no way they should overlap...i think...or not
 ================
 */
-int TaskWidget::getRelativeComboId( int comboId ) {
-    if ( !this->hasTeam())
-        return -1;
+int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
+    /*
+    FIXME?
+    this is kind of stupid, maybe we should assign team combos starting from 0,
+    since in no way they should overlap...i think...or not
+    */
 
-    if ( !this->hasCombo())
+    //if ( !this->hasTeam())
+    //    return -1;
+
+    //if ( !this->hasCombo())
+    //    return -1;
+
+    TeamEntry *teamPtr = m.teamForId( teamId );
+    if ( teamPtr == NULL )
         return -1;
 
     QList <int>combos;
-    foreach ( LogEntry *logPtr, this->team()->logList ) {
-        if ( !combos.contains( logPtr->comboId()))
-            combos << logPtr->comboId();
+    foreach ( LogEntry *logPtr, teamPtr->logList ) {
+        int id = logPtr->comboId();
+
+        if ( id == -1 )
+            continue;
+
+        if ( !combos.contains( id ))
+            combos << id;
     }
     return combos.indexOf( comboId ) + 1;
 }
@@ -313,11 +324,11 @@ comboIdChanged
 void TaskWidget::comboIdChanged() {
     //m.print(QString( "idch %1\n" ).arg( comboId ));
 
-    if ( this->hasCombo()) {
+    if ( this->hasTeam() && this->hasCombo()) {
         QPixmap px( ":/icons/star_16" );
         QPainter painter( &px );
         painter.setFont( QFont("Arial") );
-        painter.drawText( px.rect(), Qt::AlignCenter, QString( "%1" ).arg( this->getRelativeComboId( this->log()->comboId())));
+        painter.drawText( px.rect(), Qt::AlignCenter, QString( "%1" ).arg( this->getRelativeComboId( this->log()->comboId(), this->team()->id())));
         this->comboIcon->setPixmap( px );
     } else
         this->comboIcon->setPixmap( QPixmap());
