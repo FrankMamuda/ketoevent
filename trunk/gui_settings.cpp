@@ -79,7 +79,9 @@ void Gui_Settings::bindVars() {
     // bind vars
     this->bindVariable( "backup/changes", this->ui->backupChanges );
     this->bindVariable( "backup/perform", this->ui->backupPerform );
+    this->bindVariable( "", this->ui->backupPerform );
     this->bindVariable( "misc/sortTasks", this->ui->sort );
+    this->bindVariable( "databasePath", this->ui->dbPath );
 
     // unlock vars
     this->lockVariables( false );
@@ -173,4 +175,20 @@ void Gui_Settings::on_backupPerform_stateChanged( int state ) {
         this->ui->backupChanges->setEnabled( true );
     else
         this->ui->backupChanges->setDisabled( true );
+}
+
+/*
+================
+pathButton->clicked
+================
+*/
+void Gui_Settings::on_pathButton_clicked() {
+    QString path = QString( QDir::currentPath() + "/" );
+    QString filePath = QFileDialog::getSaveFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+
+    if ( filePath.startsWith( path )) {
+        m.print( QString( "path %1 is relative -> %2\n" ).arg( filePath ).arg( filePath.remove( path )));
+    } else {
+        m.print( QString( "path %1 is not relative\n" ).arg( filePath ));
+    }
 }

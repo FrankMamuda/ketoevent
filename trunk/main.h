@@ -57,8 +57,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 5;
-    const static unsigned int MinimumAPI = 1;
+    const static unsigned int API = 6;
+    const static unsigned int MinimumAPI = 6;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
     const static unsigned int defaultComboOfTwo = 1;
@@ -68,6 +68,7 @@ namespace Common {
     const static QString defaultStartTime( "10:00" );
     const static QString defaultFinishTime( "15:00" );
     const static QString defaultFinalTime( "15:30" );
+    const static QString defaultDatabase( "ketoevent.db" );
 }
 
 //
@@ -104,7 +105,6 @@ public:
     TeamEntry *teamForId( int id );
     TeamEntry *teamForName( const QString &name );
     QString path;
-    QString databasePath;
 
     // console/settings variables
     ConsoleVariable *cvar( const QString &key );
@@ -171,6 +171,7 @@ private slots:
     // database related
     void addEvent();
     void loadDatabase();
+    void makePath( const QString &path = QString::null );
     void loadTasks();
     void loadTeams();
     void loadLogs();

@@ -77,11 +77,15 @@ void Main::initialize( QObject *parent ) {
     this->settings = new QSettings( "avoti", "ketoevent3" );
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
+    // make default path
+    this->makePath();
+
     // init cvars
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
     this->addCvar( new ConsoleVariable( "lastEventId", this->settings, -1 ));
+    this->addCvar( new ConsoleVariable( "databasePath", this->settings, this->path ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -105,6 +109,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
+    this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
 
     // set parent
     this->parent = parent;
@@ -202,8 +207,9 @@ writeBackup
 void Main::writeBackup() {
     QString backupPath;
 
-    // make path id nonexistant
-    backupPath = this->path + "backups/";
+    // make path if nonexistant
+    QFileInfo db( this->path );
+    backupPath = db.absolutePath() + "/" + "backups/";
     QDir dir( backupPath );
     if ( !dir.exists()) {
         dir.mkpath( backupPath );
@@ -212,7 +218,7 @@ void Main::writeBackup() {
             return;
         }
     }
-    QFile::copy( this->databasePath, QString( "%1%2.db" ).arg( backupPath ).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+    QFile::copy( this->path, QString( "%1%2.db" ).arg( backupPath ).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }
 
 /*
