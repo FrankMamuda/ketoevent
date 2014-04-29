@@ -33,32 +33,50 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 
 /*
 ================
+makePath
+================
+*/
+void Main::makePath( const QString &path ) {
+    QString fullPath;
+
+    // default path?
+    if ( path.isEmpty()) {
+#ifdef Q_OS_UNIX
+#ifdef Q_OS_ANDROID
+        fullPath = QString( "/sdcard/data/org.factory12.ketoevent3/" );
+#else
+        fullPath = QString( QDir::homePath() + "/.ketoevent/" );
+#endif
+#else
+        fullPath = QString( QDir::currentPath() + "/" );
+#endif
+        fullPath.append( "/" );
+        fullPath.append( Common::defaultDatabase );
+    } else
+        fullPath = path;
+
+    // make path id nonexistant
+    QFileInfo db( fullPath );
+
+    if ( !db.absoluteDir().exists()) {
+        db.absoluteDir().mkpath( fullPath );
+        if ( !db.absoluteDir().exists())
+            this->error( StrFatalError + this->tr( "could not create database path\n" ));
+    }
+
+    // store path
+    this->path = fullPath;
+}
+
+/*
+================
 loadDatabase
 ================
 */
 void Main::loadDatabase() {
-#ifdef Q_OS_UNIX
-#ifdef Q_OS_ANDROID
-    this->path = QString( "/sdcard/data/org.factory12.ketoevent3/" );
-#else
-    this->path = QString( QDir::homePath() + "/.ketoevent/" );
-#endif
-#else
-    this->path = QString( QDir::currentPath() + "/" );
-#endif
-
-    // make path id nonexistant
-    QDir dir( this->path );
-    if ( !dir.exists()) {
-        dir.mkpath( this->path );
-        if ( !dir.exists())
-            this->error( StrFatalError + this->tr( "could not create database path\n" ));
-    }
-
     // create database
-
-    this->databasePath = this->path + "ketoevent.db";
-    QFile database( this->databasePath );
+    //this->databasePath = this->path;// + Common::defaultDatabase;
+    QFile database( this->path );
     QSqlDatabase db;
 
     // failsafe
@@ -75,7 +93,7 @@ void Main::loadDatabase() {
     }
 
     // set path and open
-    db.setDatabaseName( this->databasePath );
+    db.setDatabaseName( this->path );
     if ( !db.open())
         this->error( StrFatalError + this->tr( "could not load task database\n" ));
 
