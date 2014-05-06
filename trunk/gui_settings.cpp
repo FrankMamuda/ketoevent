@@ -26,6 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QFileDialog>
 #include <QTextStream>
 #include "main.h"
+#include "gui_main.h"
 
 //
 // TODO: move most stuff to event dialog
@@ -41,7 +42,7 @@ Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
     ui->setupUi( this );
 
     if ( m.isInitialized())
-         this->bindVars();
+        this->bindVars();
     else {
         // TODO: disable stuff
         //this->ui->groupMisc->setDisabled( true );
@@ -79,7 +80,6 @@ void Gui_Settings::bindVars() {
     // bind vars
     this->bindVariable( "backup/changes", this->ui->backupChanges );
     this->bindVariable( "backup/perform", this->ui->backupPerform );
-    this->bindVariable( "", this->ui->backupPerform );
     this->bindVariable( "misc/sortTasks", this->ui->sort );
     this->bindVariable( "databasePath", this->ui->dbPath );
 
@@ -126,9 +126,9 @@ void Gui_Settings::on_buttonExportCSV_clicked() {
         QTextStream out( &csv );
         out.setCodec( "UTF-8" );
         out << this->tr( "name;type;style;points;multi" )
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                .append( "\r" )
-#endif
+       #endif
                .append( "\n" );
         foreach ( TaskEntry *taskPtr, m.taskList ) {
             out << QString( "%1;%2;%3;%4;%5%6" )
@@ -137,7 +137,7 @@ void Gui_Settings::on_buttonExportCSV_clicked() {
                    .arg( taskPtr->style())
                    .arg( taskPtr->points())
                    .arg( taskPtr->multi())
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                    .arg( "\r\n" );
 #else
                    .arg( "\n" );
@@ -183,12 +183,40 @@ pathButton->clicked
 ================
 */
 void Gui_Settings::on_pathButton_clicked() {
-    QString path = QString( QDir::currentPath() + "/" );
-    QString filePath = QFileDialog::getSaveFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+    Gui_Main *gui;
+    QString path, filePath;
 
-    if ( filePath.startsWith( path )) {
-        m.print( QString( "path %1 is relative -> %2\n" ).arg( filePath ).arg( filePath.remove( path )));
-    } else {
-        m.print( QString( "path %1 is not relative\n" ).arg( filePath ));
-    }
+    // get filename from dialog
+    path = QString( QDir::currentPath() + "/" );
+    filePath = QFileDialog::getSaveFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+
+    // check for empty filenames
+    if ( filePath.isEmpty())
+        return;
+
+    // check if path is valid
+    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
+        return;
+
+    // append extension
+    if ( !filePath.endsWith( ".db" ))
+        filePath.append( ".db" );
+
+    // don't reload the same database
+    if ( !QString::compare( filePath, m.cvar( "databasePath" )->string()))
+        return;
+
+    // store database path
+    this->ui->dbPath->setText( filePath );
+
+    // clear data on reload
+    m.clearEvent();
+
+    // reload database
+    m.reloadDatabase( m.cvar( "databasePath" )->string());
+
+    // reinitialize gui
+    gui = qobject_cast<Gui_Main*>( this->parent());
+    if ( gui != NULL )
+        gui->initialize( true );
 }

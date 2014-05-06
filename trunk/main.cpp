@@ -77,15 +77,17 @@ void Main::initialize( QObject *parent ) {
     this->settings = new QSettings( "avoti", "ketoevent3" );
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
+    // initialize this first
+    this->addCvar( new ConsoleVariable( "databasePath", this->settings, this->path ));
+
     // make default path
-    this->makePath();
+    this->makePath( m.cvar( "databasePath" )->string());
 
     // init cvars
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
     this->addCvar( new ConsoleVariable( "lastEventId", this->settings, -1 ));
-    this->addCvar( new ConsoleVariable( "databasePath", this->settings, this->path ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -162,16 +164,9 @@ void Main::shutdown( bool ignoreDatabase ) {
         delete this->settings;
     }
 
-    // delete orphaned logs on shutdown
-    if ( !ignoreDatabase ) {
-        // close database if open
-        QSqlDatabase db = QSqlDatabase::database();
-        if ( db.open()) {
-            this->removeOrphanedLogs();
-            //this->removeOrphanedCombos();
-            db.close();
-        }
-    }
+    // close database
+    if ( !ignoreDatabase )
+        m.unloadDatabase();
 
     // clear console vars
     foreach ( ConsoleVariable *varPtr, this->cvarList )
@@ -218,7 +213,7 @@ void Main::writeBackup() {
             return;
         }
     }
-    QFile::copy( this->path, QString( "%1%2.db" ).arg( backupPath ).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+    QFile::copy( this->path, QString( "%1%2_%3.db" ).arg( backupPath ).arg( QFileInfo( this->path ).fileName().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }
 
 /*

@@ -90,14 +90,14 @@
     </spacer>
    </item>
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="dbPathLabel">
      <property name="text">
       <string>Database path</string>
      </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="hilightEntries">
      <property name="text">
       <string>Highlight logged entries</string>
      </property>

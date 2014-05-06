@@ -97,6 +97,7 @@ public:
     // database related
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
+    void addEvent( const QString &title = QString::null );
     LogEntry *addLog( int taskId, int teamId, int value = 0, int comboId = -1 );
     LogEntry *logForId( int id );
     LogEntry *logForIds( int teamId, int taskId );
@@ -114,6 +115,7 @@ public:
 
     // event
     EventEntry *currentEvent();
+    EventEntry *eventForId( int id );
 
     // lists
     QList <TeamEntry*>  teamList;
@@ -152,6 +154,9 @@ public slots:
     void sort( ListTypes type );
     void update();
     void initConsole();
+    void clearEvent() { this->teamList.clear(); this->taskList.clear(); this->taskListSorted().clear(); this->logList.clear(); this->eventList.clear(); }
+    void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
+    bool setCurrentEvent( EventEntry *eventPtr );
 
     // combos
     int getFreeComboId() const;
@@ -169,8 +174,8 @@ private slots:
     void addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
 
     // database related
-    void addEvent();
     void loadDatabase();
+    void unloadDatabase();
     void makePath( const QString &path = QString::null );
     void loadTasks();
     void loadTeams();
@@ -179,7 +184,6 @@ private slots:
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();
-    bool setCurrentEvent( EventEntry *eventPtr );
 };
 
 //
