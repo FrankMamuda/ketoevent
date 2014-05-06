@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     gui_event.cpp \
     gui_combos.cpp \
     gui_combomodel.cpp \
-    combo.cpp
+    combo.cpp \
+    gui_addevent.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -68,7 +69,8 @@ HEADERS  += gui_main.h \
     gui_event.h \
     gui_settingsdialog.h \
     gui_combos.h \
-    gui_combomodel.h
+    gui_combomodel.h \
+    gui_addevent.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
@@ -79,7 +81,8 @@ FORMS    += gui_main.ui \
     gui_settings.ui \
     gui_console.ui \
     gui_event.ui \
-    gui_combos.ui
+    gui_combos.ui \
+    gui_addevent.ui
 
 RESOURCES += \
     resources.qrc

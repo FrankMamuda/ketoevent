@@ -53,10 +53,11 @@ public:
     ~Gui_Main();
 
 public slots:
-    void initialize();
+    void initialize( bool reload = false );
     int currentTeamIndex() const { return this->m_currentTeamIndex; }
     int currentComboIndex() const { return this->m_currentComboIndex; }
     void taskIndexChanged( int row );
+    void setEventTitle( const QString &name );
 
 private slots:
     // team/task fill

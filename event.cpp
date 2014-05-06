@@ -34,12 +34,18 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 addEvent
 ================
 */
-void Main::addEvent() {
+void Main::addEvent( const QString &title ) {
     QSqlQuery query;
     QString comboString;
     QString timeString;
+    QString eventTitle;
+    //QString indexString;
 
     // currenly we have only one entry
+
+    // copy title
+    eventTitle = title;
+
     // in future use multiple databases for multiple events
     //if ( this->event != NULL ) {
     //    m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
@@ -56,10 +62,21 @@ void Main::addEvent() {
             .arg( Common::defaultFinishTime )
             .arg( Common::defaultFinalTime );
 
+    // set title if none
+    if ( eventTitle.isEmpty())
+        eventTitle = this->tr( "unnamed event" );
+
+    // 1 is reserved for the first event
+   /* if ( m.eventList.isEmpty())
+        indexString = "1";
+    else
+        indexString = "null";*/
+
     // add new log
-    if ( !query.exec( QString( "insert into events values ( 1, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
+    if ( !query.exec( QString( "insert into events values ( null, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
+                      //.arg( indexString )
                       .arg( Common::API )
-                      .arg( this->tr( "unnamed event" ))
+                      .arg( eventTitle )
                       .arg( Common::defaultMinMembers )
                       .arg( Common::defaultMaxMembers )
                       .arg( timeString )
@@ -67,7 +84,7 @@ void Main::addEvent() {
                       .arg( comboString ))) {
         this->error( StrSoftError + QString( "could not add event, reason: %1\n" ).arg( query.lastError().text()));
     }
-    query.exec( QString( "select * from events where id=1" ));
+    query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last entry and construct internal entry
     while ( query.next()) {
@@ -78,14 +95,14 @@ void Main::addEvent() {
 
 /*
 ================
-loadEvent
+loadEvents
 ================
 */
 void Main::loadEvents() {
     QSqlQuery query;
 
-    // currently read the first entry
-    query.exec( "select * from events where id=1" );
+    // read all event entries
+    query.exec( "select * from events" );
 
     // store entries
     while ( query.next()) {
@@ -141,4 +158,17 @@ bool Main::setCurrentEvent( EventEntry *eventPtr ) {
         }
     }
     return false;
+}
+
+/*
+================
+eventForId
+================
+*/
+EventEntry *Main::eventForId( int id ) {
+    foreach ( EventEntry *eventPtr, this->eventList ) {
+        if ( eventPtr->id() == id )
+            return eventPtr;
+    }
+    return NULL;
 }

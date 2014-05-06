@@ -46,7 +46,7 @@ Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_M
 initialize
 ================
 */
-void Gui_Main::initialize() {
+void Gui_Main::initialize( bool reload ) {
     // disable actions on partial initialization (debug)
     if ( !m.isInitialized()) {
         this->ui->actionTeams->setDisabled( true );
@@ -63,9 +63,11 @@ void Gui_Main::initialize() {
         this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
 
         // connect team switcher and finish time editor
-        this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
-        this->connect( this->ui->taskList, SIGNAL( currentRowChanged( int )), this, SLOT( taskIndexChanged( int )));
-        this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
+        if ( !reload ) {
+            this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
+            this->connect( this->ui->taskList, SIGNAL( currentRowChanged( int )), this, SLOT( taskIndexChanged( int )));
+            this->connect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )), this, SLOT( updateFinishTime( QTime )));
+        }
 
         // fill in tasks and teams
         this->fillTeams();
@@ -87,8 +89,20 @@ void Gui_Main::initialize() {
     this->connect( dwPtr, SIGNAL( clicked()), this, SLOT( on_downButton_clicked()));
 #endif
 
+    // set title
+    this->setEventTitle( m.currentEvent()->name());
+
     // announce
     m.print( StrMsg + this->tr( "initialization complete\n" ));
+}
+
+/*
+============
+setEventTitle
+============
+*/
+void Gui_Main::setEventTitle( const QString &name ) {
+    this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( name/* m.currentEvent()->name()*/));
 }
 
 /*

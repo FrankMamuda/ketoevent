@@ -44,13 +44,19 @@ public:
     explicit Gui_Event( QWidget *parent = 0 );
     ~Gui_Event();
 
+public slots:
+    void fillEvents();
+
 private slots:
     void bindVars();
-
     void on_buttonClose_clicked();
+    void on_eventCombo_currentIndexChanged( int index );
+    void on_buttonAdd_clicked();
+    void validate();
 
 private:
     Ui::Gui_Event *ui;
+    int m_lastId;
 };
 
 #endif // GUI_EVENT_H

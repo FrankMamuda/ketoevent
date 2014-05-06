@@ -75,9 +75,8 @@ loadDatabase
 */
 void Main::loadDatabase() {
     // create database
-    //this->databasePath = this->path;// + Common::defaultDatabase;
     QFile database( this->path );
-    QSqlDatabase db;
+    QSqlDatabase db = QSqlDatabase::database();
 
     // failsafe
     if ( !db.isDriverAvailable( "QSQLITE" ))
@@ -85,6 +84,8 @@ void Main::loadDatabase() {
 
     // set sqlite driver
     db = QSqlDatabase::addDatabase( "QSQLITE" );
+    db.setHostName( "localhost" );
+    db.setDatabaseName( this->path );
 
     // touch file if empty
     if ( !database.exists()) {
@@ -93,7 +94,6 @@ void Main::loadDatabase() {
     }
 
     // set path and open
-    db.setDatabaseName( this->path );
     if ( !db.open())
         this->error( StrFatalError + this->tr( "could not load task database\n" ));
 
@@ -118,6 +118,21 @@ void Main::loadDatabase() {
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();
+}
+
+/*
+================
+unloadDatabase
+================
+*/
+void Main::unloadDatabase() {
+    // close database if open and delete orphaned logs on shutdown
+    QSqlDatabase db = QSqlDatabase::database();
+    if ( db.isOpen()) {
+        this->removeOrphanedLogs();        
+        db.close();
+        QSqlDatabase::removeDatabase( db.connectionName());
+    }
 }
 
 /*
