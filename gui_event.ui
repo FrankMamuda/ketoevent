@@ -222,7 +222,7 @@
          <item row="3" column="0">
           <widget class="QLabel" name="dComboLabel">
            <property name="text">
-            <string>Double combo</string>
+            <string>Combo of three</string>
            </property>
           </widget>
          </item>
@@ -239,7 +239,7 @@
          <item row="5" column="0">
           <widget class="QLabel" name="tComboLabel">
            <property name="text">
-            <string>Triple combo</string>
+            <string>Combo of four+</string>
            </property>
           </widget>
          </item>
@@ -256,7 +256,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="sComboLabel">
            <property name="text">
-            <string>Single combo</string>
+            <string>Combo of two</string>
            </property>
           </widget>
          </item>

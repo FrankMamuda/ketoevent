@@ -188,7 +188,8 @@ void Gui_Settings::on_pathButton_clicked() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getSaveFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+    // FIXME: getSaveFileName might not be the best way to choose files (it asks for owerwrites)
+    filePath = QFileDialog::getSaveFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ), 0, QFileDialog::DontConfirmOverwrite );
 
     // check for empty filenames
     if ( filePath.isEmpty())

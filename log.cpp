@@ -123,5 +123,5 @@ void Main::removeOrphanedLogs() {
 
     // remove orphaned logs (fixes crash with invalid teamId/taskId)
     if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
-        m.error( StrSoftError + QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError + QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
 }

@@ -38,7 +38,7 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool
     QSqlQuery query;
 
     // avoid duplicates
-    if ( m.teamForName( teamName ) != NULL )
+    if ( this->teamForName( teamName ) != NULL )
         return;
 
     // perform database update and select last row
@@ -67,7 +67,7 @@ void Main::removeTeam( const QString &teamName ) {
     QSqlQuery query;
 
     // find team
-    teamPtr = m.teamForName( teamName );
+    teamPtr = this->teamForName( teamName );
 
     // failsafe
     if ( teamPtr == NULL )
@@ -138,9 +138,6 @@ Main::stats_t Main::getComboStats( int id ) const {
     stats_t stats;
 
     // reset
-    //combos = 0;
-    //points = 0;
-    //total = 0;
     memset( &stats, 0, sizeof( stats ));
 
     // get team

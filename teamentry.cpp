@@ -85,7 +85,6 @@ combos
 */
 int TeamEntry::combos() const {
     Main::stats_t stats = m.getComboStats( this->id());
-    //m.print( QString( "%1 %2\n" ).arg( this->name()).arg( stats.points ));
     return stats.combos;
 }
 

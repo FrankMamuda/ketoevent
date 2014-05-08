@@ -48,16 +48,13 @@ class Main m;
 //
 // TODO:
 //
-// preload events
-// set name in titlebar
-// allow locking whole events
-// db paths in settings
+// deprecate db importing, allow only import of statistics
+//   (or at least calculate stats on the fly (no real allocs))
 // statistics - import void teams from csv (just to see the results)
 // check private/public funcs
 // check includes
 // add more props
 // verbocity for console Regular Verbose PrintEverything
-// advanced combos
 // replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
@@ -81,7 +78,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "databasePath", this->settings, this->path ));
 
     // make default path
-    this->makePath( m.cvar( "databasePath" )->string());
+    this->makePath( this->cvar( "databasePath" )->string());
 
     // init cvars
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
@@ -155,6 +152,8 @@ void Main::error( ErrorTypes type, const QString &msg ) {
 /*
 ================
 shutdown
+
+  garbage collection
 ================
 */
 void Main::shutdown( bool ignoreDatabase ) {
@@ -164,28 +163,29 @@ void Main::shutdown( bool ignoreDatabase ) {
         delete this->settings;
     }
 
-    // close database
-    if ( !ignoreDatabase )
-        m.unloadDatabase();
+    // clear entries
+    this->clearEvent();
 
     // clear console vars
     foreach ( ConsoleVariable *varPtr, this->cvarList )
         delete varPtr;
     this->cvarList.clear();
-
     if ( this->defaultCvar != NULL )
         delete this->defaultCvar;
 
-    // garbage collection
+    // ckear settings vars
     foreach ( SettingsVariable *varPtr, this->svarList )
         delete varPtr;
     this->svarList.clear();
-
     if ( this->defaultSvar != NULL )
         delete this->defaultSvar;
 
-    if ( this->console != NULL )
-        delete this->console;
+    // close console
+    this->console->close();
+
+    // close database
+    if ( !ignoreDatabase )
+        this->unloadDatabase();
 
     // reset initialization state
     this->setInitialized( false );
@@ -209,7 +209,7 @@ void Main::writeBackup() {
     if ( !dir.exists()) {
         dir.mkpath( backupPath );
         if ( !dir.exists()) {
-            m.error( StrFatalError + this->tr( "could not create backup path\n" ));
+            this->error( StrFatalError + this->tr( "could not create backup path\n" ));
             return;
         }
     }
@@ -241,6 +241,45 @@ void Main::initConsole() {
 
     this->console = new Gui_Console();
     this->console->show();
+}
+
+/*
+================
+clearEvent
+
+  garbage collection
+================
+*/
+void Main::clearEvent() {
+    // get main screen
+    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent );
+    if ( gui == NULL )
+        return;
+
+    // clear task widgets on main screen
+    gui->clearTasks();
+
+    // clear teams (logs should be cleaned automatically on destruct)
+    foreach ( TeamEntry *teamPtr, this->teamList ) {
+        this->teamList.removeOne( teamPtr );
+        delete teamPtr;
+    }
+    this->teamList.clear();
+
+    // clear events
+    foreach ( EventEntry *eventPtr, this->eventList ) {
+        this->eventList.removeOne( eventPtr );
+        delete eventPtr;
+    }
+    this->eventList.clear();
+
+    // cleat tasks
+    foreach ( TaskEntry *taskPtr, this->taskList ) {
+        this->taskList.removeOne( taskPtr );
+        delete taskPtr;
+    }
+    this->taskList.clear();
+    this->taskListSorted().clear();
 }
 
 /*
