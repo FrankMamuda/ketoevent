@@ -126,111 +126,22 @@ unloadDatabase
 ================
 */
 void Main::unloadDatabase() {
+    QString connectionName;
+    bool open = false;
+
     // close database if open and delete orphaned logs on shutdown
-    QSqlDatabase db = QSqlDatabase::database();
-    if ( db.isOpen()) {
-        this->removeOrphanedLogs();        
-        db.close();
-        QSqlDatabase::removeDatabase( db.connectionName());
-    }
-}
-
-/*
-================
-importDatabase (testing)
-================
-*/
-void Main::importDatabase( const QString &path ) {
-    Q_UNUSED( path );
-
-    // non-functional for now
-#if 0
-    QList<QPair<int, QString> > teamMatchList;
-    QList<QPair<int, QString> > taskMatchList;
-
-    // create query
-    QSqlQuery query;
-
-    // attach the new database
-    query.exec( QString( "attach '%1' as toMerge" ).arg( path ));
-
-    //
-    // first add teams
-    //
-    query.exec( "select * from toMerge.teams" );
-
-    // store entries
-    while ( query.next()) {
-        QString teamName = query.record().value( "name" ).toString();
-
-        // check for duplicates
-        if ( this->teamForName( teamName ) != NULL ) {
-            // TODO: messagebox - replace?
-            if ( QMessageBox::question( NULL, this->tr( "Replace team" ), this->tr( "Replace logs for team \"%1\"?" ).arg( teamName ), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
-                this->removeTeam( teamName );
-        }
-
-        // store temp value
-        QList<QPair<int, QString> > teamMatch;
-        teamMatch.append( qMakePair( query.record().value( "id" ).toInt(), teamName ));
-        teamMatchList << teamMatch;
-
-        // add to database
-        this->addTeam( query.record().value( "name" ).toString(), query.record().value( "members" ).toInt(), QTime::fromString( query.record().value( "finishTime" ).toString(), "hh:mm" ), query.record().value( "lock" ).toBool());
-    }
-
-    //
-    // then add tasks
-    //
-    query.exec( "select * from toMerge.tasks" );
-
-    // store entries
-    while ( query.next()) {
-        // store temp value
-        QList<QPair<int, QString> > taskMatch;
-        taskMatch.append( qMakePair( query.record().value( "id" ).toInt(), query.record().value( "name" ).toString()));
-        taskMatchList << taskMatch;
-
-        // add to main database
-        // duplicates are ignored
-        this->addTask( query.record().value( "name" ).toString(), query.record().value( "points" ).toInt(), query.record().value( "multi" ).toInt(), static_cast<TaskEntry::Types>( query.record().value( "type" ).toInt()), static_cast<TaskEntry::Styles>( query.record().value( "style" ).toInt()));
-    }
-
-    //
-    // next part is tricky one:
-    // we have to match log by old taskId and teamId
-    // I'm sure it can be done more efficiently
-    //
-    QPair<int, QString> teamMatchPtr;
-    foreach ( teamMatchPtr, teamMatchList ) {
-        TeamEntry *teamPtr;
-
-        // first find the new team (if none, don't bother)
-        teamPtr = m.teamForName( teamMatchPtr.second );
-        if ( teamPtr == NULL )
-            return;
-
-        // then get all logs for the team
-        query.exec( QString( "select * from toMerge.logs where teamId=%1" ).arg( teamMatchPtr.first ));
-
-        // cycle through logs
-        while ( query.next()) {
-            // first find the task (it may be imported or already existing)
-            QPair<int, QString> taskMatchPtr;
-            foreach ( taskMatchPtr, taskMatchList ) {
-                if ( taskMatchPtr.first == query.record().value( 2 ).toInt())
-                    break;
-            }
-            TaskEntry *taskPtr = m.taskForName( taskMatchPtr.second );
-            if ( taskPtr == NULL )
-                return;
-
-            // then add log
-            this->addLog( taskPtr->id(), teamPtr->id(), query.record().value( "value" ).toInt(), static_cast<LogEntry::Combos>( query.record().value( "combo" ).toInt()));
+    // according to Qt5 documentation, this must be out of scope
+    {
+        QSqlDatabase db = QSqlDatabase::database();
+        if ( db.isOpen()) {
+            open = true;
+            this->removeOrphanedLogs();
+            connectionName = db.connectionName();
+            db.close();
         }
     }
 
-    // detach the new database
-    query.exec( "detach toMerge" );
-#endif
+    // only now we can remove the connection completely
+    if ( open )
+        QSqlDatabase::removeDatabase( connectionName );
 }

@@ -39,7 +39,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
     int max = 0;
 
     // avoid duplicates
-    if ( m.taskForName( taskName ) != NULL )
+    if ( this->taskForName( taskName ) != NULL )
         return;
 
     // make sure we insert value at the bottom of the list

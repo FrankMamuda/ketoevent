@@ -140,10 +140,8 @@ saveLog
 void TaskWidget::saveLog() {
     int value = 0;
 
-    if ( !this->m_active ) {
-        //m.print( "log inactive, ignoring save\n" );
+    if ( !this->m_active )
         return;
-    }
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
@@ -207,8 +205,6 @@ TaskWidget::~TaskWidget() {
     }
 
     // disconnect buttons and spinboxes
-    //this->disconnect( this->combo, SIGNAL( clicked()));
-
     if ( this->task()->type() == TaskEntry::Check && this->check != NULL ) {
         this->disconnect( this->check, SIGNAL( clicked()));
         delete this->check;
@@ -217,17 +213,18 @@ TaskWidget::~TaskWidget() {
         delete this->multi;
     }
 
-    //
-   // if  ( this->hasLog()) {
-   //     m.print( "disconnect\n");
-   //     this->disconnect( this->log(), SIGNAL( comboIdChanged()));
-   // }
-
     // clean up
-    delete this->taskName;
-    delete this->comboIcon;
-    delete this->combo;
-    delete this->grid;
+    if ( this->taskName != NULL )
+        delete this->taskName;
+
+    if ( this->comboIcon != NULL )
+        delete this->comboIcon;
+
+    if ( this->combo != NULL )
+        delete this->combo;
+
+    if ( this->grid != NULL )
+        delete this->grid;
 }
 
 /*
@@ -287,18 +284,6 @@ getRelativeComboId
 ================
 */
 int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
-    /*
-    FIXME?
-    this is kind of stupid, maybe we should assign team combos starting from 0,
-    since in no way they should overlap...i think...or not
-    */
-
-    //if ( !this->hasTeam())
-    //    return -1;
-
-    //if ( !this->hasCombo())
-    //    return -1;
-
     TeamEntry *teamPtr = m.teamForId( teamId );
     if ( teamPtr == NULL )
         return -1;
@@ -322,8 +307,6 @@ comboIdChanged
 ================
 */
 void TaskWidget::comboIdChanged() {
-    //m.print(QString( "idch %1\n" ).arg( comboId ));
-
     if ( this->hasTeam() && this->hasCombo()) {
         QPixmap px( ":/icons/star_16" );
         QPainter painter( &px );

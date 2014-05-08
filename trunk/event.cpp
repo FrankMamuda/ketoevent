@@ -46,12 +46,6 @@ void Main::addEvent( const QString &title ) {
     // copy title
     eventTitle = title;
 
-    // in future use multiple databases for multiple events
-    //if ( this->event != NULL ) {
-    //    m.error( StrSoftError + QString( "event '%1' already present, aborting\n" ).arg( this->event->name()));
-    //    return;
-    //}
-
     // compile strings
     comboString = QString( "%1, %2, %3" )
             .arg( Common::defaultComboOfTwo )
@@ -65,12 +59,6 @@ void Main::addEvent( const QString &title ) {
     // set title if none
     if ( eventTitle.isEmpty())
         eventTitle = this->tr( "unnamed event" );
-
-    // 1 is reserved for the first event
-   /* if ( m.eventList.isEmpty())
-        indexString = "1";
-    else
-        indexString = "null";*/
 
     // add new log
     if ( !query.exec( QString( "insert into events values ( null, %1, '%2', %3, %4, %5, %6, %7, '0' )" )

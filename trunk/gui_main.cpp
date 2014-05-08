@@ -290,11 +290,28 @@ void Gui_Main::fillTeams( int forcedId ) {
 
 /*
 ================
+clearTasks
+================
+*/
+void Gui_Main::clearTasks() {
+    QListWidget *lw = this->ui->taskList;
+
+    // cannot use for loop, since items are removed from list
+    while ( lw->count()) {
+        GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( 0 ))); TestPtr( taskPtr ) continue;
+        this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
+        delete taskPtr;
+        delete lw->item( 0 );
+    }
+    lw->clear();
+}
+
+/*
+================
 fillTasks
 ================
 */
 void Gui_Main::fillTasks() {
-    int y;
     QListWidget *lw = this->ui->taskList;
     QList <TaskEntry*>taskList;
 
@@ -302,14 +319,10 @@ void Gui_Main::fillTasks() {
     if ( !m.isInitialized())
         return;
 
-    for ( y = 0; y < lw->count(); y++ ) {
-        GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
-        this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
-        delete taskPtr;
-        delete lw->item( y );
-    }
-    lw->clear();
+    // clear tasks
+    this->clearTasks();
 
+    // fill with either sorted or unsorted list
     if ( m.cvar( "misc/sortTasks" )->isEnabled())
         taskList = m.taskListSorted();
     else

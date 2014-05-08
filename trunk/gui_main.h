@@ -58,6 +58,7 @@ public slots:
     int currentComboIndex() const { return this->m_currentComboIndex; }
     void taskIndexChanged( int row );
     void setEventTitle( const QString &name );
+    void clearTasks();
 
 private slots:
     // team/task fill

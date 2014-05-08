@@ -150,11 +150,10 @@ public slots:
     void print( const QString &msg );
 
     // misc
-    void importDatabase( const QString &path );
     void sort( ListTypes type );
     void update();
     void initConsole();
-    void clearEvent() { this->teamList.clear(); this->taskList.clear(); this->taskListSorted().clear(); this->logList.clear(); this->eventList.clear(); }
+    void clearEvent();// { this->teamList.clear(); this->taskList.clear(); this->taskListSorted().clear(); this->logList.clear(); this->eventList.clear(); }
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
 
