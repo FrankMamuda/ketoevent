@@ -359,7 +359,7 @@ void Gui_Main::on_quickAddButton_clicked() {
     Gui_TeamEdit teamEdit( this );
     teamEdit.toggleAddEditWidget( Gui_TeamEdit::AddQuick );
     teamEdit.exec();
-    this->fillTeams( teamEdit.lastId );
+    this->fillTeams( teamEdit.lastId());
 }
 
 /*
@@ -401,16 +401,16 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         return;
 
     // advance
-    if ( this->currentMatch >= this->ui->taskList->count() - 1 || this->currentMatch <= 0 )
-        this->currentMatch = 0;
+    if ( this->currentMatch() >= this->ui->taskList->count() - 1 || this->currentMatch() <= 0 )
+        this->setCurrentMatch();
     else
-        this->currentMatch++;
+        this->setCurrentMatch( this->currentMatch() + 1 );
 
     // find item from current position
-    for ( y = this->currentMatch; y < this->ui->taskList->count(); y++ ) {
+    for ( y = this->currentMatch(); y < this->ui->taskList->count(); y++ ) {
         if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
             match = true;
-            currentMatch = y;
+            this->setCurrentMatch( y );
             break;
         }
     }
@@ -420,7 +420,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         for ( y = 0; y < this->ui->taskList->count(); y++ ) {
             if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
-                currentMatch = y;
+                this->setCurrentMatch( y );
                 break;
             }
         }
@@ -524,7 +524,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
         // check if it has a combo assigned, if not get the next free index
         if ( !tw->hasCombo())
-            tw->log()->setComboId( m.getFreeComboId());
+            tw->log()->setComboId( m.getFreeComboHandle());
 
         this->m_currentComboIndex = tw->log()->comboId();
 
@@ -633,7 +633,6 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
         // just refill the whole list on reset
         this->fillTasks();
         this->m_currentComboIndex = -1;
-        //m.removeOrphanedCombos();
         return;
     }
 

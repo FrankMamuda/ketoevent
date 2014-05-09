@@ -79,6 +79,7 @@ class Main : public QObject {
     Q_ENUMS( ListTypes )
     Q_ENUMS( ErrorTypes )
     Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
+    Q_CLASSINFO( "description", "Applet main class" )
 
 public:
     // sorting types
@@ -95,9 +96,6 @@ public:
     };
 
     // database related
-    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
-    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
-    void addEvent( const QString &title = QString::null );
     LogEntry *addLog( int taskId, int teamId, int value = 0, int comboId = -1 );
     LogEntry *logForId( int id );
     LogEntry *logForIds( int teamId, int taskId );
@@ -129,13 +127,16 @@ public:
     // misc
     QString transliterate( const QString &path );
     bool isInitialized() const { return this->m_init; }
-    QObject *parent;
 
     // combination statistics
     typedef struct stats_s {
         int points;
         int combos;
         int total;
+
+        /* expanded to support statistics imports */
+        int tasks;
+        int timeOnTrack;
     } stats_t;
     stats_t getComboStats( int id ) const;
 
@@ -144,6 +145,11 @@ public slots:
     void initialize( QObject *parent );
     void setInitialized( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
+
+    // database related
+    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
+    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
+    void addEvent( const QString &title = QString::null );
 
     // console io
     void error( ErrorTypes type, const QString &msg );
@@ -158,7 +164,7 @@ public slots:
     bool setCurrentEvent( EventEntry *eventPtr );
 
     // combos
-    int getFreeComboId() const;
+    int getFreeComboHandle() const;
 
 private:
     QSettings *settings;

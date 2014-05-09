@@ -29,21 +29,24 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 
 //
-// class: Gui_ComboModel
+// class: Combo model (gui)
 //
 class Gui_ComboModel : public QStringListModel {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Combination view engine" )
 
 public:
     Gui_ComboModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) { this->listParent = parentPtr; }
-    int rowCount( const QModelIndex & = QModelIndex()) const;// { return m.taskList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const;
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
+public slots:
     // this resets whole model based on data in m.teamList
     void beginReset() { this->beginResetModel(); }
     void endReset() { this->endResetModel(); }
 
+private:
     QObject *listParent;
 };
 

@@ -34,7 +34,7 @@ Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Abo
 
 #ifdef Q_OS_MAC
     // fixes ugly mac font
-    m_ui->appInfo->setHtml( m_ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
+    this->ui->appInfo->setHtml( m_ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
 #endif
 
 #ifdef Q_OS_ANDROID

@@ -43,6 +43,8 @@ class Gui_TeamEdit : public QDialog {
     Q_OBJECT
     Q_ENUMS( AddEditState )
     Q_PROPERTY( AddEditState state READ state WRITE setState )
+    Q_PROPERTY( int lastId READ lastId WRITE setLastId RESET resetLastId )
+    Q_CLASSINFO( "description", "Team management dialog" )
 
 public:
     // widget states
@@ -57,9 +59,7 @@ public:
     ~Gui_TeamEdit();
     void toggleAddEditWidget( AddEditState state );
     AddEditState state() const { return this->m_state; }
-
-    // TODO: prop!!!
-    int lastId;
+    int lastId() const { return this->m_lastId; }
 
 private slots:
     void on_removeTeamButton_clicked();
@@ -70,11 +70,14 @@ private slots:
     void setState( AddEditState state ) { this->m_state = state; }
     void enableView();
     void on_addEditWidget_visibilityChanged( bool visible ) { if ( !visible ) this->enableView(); }
+    void setLastId( int id ) { this->m_lastId = id; }
+    void resetLastId() { this->m_lastId = -1; }
 
 private:
     Ui::Gui_TeamEdit *ui;
     AddEditState m_state;
     Gui_TeamListModel *listModelPtr;
+    int m_lastId;
 };
 
 

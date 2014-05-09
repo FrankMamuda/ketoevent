@@ -40,6 +40,7 @@ namespace Ui {
 //
 class Gui_Rankings : public QDialog {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Team rankings dialog" )
 
 public:
     explicit Gui_Rankings( QWidget *parent = 0 );
@@ -50,7 +51,6 @@ public slots:
 
 private slots:
     void calculateStatistics();
-
     void on_exportButton_clicked();
 
 private:

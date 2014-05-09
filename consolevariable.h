@@ -29,7 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QTime>
 
 //
-// class: ConsoleVariable
+// class: Console variable
 //
 class ConsoleVariable : public QObject {
     Q_OBJECT
@@ -42,6 +42,7 @@ class ConsoleVariable : public QObject {
     Q_PROPERTY( QString string READ string )
     Q_PROPERTY( QTime time READ time )
     Q_PROPERTY( QString timeString READ timeString )
+    Q_CLASSINFO( "description", "Console variable" )
 
 public:
     explicit ConsoleVariable( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) { this->setKey( key ); this->s = settingsPtr; this->setDefaultValue( defaultValue ); }

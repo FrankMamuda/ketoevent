@@ -37,6 +37,7 @@ class LogEntry : public DatabaseEntry {
     Q_PROPERTY( int teamId READ teamId WRITE setTeamId )
     Q_PROPERTY( int taskId READ taskId WRITE setTaskId )
     Q_PROPERTY( int comboId READ comboId WRITE setComboId )
+    Q_CLASSINFO( "description", "Log SQL Entry" )
 
 public:
     LogEntry( const QSqlRecord &record, const QString &table );

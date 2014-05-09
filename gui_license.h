@@ -40,6 +40,7 @@ namespace Ui {
 //
 class Gui_License : public QDialog {
     Q_OBJECT
+    Q_CLASSINFO( "description", "License dialog" )
 
 public:
     explicit Gui_License( QWidget *parent = 0 );

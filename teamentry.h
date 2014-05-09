@@ -40,6 +40,7 @@ class TeamEntry : public DatabaseEntry {
     Q_PROPERTY( int total READ total )
     Q_PROPERTY( int penalty READ penalty )
     Q_PROPERTY( int timeOnTrack READ timeOnTrack )
+    Q_CLASSINFO( "description", "Team SQL Entry" )
 
 public:
     explicit TeamEntry( const QSqlRecord &record, const QString &table );

@@ -42,6 +42,7 @@ class EventEntry : public DatabaseEntry {
     Q_PROPERTY( QTime startTime READ startTime WRITE setStartTime )
     Q_PROPERTY( QTime finishTime READ finishTime WRITE setFinishTime )
     Q_PROPERTY( QTime finalTime READ finalTime WRITE setFinalTime )
+    Q_CLASSINFO( "description", "Event SQL Entry" )
 
 public:
     EventEntry( const QSqlRecord &record, const QString &table );

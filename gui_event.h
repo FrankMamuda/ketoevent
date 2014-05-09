@@ -39,6 +39,7 @@ class Gui_Event;
 //
 class Gui_Event : public Gui_SettingsDialog {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Event handling dialog" )
 
 public:
     explicit Gui_Event( QWidget *parent = 0 );
@@ -53,10 +54,10 @@ private slots:
     void on_eventCombo_currentIndexChanged( int index );
     void on_buttonAdd_clicked();
     void validate();
+    void on_buttonRemove_clicked();
 
 private:
     Ui::Gui_Event *ui;
-    int m_lastId;
 };
 
 #endif // GUI_EVENT_H

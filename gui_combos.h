@@ -44,22 +44,25 @@ class Gui_ComboModel;
 //
 class Gui_Combos : public QDialog {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Combination dialog" )
+    Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
 
 public:
     explicit Gui_Combos( QWidget *parent = 0 );
     ~Gui_Combos();
     QList <LogEntry *>logListSorted;
-    int currentTeamId() const { return this->m_currentTeamId; }
+    int currentTeamIndex() const { return this->m_currentTeamIndex; }
 
 private slots:
     void fillTeams();
     void on_buttonClose_clicked();
-    void teamIndexChanged( int );
+    void currentTeamIndexChanged( int );
+    void setCurrentTeamIndex( int index ) { this->m_currentTeamIndex = index; }
 
 private:
     Ui::Gui_Combos *ui;
     Gui_ComboModel *comboModelPtr;
-    int m_currentTeamId;
+    int m_currentTeamIndex;
 };
 
 #endif // GUI_COMBOS_H

@@ -58,7 +58,7 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
 #endif    
 
     // reset team id
-    this->lastId = -1;
+    this->resetLastId();
 }
 
 /*
@@ -233,7 +233,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
     // quick add
     if ( this->state() == AddQuick ) {
-        this->lastId = m.teamList.last()->id();
+        this->setLastId( m.teamList.last()->id());
         this->close();
     }
 

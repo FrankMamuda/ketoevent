@@ -39,13 +39,14 @@ class Gui_Console;
 //
 class Gui_Console : public QDialog {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Debugging console" )
 
 public:
-    explicit Gui_Console(QWidget *parent = 0);
+    explicit Gui_Console( QWidget *parent = 0 );
     ~Gui_Console();
 
 public slots:
-    void print( QString msg );
+    void print( const QString &msg );
 
 protected:
     virtual void mousePressEvent( QMouseEvent * );

@@ -84,7 +84,7 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
         return cPtr->logListSorted.at( index.row())->id();
     else if ( role == Qt::BackgroundColorRole ) {
         // make sets of combos **colourful**
-        comboColour_t colour = colourForId( TaskWidget::getRelativeComboId( cPtr->logListSorted.at( index.row())->comboId(), cPtr->currentTeamId()));
+        comboColour_t colour = colourForId( TaskWidget::getRelativeComboId( cPtr->logListSorted.at( index.row())->comboId(), cPtr->currentTeamIndex()));
         return QColor( colour.r, colour.g, colour.b, 64 );
     } else
         return QVariant();

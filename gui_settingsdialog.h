@@ -30,11 +30,16 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <main.h>
 
 //
-// class: Gui_SettingsDialog
+// inherited by Gui_Event and Gui_Settings
+//
+
+//
+// class: Settings Dialog (gui)
 //
 class Gui_SettingsDialog : public QDialog {
     Q_OBJECT
     Q_PROPERTY( bool variablesLocked READ variablesLocked WRITE lockVariables )
+    Q_CLASSINFO( "description", "Settings base class" )
 
 public:
     Gui_SettingsDialog( QWidget *parent ) : QDialog( parent ) {}

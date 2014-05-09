@@ -38,6 +38,7 @@ class TaskEntry : public DatabaseEntry {
     Q_PROPERTY( int order READ order WRITE setOrder )
     Q_ENUMS( Types )
     Q_ENUMS( Styles )
+    Q_CLASSINFO( "description", "Task SQL Entry" )
 
 public:
     enum Types {

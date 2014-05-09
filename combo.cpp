@@ -29,10 +29,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 
 /*
 ================
-getFreeComboId
+getFreeComboHandle
 ================
 */
-int Main::getFreeComboId() const {
+int Main::getFreeComboHandle() const {
     int highest = 0;
     foreach ( LogEntry *logPtr, this->logList ) {
         if ( logPtr->comboId() >= highest )

@@ -1,3 +1,26 @@
+/*
+===========================================================================
+Copyright (C) 2013-2014 Avotu Briezhaudzetava
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see http://www.gnu.org/licenses/.
+
+===========================================================================
+*/
+
+//
+// includes
+//
 #include "gui_combos.h"
 #include "ui_gui_combos.h"
 #include "gui_main.h"
@@ -20,7 +43,7 @@ Gui_Combos::Gui_Combos( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_C
     ui->setupUi( this );
 
     // connect for updates
-    this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
+    this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( currentTeamIndexChanged( int )));
 
     // set up view
     this->comboModelPtr = new Gui_ComboModel( this );
@@ -45,10 +68,10 @@ Gui_Combos::~Gui_Combos() {
 
 /*
 ================
-teamIndexChanged
+currentTeamIndexChanged
 ================
 */
-void Gui_Combos::teamIndexChanged( int index ) {
+void Gui_Combos::currentTeamIndexChanged( int index ) {
     TeamEntry *teamPtr;
 
     // abort on invalid indexes
@@ -56,8 +79,8 @@ void Gui_Combos::teamIndexChanged( int index ) {
         return;
 
     // get current team
-    this->m_currentTeamId = this->ui->comboTeams->itemData( index ).toInt();
-    teamPtr = m.teamForId( this->m_currentTeamId );
+    this->setCurrentTeamIndex( this->ui->comboTeams->itemData( index ).toInt());
+    teamPtr = m.teamForId( this->currentTeamIndex());
     if ( teamPtr == NULL )
         return;
 

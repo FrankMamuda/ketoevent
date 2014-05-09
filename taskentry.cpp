@@ -89,30 +89,6 @@ int TaskEntry::calculate( int logId ) const {
         return 0;
     }
 
-    // get combo points
-    // TODO/FIXME: MUST COUNT COMBO POINTS ELSEWHERE
-    // ALSO CHECK FOR TOOLTIPS (correct points)
-  //  foreach ( ComboEntry *cPtr, )
-#if 0
-    switch ( logPtr->combo()) {
-    case LogEntry::Single:
-        value += m.currentEvent()->singleCombo();
-        break;
-
-    case LogEntry::Double:
-        value += m.currentEvent()->doubleCombo();
-        break;
-
-    case LogEntry::Triple:
-        value += m.currentEvent()->tripleCombo();
-        break;
-
-    default:
-    case LogEntry::NoCombo:
-        break;
-    }
-#endif
-
     // we're done
     return value;
 }

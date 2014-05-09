@@ -33,6 +33,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 class Gui_TeamListModel : public QStringListModel {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Team view engine" )
 
 public:
     Gui_TeamListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}

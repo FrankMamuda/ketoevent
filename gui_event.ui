@@ -35,6 +35,9 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QPushButton" name="buttonImport">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
             <string>Import log database from a different machine (beta)</string>
            </property>
@@ -44,20 +47,6 @@
            <property name="icon">
             <iconset resource="resources.qrc">
              <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonExport">
-           <property name="toolTip">
-            <string>Make a copy of the current database</string>
-           </property>
-           <property name="text">
-            <string>Export database</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
            </property>
           </widget>
          </item>

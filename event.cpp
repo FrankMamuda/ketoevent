@@ -39,12 +39,13 @@ void Main::addEvent( const QString &title ) {
     QString comboString;
     QString timeString;
     QString eventTitle;
-    //QString indexString;
-
-    // currenly we have only one entry
 
     // copy title
     eventTitle = title;
+
+    // set title if none
+    if ( eventTitle.isEmpty())
+        eventTitle = this->tr( "unnamed event" );
 
     // compile strings
     comboString = QString( "%1, %2, %3" )
@@ -56,13 +57,8 @@ void Main::addEvent( const QString &title ) {
             .arg( Common::defaultFinishTime )
             .arg( Common::defaultFinalTime );
 
-    // set title if none
-    if ( eventTitle.isEmpty())
-        eventTitle = this->tr( "unnamed event" );
-
-    // add new log
+    // add new event log with default/built-in values
     if ( !query.exec( QString( "insert into events values ( null, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
-                      //.arg( indexString )
                       .arg( Common::API )
                       .arg( eventTitle )
                       .arg( Common::defaultMinMembers )
@@ -70,11 +66,11 @@ void Main::addEvent( const QString &title ) {
                       .arg( timeString )
                       .arg( Common::defaultPenaltyPoints )
                       .arg( comboString ))) {
-        this->error( StrSoftError + QString( "could not add event, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError + QString( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
 
-    // get last entry and construct internal entry
+    // get last sql entry and construct internal entry
     while ( query.next()) {
         this->eventList << new EventEntry( query.record(), "events" );
         break;
@@ -98,7 +94,6 @@ void Main::loadEvents() {
 
         // failsafe - api check
         // add compatibility in future if needed (unlikely)
-        // TODO: add dialog to create new database (rename old one)
         if ( static_cast<unsigned int>( this->eventList.last()->api()) < Common::MinimumAPI ) {
             this->error( StrSoftError +
                      this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
