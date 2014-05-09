@@ -32,6 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 class Gui_TaskListModel : public QStringListModel {
     Q_OBJECT
+    Q_CLASSINFO( "description", "Task view engine" )
 
 public:
     Gui_TaskListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}

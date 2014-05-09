@@ -140,7 +140,7 @@ saveLog
 void TaskWidget::saveLog() {
     int value = 0;
 
-    if ( !this->m_active )
+    if ( !this->isActive())
         return;
 
     // failsafe
@@ -187,7 +187,7 @@ void TaskWidget::saveLog() {
     //this->log()->setCombo( this->comboState());
 
     //Gui_Main *this->parent()
-    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
+    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
     if ( gui != NULL )
         gui->taskIndexChanged( -1 );
 }
@@ -372,8 +372,8 @@ void TaskWidget::setTeam( TeamEntry *teamPtr ) {
         }
     }
 
-    // enable - TODO: props!!!
-    this->m_active = true;
+    // enable
+    this->setActive();
 }
 
 /*
@@ -383,7 +383,7 @@ resetTeam
 */
 void TaskWidget::resetTeam() {
     this->m_team = NULL;
-    this->m_active = false;
+    this->setActive( false );
     this->resetLog();
 }
 
@@ -393,7 +393,7 @@ toggleCombo
 ================
 */
 void TaskWidget::toggleCombo( bool checked ) {    
-    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent );
+    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
     if ( gui == NULL )
         return;
 
@@ -415,15 +415,10 @@ void TaskWidget::toggleCombo( bool checked ) {
         this->taskName->setStyleSheet( "padding: 6px;" );
         this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
 
-        if ( !this->hasLog()/* || this->hasCombo()*/ && gui->currentComboIndex() != -1 )
+        if ( !this->hasLog() && gui->currentComboIndex() != -1 )
             return;
 
         this->log()->setComboId( -1 );
-
         this->disconnect( this->log(), SIGNAL( comboIdChanged()));
-      //  this->comboIcon->setPixmap( QPixmap());
-
-        //if ( this->hasCombo() && this->hasLog())
-        //    this->log->setComboId();
     }
 }

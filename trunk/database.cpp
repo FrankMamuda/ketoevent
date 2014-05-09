@@ -61,7 +61,7 @@ void Main::makePath( const QString &path ) {
     if ( !db.absoluteDir().exists()) {
         db.absoluteDir().mkpath( fullPath );
         if ( !db.absoluteDir().exists())
-            this->error( StrFatalError + this->tr( "could not create database path\n" ));
+            this->error( StrFatalError + this->tr( "could not create database path - \"%1\"\n" ).arg( fullPath ));
     }
 
     // store path
@@ -76,6 +76,7 @@ loadDatabase
 void Main::loadDatabase() {
     // create database
     QFile database( this->path );
+    QFileInfo dbInfo( database );
     QSqlDatabase db = QSqlDatabase::database();
 
     // failsafe
@@ -91,23 +92,24 @@ void Main::loadDatabase() {
     if ( !database.exists()) {
         database.open( QFile::WriteOnly );
         database.close();
+        m.print( StrMsg + this->tr( "creating non-existant database - \"%1\"\n" ).arg( dbInfo.fileName()));
     }
 
     // set path and open
     if ( !db.open())
-        this->error( StrFatalError + this->tr( "could not load task database\n" ));
+        this->error( StrFatalError + this->tr( "could not load task database - \"%1\"\n" ).arg( dbInfo.fileName()));
 
     // create query
     QSqlQuery query;
 
     // create initial table structure (if non-existant)
-    // TODO: add compatibility layer for the 2013 event
+    // TODO: add compatibility layer for the 2013 event (or just stats)
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer )" ) ||
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, reviewerId integer )" ) ||
          !query.exec( "create table if not exists evaluators ( id integer primary key, name varchar( 64 ) unique )" ) ||
          !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" )) {
-        this->error( StrFatalError + this->tr( "could not create internal database structure\n" ));
+        this->error( StrFatalError + this->tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
 
     // delete orphaned logs on init

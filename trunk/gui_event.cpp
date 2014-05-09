@@ -26,6 +26,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_main.h"
 #include "evententry.h"
 #include "gui_addevent.h"
+#include <QMessageBox>
+#include <QSqlQuery>
 
 /*
 ================
@@ -152,18 +154,6 @@ buttonAdd->clicked
 void Gui_Event::on_buttonAdd_clicked() {
     Gui_AddEvent evAdd( this );
     evAdd.exec();
-
-    /*QMessageBox msgBox;
-     *
-
-     TODO: remove event
-
-    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( teamPtr->name()));
-    msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-    msgBox.setDefaultButton( QMessageBox::Yes );
-    msgBox.setIcon( QMessageBox::Warning );
-    msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
-    state = msgBox.exec();*/
 }
 
 /*
@@ -185,4 +175,49 @@ void Gui_Event::validate() {
         this->ui->min->setValue( this->ui->max->value());
 
     // as for combos - do as you please
+}
+
+/*
+================
+buttonRemove->clicked
+================
+*/
+void Gui_Event::on_buttonRemove_clicked() {
+    QMessageBox msgBox;
+    int state;
+    EventEntry *eventPtr = m.currentEvent();
+    QSqlQuery query;
+
+    // make sure we cannot delete all events
+    if ( m.eventList.count() <= 1 )
+        return;
+
+    // allow to reconsider
+    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( m.currentEvent()->name()));
+    msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+    msgBox.setDefaultButton( QMessageBox::Yes );
+    msgBox.setIcon( QMessageBox::Warning );
+    // TODO: change icon
+    msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
+    state = msgBox.exec();
+
+    // check options
+    switch ( state ) {
+    case QMessageBox::Yes:
+        // remove from memory
+        m.eventList.removeOne( m.currentEvent());
+        m.setCurrentEvent( m.eventList.first());
+
+        // remove from database
+        query.exec( QString( "delete from events where id=%1" ).arg( eventPtr->id()));
+        delete eventPtr;
+
+        // reset
+        this->fillEvents();
+        break;
+
+    case QMessageBox::No:
+    default:
+        return;
+    }
 }

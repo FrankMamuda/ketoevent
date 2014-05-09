@@ -41,6 +41,7 @@ namespace Rankings {
 class Gui_RankingModel : public QAbstractTableModel {
     Q_OBJECT
     Q_ENUMS( Columns )
+    Q_CLASSINFO( "description", "Ranking view engine" )
 
 public:
     enum Columns {

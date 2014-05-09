@@ -29,6 +29,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QVariant>
 
 //
+// inherited by EventEntry, LogEntry, TaskEntry, TeamEntry
+//
+
+//
 // class: DatabaseEntry
 //
 class DatabaseEntry : public QObject {
@@ -36,13 +40,14 @@ class DatabaseEntry : public QObject {
     Q_PROPERTY( int id READ id )
     Q_PROPERTY( QString table READ table WRITE setTable )
     Q_PROPERTY( QSqlRecord record READ record WRITE setRecord )
+    Q_CLASSINFO( "description", "SQL Entry" )
 
 public:
     DatabaseEntry() {}
     ~DatabaseEntry() { this->m_table.clear(); this->m_record.clear(); }
     int id () const { return this->record().value( "id" ).toInt(); }
     QSqlRecord record() const { return this->m_record; }
-    QString table() { return this->m_table; }
+    QString table() const { return this->m_table; }
 
 public slots:
     void setTable( const QString &name ) { this->m_table = name; }

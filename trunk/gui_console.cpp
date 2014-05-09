@@ -71,6 +71,6 @@ void Gui_Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
 print
 ================
 */
-void Gui_Console::print( QString msg ) {
+void Gui_Console::print( const QString &msg ) {
     this->ui->screen->append( msg );
 }

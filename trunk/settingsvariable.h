@@ -30,7 +30,11 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QLineEdit>
 
 //
-// class:pSettingsCvar
+// this var can be bound to objects for live updates
+//
+
+//
+// class: Settings variable
 //
 class SettingsVariable : public QObject {
     Q_OBJECT
@@ -38,6 +42,7 @@ class SettingsVariable : public QObject {
     Q_PROPERTY( Types type READ type WRITE setType )
     Q_ENUMS( Types )
     Q_ENUMS( Class )
+    Q_CLASSINFO( "description", "Settings variable" )
 
 public:
     // currently supported types

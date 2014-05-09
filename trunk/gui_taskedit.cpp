@@ -48,7 +48,7 @@ Gui_TaskEdit::Gui_TaskEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->toggleAddEditWidget( NoState );
 
     // reset current match
-    this->currentMatch = 0;
+    this->setCurrentMatch();
 
     // connect
     this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));
@@ -232,7 +232,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
 
     // reset view
     this->toggleAddEditWidget( NoState );
-    this->currentMatch = 0;
+    this->setCurrentMatch();
     this->listModelPtr->endReset();
 
     // TODO: select last added/edited value (not implemented)
@@ -257,6 +257,8 @@ void Gui_TaskEdit::keyPressEvent( QKeyEvent *ePtr ) {
 /*
 ================
 findTask
+
+  reuse code from Gui_Main?
 ================
 */
 void Gui_TaskEdit::findTask() {
@@ -272,19 +274,19 @@ void Gui_TaskEdit::findTask() {
         return;
 
     // advance
-    if ( this->currentMatch >= this->listModelPtr->rowCount() - 1 || this->currentMatch <= 0 )
-        this->currentMatch = 0;
+    if ( this->currentMatch() >= this->listModelPtr->rowCount() - 1 || this->currentMatch() <= 0 )
+        this->setCurrentMatch();
     else
-        this->currentMatch++;
+        this->setCurrentMatch( this->currentMatch() + 1 );
 
     // find item from current position
-    for ( y = this->currentMatch; y < this->listModelPtr->rowCount(); y++ ) {
+    for ( y = this->currentMatch(); y < this->listModelPtr->rowCount(); y++ ) {
         index = this->listModelPtr->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
             if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
-                currentMatch = y;
+                this->setCurrentMatch( y );
                 break;
             }
         }
@@ -298,7 +300,7 @@ void Gui_TaskEdit::findTask() {
                 // list must be the same as in App_Main, don't match by display role
                 if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                     match = true;
-                    currentMatch = y;
+                    this->setCurrentMatch( y );
                     break;
                 }
             }
@@ -420,7 +422,7 @@ void Gui_TaskEdit::move( MoveDirection direction ) {
     // reselect value
     index = this->listModelPtr->index( k, 0 );
     this->ui->taskList->setCurrentIndex( index );
-    this->currentMatch = k;
+    this->setCurrentMatch( k );
 }
 
 /*

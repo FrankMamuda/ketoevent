@@ -43,6 +43,8 @@ class TaskWidget : public QWidget {
     Q_PROPERTY( LogEntry *log READ log WRITE setLog RESET resetLog )
     Q_PROPERTY( TaskEntry *task READ task WRITE setTask )
     Q_PROPERTY( TeamEntry *team READ team WRITE setTeam RESET resetTeam )
+    Q_PROPERTY( bool active READ isActive WRITE setActive )
+    Q_CLASSINFO( "description", "Task logging widget" )
 
 public:
     explicit TaskWidget( TaskEntry *parentPtr );
@@ -55,10 +57,12 @@ public:
     bool hasTeam() const { return this->team() != NULL; }
     bool hasTask() const { return this->task() != NULL; }
     static int getRelativeComboId( int comboId, int teamId );
+    bool isActive() const { return this->m_active; }
 
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
     void resetLog();
+    void setActive( bool active = true ) { this->m_active = active; }
 
 public slots:
     void setTeam( TeamEntry *teamPtr );
@@ -68,11 +72,6 @@ public slots:
     void toggleCombo( bool );
     void comboIdChanged();
 
-//signals:
-//    void valueChanged;
-
-//private:
-// TODO: disabler function
 public:
     QGridLayout *grid;
     QLabel *taskName;

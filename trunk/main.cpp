@@ -53,7 +53,7 @@ class Main m;
 // statistics - import void teams from csv (just to see the results)
 // check private/public funcs
 // check includes
-// add more props
+// const and static funcs
 // verbocity for console Regular Verbose PrintEverything
 // replace event with bad API
 // allow debugging of components:
@@ -111,7 +111,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
 
     // set parent
-    this->parent = parent;
+    this->setParent( parent );
 
     // we're up
     this->setInitialized();
@@ -157,6 +157,9 @@ shutdown
 ================
 */
 void Main::shutdown( bool ignoreDatabase ) {
+    // clear parent
+    this->setParent( NULL );
+
     // save settings
     if ( this->settings != NULL ) {
         this->settings->sync();
@@ -252,7 +255,7 @@ clearEvent
 */
 void Main::clearEvent() {
     // get main screen
-    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent );
+    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
     if ( gui == NULL )
         return;
 
@@ -273,7 +276,7 @@ void Main::clearEvent() {
     }
     this->eventList.clear();
 
-    // cleat tasks
+    // clear tasks
     foreach ( TaskEntry *taskPtr, this->taskList ) {
         this->taskList.removeOne( taskPtr );
         delete taskPtr;

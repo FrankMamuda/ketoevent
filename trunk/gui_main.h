@@ -47,15 +47,18 @@ class Gui_Main : public QMainWindow {
     Q_OBJECT
     Q_PROPERTY( int currentTeamIndex READ currentTeamIndex )
     Q_PROPERTY( int currentComboIndex READ currentComboIndex )
+    Q_PROPERTY( int currentMatch READ currentMatch WRITE setCurrentMatch )
+    Q_CLASSINFO( "description", "Applet main window" )
 
 public:
     explicit Gui_Main( QWidget *parent = 0 );
     ~Gui_Main();
+    int currentTeamIndex() const { return this->m_currentTeamIndex; }
+    int currentComboIndex() const { return this->m_currentComboIndex; }
+    int currentMatch() const { return this->m_currentMatch; }
 
 public slots:
     void initialize( bool reload = false );
-    int currentTeamIndex() const { return this->m_currentTeamIndex; }
-    int currentComboIndex() const { return this->m_currentComboIndex; }
     void taskIndexChanged( int row );
     void setEventTitle( const QString &name );
     void clearTasks();
@@ -68,6 +71,9 @@ private slots:
     // misc
     void teamIndexChanged( int index );
     void updateFinishTime( QTime time );
+
+    // search
+    void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
 
     // ui elements
     void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->fillTeams(); }
@@ -88,7 +94,7 @@ private slots:
     void on_upButton_clicked();
     void on_downButton_clicked();
 #endif
-    void on_combineButton_toggled(bool checked);
+    void on_combineButton_toggled( bool checked );
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
@@ -97,7 +103,7 @@ private:
     Ui::Gui_Main *ui;
     int m_currentTeamIndex;
     int m_currentComboIndex;
-    int currentMatch;
+    int m_currentMatch;
 };
 
 #endif // GUI_MAIN_H

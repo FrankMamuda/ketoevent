@@ -45,6 +45,8 @@ class Gui_TaskEdit : public QDialog {
     Q_ENUMS( MoveDirection )
     Q_ENUMS( ViewState )
     Q_PROPERTY( AddEditState state READ state WRITE setState )
+    Q_CLASSINFO( "description", "Task handling dialog" )
+    Q_PROPERTY( int currentMatch READ currentMatch WRITE setCurrentMatch )
 
 public:
     // widget states
@@ -66,8 +68,8 @@ public:
 
     explicit Gui_TaskEdit( QWidget * = 0 );
     ~Gui_TaskEdit();
-    void toggleAddEditWidget( AddEditState state );
     AddEditState state() const { return this->m_state; }
+    int currentMatch() const { return this->m_currentMatch; }
 
 private slots:
     void on_removeTaskButton_clicked();
@@ -86,12 +88,16 @@ private slots:
     void on_upButton_clicked();
     void on_downButton_clicked();
     void on_sortButton_clicked();
+    void toggleAddEditWidget( AddEditState state );
+
+    // search
+    void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
 
 private:
     Ui::Gui_TaskEdit *ui;
     AddEditState m_state;
     Gui_TaskListModel *listModelPtr;
-    int currentMatch;
+    int m_currentMatch;
     void move( MoveDirection direction );
 
 protected:
