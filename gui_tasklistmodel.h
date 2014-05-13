@@ -36,7 +36,7 @@ class Gui_TaskListModel : public QStringListModel {
 
 public:
     Gui_TaskListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return m.taskList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const { return m.currentEvent()->taskList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 

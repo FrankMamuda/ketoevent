@@ -51,7 +51,8 @@ fillEvents
 ================
 */
 void Gui_Event::fillEvents() {
-    int y = 0;
+    int y = 0, id = -1;
+    EventEntry *eventPtr;
 
     if ( this->variablesLocked())
         return;
@@ -59,10 +60,15 @@ void Gui_Event::fillEvents() {
     // clear event list
     this->ui->eventCombo->clear();
 
+    // set last event
+    eventPtr = m.eventForId( m.cvar( "currentEvent" )->integer());
+    if ( eventPtr != NULL )
+        id = eventPtr->id();
+
     // fill the combobox with events
     foreach ( EventEntry *ePtr, m.eventList ) {
         this->ui->eventCombo->addItem( ePtr->name(), ePtr->id());
-        if ( ePtr->id() == m.currentEvent()->id())
+        if ( ePtr->id() == id )
             this->ui->eventCombo->setCurrentIndex( y );
         y++;
     }

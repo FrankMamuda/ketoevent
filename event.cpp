@@ -113,7 +113,8 @@ void Main::loadEvents() {
     }
 
     // for now - resort to indexes?? (use list indexof)
-    this->setCurrentEvent( this->eventList.last());
+    if ( !this->setCurrentEvent( this->eventForId( this->cvar( "currentEvent" )->integer())))
+         this->setCurrentEvent( this->eventList.first());
 }
 
 /*
@@ -137,6 +138,7 @@ bool Main::setCurrentEvent( EventEntry *eventPtr ) {
     foreach ( EventEntry *entry, this->eventList ) {
         if ( entry == eventPtr ) {
             this->m_event = entry;
+            this->cvar( "currentEvent" )->setValue( eventPtr->id());
             return true;
         }
     }
@@ -154,4 +156,26 @@ EventEntry *Main::eventForId( int id ) {
             return eventPtr;
     }
     return NULL;
+}
+
+/*
+================
+buildEventTTList
+================
+*/
+void Main::buildEventTTList() {
+    foreach ( EventEntry *eventPtr, this->eventList ) {
+        eventPtr->teamList.clear();
+        eventPtr->taskList.clear();
+
+        foreach ( TeamEntry *teamPtr, this->teamList ) {
+            if ( teamPtr->eventId() == eventPtr->id())
+                eventPtr->teamList << teamPtr;
+        }
+
+        foreach ( TaskEntry *taskPtr, this->taskList ) {
+            if ( taskPtr->eventId() == eventPtr->id())
+                eventPtr->taskList << taskPtr;
+        }
+    }
 }

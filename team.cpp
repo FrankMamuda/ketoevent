@@ -42,11 +42,13 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool
         return;
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', null )" )
+    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', null, %5 )" )
                       .arg( teamName )
                       .arg( members )
                       .arg( finishTime.toString( "hh:mm" ))
                       .arg( static_cast<int>( lockState ))
+                      /* reserved for reviewerId */
+                      .arg( m.currentEvent()->id())
                       )) {
         this->error( StrSoftError + QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
     }
@@ -55,6 +57,9 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool
     // get last entry and construct internal entry
     while ( query.next())
         this->teamList << new TeamEntry( query.record(), "teams" );
+
+    // add to event
+    this->currentEvent()->teamList << this->teamList.last();
 }
 
 /*

@@ -25,6 +25,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include "databaseentry.h"
+#include "taskentry.h"
+#include "teamentry.h"
 #include <QTime>
 
 //
@@ -57,6 +59,8 @@ public:
     QTime startTime() const { return QTime::fromString( this->record().value( "startTime" ).toString(), "hh:mm" ); }
     QTime finishTime() const { return QTime::fromString( this->record().value( "finishTime" ).toString(), "hh:mm" ); }
     QTime finalTime() const { return QTime::fromString( this->record().value( "finalTime" ).toString(), "hh:mm" ); }
+    QList <TeamEntry*> teamList;
+    QList <TaskEntry*> taskList;
 
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }

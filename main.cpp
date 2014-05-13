@@ -58,6 +58,7 @@ class Main m;
 // replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
+// TODO: store last EVENT!!! in settings
 //
 
 /*
@@ -84,7 +85,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
-    this->addCvar( new ConsoleVariable( "lastEventId", this->settings, -1 ));
+    this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );

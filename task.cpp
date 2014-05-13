@@ -48,13 +48,14 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
         max = query.value( 0 ).toInt();
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6 )" )
+    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7 )" )
                       .arg( taskName )
                       .arg( points )
                       .arg( multi )
                       .arg( static_cast<TaskEntry::Styles>( style ))
                       .arg( static_cast<TaskEntry::Types>( type ))
                       .arg( max + 1 )
+                      .arg( m.currentEvent()->id())
                       )) {
         this->error( StrSoftError + QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
     }
@@ -63,6 +64,9 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
     // get last entry and construct internal entry
     while ( query.next())
         this->taskList << new TaskEntry( query.record(), "tasks" );
+
+    // add to event
+    this->currentEvent()->taskList << this->taskList.last();
 }
 
 /*

@@ -33,13 +33,13 @@ QVariant Gui_TeamListModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
-    if ( index.row() >= m.teamList.count())
+    if ( index.row() >= m.currentEvent()->teamList.count())
         return QVariant();
 
     if ( role == Qt::DisplayRole )
-        return m.teamList.at( index.row())->name();
+        return m.currentEvent()->teamList.at( index.row())->name();
     else if ( role == Qt::UserRole )
-        return m.teamList.at( index.row())->id();
+        return m.currentEvent()->teamList.at( index.row())->id();
     else
         return QVariant();
 }
