@@ -212,7 +212,7 @@ QList<TaskEntry*> Main::taskListSorted() {
     QList <TaskEntry*>sortedList;
 
     // make a local copy and sort it alphabetically
-    sortedList = this->taskList;
+    sortedList = this->currentEvent()->taskList;
     qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
 
     // return sorted list

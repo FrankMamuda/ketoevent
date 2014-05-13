@@ -33,6 +33,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskentry.h"
 #include "consolevariable.h"
 #include "evententry.h"
+#include "reviewerentry.h"
 #include "settingsvariable.h"
 #include "gui_console.h"
 
@@ -57,8 +58,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 6;
-    const static unsigned int MinimumAPI = 6;
+    const static unsigned int API = 7;
+    const static unsigned int MinimumAPI = 7;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
     const static unsigned int defaultComboOfTwo = 1;
@@ -115,12 +116,16 @@ public:
     EventEntry *currentEvent();
     EventEntry *eventForId( int id );
 
+    // reviewers
+    ReviewerEntry *reviewerForId( int id );
+
     // lists
     QList <TeamEntry*>  teamList;
     QList <TaskEntry*>  taskList;
     QList <TaskEntry*>  taskListSorted();
     QList <LogEntry*>   logList;
     QList <EventEntry*> eventList;
+    QList <ReviewerEntry*> reviewerList;
     QList <ConsoleVariable*>  cvarList;
     QList <SettingsVariable*> svarList;
 
@@ -150,6 +155,7 @@ public slots:
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     void addEvent( const QString &title = QString::null );
+    void addReviewer( const QString &name = QString::null );
 
     // console io
     void error( ErrorTypes type, const QString &msg );
@@ -162,6 +168,7 @@ public slots:
     void clearEvent();// { this->teamList.clear(); this->taskList.clear(); this->taskListSorted().clear(); this->logList.clear(); this->eventList.clear(); }
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
+    void buildEventTTList();
 
     // combos
     int getFreeComboHandle() const;
@@ -186,6 +193,7 @@ private slots:
     void loadTeams();
     void loadLogs();
     void loadEvents();
+    void loadReviewers();
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();

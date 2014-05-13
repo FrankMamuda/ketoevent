@@ -45,8 +45,8 @@ class Gui_Main;
 //
 class Gui_Main : public QMainWindow {
     Q_OBJECT
-    Q_PROPERTY( int currentTeamIndex READ currentTeamIndex )
-    Q_PROPERTY( int currentComboIndex READ currentComboIndex )
+    Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
+    Q_PROPERTY( int currentComboIndex READ currentComboIndex WRITE setCurrentComboIndex )
     Q_PROPERTY( int currentMatch READ currentMatch WRITE setCurrentMatch )
     Q_CLASSINFO( "description", "Applet main window" )
 
@@ -71,6 +71,8 @@ private slots:
     // misc
     void teamIndexChanged( int index );
     void updateFinishTime( QTime time );
+    void setCurrentComboIndex( int index = -1 ) { this->m_currentComboIndex = index; }
+    void setCurrentTeamIndex( int index = -1 ) { this->m_currentTeamIndex = index; }
 
     // search
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }

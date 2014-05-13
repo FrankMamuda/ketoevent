@@ -38,7 +38,7 @@ construct
 */
 Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_Main ) {
     ui->setupUi( this );
-    this->m_currentComboIndex = -1;
+    this->setCurrentComboIndex();
 }
 
 /*
@@ -195,7 +195,7 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->logButton->setEnabled( true );
         }
 
-        this->m_currentTeamIndex = index;
+        this->setCurrentTeamIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
@@ -203,7 +203,7 @@ void Gui_Main::teamIndexChanged( int index ) {
         this->ui->lockButton->setDisabled( true );
         this->ui->logButton->setDisabled( true );
 
-        this->m_currentTeamIndex = -1;
+        this->setCurrentTeamIndex();
     }
 }
 
@@ -279,7 +279,7 @@ void Gui_Main::fillTeams( int forcedId ) {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( TeamEntry *teamPtr, m.teamList ) {
+    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
         // resore last id if any
@@ -326,7 +326,7 @@ void Gui_Main::fillTasks() {
     if ( m.cvar( "misc/sortTasks" )->isEnabled())
         taskList = m.taskListSorted();
     else
-        taskList = m.taskList;
+        taskList = m.currentEvent()->taskList;
 
     foreach ( TaskEntry *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
@@ -472,8 +472,23 @@ actionEvents->triggered
 ================
 */
 void Gui_Main::on_actionEvents_triggered() {
+    int currentEventId, newEventId;
+
+    // store last event id
+    currentEventId = m.cvar( "currentEvent" )->integer();
+
+    // construct dialog
     Gui_Event events( this );
     events.exec();
+
+    // get current id
+    newEventId = m.cvar( "currentEvent" )->integer();
+
+    // compare these two
+    if ( newEventId != currentEventId ) {
+        this->fillTasks();
+        this->fillTeams();
+    }
 }
 
 /*
@@ -507,7 +522,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
     // failsafe
     if ( tw == NULL ) {
         this->ui->combineButton->setChecked( false );
-        this->m_currentComboIndex = -1;
+        this->setCurrentComboIndex();
         return;
     }
 
@@ -518,7 +533,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
         // check if the active task is logged
         if ( !tw->hasLog()) {
             this->ui->combineButton->setChecked( false );
-            this->m_currentComboIndex = -1;
+            this->setCurrentComboIndex();
             return;
         }
 
@@ -526,7 +541,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
         if ( !tw->hasCombo())
             tw->log()->setComboId( m.getFreeComboHandle());
 
-        this->m_currentComboIndex = tw->log()->comboId();
+        this->setCurrentComboIndex( tw->log()->comboId());
 
         // hilight entry (setCombo or smth?)
         tw->combo->setChecked( true );
@@ -545,7 +560,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
             // less than two tasks - abort!
             if ( count < 2 ) {
                 this->ui->combineButton->setChecked( false );
-                this->m_currentComboIndex = -1;
+                this->setCurrentComboIndex();
                 return;
             }
         }
@@ -632,7 +647,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
         // just refill the whole list on reset
         this->fillTasks();
-        this->m_currentComboIndex = -1;
+        this->setCurrentComboIndex();
         return;
     }
 

@@ -36,6 +36,7 @@ class TaskEntry : public DatabaseEntry {
     Q_PROPERTY( Types type READ type WRITE setType )
     Q_PROPERTY( Styles style READ style WRITE setStyle )
     Q_PROPERTY( int order READ order WRITE setOrder )
+    Q_PROPERTY( int eventId READ eventId WRITE setEventId )
     Q_ENUMS( Types )
     Q_ENUMS( Styles )
     Q_CLASSINFO( "description", "Task SQL Entry" )
@@ -59,15 +60,17 @@ public:
     Types type() const { return static_cast<Types>( this->record().value( "type" ).toInt()); }
     Styles style() const { return static_cast<Styles>( this->record().value( "style" ).toInt()); }
     int order() const { return this->record().value( "parent" ).toInt(); }
+    int calculate( int logId ) const;
+    int eventId() const { return this->record().value( "eventId" ).toInt(); }
 
 public slots:
-    int calculate( int logId ) const;
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setPoints( int points = 0 ) { this->setValue( "points", points ); }
     void setMulti( int multi = 2 ) { if ( this->type() == Multi ) this->setValue( "multi", multi ); else this->setValue( "multi", 0 ); }
     void setType( Types type = Check ) { this->setValue( "type", static_cast<int>( type )); }
     void setStyle( Styles style = NoStyle ) { this->setValue( "style", static_cast<int>( style )); }
     void setOrder( int order = 0 ) { if ( order >= 0 ) this->setValue( "parent", order ); }
+    void setEventId( int id ) { this->setValue( "eventId", id ); }
 };
 
 #endif // TASKENTRY_H

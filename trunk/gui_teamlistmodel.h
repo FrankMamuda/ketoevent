@@ -37,7 +37,7 @@ class Gui_TeamListModel : public QStringListModel {
 
 public:
     Gui_TeamListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return m.teamList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const { return m.currentEvent()->teamList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 

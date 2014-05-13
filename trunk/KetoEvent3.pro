@@ -44,7 +44,9 @@ SOURCES += main.cpp\
     gui_combos.cpp \
     gui_combomodel.cpp \
     combo.cpp \
-    gui_addevent.cpp
+    gui_addevent.cpp \
+    reviewerentry.cpp \
+    reviewer.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -70,7 +72,8 @@ HEADERS  += gui_main.h \
     gui_settingsdialog.h \
     gui_combos.h \
     gui_combomodel.h \
-    gui_addevent.h
+    gui_addevent.h \
+    reviewerentry.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
