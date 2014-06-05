@@ -103,7 +103,6 @@ void Main::loadDatabase() {
 
     // create initial table structure (if non-existant)
     // TODO: add compatibility layer for the 2013 event (or just stats)
-    // TODO: eventId for tasks, teams, logs
     if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ) ||
          !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ) ||
          !query.exec( "create table if not exists reviewers ( id integer primary key, name varchar( 64 ) unique )" ) ||

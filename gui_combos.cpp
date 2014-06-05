@@ -116,7 +116,7 @@ void Gui_Combos::fillTeams() {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( TeamEntry *teamPtr, m.teamList )
+    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList )
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
     // set to current team

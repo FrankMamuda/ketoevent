@@ -46,7 +46,8 @@ SOURCES += main.cpp\
     combo.cpp \
     gui_addevent.cpp \
     reviewerentry.cpp \
-    reviewer.cpp
+    reviewer.cpp \
+    gui_reviewers.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -73,7 +74,8 @@ HEADERS  += gui_main.h \
     gui_combos.h \
     gui_combomodel.h \
     gui_addevent.h \
-    reviewerentry.h
+    reviewerentry.h \
+    gui_reviewers.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
@@ -85,7 +87,8 @@ FORMS    += gui_main.ui \
     gui_console.ui \
     gui_event.ui \
     gui_combos.ui \
-    gui_addevent.ui
+    gui_addevent.ui \
+    gui_reviewers.ui
 
 RESOURCES += \
     resources.qrc

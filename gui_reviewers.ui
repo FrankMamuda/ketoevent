@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui_Reviewers</class>
+ <widget class="QDialog" name="Gui_Reviewers">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>422</width>
+    <height>429</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QListView" name="reviewerList">
+     <property name="toolTip">
+      <string>List of all participating teams</string>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="addRemoveLayout">
+     <item row="1" column="0">
+      <widget class="QPushButton" name="addButton">
+       <property name="toolTip">
+        <string>Click to add a new team</string>
+       </property>
+       <property name="text">
+        <string>Add reviewer</string>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/team_add_16</normaloff>:/icons/team_add_16</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="removeButton">
+       <property name="toolTip">
+        <string>Click to remove current team</string>
+       </property>
+       <property name="text">
+        <string>Remove reviewer</string>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/team_delete_16</normaloff>:/icons/team_delete_16</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="renameButton">
+       <property name="toolTip">
+        <string>Click to edit current team</string>
+       </property>
+       <property name="text">
+        <string>Rename reviewer</string>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/team_edit_16</normaloff>:/icons/team_edit_16</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="closeButton">
+     <property name="toolTip">
+      <string>Click to close team dialog</string>
+     </property>
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

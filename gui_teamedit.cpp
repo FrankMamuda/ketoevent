@@ -173,6 +173,7 @@ void Gui_TeamEdit::on_removeTeamButton_clicked() {
 
             // remove from memory
             m.teamList.removeOne( teamPtr );
+            m.currentEvent()->teamList.removeOne( teamPtr );
 
             // remove from database
             // fortunately teams are listed alphabetically, so there is no need to update order

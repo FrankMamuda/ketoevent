@@ -28,6 +28,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskwidget.h"
 #include "gui_event.h"
 #include "gui_combos.h"
+#include "gui_reviewers.h"
 
 // FIXME: fix hilight colours
 
@@ -93,7 +94,7 @@ void Gui_Main::initialize( bool reload ) {
     this->setEventTitle( m.currentEvent()->name());
 
     // announce
-    m.print( StrMsg + this->tr( "initialization complete\n" ));
+    this->print( this->tr( "initialization complete\n" ));
 }
 
 /*
@@ -194,7 +195,6 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->timeFinish->setEnabled( true );
             this->ui->logButton->setEnabled( true );
         }
-
         this->setCurrentTeamIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
@@ -666,4 +666,14 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
         if ( taskPtr != NULL )
             taskPtr->combo->setDisabled( true );
     }
+}
+
+/*
+================
+actionCombos->triggered
+================
+*/
+void Gui_Main::on_actionReviewers_triggered() {
+    Gui_Reviewers rd;
+    rd.exec();
 }

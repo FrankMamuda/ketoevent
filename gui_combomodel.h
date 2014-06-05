@@ -42,7 +42,7 @@ public:
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
 public slots:
-    // this resets whole model based on data in m.teamList
+    // this resets whole model
     void beginReset() { this->beginResetModel(); }
     void endReset() { this->endResetModel(); }
 

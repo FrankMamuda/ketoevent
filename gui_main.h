@@ -62,6 +62,7 @@ public slots:
     void taskIndexChanged( int row );
     void setEventTitle( const QString &name );
     void clearTasks();
+    void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
 
 private slots:
     // team/task fill
@@ -97,6 +98,8 @@ private slots:
     void on_downButton_clicked();
 #endif
     void on_combineButton_toggled( bool checked );
+
+    void on_actionReviewers_triggered();
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }

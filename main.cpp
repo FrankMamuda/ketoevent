@@ -58,7 +58,6 @@ class Main m;
 // replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// TODO: store last EVENT!!! in settings
 //
 
 /*
@@ -123,7 +122,13 @@ void Main::initialize( QObject *parent ) {
 print
 ============
 */
-void Main::print( const QString &msg ) {
+void Main::print( const QString &msg, DebugLevel debug ) {
+    Q_UNUSED( debug )
+
+    // are we debugging current subsystem
+    if ( !this->debugLevel().testFlag( debug ))
+        return;
+
     // print to console
     if ( this->console != NULL ) {
         if ( msg.endsWith( "\n" ))
@@ -157,7 +162,7 @@ shutdown
   garbage collection
 ================
 */
-void Main::shutdown( bool ignoreDatabase ) {
+void Main::shutdown( bool ignoreDatabase ) {    
     // clear parent
     this->setParent( NULL );
 
@@ -297,6 +302,9 @@ int main( int argc, char *argv[] ) {
     // init app
     QCoreApplication::setOrganizationName( "avoti" );
     QCoreApplication::setApplicationName( "ketoevent3" );
+
+    // set debug level
+    m.setDebugLevel( Main::GuiMain | Main::System );
 
     // i18n
     QTranslator translator;
