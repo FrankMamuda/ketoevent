@@ -28,11 +28,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 #include "gui_main.h"
 
-//
-// TODO: move most stuff to event dialog
-//       leave things like backup, sorting and display here
-//
-
 /*
 ================
 construct

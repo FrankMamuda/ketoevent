@@ -40,7 +40,7 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
-    if ( index.row() >= m.teamList.count() || index.row() < 0 )
+    if ( index.row() >= m.currentEvent()->teamList.count() || index.row() < 0 )
         return QVariant();
 
     if ( role == Qt::FontRole ) {
@@ -52,13 +52,13 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
     }
 
     if ( role == Qt::ForegroundRole ) {
-        TeamEntry *teamPtr = m.teamList.at( index.row());
+        TeamEntry *teamPtr = m.currentEvent()->teamList.at( index.row());
         if ( teamPtr->disqualified())
             return QColor( Qt::red );
     }
 
     if ( role == Qt::DisplayRole ) {
-        TeamEntry *teamPtr = m.teamList.at( index.row());
+        TeamEntry *teamPtr = m.currentEvent()->teamList.at( index.row());
 
         switch ( index.column()) {
         case TeamName:
@@ -84,7 +84,7 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
             //
         case Points:
         {
-            TeamEntry *teamPtr = m.teamList.at( index.row());
+            TeamEntry *teamPtr = m.currentEvent()->teamList.at( index.row());
 
             if ( teamPtr->disqualified())
                 return -1;

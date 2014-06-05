@@ -72,8 +72,8 @@ calculateStatistics
 void Gui_Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0;
 
-    this->ui->tTeams->setText( QString( "%1\n" ).arg( m.teamList.count()));
-    foreach ( TeamEntry *teamPtr, m.teamList ) {
+    this->ui->tTeams->setText( QString( "%1\n" ).arg( m.currentEvent()->teamList.count()));
+    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
     }
@@ -139,9 +139,8 @@ void Gui_Rankings::on_exportButton_clicked() {
                .append( "\r" )
 #endif
                .append( "\n" );
-        foreach ( TeamEntry *teamPtr, m.teamList ) {
+        foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
             int points;
-
 
             if ( teamPtr->disqualified())
                 points = -1;

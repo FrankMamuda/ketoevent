@@ -80,7 +80,9 @@ class Main : public QObject {
     Q_ENUMS( ListTypes )
     Q_ENUMS( ErrorTypes )
     Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
+    Q_PROPERTY( DebugLevels debugLevel READ debugLevel WRITE setDebugLevel )
     Q_CLASSINFO( "description", "Applet main class" )
+    Q_FLAGS( DebugLevels )
 
 public:
     // sorting types
@@ -95,6 +97,15 @@ public:
         SoftError = 0,
         FatalError
     };
+
+    // debug levels
+    enum DebugLevel {
+        NoDebug =   0x0,
+        System =    0x0001,
+        GuiMain =   0x0002,
+        Database =  0x0004
+    };
+    Q_DECLARE_FLAGS( DebugLevels, DebugLevel )
 
     // database related
     LogEntry *addLog( int taskId, int teamId, int value = 0, int comboId = -1 );
@@ -132,6 +143,7 @@ public:
     // misc
     QString transliterate( const QString &path );
     bool isInitialized() const { return this->m_init; }
+    DebugLevels debugLevel() const { return this->m_debug; }
 
     // combination statistics
     typedef struct stats_s {
@@ -151,6 +163,9 @@ public slots:
     void setInitialized( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
+    // debug
+    void setDebugLevel( DebugLevels debug ) { this->m_debug = debug; }
+
     // database related
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
@@ -159,13 +174,13 @@ public slots:
 
     // console io
     void error( ErrorTypes type, const QString &msg );
-    void print( const QString &msg );
+    void print( const QString &msg, DebugLevel = Main::NoDebug );
 
     // misc
     void sort( ListTypes type );
     void update();
     void initConsole();
-    void clearEvent();// { this->teamList.clear(); this->taskList.clear(); this->taskListSorted().clear(); this->logList.clear(); this->eventList.clear(); }
+    void clearEvent();
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
     void buildEventTTList();
@@ -179,6 +194,7 @@ private:
     EventEntry *m_event;
     bool m_init;
     Gui_Console *console;
+    DebugLevels m_debug;
 
 private slots:
     // console/settings variables
@@ -198,6 +214,9 @@ private slots:
     void removeOrphanedLogs();
     void writeBackup();
 };
+
+// flags
+Q_DECLARE_OPERATORS_FOR_FLAGS( Main::DebugLevels )
 
 //
 // externals

@@ -36,7 +36,7 @@ namespace Rankings {
 }
 
 //
-// class: Gui_RankingModel
+// class: Ranking Model (gui)
 //
 class Gui_RankingModel : public QAbstractTableModel {
     Q_OBJECT
@@ -56,7 +56,7 @@ public:
     Gui_RankingModel() { }
 
     // reimplemented functions
-    int rowCount( const QModelIndex & ) const { return m.teamList.count(); }
+    int rowCount( const QModelIndex & ) const { return m.currentEvent()->teamList.count(); }
     int columnCount( const QModelIndex & ) const { return Rankings::NumRankingColumns; }
     QVariant data( const QModelIndex &, int  ) const;
     QVariant headerData( int, Qt::Orientation, int  ) const;
