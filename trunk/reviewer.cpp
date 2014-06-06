@@ -80,13 +80,15 @@ void Main::loadReviewers() {
     while ( query.next())
         this->reviewerList << new ReviewerEntry( query.record(), "reviewers" );
 
-    // no reviewers? - add a default one
-    if ( this->reviewerList.isEmpty())
+    //
+    // we don't need a default reviewer to be always present
+    //
+    /*if ( this->reviewerList.isEmpty())
         this->addReviewer();
 
     // still nothing?
     if ( this->reviewerList.isEmpty())
-        this->error( StrFatalError + this->tr( "could not add a reviewer\n" ));
+        this->error( StrFatalError + this->tr( "could not add a reviewer\n" ));*/
 }
 
 /*

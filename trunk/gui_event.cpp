@@ -25,7 +25,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "ui_gui_event.h"
 #include "gui_main.h"
 #include "evententry.h"
-#include "gui_addevent.h"
+#include "gui_addedit.h"
 #include <QMessageBox>
 #include <QSqlQuery>
 
@@ -158,7 +158,7 @@ buttonAdd->clicked
 ================
 */
 void Gui_Event::on_buttonAdd_clicked() {
-    Gui_AddEvent evAdd( this );
+    Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Add, -1, this );
     evAdd.exec();
 }
 

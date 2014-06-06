@@ -18,42 +18,32 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifndef GUI_REVIEWERS_H
-#define GUI_REVIEWERS_H
+#ifndef GUI_REVIEWERMODEL_H
+#define GUI_REVIEWERMODEL_H
 
 //
 // includes
 //
-#include <QDialog>
-#include "gui_reviewermodel.h"
+#include <QStringListModel>
+#include <QSortFilterProxyModel>
+#include "main.h"
 
 //
-// namespaces
+// Reviewer List Model (gui)
 //
-namespace Ui {
-class Gui_Reviewers;
-}
-
-//
-// class: Reviewers (gui)
-//
-class Gui_Reviewers : public QDialog {
+class Gui_ReviewerModel : public QStringListModel {
     Q_OBJECT
-    Q_CLASSINFO( "description", "Reviewer management dialog" )
+    Q_CLASSINFO( "description", "Reviewer view engine" )
 
 public:
-    explicit Gui_Reviewers( QWidget *parent = 0 );
-    ~Gui_Reviewers();
+    Gui_ReviewerModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
+    int rowCount( const QModelIndex & = QModelIndex()) const { return m.reviewerList.count(); }
+    QVariant data( const QModelIndex &, int ) const;
+    Qt::ItemFlags flags( const QModelIndex & ) const;
 
-private slots:
-    void on_closeButton_clicked();
-    void on_addButton_clicked();
-    void on_renameButton_clicked();
-    void on_removeButton_clicked();
-
-private:
-    Ui::Gui_Reviewers *ui;
-    Gui_ReviewerModel *listModelPtr;
+    // this resets whole model data
+    void beginReset() { this->beginResetModel(); }
+    void endReset() { this->endResetModel(); }
 };
 
-#endif // GUI_REVIEWERS_H
+#endif // GUI_REVIEWERMODEL_H

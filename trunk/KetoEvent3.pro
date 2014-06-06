@@ -47,7 +47,9 @@ SOURCES += main.cpp\
     gui_addevent.cpp \
     reviewerentry.cpp \
     reviewer.cpp \
-    gui_reviewers.cpp
+    gui_reviewers.cpp \
+    gui_reviewermodel.cpp \
+    gui_addedit.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -75,7 +77,9 @@ HEADERS  += gui_main.h \
     gui_combomodel.h \
     gui_addevent.h \
     reviewerentry.h \
-    gui_reviewers.h
+    gui_reviewers.h \
+    gui_reviewermodel.h \
+    gui_addedit.h
 
 FORMS    += gui_main.ui \
     gui_teamedit.ui \
@@ -88,7 +92,8 @@ FORMS    += gui_main.ui \
     gui_event.ui \
     gui_combos.ui \
     gui_addevent.ui \
-    gui_reviewers.ui
+    gui_reviewers.ui \
+    gui_addedit.ui
 
 RESOURCES += \
     resources.qrc

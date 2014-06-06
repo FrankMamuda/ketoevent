@@ -18,42 +18,57 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifndef GUI_REVIEWERS_H
-#define GUI_REVIEWERS_H
+#ifndef GUI_ADDEDIT_H
+#define GUI_ADDEDIT_H
 
 //
 // includes
 //
 #include <QDialog>
-#include "gui_reviewermodel.h"
+#include "main.h"
 
 //
 // namespaces
 //
 namespace Ui {
-class Gui_Reviewers;
+class Gui_AddEdit;
 }
 
 //
-// class: Reviewers (gui)
+// class Add/Edit dialog (gui)
 //
-class Gui_Reviewers : public QDialog {
+class Gui_AddEdit : public QDialog {
     Q_OBJECT
-    Q_CLASSINFO( "description", "Reviewer management dialog" )
+    Q_ENUMS( Parent )
+    Q_ENUMS( Mode )
+    Q_PROPERTY( Parent dialogParent READ dialogParent )
+    Q_PROPERTY( Mode mode READ mode )
 
 public:
-    explicit Gui_Reviewers( QWidget *parent = 0 );
-    ~Gui_Reviewers();
+    enum Parent {
+        NoParent = -1,
+        EventDialog,
+        ReviewerDialog
+    };
+    enum Mode {
+        NoMode = -1,
+        Add,
+        Edit
+    };
+    explicit Gui_AddEdit( Parent = NoParent, Mode = NoMode, int id = -1, QWidget *parent = 0 );
+    ~Gui_AddEdit();
+    int id() const { return this->m_id; }
+    Parent dialogParent() const { return this->m_dialogParent; }
+    Mode mode() const { return this->m_mode; }
 
 private slots:
-    void on_closeButton_clicked();
-    void on_addButton_clicked();
-    void on_renameButton_clicked();
-    void on_removeButton_clicked();
+    void on_acceptButton_clicked();
 
 private:
-    Ui::Gui_Reviewers *ui;
-    Gui_ReviewerModel *listModelPtr;
+    Ui::Gui_AddEdit *ui;
+    int m_id;
+    Parent m_dialogParent;
+    Mode m_mode;
 };
 
-#endif // GUI_REVIEWERS_H
+#endif // GUI_ADDEDIT_H

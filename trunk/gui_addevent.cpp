@@ -32,7 +32,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-Gui_AddEvent::Gui_AddEvent( QWidget *parent ) :QDialog( parent ), ui( new Ui::Gui_AddEvent ) {
+Gui_AddEvent::Gui_AddEvent( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_AddEvent ) {
     ui->setupUi( this );
 }
 

@@ -29,6 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_event.h"
 #include "gui_combos.h"
 #include "gui_reviewers.h"
+#include <QMessageBox>
 
 // FIXME: fix hilight colours
 
@@ -48,6 +49,9 @@ initialize
 ================
 */
 void Gui_Main::initialize( bool reload ) {
+    // lock reviewers
+    this->setLocked();
+
     // disable actions on partial initialization (debug)
     if ( !m.isInitialized()) {
         this->ui->actionTeams->setDisabled( true );
@@ -286,6 +290,56 @@ void Gui_Main::fillTeams( int forcedId ) {
         if ( lastId != -1 && lastId == teamPtr->id())
             this->ui->comboTeams->setCurrentIndex( this->ui->comboTeams->count()-1 );
     }
+
+    // just redo this here
+    this->fillReviewers();
+}
+
+/*
+================
+fillReviewers
+================
+*/
+void Gui_Main::fillReviewers() {
+    bool reviewerSet = false;
+
+    // abort if partially initialized
+    if ( !m.isInitialized())
+        return;
+
+    // clear list
+    this->ui->comboReviewers->clear();
+
+    // set current value
+    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( teamPtr == NULL )
+        return;
+
+    // repopulate list
+    this->ui->comboReviewers->addItem( this->tr( "unknown reviewer" ), -1 );
+    foreach ( ReviewerEntry *reviewerPtr, m.reviewerList ) {
+        this->ui->comboReviewers->addItem( reviewerPtr->name(), reviewerPtr->id());
+
+        // set to team reviewer id
+        if ( teamPtr->reviewerId() == reviewerPtr->id()) {
+            this->ui->comboReviewers->setCurrentIndex( this->ui->comboReviewers->count()-1 );
+            reviewerSet = true;
+        }
+    }
+
+    // no reviewers? default to unknown
+    if ( !reviewerSet ) {
+        this->ui->comboReviewers->setCurrentIndex( 0 );
+
+        // default to zero
+        teamPtr->setReviewerId( 0 );
+    }
+
+    // store last index
+    this->setCurrentReviewerIndex( this->ui->comboReviewers->currentIndex());
+
+    // unlock reviewers
+    this->unlock();
 }
 
 /*
@@ -676,4 +730,58 @@ actionCombos->triggered
 void Gui_Main::on_actionReviewers_triggered() {
     Gui_Reviewers rd;
     rd.exec();
+    this->setLocked();
+    this->fillReviewers();
+}
+
+/*
+================
+comboReviewers->currentIndexChanged
+================
+*/
+void Gui_Main::on_comboReviewers_currentIndexChanged( int index ) {
+    if ( !this->isLocked()) {
+        ReviewerEntry *reviewerPtr = m.reviewerForId( this->ui->comboReviewers->itemData( index ).toInt());
+        if ( reviewerPtr == NULL )
+            return;
+
+        TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        if ( teamPtr == NULL )
+            return;
+
+        // init messagebox
+        QMessageBox msgBox;
+        int state;
+
+        // allow to reconsider
+        msgBox.setText( this->tr( "Change team \"%1\" reviewer to \"%2\"?" )
+                        .arg( teamPtr->name())
+                        .arg( reviewerPtr->name()));
+        msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+        msgBox.setDefaultButton( QMessageBox::Yes );
+        msgBox.setIcon( QMessageBox::Warning );
+        msgBox.setWindowIcon( QIcon( ":/icons/reviewers_48" ));
+        state = msgBox.exec();
+
+        // check options
+        switch ( state ) {
+        case QMessageBox::Yes:
+            teamPtr->setReviewerId( reviewerPtr->id());
+            this->setCurrentReviewerIndex( this->ui->comboReviewers->currentIndex());
+            break;
+
+        case QMessageBox::No:
+            //
+            // BAD CODE
+            //
+            // DIRTY FIX
+            this->setLocked();
+            this->fillReviewers();
+            //this->ui->comboReviewers->setCurrentIndex( this->currentReviewerIndex());
+            break;
+
+        default:
+            return;
+        }
+    }
 }
