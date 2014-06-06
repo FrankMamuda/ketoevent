@@ -47,7 +47,9 @@ class Gui_Main : public QMainWindow {
     Q_OBJECT
     Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
     Q_PROPERTY( int currentComboIndex READ currentComboIndex WRITE setCurrentComboIndex )
+    Q_PROPERTY( int currentReviewerIndex READ currentReviewerIndex WRITE setCurrentReviewerIndex )
     Q_PROPERTY( int currentMatch READ currentMatch WRITE setCurrentMatch )
+    Q_PROPERTY( bool locked READ isLocked WRITE setLocked RESET unlock )
     Q_CLASSINFO( "description", "Applet main window" )
 
 public:
@@ -55,7 +57,9 @@ public:
     ~Gui_Main();
     int currentTeamIndex() const { return this->m_currentTeamIndex; }
     int currentComboIndex() const { return this->m_currentComboIndex; }
+    int currentReviewerIndex() const { return this->m_currentReviewerIndex; }
     int currentMatch() const { return this->m_currentMatch; }
+    bool isLocked() const { return m_lock; }
 
 public slots:
     void initialize( bool reload = false );
@@ -65,15 +69,19 @@ public slots:
     void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
 
 private slots:
-    // team/task fill
+    // team/task/reviewer fill
     void fillTeams( int focedId = -1 );
     void fillTasks();
+    void fillReviewers();
 
     // misc
     void teamIndexChanged( int index );
     void updateFinishTime( QTime time );
     void setCurrentComboIndex( int index = -1 ) { this->m_currentComboIndex = index; }
     void setCurrentTeamIndex( int index = -1 ) { this->m_currentTeamIndex = index; }
+    void setCurrentReviewerIndex( int index = -1 ) { this->m_currentReviewerIndex = index; }
+    void setLocked( bool locked = true ) { this->m_lock = locked; }
+    void unlock() { this->m_lock = false; }
 
     // search
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
@@ -98,8 +106,8 @@ private slots:
     void on_downButton_clicked();
 #endif
     void on_combineButton_toggled( bool checked );
-
     void on_actionReviewers_triggered();
+    void on_comboReviewers_currentIndexChanged(int index);
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
@@ -109,6 +117,8 @@ private:
     int m_currentTeamIndex;
     int m_currentComboIndex;
     int m_currentMatch;
+    int m_currentReviewerIndex;
+    bool m_lock;
 };
 
 #endif // GUI_MAIN_H

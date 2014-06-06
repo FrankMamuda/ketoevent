@@ -18,42 +18,41 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifndef GUI_REVIEWERS_H
-#define GUI_REVIEWERS_H
-
 //
 // includes
 //
-#include <QDialog>
 #include "gui_reviewermodel.h"
+#include <QFont>
 
-//
-// namespaces
-//
-namespace Ui {
-class Gui_Reviewers;
+/*
+================
+data
+================
+*/
+QVariant Gui_ReviewerModel::data( const QModelIndex &index, int role ) const {
+    if ( !index.isValid())
+        return QVariant();
+
+    if ( index.row() >= m.reviewerList.count())
+        return QVariant();
+
+    if ( role == Qt::DisplayRole )
+        return m.reviewerList.at( index.row())->name();
+    else if ( role == Qt::UserRole )
+        return m.reviewerList.at( index.row())->id();
+    else
+        return QVariant();
 }
 
-//
-// class: Reviewers (gui)
-//
-class Gui_Reviewers : public QDialog {
-    Q_OBJECT
-    Q_CLASSINFO( "description", "Reviewer management dialog" )
+/*
+================
+flags
+================
+*/
+Qt::ItemFlags Gui_ReviewerModel::flags( const QModelIndex &index ) const {
+    if ( !index.isValid())
+        return Qt::ItemIsEnabled;
 
-public:
-    explicit Gui_Reviewers( QWidget *parent = 0 );
-    ~Gui_Reviewers();
+    return QAbstractItemModel::flags( index );
+}
 
-private slots:
-    void on_closeButton_clicked();
-    void on_addButton_clicked();
-    void on_renameButton_clicked();
-    void on_removeButton_clicked();
-
-private:
-    Ui::Gui_Reviewers *ui;
-    Gui_ReviewerModel *listModelPtr;
-};
-
-#endif // GUI_REVIEWERS_H

@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>429</height>
+    <width>360</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Reviewer management</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/reviewers_48</normaloff>:/icons/reviewers_48</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
