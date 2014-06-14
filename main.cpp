@@ -58,6 +58,8 @@ class Main m;
 // replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
+// FIXME: reviewerchange
+// FIXME: import reviewers
 //
 
 /*
@@ -123,8 +125,6 @@ print
 ============
 */
 void Main::print( const QString &msg, DebugLevel debug ) {
-    Q_UNUSED( debug )
-
     // are we debugging current subsystem
     if ( !this->debugLevel().testFlag( debug ))
         return;
@@ -149,10 +149,10 @@ error
 */
 void Main::error( ErrorTypes type, const QString &msg ) {
     if ( type == FatalError ) {
-        this->print( this->tr( "FATAL ERROR: %1" ).arg( msg ));
+        this->print( this->tr( "FATAL ERROR: %1" ).arg( msg ), System );
         this->shutdown( true );
     } else
-        this->print( this->tr( "ERROR: %1" ).arg( msg ));
+        this->print( this->tr( "ERROR: %1" ).arg( msg ), System );
 }
 
 /*
@@ -269,25 +269,25 @@ void Main::clearEvent() {
     gui->clearTasks();
 
     // clear teams (logs should be cleaned automatically on destruct)
-    foreach ( TeamEntry *teamPtr, this->teamList ) {
-        this->teamList.removeOne( teamPtr );
+    foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+        this->base.teamList.removeOne( teamPtr );
         delete teamPtr;
     }
-    this->teamList.clear();
+    this->base.teamList.clear();
 
     // clear events
-    foreach ( EventEntry *eventPtr, this->eventList ) {
-        this->eventList.removeOne( eventPtr );
+    foreach ( EventEntry *eventPtr, this->base.eventList ) {
+        this->base.eventList.removeOne( eventPtr );
         delete eventPtr;
     }
-    this->eventList.clear();
+    this->base.eventList.clear();
 
     // clear tasks
-    foreach ( TaskEntry *taskPtr, this->taskList ) {
-        this->taskList.removeOne( taskPtr );
+    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+        this->base.taskList.removeOne( taskPtr );
         delete taskPtr;
     }
-    this->taskList.clear();
+    this->base.taskList.clear();
     this->taskListSorted().clear();
 }
 

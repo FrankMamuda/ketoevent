@@ -40,7 +40,7 @@ public:
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
-    // this resets whole model based on data in m.taskList
+    // this resets whole model based on data in m.base.taskList
     void beginReset() { this->beginResetModel(); }
     void endReset() { this->endResetModel(); }
 };

@@ -113,7 +113,7 @@ public:
     LogEntry *logForIds( int teamId, int taskId );
     TaskEntry *taskForId( int id );
     TaskEntry *taskForName( const QString &name );
-    TeamEntry *teamForId( int id );
+    TeamEntry *teamForId( int id, bool import = false );
     TeamEntry *teamForName( const QString &name );
     QString path;
 
@@ -131,12 +131,16 @@ public:
     ReviewerEntry *reviewerForId( int id );
 
     // lists
-    QList <TeamEntry*>  teamList;
-    QList <TaskEntry*>  taskList;
+    typedef struct ketoList_s {
+        QList <TeamEntry*>  teamList;
+        QList <TaskEntry*>  taskList;
+        QList <LogEntry*>   logList;
+        QList <EventEntry*> eventList;
+        QList <ReviewerEntry*> reviewerList;
+    } ketoList_t;
+    ketoList_t base;
+    ketoList_t import;
     QList <TaskEntry*>  taskListSorted();
-    QList <LogEntry*>   logList;
-    QList <EventEntry*> eventList;
-    QList <ReviewerEntry*> reviewerList;
     QList <ConsoleVariable*>  cvarList;
     QList <SettingsVariable*> svarList;
 
@@ -171,6 +175,7 @@ public slots:
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
     void addEvent( const QString &title = QString::null );
     void addReviewer( const QString &name = QString::null );
+    void attachDatabase( const QString &path );
 
     // console io
     void error( ErrorTypes type, const QString &msg );
@@ -205,11 +210,11 @@ private slots:
     void loadDatabase();
     void unloadDatabase();
     void makePath( const QString &path = QString::null );
-    void loadTasks();
-    void loadTeams();
-    void loadLogs();
-    void loadEvents();
-    void loadReviewers();
+    void loadTasks( bool import = false );
+    void loadTeams( bool import = false );
+    void loadLogs(bool import = false );
+    void loadEvents( bool import = false );
+    void loadReviewers( bool import = false, int offset = -1 );
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();

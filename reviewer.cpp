@@ -46,7 +46,7 @@ void Main::addReviewer( const QString &name ) {
         reviewerName = this->tr( "unnamed reviewer" );
 
     // check for duplicates
-    foreach ( ReviewerEntry *rPtr, this->reviewerList ) {
+    foreach ( ReviewerEntry *rPtr, this->base.reviewerList ) {
         if ( !QString::compare( rPtr->name(), reviewerName ))
             continue;
     }
@@ -60,7 +60,7 @@ void Main::addReviewer( const QString &name ) {
 
     // get last sql entry and construct internal entry
     while ( query.next()) {
-        this->reviewerList << new ReviewerEntry( query.record(), "reviewers" );
+        this->base.reviewerList << new ReviewerEntry( query.record(), "reviewers" );
         break;
     }
 }
@@ -70,25 +70,17 @@ void Main::addReviewer( const QString &name ) {
 loadReviewers
 ================
 */
-void Main::loadReviewers() {
+void Main::loadReviewers( bool import, int offset ) {
     QSqlQuery query;
+    Q_UNUSED( import )
+    Q_UNUSED( offset )
 
     // read all reviewer entries
     query.exec( "select * from reviewers" );
 
     // store entries in memory
     while ( query.next())
-        this->reviewerList << new ReviewerEntry( query.record(), "reviewers" );
-
-    //
-    // we don't need a default reviewer to be always present
-    //
-    /*if ( this->reviewerList.isEmpty())
-        this->addReviewer();
-
-    // still nothing?
-    if ( this->reviewerList.isEmpty())
-        this->error( StrFatalError + this->tr( "could not add a reviewer\n" ));*/
+        this->base.reviewerList << new ReviewerEntry( query.record(), "reviewers" );
 }
 
 /*
@@ -97,7 +89,7 @@ reviewerForId
 ================
 */
 ReviewerEntry *Main::reviewerForId( int id ) {
-    foreach ( ReviewerEntry *rPtr, this->reviewerList ) {
+    foreach ( ReviewerEntry *rPtr, this->base.reviewerList ) {
         if ( rPtr->id() == id )
             return rPtr;
     }

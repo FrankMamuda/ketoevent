@@ -40,6 +40,7 @@ class Gui_Event;
 class Gui_Event : public Gui_SettingsDialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Event handling dialog" )
+    Q_PROPERTY( bool import READ importPerformed WRITE setImported )
 
 public:
     explicit Gui_Event( QWidget *parent = 0 );
@@ -47,6 +48,7 @@ public:
 
 public slots:
     void fillEvents();
+    bool importPerformed() const { return m_import; }
 
 private slots:
     void bindVars();
@@ -55,9 +57,12 @@ private slots:
     void on_buttonAdd_clicked();
     void validate();
     void on_buttonRemove_clicked();
+    void on_buttonImport_clicked();
+    void setImported( bool import = true ) { this->m_import = import; }
 
 private:
     Ui::Gui_Event *ui;
+    bool m_import;
 };
 
 #endif // GUI_EVENT_H

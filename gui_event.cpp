@@ -28,6 +28,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_addedit.h"
 #include <QMessageBox>
 #include <QSqlQuery>
+#include <QFileDialog>
 
 /*
 ================
@@ -43,6 +44,7 @@ Gui_Event::Gui_Event( QWidget *parent ) : Gui_SettingsDialog( parent ), ui( new 
         this->bindVars();
 
     this->fillEvents();
+    this->setImported( false );
 }
 
 /*
@@ -66,7 +68,7 @@ void Gui_Event::fillEvents() {
         id = eventPtr->id();
 
     // fill the combobox with events
-    foreach ( EventEntry *ePtr, m.eventList ) {
+    foreach ( EventEntry *ePtr, m.base.eventList ) {
         this->ui->eventCombo->addItem( ePtr->name(), ePtr->id());
         if ( ePtr->id() == id )
             this->ui->eventCombo->setCurrentIndex( y );
@@ -195,7 +197,7 @@ void Gui_Event::on_buttonRemove_clicked() {
     QSqlQuery query;
 
     // make sure we cannot delete all events
-    if ( m.eventList.count() <= 1 )
+    if ( m.base.eventList.count() <= 1 )
         return;
 
     // allow to reconsider
@@ -211,8 +213,8 @@ void Gui_Event::on_buttonRemove_clicked() {
     switch ( state ) {
     case QMessageBox::Yes:
         // remove from memory
-        m.eventList.removeOne( m.currentEvent());
-        m.setCurrentEvent( m.eventList.first());
+        m.base.eventList.removeOne( m.currentEvent());
+        m.setCurrentEvent( m.base.eventList.first());
 
         // remove from database
         query.exec( QString( "delete from events where id=%1" ).arg( eventPtr->id()));
@@ -226,4 +228,35 @@ void Gui_Event::on_buttonRemove_clicked() {
     default:
         return;
     }
+}
+
+/*
+================
+buttonImport->clicked
+================
+*/
+void Gui_Event::on_buttonImport_clicked() {
+
+    // TODO: disallow importing the same database
+    // TODO: allow exporting base event structure (currentEvent + all tasks without teams and logs)
+
+    QString path, filePath;
+
+    // get filename from dialog
+    path = QString( QDir::currentPath() + "/" );
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+
+    // check for empty filenames
+    if ( filePath.isEmpty())
+        return;
+
+    // check if path is valid
+    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
+        return;
+
+    // import database
+    m.attachDatabase( filePath );
+
+    // mark as imported
+    this->setImported();
 }

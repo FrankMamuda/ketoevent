@@ -28,12 +28,26 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 
 /*
 ================
+import
+================
+*/
+void DatabaseEntry::store() {
+    if ( !this->isImported())
+        return;
+
+    QSqlQuery query;
+    query.exec( QString( "insert into %1 select * from merge.%1 where id = %2" ).arg( this->table()).arg( this->id()));
+}
+
+/*
+================
 setValue
 ================
 */
 void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
     QSqlQuery query;
     QVariant update;
+    QString table = this->table();
 
     // copy local value
     update = value;
@@ -52,9 +66,13 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
     if ( value.type() == QVariant::String )
         update.setValue( QString( "'%1'" ).arg( value.toString()));
 
+    // update imported entries properly
+    if ( this->isImported())
+        table.prepend( "merge." );
+
     // update database value
     if ( !this->table().isNull()) {
-        if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( this->table()).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
+        if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( table ).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
             m.error( StrSoftError + this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
 }

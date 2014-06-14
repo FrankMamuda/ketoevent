@@ -172,7 +172,7 @@ void Gui_TeamEdit::on_removeTeamButton_clicked() {
             this->listModelPtr->beginReset();
 
             // remove from memory
-            m.teamList.removeOne( teamPtr );
+            m.base.teamList.removeOne( teamPtr );
             m.currentEvent()->teamList.removeOne( teamPtr );
 
             // remove from database
@@ -234,7 +234,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
     // quick add
     if ( this->state() == AddQuick ) {
-        this->setLastId( m.teamList.last()->id());
+        this->setLastId( m.base.teamList.last()->id());
         this->close();
     }
 

@@ -27,7 +27,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QtGlobal>
 #include <QDialog>
 #include "settingsvariable.h"
-#include <main.h>
+#include "main.h"
 
 //
 // inherited by Gui_Event and Gui_Settings

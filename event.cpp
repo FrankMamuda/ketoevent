@@ -72,7 +72,7 @@ void Main::addEvent( const QString &title ) {
 
     // get last sql entry and construct internal entry
     while ( query.next()) {
-        this->eventList << new EventEntry( query.record(), "events" );
+        this->base.eventList << new EventEntry( query.record(), "events" );
         break;
     }
 }
@@ -82,39 +82,52 @@ void Main::addEvent( const QString &title ) {
 loadEvents
 ================
 */
-void Main::loadEvents() {
+void Main::loadEvents( bool import ) {
     QSqlQuery query;
 
     // read all event entries
-    query.exec( "select * from events" );
+    if ( import )
+        query.exec( "select * from merge.events" );
+    else
+        query.exec( "select * from events" );
 
     // store entries
     while ( query.next()) {
-        this->eventList << new EventEntry( query.record(), "events" );
+        EventEntry *eventPtr = new EventEntry( query.record(), "events" );
+
+        if ( import ) {
+            eventPtr->setImported();
+            this->import.eventList << eventPtr;
+        } else
+            this->base.eventList << eventPtr;
 
         // failsafe - api check
         // add compatibility in future if needed (unlikely)
-        if ( static_cast<unsigned int>( this->eventList.last()->api()) < Common::MinimumAPI ) {
-            this->error( StrSoftError +
-                     this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
-                     .arg( this->eventList.last()->api())
-                     .arg( Common::MinimumAPI ));
-            this->eventList.removeLast();
+        if ( !import ) {
+            if ( static_cast<unsigned int>( this->base.eventList.last()->api()) < Common::MinimumAPI ) {
+                this->error( StrSoftError +
+                             this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
+                             .arg( this->base.eventList.last()->api())
+                             .arg( Common::MinimumAPI ));
+                this->base.eventList.removeLast();
+            }
         }
     }
 
-    // no event entry? - create one
-    if ( this->eventList.isEmpty())
-        this->addEvent();
+    if ( !import ) {
+        // no event entry? - create one
+        if ( this->base.eventList.isEmpty())
+            this->addEvent();
 
-    // still nothing?
-    if ( this->eventList.isEmpty()) {
-        this->error( StrFatalError + this->tr( "could not create event\n" ));
+        // still nothing?
+        if ( this->base.eventList.isEmpty()) {
+            this->error( StrFatalError + this->tr( "could not create event\n" ));
+        }
+
+        // for now - resort to indexes?? (use list indexof)
+        if ( !this->setCurrentEvent( this->eventForId( this->cvar( "currentEvent" )->integer())))
+            this->setCurrentEvent( this->base.eventList.first());
     }
-
-    // for now - resort to indexes?? (use list indexof)
-    if ( !this->setCurrentEvent( this->eventForId( this->cvar( "currentEvent" )->integer())))
-         this->setCurrentEvent( this->eventList.first());
 }
 
 /*
@@ -135,7 +148,7 @@ setCurrentEvent
 ================
 */
 bool Main::setCurrentEvent( EventEntry *eventPtr ) {
-    foreach ( EventEntry *entry, this->eventList ) {
+    foreach ( EventEntry *entry, this->base.eventList ) {
         if ( entry == eventPtr ) {
             this->m_event = entry;
             this->cvar( "currentEvent" )->setValue( eventPtr->id());
@@ -151,7 +164,7 @@ eventForId
 ================
 */
 EventEntry *Main::eventForId( int id ) {
-    foreach ( EventEntry *eventPtr, this->eventList ) {
+    foreach ( EventEntry *eventPtr, this->base.eventList ) {
         if ( eventPtr->id() == id )
             return eventPtr;
     }
@@ -164,16 +177,16 @@ buildEventTTList
 ================
 */
 void Main::buildEventTTList() {
-    foreach ( EventEntry *eventPtr, this->eventList ) {
+    foreach ( EventEntry *eventPtr, this->base.eventList ) {
         eventPtr->teamList.clear();
         eventPtr->taskList.clear();
 
-        foreach ( TeamEntry *teamPtr, this->teamList ) {
+        foreach ( TeamEntry *teamPtr, this->base.teamList ) {
             if ( teamPtr->eventId() == eventPtr->id())
                 eventPtr->teamList << teamPtr;
         }
 
-        foreach ( TaskEntry *taskPtr, this->taskList ) {
+        foreach ( TaskEntry *taskPtr, this->base.taskList ) {
             if ( taskPtr->eventId() == eventPtr->id())
                 eventPtr->taskList << taskPtr;
         }

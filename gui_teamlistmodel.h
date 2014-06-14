@@ -41,7 +41,7 @@ public:
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
-    // this resets whole model based on data in m.teamList
+    // this resets whole model based on data in m.base.teamList
     void beginReset() { this->beginResetModel(); }
     void endReset() { m.sort( Main::Teams ); this->endResetModel(); }
 };

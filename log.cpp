@@ -39,7 +39,7 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     QSqlQuery query;
 
     // avoid duplicates
-    foreach ( logPtr, this->logList ) {
+    foreach ( logPtr, this->base.logList ) {
         if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
             return logPtr;
     }
@@ -58,7 +58,7 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     // get last entry and construct internal entry
     while ( query.next()) {
         logPtr = new LogEntry( query.record(), "logs" );
-        this->logList << logPtr;
+        this->base.logList << logPtr;
     }
     return logPtr;
 }
@@ -68,17 +68,30 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
 loadLogs
 ================
 */
-void Main::loadLogs() {
+void Main::loadLogs( bool import ) {
     QSqlQuery query;
 
     // read stuff
-    query.exec( "select * from logs" );
+    if ( import )
+        query.exec( "select * from merge.logs" );
+    else
+        query.exec( "select * from logs" );
 
     // store entries
     while ( query.next()) {
         LogEntry *logPtr = new LogEntry( query.record(), "logs" );
-        this->teamForId( logPtr->teamId())->logList << logPtr;
-        this->logList << logPtr;
+        TeamEntry *teamPtr = this->teamForId( logPtr->teamId(), import );
+        if ( teamPtr == NULL )
+            return;
+
+        teamPtr->logList << logPtr;
+
+        if ( import ) {
+            logPtr->setImported();
+            this->import.logList << logPtr;
+            logPtr->store();
+        } else
+            this->base.logList << logPtr;
     }
 }
 
@@ -88,7 +101,7 @@ logForId
 ================
 */
 LogEntry *Main::logForId( int id ) {
-    foreach ( LogEntry *logPtr, this->logList ) {
+    foreach ( LogEntry *logPtr, this->base.logList ) {
         if ( logPtr->id() == id )
             return logPtr;
     }

@@ -84,8 +84,8 @@ p, li { white-space: pre-wrap; }
      <property name="frame">
       <bool>false</bool>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     <property name="placeholderText">
+      <string notr="true">&gt;</string>
      </property>
     </widget>
    </item>
