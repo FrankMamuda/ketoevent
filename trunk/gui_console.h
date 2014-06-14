@@ -52,6 +52,9 @@ protected:
     virtual void mousePressEvent( QMouseEvent * );
     virtual void mouseMoveEvent( QMouseEvent * );
 
+private slots:
+    void on_input_returnPressed();
+
 private:
     Ui::Gui_Console *ui;
     QPoint m_windowPos;

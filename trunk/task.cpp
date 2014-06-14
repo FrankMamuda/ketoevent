@@ -63,10 +63,10 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->taskList << new TaskEntry( query.record(), "tasks" );
+        this->base.taskList << new TaskEntry( query.record(), "tasks" );
 
     // add to event
-    this->currentEvent()->taskList << this->taskList.last();
+    this->currentEvent()->taskList << this->base.taskList.last();
 }
 
 /*
@@ -74,15 +74,27 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
 loadTasks
 ================
 */
-void Main::loadTasks() {
+void Main::loadTasks( bool import ) {
     QSqlQuery query;
 
     // read stuff
-    query.exec( "select * from tasks order by parent asc" );
+    if ( import )
+        query.exec( "select * from merge.tasks order by parent asc" );
+    else
+        query.exec( "select * from tasks order by parent asc" );
 
     // store entries
-    while ( query.next())
-        this->taskList << new TaskEntry( query.record(), "tasks" );
+    while ( query.next()) {
+        TaskEntry *taskPtr = new TaskEntry( query.record(), "tasks" );
+
+        // since we're just checking hash and not adding any new tasks on import
+        // there is no need for reindexing
+        if ( import ) {
+            taskPtr->setImported();
+            this->import.taskList << taskPtr;
+        } else
+            this->base.taskList << taskPtr;
+    }
 }
 
 /*
@@ -91,7 +103,7 @@ taskForId
 ================
 */
 TaskEntry *Main::taskForId( int id ) {
-    foreach ( TaskEntry *taskPtr, this->taskList ) {
+    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
         if ( taskPtr->id() == id )
             return taskPtr;
     }
@@ -104,7 +116,7 @@ taskForName
 ================
 */
 TaskEntry *Main::taskForName( const QString &name ) {
-    foreach ( TaskEntry *taskPtr, this->taskList ) {
+    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
         if ( !QString::compare( name, taskPtr->name()))
             return taskPtr;
     }

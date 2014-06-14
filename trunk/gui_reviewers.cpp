@@ -101,7 +101,7 @@ void Gui_Reviewers::on_removeButton_clicked() {
     QSqlQuery query;
 
     // make sure we cannot delete all reviewers
-    if ( m.reviewerList.count() == 1 ) {
+    if ( m.base.reviewerList.count() == 1 ) {
         QMessageBox::warning( this, this->tr( "Reviewer" ), this->tr( "Cannot remove the last reviewer" ));
         return;
     }
@@ -127,7 +127,7 @@ void Gui_Reviewers::on_removeButton_clicked() {
         this->listModelPtr->beginReset();
 
         // remove from memory
-        m.reviewerList.removeOne( reviewerPtr );
+        m.base.reviewerList.removeOne( reviewerPtr );
 
         // remove from database
         query.exec( QString( "delete from reviewers where id=%1" ).arg( reviewerPtr->id()));

@@ -54,7 +54,7 @@ destruct
 */
 TeamEntry::~TeamEntry() {
     foreach ( LogEntry *logPtr, this->logList ) {
-        m.logList.removeOne( logPtr );
+        m.base.logList.removeOne( logPtr );
         delete logPtr;
     }
     this->logList.clear();

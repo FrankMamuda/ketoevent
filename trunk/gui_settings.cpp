@@ -125,7 +125,7 @@ void Gui_Settings::on_buttonExportCSV_clicked() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( TaskEntry *taskPtr, m.taskList ) {
+        foreach ( TaskEntry *taskPtr, m.base.taskList ) {
             out << QString( "%1;%2;%3;%4;%5%6" )
                    .arg( taskPtr->name())
                    .arg( taskPtr->type())

@@ -40,23 +40,28 @@ class DatabaseEntry : public QObject {
     Q_PROPERTY( int id READ id )
     Q_PROPERTY( QString table READ table WRITE setTable )
     Q_PROPERTY( QSqlRecord record READ record WRITE setRecord )
+    Q_PROPERTY( bool imported READ isImported WRITE setImported )
     Q_CLASSINFO( "description", "SQL Entry" )
 
 public:
-    DatabaseEntry() {}
+    DatabaseEntry() { this->setImported( false ); }
     ~DatabaseEntry() { this->m_table.clear(); this->m_record.clear(); }
     int id () const { return this->record().value( "id" ).toInt(); }
     QSqlRecord record() const { return this->m_record; }
     QString table() const { return this->m_table; }
+    bool isImported() const { return this->m_import; }
 
 public slots:
     void setTable( const QString &name ) { this->m_table = name; }
     void setRecord( const QSqlRecord &record ) { this->m_record = record; }
     void setValue( const QString &name, const QVariant &value );
+    void store();
+    void setImported( bool import = true ) { this->m_import = import; }
 
 private:
     QString m_table;
     QSqlRecord m_record;
+    bool m_import;
 
 signals:
     void changed();

@@ -34,7 +34,7 @@ getFreeComboHandle
 */
 int Main::getFreeComboHandle() const {
     int highest = 0;
-    foreach ( LogEntry *logPtr, this->logList ) {
+    foreach ( LogEntry *logPtr, this->base.logList ) {
         if ( logPtr->comboId() >= highest )
             highest = logPtr->comboId();
     }

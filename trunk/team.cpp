@@ -34,7 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 addTeam
 ================
 */
-void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool lockState ) {
+void Main::addTeam(const QString &teamName, int members, QTime finishTime, bool lockState ) {
     QSqlQuery query;
 
     // avoid duplicates
@@ -56,10 +56,10 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, bool
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->teamList << new TeamEntry( query.record(), "teams" );
+        this->base.teamList << new TeamEntry( query.record(), "teams" );
 
     // add to event
-    this->currentEvent()->teamList << this->teamList.last();
+    this->currentEvent()->teamList << this->base.teamList.last();
 }
 
 /*
@@ -83,7 +83,7 @@ void Main::removeTeam( const QString &teamName ) {
     query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
 
     // remove from display
-    this->teamList.removeAll( teamPtr );
+    this->base.teamList.removeAll( teamPtr );
 }
 
 /*
@@ -91,18 +91,45 @@ void Main::removeTeam( const QString &teamName ) {
 loadTeams
 ================
 */
-void Main::loadTeams() {
+void Main::loadTeams( bool import ) {
     QSqlQuery query;
 
     // read stuff
-    query.exec( "select * from teams" );
+    if ( import )
+        query.exec( "select * from merge.teams" );
+    else
+        query.exec( "select * from teams" );
 
     // store entries
-    while ( query.next())
-        this->teamList << new TeamEntry( query.record(), "teams" );
+    while ( query.next()) {
+        TeamEntry *teamPtr = new TeamEntry( query.record(), "teams" );
+
+        if ( import ) {
+            teamPtr->setImported();
+            this->import.teamList << teamPtr;
+        } else
+            this->base.teamList << teamPtr;
+    }
 
     // sort alphabetically
-    this->sort( Main::Teams );
+    if ( !import )
+        this->sort( Main::Teams );
+    else {
+        // check for duplicates
+        foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
+            foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+                if ( !QString::compare( teamPtr->name(), importedTeamPtr->name())) {
+                    if ( !importedTeamPtr->name().endsWith( " (imported)")) {
+                        importedTeamPtr->setName( importedTeamPtr->name() + " (imported)" );
+                        importedTeamPtr->store();
+                    } else {
+                        m.error( StrSoftError + this->tr( "aborting double import of team \"%1\"\n" ).arg( importedTeamPtr->name()));
+                        this->import.teamList.removeOne( teamPtr );
+                    }
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -110,8 +137,15 @@ void Main::loadTeams() {
 teamForId
 ================
 */
-TeamEntry *Main::teamForId( int id ) {
-    foreach ( TeamEntry *teamPtr, this->teamList ) {
+TeamEntry *Main::teamForId( int id, bool import ) {
+    QList <TeamEntry*> teamList;
+
+    if ( import )
+        teamList = m.import.teamList;
+    else
+        teamList = m.base.teamList;
+
+    foreach ( TeamEntry *teamPtr, teamList ) {
         if ( teamPtr->id() == id )
             return teamPtr;
     }
@@ -124,7 +158,7 @@ teamForName
 ================
 */
 TeamEntry *Main::teamForName( const QString &name ) {
-    foreach ( TeamEntry *teamPtr, this->teamList ) {
+    foreach ( TeamEntry *teamPtr, this->base.teamList ) {
         if ( !QString::compare( name, teamPtr->name()))
             return teamPtr;
     }

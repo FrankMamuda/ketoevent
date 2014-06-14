@@ -33,13 +33,13 @@ QVariant Gui_ReviewerModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
-    if ( index.row() >= m.reviewerList.count())
+    if ( index.row() >= m.base.reviewerList.count())
         return QVariant();
 
     if ( role == Qt::DisplayRole )
-        return m.reviewerList.at( index.row())->name();
+        return m.base.reviewerList.at( index.row())->name();
     else if ( role == Qt::UserRole )
-        return m.reviewerList.at( index.row())->id();
+        return m.base.reviewerList.at( index.row())->id();
     else
         return QVariant();
 }

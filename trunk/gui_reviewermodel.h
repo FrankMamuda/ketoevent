@@ -37,7 +37,7 @@ class Gui_ReviewerModel : public QStringListModel {
 
 public:
     Gui_ReviewerModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return m.reviewerList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const { return m.base.reviewerList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 

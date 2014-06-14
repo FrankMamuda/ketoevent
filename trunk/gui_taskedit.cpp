@@ -172,13 +172,13 @@ void Gui_TaskEdit::on_removeTaskButton_clicked() {
     this->listModelPtr->beginReset();
 
     // remove from internal list
-    m.taskList.removeOne( taskPtr );
+    m.base.taskList.removeOne( taskPtr );
 
     // remove from database
     query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
 
     // reindex database (yes, it is very unfortunate)
-    foreach ( TaskEntry *reorderPtr, m.taskList ) {
+    foreach ( TaskEntry *reorderPtr, m.base.taskList ) {
         reorderPtr->setOrder( y );
         y++;
     }
@@ -236,7 +236,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
     this->listModelPtr->endReset();
 
     // TODO: select last added/edited value (not implemented)
-    //index = this->listModelPtr->index( m.taskList.indexOf( entryPtr ), 0 );
+    //index = this->listModelPtr->index( m.base.taskList.indexOf( entryPtr ), 0 );
     //this->ui->taskList->setCurrentIndex( index );
 }
 
@@ -284,7 +284,7 @@ void Gui_TaskEdit::findTask() {
         index = this->listModelPtr->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
-            if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+            if ( m.base.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -298,7 +298,7 @@ void Gui_TaskEdit::findTask() {
             index = this->listModelPtr->index( y, 0 );
             if ( index.isValid()) {
                 // list must be the same as in App_Main, don't match by display role
-                if ( m.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+                if ( m.base.taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                     match = true;
                     this->setCurrentMatch( y );
                     break;
@@ -390,30 +390,30 @@ void Gui_TaskEdit::move( MoveDirection direction ) {
     if ( taskPtr == NULL )
         return;
 
-    y = m.taskList.indexOf( taskPtr );
+    y = m.base.taskList.indexOf( taskPtr );
 
     if ( direction == Up && y != 0 ) {
         k = y - 1;
 
         // move in database
-        t0 = m.taskList.at( y )->order();
-        t1 = m.taskList.at( k )->order();
-        m.taskList.at( y )->setOrder( t1 );
-        m.taskList.at( k )->setOrder( t0 );
+        t0 = m.base.taskList.at( y )->order();
+        t1 = m.base.taskList.at( k )->order();
+        m.base.taskList.at( y )->setOrder( t1 );
+        m.base.taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        m.taskList.move( y, k );
-    } else if ( direction == Down && y != m.taskList.count() - 1 ) {
+        m.base.taskList.move( y, k );
+    } else if ( direction == Down && y != m.base.taskList.count() - 1 ) {
         k = y + 1;
 
         // move in database
-        t0 = m.taskList.at( y )->order();
-        t1 = m.taskList.at( k )->order();
-        m.taskList.at( y )->setOrder( t1 );
-        m.taskList.at( k )->setOrder( t0 );
+        t0 = m.base.taskList.at( y )->order();
+        t1 = m.base.taskList.at( k )->order();
+        m.base.taskList.at( y )->setOrder( t1 );
+        m.base.taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        m.taskList.move( y, k );
+        m.base.taskList.move( y, k );
     }
 
     // end reset
@@ -458,7 +458,7 @@ void Gui_TaskEdit::on_sortButton_clicked() {
     m.sort( Main::Tasks );
 
     // reindex whole list
-    foreach ( TaskEntry *taskPtr, m.taskList ) {
+    foreach ( TaskEntry *taskPtr, m.base.taskList ) {
         taskPtr->setOrder( y );
         y++;
     }

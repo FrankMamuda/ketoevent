@@ -29,6 +29,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDir>
+#include <QCryptographicHash>
+#include <QProcess>
+#include <QApplication>
 
 /*
 ================
@@ -65,6 +68,172 @@ void Main::makePath( const QString &path ) {
 
     // store path
     this->path = fullPath;
+}
+
+/*
+================
+highestTeamId
+================
+*/
+static int highestTeamId() {
+    int teamId = 1;
+    foreach ( TeamEntry *teamPtr, m.base.teamList ) {
+        if ( teamPtr->id() > teamId )
+            teamId =  teamPtr->id();
+    }
+    return teamId;
+}
+
+/*
+================
+highestLogId
+================
+*/
+static int highestLogId() {
+    int logId = 1;
+    foreach ( LogEntry *logPtr, m.base.logList ) {
+        if ( logPtr->id() > logId )
+            logId =  logPtr->id();
+    }
+    return logId;
+}
+
+/*
+================
+highestComboId
+================
+*/
+static int highestComboId() {
+    // TODO: reuse code
+
+    int comboId = 1;
+    foreach ( LogEntry *logPtr, m.base.logList ) {
+        if ( logPtr->comboId() > comboId )
+            comboId = logPtr->id();
+    }
+    return comboId;
+}
+
+/*
+================
+encrypt
+================
+*/
+static QString encrypt( const QString &input ) {
+    QCryptographicHash *hash = new QCryptographicHash( QCryptographicHash::Md5 );
+    hash->addData( input.toLatin1().constData(), input.length());
+    return QString( hash->result().toHex().constData());
+}
+
+/*
+================
+taskListHash
+
+    FIXME: must check against eventId
+================
+*/
+static QString taskListHash( bool import ) {
+    QList<TaskEntry*> list;
+    QString taskString;
+    int eventId = m.currentEvent()->id();
+
+    if ( import )
+        list = m.import.taskList;
+    else
+        list = m.base.taskList;
+
+    // build unique taskList
+    foreach ( TaskEntry *taskPtr, list ) {
+        if ( taskPtr->eventId() != eventId )
+            continue;
+
+        taskString.append( QString( "%1%2%3%4" ).arg( taskPtr->name()).arg( taskPtr->points()).arg( taskPtr->multi()).arg( taskPtr->type()));
+    }
+
+    // generate taskList checksum (to avoid mismatches)
+    return encrypt( taskString );
+}
+
+/*
+================
+attachDatabase
+================
+*/
+void Main::attachDatabase( const QString &path ) {
+    QSqlQuery query;
+    QString dbPath = path + "import";
+
+    //
+    // TODO: create a local copy, since attachements get deleted
+    //
+
+    // check database
+    QFile::copy( path, dbPath );
+    QFile database( dbPath );
+    QFileInfo dbInfo( database );
+    if ( !database.exists()) {
+        this->error( StrSoftError + this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        return;
+    }
+
+    // attach the new database
+    query.exec( QString( "attach '%1' as merge" ).arg( dbPath ));
+    query.exec( QString( "update merge.teams set id=id+%1" ).arg( highestTeamId()));
+    query.exec( QString( "update merge.logs set id=id+%1" ).arg( highestLogId()));
+
+    // load eventList into temporary storage
+    this->loadEvents( true );
+
+    // find event by name
+    int eventId = -1;
+    foreach ( EventEntry *eventPtr, m.import.eventList ) {
+        if ( !QString::compare( eventPtr->name(), m.currentEvent()->name())) {
+            eventId = eventPtr->id();
+            break;
+        }
+    }
+
+    // failsafe
+    if ( eventId == -1 ) {
+        this->error( StrSoftError + this->tr( "database \"%1\" does not contain event \"%2\"\n" ).arg( dbInfo.fileName()).arg( m.currentEvent()->name()));
+        return;
+    }
+
+    // get rid of junk
+    query.exec( QString( "delete from merge.events where id!=%1" ).arg( eventId ));
+    query.exec( QString( "delete from merge.teams where eventId!=%1" ).arg( eventId ));
+    query.exec( QString( "delete from merge.logs where eventId!=%1" ).arg( eventId ));
+    query.exec( QString( "delete from merge.tasks where eventId!=%1" ).arg( eventId ));
+
+    // update connections
+    query.exec( QString( "update merge.teams set eventId=%1" ).arg( m.currentEvent()->id()));
+    query.exec( QString( "update merge.tasks set eventId=%1" ).arg( m.currentEvent()->id()));
+    query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( highestTeamId()));
+    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( highestComboId()));
+
+    // load taskList into temporary storage
+    this->loadTasks( true );
+
+    // compare task hashes
+    if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
+        this->error( StrSoftError + this->tr( "task list mismatch\n" ));
+        return;
+    }
+
+    // load teamlist into temporary storage
+    this->loadTeams( true );
+
+    // load logs into temporary storage
+    this->loadLogs( true );
+
+    // clean up
+    this->import.teamList.clear();
+    this->import.logList.clear();
+    this->import.taskList.clear();
+    this->import.reviewerList.clear();
+    this->import.eventList.clear();
+    query.exec( "detach merge" );
+    database.remove();
 }
 
 /*

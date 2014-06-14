@@ -317,7 +317,7 @@ void Gui_Main::fillReviewers() {
 
     // repopulate list
     this->ui->comboReviewers->addItem( this->tr( "unknown reviewer" ), -1 );
-    foreach ( ReviewerEntry *reviewerPtr, m.reviewerList ) {
+    foreach ( ReviewerEntry *reviewerPtr, m.base.reviewerList ) {
         this->ui->comboReviewers->addItem( reviewerPtr->name(), reviewerPtr->id());
 
         // set to team reviewer id
@@ -462,7 +462,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
 
     // find item from current position
     for ( y = this->currentMatch(); y < this->ui->taskList->count(); y++ ) {
-        if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+        if ( m.base.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
             match = true;
             this->setCurrentMatch( y );
             break;
@@ -472,7 +472,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
     // no match, try again from beginning
     if ( !match ) {
         for ( y = 0; y < this->ui->taskList->count(); y++ ) {
-            if ( m.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+            if ( m.base.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -542,6 +542,11 @@ void Gui_Main::on_actionEvents_triggered() {
     if ( newEventId != currentEventId ) {
         this->fillTasks();
         this->fillTeams();
+    }
+
+    if ( events.importPerformed()) {
+        QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
+        m.shutdown();
     }
 }
 
@@ -747,6 +752,10 @@ void Gui_Main::on_comboReviewers_currentIndexChanged( int index ) {
 
         TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
         if ( teamPtr == NULL )
+            return;
+
+        // abort if the same reviewer
+        if ( teamPtr->reviewerId() == reviewerPtr->id())
             return;
 
         // init messagebox
