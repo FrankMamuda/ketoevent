@@ -139,6 +139,7 @@ saveLog
 */
 void TaskWidget::saveLog() {
     int value = 0;
+    QSqlQuery query;
 
     if ( !this->isActive())
         return;
@@ -162,9 +163,12 @@ void TaskWidget::saveLog() {
         return;
     }
 
-    // set to zero - orphans will be deleted anyway
+    // set to zero
     if ( value <= 0 && this->hasLog()) {
         this->log()->setValue( 0 );
+
+        // bugfix - muliple logs
+        query.exec( QString( "delete from logs where teamId=%1 and taskId=%2" ).arg( this->log()->teamId()).arg( this->log()->taskId()));
 
         // remove orphans
         int count = 0;

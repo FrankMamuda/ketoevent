@@ -63,6 +63,7 @@ class Main m;
 // on fresh reinstall, db name (path) is not set
 // FIXME: clean up orphaned combos
 //        recreate bug - unchecking log does not remove combo
+// wrap all sqlqueries with error message output
 //
 
 /*
