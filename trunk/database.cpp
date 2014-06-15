@@ -72,46 +72,47 @@ void Main::makePath( const QString &path ) {
 
 /*
 ================
-highestTeamId
+highestId
 ================
 */
-static int highestTeamId() {
-    int teamId = 1;
-    foreach ( TeamEntry *teamPtr, m.base.teamList ) {
-        if ( teamPtr->id() > teamId )
-            teamId =  teamPtr->id();
-    }
-    return teamId;
-}
+int Main::highestId( IdTypes type ) const {
+    int id = 1;
 
-/*
-================
-highestLogId
-================
-*/
-static int highestLogId() {
-    int logId = 1;
-    foreach ( LogEntry *logPtr, m.base.logList ) {
-        if ( logPtr->id() > logId )
-            logId =  logPtr->id();
-    }
-    return logId;
-}
+    switch ( type ) {
+    case ComboId:
+        foreach ( LogEntry *logPtr, m.base.logList ) {
+            if ( logPtr->comboId() > id )
+                id = logPtr->id();
+        }
+        break;
 
-/*
-================
-highestComboId
-================
-*/
-static int highestComboId() {
-    // TODO: reuse code
+    case TeamId:
+        foreach ( TeamEntry *teamPtr, m.base.teamList ) {
+            if ( teamPtr->id() > id )
+                id = teamPtr->id();
+        }
+        break;
 
-    int comboId = 1;
-    foreach ( LogEntry *logPtr, m.base.logList ) {
-        if ( logPtr->comboId() > comboId )
-            comboId = logPtr->id();
+    case LogId:
+        foreach ( LogEntry *logPtr, m.base.logList ) {
+            if ( logPtr->id() > id )
+                id = logPtr->id();
+        }
+        break;
+
+    case ReviewerId:
+        foreach ( ReviewerEntry *reviewerPtr, m.base.reviewerList ) {
+            if ( reviewerPtr->id() > id )
+                id = reviewerPtr->id();
+        }
+        break;
+
+    case NoId:
+    default:
+        id = 0;
+        break;
     }
-    return comboId;
+    return id;
 }
 
 /*
@@ -128,8 +129,6 @@ static QString encrypt( const QString &input ) {
 /*
 ================
 taskListHash
-
-    FIXME: must check against eventId
 ================
 */
 static QString taskListHash( bool import ) {
@@ -163,10 +162,6 @@ void Main::attachDatabase( const QString &path ) {
     QSqlQuery query;
     QString dbPath = path + "import";
 
-    //
-    // TODO: create a local copy, since attachements get deleted
-    //
-
     // check database
     QFile::copy( path, dbPath );
     QFile database( dbPath );
@@ -178,8 +173,8 @@ void Main::attachDatabase( const QString &path ) {
 
     // attach the new database
     query.exec( QString( "attach '%1' as merge" ).arg( dbPath ));
-    query.exec( QString( "update merge.teams set id=id+%1" ).arg( highestTeamId()));
-    query.exec( QString( "update merge.logs set id=id+%1" ).arg( highestLogId()));
+    query.exec( QString( "update merge.teams set id=id+%1" ).arg( this->highestId( TeamId )));
+    query.exec( QString( "update merge.logs set id=id+%1" ).arg( this->highestId( LogId )));
 
     // load eventList into temporary storage
     this->loadEvents( true );
@@ -208,8 +203,8 @@ void Main::attachDatabase( const QString &path ) {
     // update connections
     query.exec( QString( "update merge.teams set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.tasks set eventId=%1" ).arg( m.currentEvent()->id()));
-    query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( highestTeamId()));
-    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( highestComboId()));
+    query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( this->highestId( TeamId )));
+    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg(  this->highestId( LogId )));
 
     // load taskList into temporary storage
     this->loadTasks( true );

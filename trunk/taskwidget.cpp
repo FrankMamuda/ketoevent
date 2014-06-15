@@ -165,7 +165,21 @@ void TaskWidget::saveLog() {
     // set to zero - orphans will be deleted anyway
     if ( value <= 0 && this->hasLog()) {
         this->log()->setValue( 0 );
-        //this->log()->setCombo( LogEntry::NoCombo );
+
+        // remove orphans
+        int count = 0;
+        int badId = this->log()->comboId();
+        foreach ( LogEntry *logPtr, m.base.logList ) {
+            if ( logPtr->comboId() == badId )
+                count++;
+        }
+        if ( count == 2 ) {
+            foreach ( LogEntry *logPtr, m.base.logList ) {
+                if ( logPtr->comboId() == badId )
+                    logPtr->setComboId( -1 );
+            }
+        }
+        this->log()->setComboId( -1 );
     }
 
     // no log?, no problem - create one

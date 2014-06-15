@@ -259,4 +259,7 @@ void Gui_Event::on_buttonImport_clicked() {
 
     // mark as imported
     this->setImported();
+
+    // close window
+    this->accept();
 }

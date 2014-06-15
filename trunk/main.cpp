@@ -60,6 +60,9 @@ class Main m;
 //       Tasks, Teams, Gui as flags (prints out if enabled)
 // FIXME: reviewerchange
 // FIXME: import reviewers
+// on fresh reinstall, db name (path) is not set
+// FIXME: clean up orphaned combos
+//        recreate bug - unchecking log does not remove combo
 //
 
 /*
