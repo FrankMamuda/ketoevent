@@ -82,7 +82,8 @@ class Main : public QObject {
     Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
     Q_PROPERTY( DebugLevels debugLevel READ debugLevel WRITE setDebugLevel )
     Q_CLASSINFO( "description", "Applet main class" )
-    Q_FLAGS( DebugLevels )
+    Q_FLAGS( IdTypes )
+    Q_ENUMS( ErrorTypes )
 
 public:
     // sorting types
@@ -90,6 +91,15 @@ public:
         NoType = -1,
         Teams,
         Tasks
+    };
+
+    // id types
+    enum IdTypes {
+        NoId = -1,
+        TeamId,
+        LogId,
+        ReviewerId,
+        ComboId
     };
 
     // error types
@@ -116,6 +126,7 @@ public:
     TeamEntry *teamForId( int id, bool import = false );
     TeamEntry *teamForName( const QString &name );
     QString path;
+    int highestId( IdTypes type ) const;
 
     // console/settings variables
     ConsoleVariable *cvar( const QString &key );
