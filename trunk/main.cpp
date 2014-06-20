@@ -48,9 +48,6 @@ class Main m;
 //
 // TODO:
 //
-// deprecate db importing, allow only import of statistics
-//   (or at least calculate stats on the fly (no real allocs))
-// statistics - import void teams from csv (just to see the results)
 // check private/public funcs
 // check includes
 // const and static funcs
@@ -58,12 +55,10 @@ class Main m;
 // replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// FIXME: reviewerchange
 // FIXME: import reviewers
-// on fresh reinstall, db name (path) is not set
-// FIXME: clean up orphaned combos
-//        recreate bug - unchecking log does not remove combo
 // wrap all sqlqueries with error message output
+// wrong reviewer on import
+// TODO: allow reviewer lock
 //
 
 /*
@@ -85,6 +80,7 @@ void Main::initialize( QObject *parent ) {
 
     // make default path
     this->makePath( this->cvar( "databasePath" )->string());
+    this->cvar( "databasePath" )->setValue( this->path );
 
     // init cvars
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));

@@ -200,6 +200,18 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->logButton->setEnabled( true );
         }
         this->setCurrentTeamIndex( index );
+
+        // set the right reviewer
+        this->setLocked();
+        int y;
+        int index = -1;
+        for ( y = 0; y < this->ui->comboReviewers->count(); y++ ) {
+            if ( this->ui->comboReviewers->itemData( y ).toInt() == teamPtr->reviewerId()) {
+                index = y;
+                break;
+            }
+        }
+        this->ui->comboReviewers->setCurrentIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
@@ -528,6 +540,9 @@ actionEvents->triggered
 void Gui_Main::on_actionEvents_triggered() {
     int currentEventId, newEventId;
 
+    // lock
+    this->setLocked();
+
     // store last event id
     currentEventId = m.cvar( "currentEvent" )->integer();
 
@@ -548,6 +563,9 @@ void Gui_Main::on_actionEvents_triggered() {
         QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
         m.shutdown();
     }
+
+    // unlock
+    this->unlock();
 }
 
 /*
@@ -556,8 +574,15 @@ actionCombos->triggered
 ================
 */
 void Gui_Main::on_actionCombos_triggered() {
+    // lock
+    this->setLocked();
+
+    // construct dialog
     Gui_Combos combos( this );
     combos.exec();
+
+    // unlock
+    this->unlock();
 }
 
 /*
@@ -755,8 +780,8 @@ void Gui_Main::on_comboReviewers_currentIndexChanged( int index ) {
             return;
 
         // abort if the same reviewer
-        if ( teamPtr->reviewerId() == reviewerPtr->id())
-            return;
+        //if ( teamPtr->reviewerId() == reviewerPtr->id())
+        //    return;
 
         // init messagebox
         QMessageBox msgBox;

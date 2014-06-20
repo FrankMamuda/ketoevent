@@ -161,6 +161,10 @@ attachDatabase
 void Main::attachDatabase( const QString &path ) {
     QSqlQuery query;
     QString dbPath = path + "import";
+    int eventId = -1;
+
+    // write backup just in case
+    this->writeBackup();
 
     // check database
     QFile::copy( path, dbPath );
@@ -172,15 +176,42 @@ void Main::attachDatabase( const QString &path ) {
     }
 
     // attach the new database
-    query.exec( QString( "attach '%1' as merge" ).arg( dbPath ));
-    query.exec( QString( "update merge.teams set id=id+%1" ).arg( this->highestId( TeamId )));
-    query.exec( QString( "update merge.logs set id=id+%1" ).arg( this->highestId( LogId )));
+    if ( !query.exec( QString( "attach '%1' as merge" ).arg( dbPath )))
+        this->error( StrSoftError + this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+    if ( !query.exec( QString( "update merge.teams set id=id+%1" ).arg( this->highestId( TeamId ))))
+        this->error( StrSoftError + this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
+    if ( !query.exec( QString( "update merge.logs set id=id+%1" ).arg( this->highestId( LogId ))))
+        this->error( StrSoftError + this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
+    if ( !query.exec( QString( "update merge.reviewers set id=id+%1" ).arg( this->highestId( ReviewerId ))))
+        this->error( StrSoftError + this->tr( "could not update reviewers, reason - \"%1\"\n" ).arg( query.lastError().text()));
+
+/*
+    {
+        m.print( QString( "increment by %1\n" ).arg( this->highestId( ReviewerId )), System );
+
+        query.exec( "select * from merge.reviewers" );
+        while ( query.next()) {
+            ReviewerEntry *rp = new ReviewerEntry( query.record(), "reviewers" );
+            m.print( QString( "rw %1 id %2\n" ).arg( rp->name()).arg( rp->id()), System );
+
+        }
+
+        m.print( QString( "increment by %1\n" ).arg( this->highestId( TeamId )), System );
+        query.exec( "select * from merge.teams" );
+        while ( query.next()) {
+            TeamEntry *rp = new TeamEntry( query.record(), "teams" );
+            m.print( QString( "rw %1 id %2\n" ).arg( rp->name()).arg( rp->id()), System );
+
+        }
+    }*/
 
     // load eventList into temporary storage
-    this->loadEvents( true );
+    if ( !this->loadEvents( true )) {
+        this->error( StrSoftError + this->tr( "could not load database \"%1\"\n" ).arg( dbInfo.fileName()));
+        goto removeDB;
+    }
 
     // find event by name
-    int eventId = -1;
     foreach ( EventEntry *eventPtr, m.import.eventList ) {
         if ( !QString::compare( eventPtr->name(), m.currentEvent()->name())) {
             eventId = eventPtr->id();
@@ -191,7 +222,7 @@ void Main::attachDatabase( const QString &path ) {
     // failsafe
     if ( eventId == -1 ) {
         this->error( StrSoftError + this->tr( "database \"%1\" does not contain event \"%2\"\n" ).arg( dbInfo.fileName()).arg( m.currentEvent()->name()));
-        return;
+        goto removeDB;
     }
 
     // get rid of junk
@@ -204,7 +235,8 @@ void Main::attachDatabase( const QString &path ) {
     query.exec( QString( "update merge.teams set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.tasks set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( this->highestId( TeamId )));
-    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg(  this->highestId( LogId )));
+    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( this->highestId( LogId )));
+    query.exec( QString( "update merge.teams set reviewerId=reviewerId+%1" ).arg( this->highestId( ReviewerId )));
 
     // load taskList into temporary storage
     this->loadTasks( true );
@@ -212,8 +244,11 @@ void Main::attachDatabase( const QString &path ) {
     // compare task hashes
     if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
         this->error( StrSoftError + this->tr( "task list mismatch\n" ));
-        return;
+        goto removeDB;
     }
+
+    // load logs into temporary storage
+    this->loadReviewers( true );
 
     // load teamlist into temporary storage
     this->loadTeams( true );
@@ -227,6 +262,8 @@ void Main::attachDatabase( const QString &path ) {
     this->import.taskList.clear();
     this->import.reviewerList.clear();
     this->import.eventList.clear();
+
+removeDB:
     query.exec( "detach merge" );
     database.remove();
 }

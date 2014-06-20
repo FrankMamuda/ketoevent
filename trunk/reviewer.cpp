@@ -70,17 +70,25 @@ void Main::addReviewer( const QString &name ) {
 loadReviewers
 ================
 */
-void Main::loadReviewers( bool import, int offset ) {
+void Main::loadReviewers( bool import ) {
     QSqlQuery query;
-    Q_UNUSED( import )
-    Q_UNUSED( offset )
 
     // read all reviewer entries
-    query.exec( "select * from reviewers" );
+    if ( import )
+        query.exec( "select * from merge.reviewers" );
+    else
+        query.exec( "select * from reviewers" );
 
     // store entries in memory
-    while ( query.next())
-        this->base.reviewerList << new ReviewerEntry( query.record(), "reviewers" );
+    while ( query.next()) {
+        ReviewerEntry *reviewerPtr = new ReviewerEntry( query.record(), "reviewers" );
+
+        if ( import ) {
+            reviewerPtr->setImported();
+            this->import.reviewerList << reviewerPtr;
+        } else
+            this->base.reviewerList << reviewerPtr;
+    }
 }
 
 /*

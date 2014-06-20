@@ -82,7 +82,7 @@ void Main::addEvent( const QString &title ) {
 loadEvents
 ================
 */
-void Main::loadEvents( bool import ) {
+bool Main::loadEvents( bool import ) {
     QSqlQuery query;
 
     // read all event entries
@@ -102,15 +102,22 @@ void Main::loadEvents( bool import ) {
             this->base.eventList << eventPtr;
 
         // failsafe - api check
-        // add compatibility in future if needed (unlikely)
-        if ( !import ) {
-            if ( static_cast<unsigned int>( this->base.eventList.last()->api()) < Common::MinimumAPI ) {
-                this->error( StrSoftError +
-                             this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
-                             .arg( this->base.eventList.last()->api())
-                             .arg( Common::MinimumAPI ));
-                this->base.eventList.removeLast();
-            }
+        if ( static_cast<unsigned int>( this->base.eventList.last()->api()) < Common::MinimumAPI ) {
+            this->error( StrSoftError +
+                         this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
+                         .arg( this->base.eventList.last()->api())
+                         .arg( Common::MinimumAPI ));
+            this->base.eventList.removeLast();
+
+            if ( import )
+                return false;
+
+            // rename database
+            this->unloadDatabase();
+            QFile::rename( this->cvar( "databasePath" )->string(), QString( "%1_badAPI_%2.db" ).arg( this->cvar( "databasePath" )->string().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+            this->makePath( this->cvar( "databasePath" )->defaultValue().toString());
+            this->loadDatabase();
+            return false;
         }
     }
 
@@ -128,6 +135,8 @@ void Main::loadEvents( bool import ) {
         if ( !this->setCurrentEvent( this->eventForId( this->cvar( "currentEvent" )->integer())))
             this->setCurrentEvent( this->base.eventList.first());
     }
+
+    return true;
 }
 
 /*

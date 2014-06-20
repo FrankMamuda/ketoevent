@@ -39,7 +39,7 @@
             <string>Import log database from a different machine (beta)</string>
            </property>
            <property name="text">
-            <string>Import database</string>
+            <string>Import logs</string>
            </property>
            <property name="icon">
             <iconset resource="resources.qrc">
