@@ -118,14 +118,64 @@ void Main::loadTeams( bool import ) {
         // check for duplicates
         foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
             foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+                // there's a match
                 if ( !QString::compare( teamPtr->name(), importedTeamPtr->name())) {
+                    // first time import, just append imported
                     if ( !importedTeamPtr->name().endsWith( " (imported)")) {
                         importedTeamPtr->setName( importedTeamPtr->name() + " (imported)" );
-                        importedTeamPtr->store();
-                    } else {
+                    }
+                    // second time import is a no-go
+                    else {
                         m.error( StrSoftError + this->tr( "aborting double import of team \"%1\"\n" ).arg( importedTeamPtr->name()));
                         this->import.teamList.removeOne( teamPtr );
+                        continue;
                     }
+                }
+            }
+
+            // store the new-found team
+            importedTeamPtr->store();
+
+            // find a reviewer for the team
+            bool duplicate = false;
+            foreach ( ReviewerEntry *importedReviewerPtr, this->import.reviewerList ) {
+                //importedReviewerPtr->set
+
+                // found a match
+                if ( importedReviewerPtr->id() == importedTeamPtr->reviewerId()) {
+                    m.print( QString( "found reviewer %1 %2 %3\n" )
+                             .arg( importedReviewerPtr->name())
+                             .arg( importedReviewerPtr->id())
+                             .arg( importedTeamPtr->reviewerId())
+                             , System );
+
+                    // check for duplicates
+                    foreach ( ReviewerEntry *reviewerPtr, this->base.reviewerList ) {
+                        // there's a match
+                        if ( !QString::compare( reviewerPtr->name(), importedReviewerPtr->name())) {
+                            // first time import, just append imported
+                            if ( !importedReviewerPtr->name().endsWith( " (imported)")) {
+                                importedReviewerPtr->setName( importedReviewerPtr->name() + " (imported)" );
+                            }
+                            // second time import is a no-go
+                            else {
+                                duplicate = true;
+                                m.error( StrSoftError + this->tr( "aborting double import of reviewer \"%1\"\n" ).arg( importedReviewerPtr->name()));
+                                this->import.reviewerList.removeOne( importedReviewerPtr );
+                                break;
+                            }
+                        }
+                    }
+
+                    // if duplicate test failed, set to default reviewer
+                    // otherwise, store the new one
+                    if ( duplicate )
+                        importedTeamPtr->setReviewerId( -1 );
+                    else
+                        importedReviewerPtr->store();
+
+                    // nothing to do here, break out!
+                    break;
                 }
             }
         }

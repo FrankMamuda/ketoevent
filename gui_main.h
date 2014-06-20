@@ -87,11 +87,11 @@ private slots:
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
 
     // ui elements
-    void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->fillTeams(); }
-    void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->fillTasks(); }
-    void on_actionRankings_triggered() { Gui_Rankings rankings( this ); rankings.exec(); }
-    void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
-    void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); this->fillTeams(); this->fillTasks(); }
+    void on_actionTeams_triggered() { this->setLocked(); Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->fillTeams(); this->unlock(); }
+    void on_actionTasks_triggered() { this->setLocked(); Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->fillTasks(); this->unlock(); }
+    void on_actionRankings_triggered() { this->setLocked(); Gui_Rankings rankings( this ); rankings.exec(); this->unlock(); }
+    void on_actionAbout_triggered() { this->setLocked(); Gui_About about( this ); about.exec(); this->unlock(); }
+    void on_actionSettings_triggered() { this->setLocked(); Gui_Settings settings( this ); settings.exec(); this->fillTeams(); this->fillTasks(); this->unlock(); }
     void on_actionExit_triggered() { m.shutdown(); }
     void on_logButton_clicked();
     void on_quickAddButton_clicked();

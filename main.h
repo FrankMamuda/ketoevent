@@ -224,8 +224,8 @@ private slots:
     void loadTasks( bool import = false );
     void loadTeams( bool import = false );
     void loadLogs(bool import = false );
-    void loadEvents( bool import = false );
-    void loadReviewers( bool import = false, int offset = -1 );
+    bool loadEvents( bool import = false );
+    void loadReviewers( bool import = false );
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();
