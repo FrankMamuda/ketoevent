@@ -85,6 +85,7 @@ void Main::loadReviewers( bool import ) {
 
         if ( import ) {
             reviewerPtr->setImported();
+            //reviewerPtr->incrementId( this->highestId( ReviewerId ));
             this->import.reviewerList << reviewerPtr;
         } else
             this->base.reviewerList << reviewerPtr;
