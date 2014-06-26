@@ -109,7 +109,6 @@ int Main::highestId( IdTypes type ) const {
 
     case NoId:
     default:
-        id = 0;
         break;
     }
     return id;
@@ -172,38 +171,33 @@ void Main::attachDatabase( const QString &path ) {
     QFileInfo dbInfo( database );
     if ( !database.exists()) {
         this->error( StrSoftError + this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
-        return;
+        goto removeDB;
     }
 
     // attach the new database
-    if ( !query.exec( QString( "attach '%1' as merge" ).arg( dbPath )))
+    if ( !query.exec( QString( "attach '%1' as merge" ).arg( dbPath ))) {
         this->error( StrSoftError + this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
-    if ( !query.exec( QString( "update merge.teams set id=id+%1" ).arg( this->highestId( TeamId ))))
+        goto removeDB;
+    }
+
+    // update teams
+    if ( !query.exec( QString( "update merge.teams set id=id*-1" )) || !query.exec( QString( "update merge.teams set id=(id*-1)+%1" ).arg( this->highestId( TeamId )))) {
+
         this->error( StrSoftError + this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
-    if ( !query.exec( QString( "update merge.logs set id=id+%1" ).arg( this->highestId( LogId ))))
+        goto removeDB;
+    }
+
+    // update logs
+    if ( !query.exec( QString( "update merge.logs set id=id*-1" )) || !query.exec( QString( "update merge.logs set id=(id*-1)+%1" ).arg( this->highestId( LogId )))) {
         this->error( StrSoftError + this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
-    if ( !query.exec( QString( "update merge.reviewers set id=id+%1" ).arg( this->highestId( ReviewerId ))))
+        goto removeDB;
+    }
+
+    // update reviewers
+    if ( !query.exec( QString( "update merge.reviewers set id=id*-1" )) || !query.exec( QString( "update merge.reviewers set id=(id*-1)+%1" ).arg( this->highestId( ReviewerId )))) {
         this->error( StrSoftError + this->tr( "could not update reviewers, reason - \"%1\"\n" ).arg( query.lastError().text()));
-
-/*
-    {
-        m.print( QString( "increment by %1\n" ).arg( this->highestId( ReviewerId )), System );
-
-        query.exec( "select * from merge.reviewers" );
-        while ( query.next()) {
-            ReviewerEntry *rp = new ReviewerEntry( query.record(), "reviewers" );
-            m.print( QString( "rw %1 id %2\n" ).arg( rp->name()).arg( rp->id()), System );
-
-        }
-
-        m.print( QString( "increment by %1\n" ).arg( this->highestId( TeamId )), System );
-        query.exec( "select * from merge.teams" );
-        while ( query.next()) {
-            TeamEntry *rp = new TeamEntry( query.record(), "teams" );
-            m.print( QString( "rw %1 id %2\n" ).arg( rp->name()).arg( rp->id()), System );
-
-        }
-    }*/
+        goto removeDB;
+    }
 
     // load eventList into temporary storage
     if ( !this->loadEvents( true )) {
@@ -304,10 +298,10 @@ void Main::loadDatabase() {
 
     // create initial table structure (if non-existant)
     // TODO: add compatibility layer for the 2013 event (or just stats)
-    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ) unique, points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ) ||
-         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ) unique, members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ) ||
-         !query.exec( "create table if not exists reviewers ( id integer primary key, name varchar( 64 ) unique )" ) ||
-         !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ) unique, minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ) ||
+    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ) ||
+         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ) ||
+         !query.exec( "create table if not exists reviewers ( id integer primary key, name varchar( 64 ))" ) ||
+         !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ) ||
          !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" )) {
         this->error( StrFatalError + this->tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }

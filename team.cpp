@@ -139,16 +139,8 @@ void Main::loadTeams( bool import ) {
             // find a reviewer for the team
             bool duplicate = false;
             foreach ( ReviewerEntry *importedReviewerPtr, this->import.reviewerList ) {
-                //importedReviewerPtr->set
-
                 // found a match
                 if ( importedReviewerPtr->id() == importedTeamPtr->reviewerId()) {
-                    m.print( QString( "found reviewer %1 %2 %3\n" )
-                             .arg( importedReviewerPtr->name())
-                             .arg( importedReviewerPtr->id())
-                             .arg( importedTeamPtr->reviewerId())
-                             , System );
-
                     // check for duplicates
                     foreach ( ReviewerEntry *reviewerPtr, this->base.reviewerList ) {
                         // there's a match

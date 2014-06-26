@@ -59,7 +59,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 namespace Common {
     const static unsigned int API = 7;
-    const static unsigned int MinimumAPI = 7;
+    const static unsigned int MinimumAPI = 6;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
     const static unsigned int defaultComboOfTwo = 1;
