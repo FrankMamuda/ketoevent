@@ -48,6 +48,10 @@
         <property name="text">
          <string>Export statistics as &quot;.CSV&quot;</string>
         </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
+        </property>
        </widget>
       </item>
      </layout>

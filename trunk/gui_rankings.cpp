@@ -76,6 +76,7 @@ void Gui_Rankings::calculateStatistics() {
     foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
+        teamPtr->calculateCombos();
     }
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
@@ -138,7 +139,11 @@ void Gui_Rankings::on_exportButton_clicked() {
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &csv );
+#ifdef Q_OS_WIN
+        out.setCodec( "Windows-1257" );
+#else
         out.setCodec( "UTF-8" );
+#endif
         out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" )
 #ifdef Q_OS_WIN
                .append( "\r" )

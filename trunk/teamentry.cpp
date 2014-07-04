@@ -24,6 +24,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "teamentry.h"
 #include "main.h"
 #include "math.h"
+#include <QSqlQuery>
 
 /*
 ================
@@ -67,7 +68,6 @@ points
 */
 int TeamEntry::points() const {
     int points = 0;
-    Main::stats_t stats = m.getComboStats( this->id());
 
     if ( this->disqualified())
         return 0;
@@ -75,27 +75,60 @@ int TeamEntry::points() const {
     foreach ( LogEntry *logPtr, this->logList )
         points += logPtr->points();
 
-    return points + stats.points;
+    return points + this->bonus();
 }
 
 /*
 ================
-combos
+addComboPoints
 ================
 */
-int TeamEntry::combos() const {
-    Main::stats_t stats = m.getComboStats( this->id());
-    return stats.combos;
+void TeamEntry::addComboPoints( int &counter ) {
+    if ( counter >= 2 )
+        this->m_combos++;
+
+    if ( counter == 2 )
+        this->m_bonus += m.currentEvent()->comboOfTwo();
+    else if ( counter == 3 )
+        this->m_bonus += m.currentEvent()->comboOfThree();
+    else if ( counter >= 4 )
+        this->m_bonus += m.currentEvent()->comboOfFourAndMore();
+
+    counter = 0;
 }
 
 /*
 ================
-total
+comboPoints
 ================
 */
-int TeamEntry::total() const {
-    Main::stats_t stats = m.getComboStats( this->id());
-    return stats.total;
+void TeamEntry::calculateCombos() {
+    QSqlQuery query;
+    int id, lastId, counter = 0;
+
+    // reset stats
+    this->m_combos = 0;
+    this->m_bonus = 0;
+    this->m_total = 0;
+
+    // get combos for the team
+    query.exec( QString( "select * from logs where teamId=%1 and comboId!=-1 and value>0 order by comboId asc" ).arg( this->id()));
+
+    // go through list
+    while ( query.next()) {
+        id = query.record().value( "comboId" ).toInt();
+
+        if ( this->total() == 0 )
+            lastId = id;
+
+        if ( id != lastId ) {
+            lastId = id;
+            this->addComboPoints( counter );
+        }
+        counter++;
+        this->m_total++;
+    }
+    this->addComboPoints( counter );
 }
 
 /*
