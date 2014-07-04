@@ -54,7 +54,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
 
     // failsafe
     if ( this->parent() == NULL || this->objPtr == NULL ) {
-        m.error( StrSoftError + QString( this->tr( "unable to bind settings var '%1\n" )).arg( this->key()));
+        m.error( StrSoftError, QString( this->tr( "unable to bind settings var '%1\n" )).arg( this->key()));
         return;
     }
 
@@ -81,7 +81,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
         break;
 
     default:
-        m.error( StrSoftError + this->tr( "unknown type\n" ));
+        m.error( StrSoftError, this->tr( "unknown type\n" ));
         return;
     }
 
@@ -206,7 +206,7 @@ void SettingsVariable::setState() {
 
     case NoType:
     default:
-        m.error( StrSoftError + this->tr( "unknown type\n" ));
+        m.error( StrSoftError, this->tr( "unknown type\n" ));
         return;
     }
 }

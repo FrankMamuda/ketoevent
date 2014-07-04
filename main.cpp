@@ -31,7 +31,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_main.h"
 #include <QApplication>
 #include <QDir>
-#include <QSqlQuery>
 #include <QSqlError>
 #include <QMessageBox>
 #include <QTranslator>
@@ -52,13 +51,9 @@ class Main m;
 // check includes
 // const and static funcs
 // verbocity for console Regular Verbose PrintEverything
-// replace event with bad API
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// FIXME: import reviewers
-// wrap all sqlqueries with error message output
-// wrong reviewer on import
-// TODO: allow reviewer lock
+// allow reviewer lock
 //
 
 /*
@@ -147,12 +142,28 @@ void Main::print( const QString &msg, DebugLevel debug ) {
 error
 ============
 */
-void Main::error( ErrorTypes type, const QString &msg ) {
+void Main::error( ErrorTypes type, const QString &func, const QString &msg ) {
+    Gui_Main *guiPtr;
+    guiPtr = qobject_cast<Gui_Main*>( this->parent());
+    QString dialogMsg;
+
+    // capitalize for message boxes
+    dialogMsg = msg;
+    dialogMsg.replace( 0, 1, dialogMsg.at( 0 ).toUpper());
+
     if ( type == FatalError ) {
-        this->print( this->tr( "FATAL ERROR: %1" ).arg( msg ), System );
-        this->shutdown( true );
-    } else
-        this->print( this->tr( "ERROR: %1" ).arg( msg ), System );
+        this->print( this->tr( "FATAL ERROR: %1" ).arg( func + msg ), System );
+
+        if ( guiPtr != NULL )
+            QMessageBox::critical( guiPtr, "Fatal error", dialogMsg, QMessageBox::Close );
+
+        this->shutdown( true );        
+    } else {
+        if ( guiPtr != NULL )
+            QMessageBox::warning( guiPtr, "Error", dialogMsg, QMessageBox::Close );
+
+        this->print( this->tr( "ERROR: %1" ).arg( func + msg ), System );
+    }
 }
 
 /*
@@ -190,7 +201,9 @@ void Main::shutdown( bool ignoreDatabase ) {
         delete this->defaultSvar;
 
     // close console
+#ifdef APPLET_DEBUG
     this->console->close();
+#endif
 
     // close database
     if ( !ignoreDatabase )
@@ -218,7 +231,7 @@ void Main::writeBackup() {
     if ( !dir.exists()) {
         dir.mkpath( backupPath );
         if ( !dir.exists()) {
-            this->error( StrFatalError + this->tr( "could not create backup path\n" ));
+            this->error( StrFatalError, this->tr( "could not create backup path\n" ));
             return;
         }
     }

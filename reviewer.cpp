@@ -53,7 +53,7 @@ void Main::addReviewer( const QString &name ) {
 
     // add new reviewer to database
     if ( !query.exec( QString( "insert into reviewers values ( null, '%1' )" ).arg( reviewerName )))
-        this->error( StrSoftError + QString( "could not add reviewer, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not add reviewer, reason - \"%1\"\n" ).arg( query.lastError().text()));
 
     // get latest id
     query.exec( QString( "select * from reviewers where id=%1" ).arg( query.lastInsertId().toInt()));

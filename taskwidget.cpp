@@ -41,7 +41,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
+        m.error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -95,7 +95,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
-        m.error( StrSoftError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        m.error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
     }
 
@@ -146,7 +146,7 @@ void TaskWidget::saveLog() {
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        m.error( StrFatalError + this->tr( "task or team not set\n" ));
+        m.error( StrFatalError, this->tr( "task or team not set\n" ));
         return;
     }
 
@@ -159,7 +159,7 @@ void TaskWidget::saveLog() {
     } else if ( this->task()->type() == TaskEntry::Multi ) {
         value = this->multi->value();
     } else {
-        m.error( StrFatalError + this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        m.error( StrFatalError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
     }
 
@@ -202,7 +202,6 @@ void TaskWidget::saveLog() {
     }
     this->log()->setValue( value );
     this->team()->logList.last()->setValue( value );
-    //this->log()->setCombo( this->comboState());
 
     //Gui_Main *this->parent()
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
@@ -218,7 +217,7 @@ destruct
 TaskWidget::~TaskWidget() {
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
+        m.error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -255,19 +254,19 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError + this->tr( "task not set\n" ));
+        m.error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
     // failsafe
     if ( !this->hasLog()) {
-        m.error( StrSoftError + this->tr( "log not set\n" ));
+        m.error( StrSoftError, this->tr( "log not set\n" ));
         return;
     }
 
     // failsafe
     if ( !this->hasTeam()) {
-        m.error( StrSoftError + this->tr( "team not set\n" ));
+        m.error( StrSoftError, this->tr( "team not set\n" ));
         return;
     }
 
@@ -349,7 +348,7 @@ void TaskWidget::resetLog() {
 
     // failsafe - this really should not happen
     if ( !this->hasTask()) {
-        m.error( StrFatalError + this->tr( "task not set\n" ));
+        m.error( StrFatalError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -373,7 +372,7 @@ void TaskWidget::setTeam( TeamEntry *teamPtr ) {
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        m.error( StrSoftError + this->tr( "task, team or log not set\n" ));
+        m.error( StrSoftError, this->tr( "task, team or log not set\n" ));
         return;
     }
 

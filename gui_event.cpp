@@ -29,6 +29,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMessageBox>
 #include <QSqlQuery>
 #include <QFileDialog>
+#include "QSqlError"
+#include <QTextStream>
 
 /*
 ================
@@ -236,10 +238,6 @@ buttonImport->clicked
 ================
 */
 void Gui_Event::on_buttonImport_clicked() {
-
-    // TODO: disallow importing the same database
-    // TODO: allow exporting base event structure (currentEvent + all tasks without teams and logs)
-
     QString path, filePath;
 
     // get filename from dialog
@@ -254,6 +252,12 @@ void Gui_Event::on_buttonImport_clicked() {
     if ( !QFileInfo( filePath ).absoluteDir().isReadable())
         return;
 
+    // avoid importing the same database
+    if ( !QString::compare( filePath, m.path )) {
+        m.error( StrSoftError, "cannot import current database\n" );
+        return;
+    }
+
     // import database
     m.attachDatabase( filePath );
 
@@ -262,4 +266,99 @@ void Gui_Event::on_buttonImport_clicked() {
 
     // close window
     this->accept();
+}
+
+/*
+================
+buttonExport->clicked
+================
+*/
+void Gui_Event::on_buttonExport_clicked() {
+    QString path;
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), "/sdcard/", this->tr( "Database (*.db)" ));
+#else
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "Database (*.db)" ));
+#endif
+    QSqlQuery query;
+
+    // add extension
+    if ( !path.endsWith( ".db" ))
+        path.append( ".db" );
+
+    // create file
+    QFile database( path );
+    QFileInfo dbInfo( database );
+
+    // forbid overwrite of the current database
+    if ( !QString::compare( path, m.path )) {
+        m.error( StrSoftError, "cannot overwrite current database\n" );
+        return;
+    }
+
+    // touch file
+    if ( database.open( QFile::WriteOnly | QFile::Truncate ))
+        database.close();
+
+    // check if exists
+    if ( !database.exists()) {
+        m.error( StrSoftError, this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        return;
+    }
+
+    // attach the new database
+    if ( !query.exec( QString( "attach '%1' as export" ).arg( path ))) {
+        m.error( StrSoftError, this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        return;
+    }
+
+    m.touchDatabase( "export." );
+    query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( m.currentEvent()->id()));
+    query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( m.currentEvent()->id()));
+    query.exec( "detach export" );
+}
+
+/*
+================
+buttonExportCSV->clicked
+================
+*/
+void Gui_Event::on_buttonExportCSV_clicked() {
+    QString path;
+#ifdef Q_OS_ANDROID
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export tasks to CSV format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
+#else
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+#endif
+    // add extension
+    if ( !path.endsWith( ".csv" ))
+        path.append( ".csv" );
+
+    // create file
+    QFile taskList( path );
+
+    // touch file
+    if ( taskList.open( QFile::WriteOnly | QFile::Truncate )) {
+        QTextStream out( &taskList );
+        out.setCodec( "UTF-8" );
+        out << this->tr( "Task name;Points;Multi;Style;Type" )
+#ifdef Q_OS_WIN
+               .append( "\r" )
+#endif
+               .append( "\n" );
+        foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
+            out << QString( "%1;%2;%3;%4;%5;%6" )
+                   .arg( taskPtr->name())
+                   .arg( taskPtr->points())
+                   .arg( taskPtr->multi())
+                   .arg( taskPtr->style())
+                   .arg( taskPtr->type())
+#ifdef Q_OS_WIN
+                   .arg( "\r\n" );
+#else
+                   .arg( "\n" );
+#endif
+        }
+    }
+    taskList.close();
 }

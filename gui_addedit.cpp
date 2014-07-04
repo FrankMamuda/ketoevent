@@ -49,7 +49,7 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
     case ReviewerDialog:
         if ( this->mode() == Edit ) {
             if ( this->id() == -1 ) {
-                m.error( StrSoftError + this->tr( "Invalid reviewer id in edit mode\n" ));
+                m.error( StrSoftError, this->tr( "Invalid reviewer id in edit mode\n" ));
                 this->reject();
             } else {
                 ReviewerEntry *reviewerPtr = m.reviewerForId( this->id());
@@ -66,14 +66,14 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
             this->setWindowTitle( this->tr( "Add a reviewer" ));
             this->ui->acceptButton->setText( this->tr( "Add reviewer" ));
         } else {
-            m.error( StrSoftError + this->tr( "Dialog called without an edit mode\n" ));
+            m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
             return;
         }
         break;
 
     case NoParent:
     default:
-        m.error( StrSoftError + this->tr( "Dialog called without parent\n" ));
+        m.error( StrSoftError, this->tr( "Dialog called without parent\n" ));
     }
 }
 
@@ -99,7 +99,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
 
         // must not be in edit mode
         if ( this->mode() == Edit ) {
-            m.error( StrSoftError + this->tr( "Edit mode cannot be used for event dialog\n" ));
+            m.error( StrSoftError, this->tr( "Edit mode cannot be used for event dialog\n" ));
             return;
         }
 
@@ -123,7 +123,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
     {
         if ( this->mode() == Edit ) {
             if ( this->id() == -1 ) {
-                m.error( StrSoftError + this->tr( "Invalid reviewer id in edit mode\n" ));
+                m.error( StrSoftError, this->tr( "Invalid reviewer id in edit mode\n" ));
                 this->reject();
             } else {
                 ReviewerEntry *reviewerPtr = m.reviewerForId( this->id());
@@ -140,7 +140,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
             // just add a reviewer
             m.addReviewer( this->ui->titleEdit->text());
         } else {
-            m.error( StrSoftError + this->tr( "Dialog called without an edit mode\n" ));
+            m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
             return;
         }
     }
@@ -148,7 +148,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
 
     case NoMode:
     default:
-        m.error( StrSoftError + this->tr( "Dialog called without an edit mode\n" ));
+        m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
         this->reject();
     }
 

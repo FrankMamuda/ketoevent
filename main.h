@@ -178,6 +178,9 @@ public slots:
     void setInitialized( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
+    // database
+    void touchDatabase( const QString &prefix = "" );
+
     // debug
     void setDebugLevel( DebugLevels debug ) { this->m_debug = debug; }
 
@@ -189,7 +192,7 @@ public slots:
     void attachDatabase( const QString &path );
 
     // console io
-    void error( ErrorTypes type, const QString &msg );
+    void error( ErrorTypes type = SoftError, const QString &func = "", const QString &msg = "" );
     void print( const QString &msg, DebugLevel = Main::NoDebug );
 
     // misc

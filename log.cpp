@@ -51,7 +51,7 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
                       .arg( teamId )
                       .arg( comboId )
                       )) {
-        this->error( StrSoftError + QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from logs where id=%1" ).arg( query.lastInsertId().toInt() ));
 
@@ -136,5 +136,5 @@ void Main::removeOrphanedLogs() {
 
     // remove orphaned logs (fixes crash with invalid teamId/taskId)
     if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
-        this->error( StrSoftError + QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
 }
