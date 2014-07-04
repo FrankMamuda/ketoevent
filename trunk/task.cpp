@@ -57,7 +57,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
                       .arg( max + 1 )
                       .arg( m.currentEvent()->id())
                       )) {
-        this->error( StrSoftError + QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from tasks where id=%1" ).arg( query.lastInsertId().toInt() ));
 

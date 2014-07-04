@@ -125,10 +125,15 @@ exportButton
 void Gui_Rankings::on_exportButton_clicked() {
     QString path;
 #ifdef Q_OS_ANDROID
-    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to csv format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
 #else
-    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to csv format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
 #endif
+    // add extension
+    if ( !path.endsWith( ".csv" ))
+        path.append( ".csv" );
+
+    // create file
     QFile csv( path );
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {

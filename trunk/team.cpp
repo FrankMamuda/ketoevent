@@ -47,10 +47,10 @@ void Main::addTeam(const QString &teamName, int members, QTime finishTime, bool 
                       .arg( members )
                       .arg( finishTime.toString( "hh:mm" ))
                       .arg( static_cast<int>( lockState ))
-                      /* reserved for reviewerId */
+                      .arg( -1 )
                       .arg( m.currentEvent()->id())
                       )) {
-        this->error( StrSoftError + QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
 
@@ -115,6 +115,8 @@ void Main::loadTeams( bool import ) {
     if ( !import )
         this->sort( Main::Teams );
     else {
+        bool duplicate = false;
+
         // check for duplicates
         foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
             foreach ( TeamEntry *teamPtr, this->base.teamList ) {
@@ -126,7 +128,8 @@ void Main::loadTeams( bool import ) {
                     }
                     // second time import is a no-go
                     else {
-                        m.error( StrSoftError + this->tr( "aborting double import of team \"%1\"\n" ).arg( importedTeamPtr->name()));
+                        duplicate = true;
+                        m.error( StrSoftError, this->tr( "aborting double import of team \"%1\"\n" ).arg( importedTeamPtr->name()));
                         this->import.teamList.removeOne( teamPtr );
                         continue;
                     }
@@ -134,10 +137,11 @@ void Main::loadTeams( bool import ) {
             }
 
             // store the new-found team
-            importedTeamPtr->store();
+            if ( !duplicate )
+                importedTeamPtr->store();
 
             // find a reviewer for the team
-            bool duplicate = false;
+            duplicate = false;
             foreach ( ReviewerEntry *importedReviewerPtr, this->import.reviewerList ) {
                 // found a match
                 if ( importedReviewerPtr->id() == importedTeamPtr->reviewerId()) {
@@ -152,7 +156,7 @@ void Main::loadTeams( bool import ) {
                             // second time import is a no-go
                             else {
                                 duplicate = true;
-                                m.error( StrSoftError + this->tr( "aborting double import of reviewer \"%1\"\n" ).arg( importedReviewerPtr->name()));
+                                m.error( StrSoftError, this->tr( "aborting double import of reviewer \"%1\"\n" ).arg( importedReviewerPtr->name()));
                                 this->import.reviewerList.removeOne( importedReviewerPtr );
                                 break;
                             }

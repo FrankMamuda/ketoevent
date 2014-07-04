@@ -66,7 +66,7 @@ void Main::addEvent( const QString &title ) {
                       .arg( timeString )
                       .arg( Common::defaultPenaltyPoints )
                       .arg( comboString ))) {
-        this->error( StrSoftError + QString( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, QString( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
     query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
 
@@ -103,7 +103,7 @@ bool Main::loadEvents( bool import ) {
 
         // failsafe - api check
         if ( static_cast<unsigned int>( this->base.eventList.last()->api()) < Common::MinimumAPI ) {
-            this->error( StrSoftError +
+            this->error( StrSoftError,
                          this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
                          .arg( this->base.eventList.last()->api())
                          .arg( Common::MinimumAPI ));
@@ -128,7 +128,7 @@ bool Main::loadEvents( bool import ) {
 
         // still nothing?
         if ( this->base.eventList.isEmpty()) {
-            this->error( StrFatalError + this->tr( "could not create event\n" ));
+            this->error( StrFatalError, this->tr( "could not create event\n" ));
         }
 
         // for now - resort to indexes?? (use list indexof)
@@ -146,7 +146,7 @@ currentEvent
 */
 EventEntry *Main::currentEvent() {
     if ( m_event == NULL )
-        this->error( StrFatalError + this->tr( "no valid events\n" ));
+        this->error( StrFatalError, this->tr( "no valid events\n" ));
 
     return this->m_event;
 }

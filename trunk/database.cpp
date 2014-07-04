@@ -63,11 +63,12 @@ void Main::makePath( const QString &path ) {
     if ( !db.absoluteDir().exists()) {
         db.absoluteDir().mkpath( fullPath );
         if ( !db.absoluteDir().exists())
-            this->error( StrFatalError + this->tr( "could not create database path - \"%1\"\n" ).arg( fullPath ));
+            this->error( StrFatalError, this->tr( "could not create database path - \"%1\"\n" ).arg( fullPath ));
     }
 
     // store path
     this->path = fullPath;
+    this->path.replace( "//", "/" );
 }
 
 /*
@@ -170,38 +171,37 @@ void Main::attachDatabase( const QString &path ) {
     QFile database( dbPath );
     QFileInfo dbInfo( database );
     if ( !database.exists()) {
-        this->error( StrSoftError + this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        this->error( StrSoftError, this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
         goto removeDB;
     }
 
     // attach the new database
     if ( !query.exec( QString( "attach '%1' as merge" ).arg( dbPath ))) {
-        this->error( StrSoftError + this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
         goto removeDB;
     }
 
     // update teams
     if ( !query.exec( QString( "update merge.teams set id=id*-1" )) || !query.exec( QString( "update merge.teams set id=(id*-1)+%1" ).arg( this->highestId( TeamId )))) {
-
-        this->error( StrSoftError + this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
         goto removeDB;
     }
 
     // update logs
     if ( !query.exec( QString( "update merge.logs set id=id*-1" )) || !query.exec( QString( "update merge.logs set id=(id*-1)+%1" ).arg( this->highestId( LogId )))) {
-        this->error( StrSoftError + this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
         goto removeDB;
     }
 
     // update reviewers
     if ( !query.exec( QString( "update merge.reviewers set id=id*-1" )) || !query.exec( QString( "update merge.reviewers set id=(id*-1)+%1" ).arg( this->highestId( ReviewerId )))) {
-        this->error( StrSoftError + this->tr( "could not update reviewers, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        this->error( StrSoftError, this->tr( "could not update reviewers, reason - \"%1\"\n" ).arg( query.lastError().text()));
         goto removeDB;
     }
 
     // load eventList into temporary storage
     if ( !this->loadEvents( true )) {
-        this->error( StrSoftError + this->tr( "could not load database \"%1\"\n" ).arg( dbInfo.fileName()));
+        this->error( StrSoftError, this->tr( "could not load database \"%1\"\n" ).arg( dbInfo.fileName()));
         goto removeDB;
     }
 
@@ -215,7 +215,7 @@ void Main::attachDatabase( const QString &path ) {
 
     // failsafe
     if ( eventId == -1 ) {
-        this->error( StrSoftError + this->tr( "database \"%1\" does not contain event \"%2\"\n" ).arg( dbInfo.fileName()).arg( m.currentEvent()->name()));
+        this->error( StrSoftError, this->tr( "database \"%1\" does not contain event \"%2\"\n" ).arg( dbInfo.fileName()).arg( m.currentEvent()->name()));
         goto removeDB;
     }
 
@@ -237,7 +237,7 @@ void Main::attachDatabase( const QString &path ) {
 
     // compare task hashes
     if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
-        this->error( StrSoftError + this->tr( "task list mismatch\n" ));
+        this->error( StrSoftError, this->tr( "task list mismatch\n" ));
         goto removeDB;
     }
 
@@ -262,6 +262,26 @@ removeDB:
     database.remove();
 }
 
+
+/*
+================
+touchDatabase
+================
+*/
+void Main::touchDatabase( const QString &prefix ) {
+    // create query
+    QSqlQuery query;
+
+    // create initial table structure (if non-existant)
+    if ( !query.exec( QString( "create table if not exists %1tasks ( id integer primary key, name varchar( 256 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ).arg( prefix )) ||
+         !query.exec( QString( "create table if not exists %1teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ).arg( prefix )) ||
+         !query.exec( QString( "create table if not exists %1reviewers ( id integer primary key, name varchar( 64 ))" ).arg( prefix )) ||
+         !query.exec( QString( "create table if not exists %1events ( id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ).arg( prefix )) ||
+         !query.exec( QString( "create table if not exists %1logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" ).arg( prefix ))) {
+        this->error( StrFatalError, this->tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
+    }
+}
+
 /*
 ================
 loadDatabase
@@ -275,7 +295,7 @@ void Main::loadDatabase() {
 
     // failsafe
     if ( !db.isDriverAvailable( "QSQLITE" ))
-        this->error( StrFatalError + this->tr( "sqlite not present on the system\n" ));
+        this->error( StrFatalError, this->tr( "sqlite not present on the system\n" ));
 
     // set sqlite driver
     db = QSqlDatabase::addDatabase( "QSQLITE" );
@@ -291,20 +311,10 @@ void Main::loadDatabase() {
 
     // set path and open
     if ( !db.open())
-        this->error( StrFatalError + this->tr( "could not load task database - \"%1\"\n" ).arg( dbInfo.fileName()));
+        this->error( StrFatalError, this->tr( "could not load task database - \"%1\"\n" ).arg( dbInfo.fileName()));
 
-    // create query
-    QSqlQuery query;
-
-    // create initial table structure (if non-existant)
     // TODO: add compatibility layer for the 2013 event (or just stats)
-    if ( !query.exec( "create table if not exists tasks ( id integer primary key, name varchar( 256 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ) ||
-         !query.exec( "create table if not exists teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ) ||
-         !query.exec( "create table if not exists reviewers ( id integer primary key, name varchar( 64 ))" ) ||
-         !query.exec( "create table if not exists events ( id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ) ||
-         !query.exec( "create table if not exists logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" )) {
-        this->error( StrFatalError + this->tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
-    }
+    this->touchDatabase();
 
     // delete orphaned logs on init
     this->removeOrphanedLogs();

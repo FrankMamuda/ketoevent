@@ -73,6 +73,6 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
     // update database value
     if ( !this->table().isNull()) {
         if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( table ).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
-            m.error( StrSoftError + this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            m.error( StrSoftError, this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
 }

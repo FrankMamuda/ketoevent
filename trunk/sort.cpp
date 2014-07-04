@@ -198,7 +198,7 @@ void Main::sort( ListTypes type ) {
 
     case NoType:
     default:
-        this->error( StrSoftError + this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
+        this->error( StrSoftError, this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
         return;
     }
 }
