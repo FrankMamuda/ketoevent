@@ -160,18 +160,6 @@ public:
     bool isInitialized() const { return this->m_init; }
     DebugLevels debugLevel() const { return this->m_debug; }
 
-    // combination statistics
-    typedef struct stats_s {
-        int points;
-        int combos;
-        int total;
-
-        /* expanded to support statistics imports */
-        int tasks;
-        int timeOnTrack;
-    } stats_t;
-    stats_t getComboStats( int id ) const;
-
 public slots:
     // init/shutdown
     void initialize( QObject *parent );

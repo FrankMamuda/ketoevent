@@ -340,7 +340,11 @@ void Gui_Event::on_buttonExportCSV_clicked() {
     // touch file
     if ( taskList.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &taskList );
+#ifdef Q_OS_WIN
+        out.setCodec( "Windows-1257" );
+#else
         out.setCodec( "UTF-8" );
+#endif
         out << this->tr( "Task name;Points;Multi;Style;Type" )
 #ifdef Q_OS_WIN
                .append( "\r" )

@@ -58,8 +58,10 @@ public:
     bool isLocked() const { return this->record().value( "lock" ).toBool(); }
     bool isUnlocked() const { return !this->isLocked(); }
     int points() const;
-    int combos() const;
-    int total() const;
+    void calculateCombos();
+    int total() const { return this->m_total; }
+    int bonus() const { return this->m_bonus; }
+    int combos() const { return this->m_combos; }
     int penalty() const;
     float grade() const;
     int timeOnTrack() const;
@@ -73,6 +75,12 @@ public slots:
     void setEventId( int id ) { this->setValue( "eventId", id ); }
     void lock( bool lock = true ) { this->setValue( "lock", static_cast<int>( lock )); }
     void unlock( bool lock = true ) { this->setValue( "lock", static_cast<int>( !lock )); }
+    void addComboPoints( int &counter );
+
+private:
+    int m_combos;
+    int m_total;
+    int m_bonus;
 };
 
 #endif // TEAMENTRY_H

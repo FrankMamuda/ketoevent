@@ -91,16 +91,14 @@ void Gui_Combos::currentTeamIndexChanged( int index ) {
     this->logListSorted = teamPtr->logList;
     qSort( this->logListSorted.begin(), this->logListSorted.end(), listByCombos );
 
-    //QList<QPair<int, int> >combos;
     foreach ( LogEntry *logPtr, this->logListSorted ) {
         if ( logPtr->comboId() == -1 )
             this->logListSorted.removeOne( logPtr );
     }
 
-    //int points, combos, total;
-    Main::stats_t stats = m.getComboStats( teamPtr->id());
-    this->ui->combos->setText( this->tr( "%1 (%2 tasks)" ).arg( stats.combos ).arg( stats.total ));
-    this->ui->points->setText( QString( "%1" ).arg( stats.points ));
+    teamPtr->calculateCombos();
+    this->ui->combos->setText( this->tr( "%1 (%2 tasks)" ).arg( teamPtr->combos()).arg( teamPtr->total()));
+    this->ui->points->setText( QString( "%1" ).arg( teamPtr->bonus()));
 
     // end reset
     this->comboModelPtr->endReset();
