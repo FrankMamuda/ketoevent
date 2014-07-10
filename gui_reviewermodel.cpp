@@ -22,7 +22,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include "gui_reviewermodel.h"
-#include <QFont>
 
 /*
 ================

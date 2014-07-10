@@ -181,7 +181,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources.qrc">
-         <normaloff>:/icons/sort_16</normaloff>:/icons/sort_16</iconset>
+         <normaloff>:/icons/tasks_sort_16</normaloff>:/icons/tasks_sort_16</iconset>
        </property>
       </widget>
      </item>

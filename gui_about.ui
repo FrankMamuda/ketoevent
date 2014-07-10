@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/about_48</normaloff>:/icons/about_48</iconset>
+    <normaloff>:/icons/about_dialog_16</normaloff>:/icons/about_dialog_16</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="resources.qrc">
-         <normaloff>:/icons/about_48</normaloff>:/icons/about_48</iconset>
+         <normaloff>:/icons/about_dialog_16</normaloff>:/icons/about_dialog_16</iconset>
        </property>
        <property name="autoDefault">
         <bool>false</bool>

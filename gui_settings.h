@@ -24,7 +24,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QtGlobal>
 #include <QDialog>
 #include "settingsvariable.h"
 #include "gui_settingsdialog.h"

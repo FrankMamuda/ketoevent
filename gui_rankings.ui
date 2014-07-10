@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/rankings_48</normaloff>:/icons/rankings_48</iconset>
+    <normaloff>:/icons/rankings_dialog_16</normaloff>:/icons/rankings_dialog_16</iconset>
   </property>
   <layout class="QVBoxLayout" name="rankingLayout">
    <item>

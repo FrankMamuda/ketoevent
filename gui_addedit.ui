@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>AddEdit</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/events_48</normaloff>:/icons/events_48</iconset>
+    <normaloff>:/icons/events_dialog_16</normaloff>:/icons/events_dialog_16</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">

@@ -26,7 +26,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include <QObject>
 #include <QList>
-#include <QSqlDatabase>
 #include <QSettings>
 #include <QTime>
 #include "teamentry.h"
@@ -49,10 +48,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define StrFatalError Main::FatalError, ClassFunc
 #define StrSoftError Main::SoftError, ClassFunc
 #define StrWarn QObject::trUtf8( "WARNING:" ) + ClassFunc
-
-// pointer macro
-#define GetPtr( type, name, container ) type name = qobject_cast<type>( container );
-#define TestPtr( name ) if ( name == NULL )
 
 //
 // namespace: Common

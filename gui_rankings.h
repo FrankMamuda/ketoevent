@@ -24,9 +24,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QtGlobal>
 #include <QDialog>
 #include "gui_rankingmodel.h"
+#include <QSortFilterProxyModel>
 
 //
 // namespaces
@@ -46,10 +46,8 @@ public:
     explicit Gui_Rankings( QWidget *parent = 0 );
     ~Gui_Rankings();
 
-public slots:
-    void rescaleWindow();
-
 private slots:
+    void rescaleWindow();
     void calculateStatistics();
     void on_exportButton_clicked();
 

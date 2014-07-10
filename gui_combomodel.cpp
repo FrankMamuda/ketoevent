@@ -25,6 +25,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_combos.h"
 #include "taskwidget.h"
 #include <QColor>
+#include "main.h"
 
 //
 // comboColour_t
@@ -72,7 +73,9 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
         return QVariant();
 
     // get dialog parent
-    GetPtr( Gui_Combos *, cPtr, this->listParent ); TestPtr( cPtr ) return 0;
+    Gui_Combos *cPtr = qobject_cast<Gui_Combos *>( this->listParent );
+    if ( cPtr == NULL )
+        return 0;
 
     // get row count from parent
     if ( index.row() >= cPtr->logListSorted.count())
@@ -109,7 +112,9 @@ rowCount
 */
 int Gui_ComboModel::rowCount( const QModelIndex & ) const {
     // get dialog parent
-    GetPtr( Gui_Combos *, cPtr, this->listParent ); TestPtr( cPtr ) return 0;
+    Gui_Combos *cPtr = qobject_cast<Gui_Combos *>( this->listParent );
+    if ( cPtr == NULL )
+        return 0;
 
     // get row count from parent
     return cPtr->logListSorted.count();
