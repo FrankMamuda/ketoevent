@@ -207,8 +207,7 @@ void Gui_Event::on_buttonRemove_clicked() {
     msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton( QMessageBox::Yes );
     msgBox.setIcon( QMessageBox::Warning );
-    // TODO: change icon
-    msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
+    msgBox.setWindowIcon( QIcon( ":/icons/event_remove_16" ));
     state = msgBox.exec();
 
     // check options

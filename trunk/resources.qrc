@@ -7,7 +7,6 @@
         <file alias="tasks_48">icons/tasks_48.png</file>
         <file alias="teams_48">icons/teams_48.png</file>
         <file alias="team_add_16">icons/team_add_16.png</file>
-        <file alias="team_delete_16">icons/team_delete_16.png</file>
         <file alias="team_dialog_16">icons/team_dialog_16.png</file>
         <file alias="team_edit_16">icons/team_edit_16.png</file>
         <file alias="cancel_16">icons/cancel_16.png</file>
@@ -31,6 +30,14 @@
         <file alias="reviewers_48">icons/reviewers_48.png</file>
         <file alias="combos_48">icons/combos_48.png</file>
         <file alias="star_16">icons/star_16.png</file>
+        <file alias="team_remove_16">icons/team_remove_16.png</file>
+        <file alias="combo_add_16">icons/combo_add_16.png</file>
+        <file alias="combo_remove_16">icons/combo_remove_16.png</file>
+        <file alias="event_add_16">icons/event_add_16.png</file>
+        <file alias="event_remove_16">icons/event_remove_16.png</file>
+        <file alias="reviewer_add_16">icons/reviewer_add_16.png</file>
+        <file alias="reviewer_remove_16">icons/reviewer_remove_16.png</file>
+        <file alias="reviewer_edit_16">icons/reviewer_edit_16.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>

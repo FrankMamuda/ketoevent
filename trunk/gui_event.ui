@@ -308,7 +308,7 @@
      </property>
      <property name="icon">
       <iconset resource="resources.qrc">
-       <normaloff>:/icons/team_delete_16</normaloff>:/icons/team_delete_16</iconset>
+       <normaloff>:/icons/event_remove_16</normaloff>:/icons/event_remove_16</iconset>
      </property>
     </widget>
    </item>
@@ -319,7 +319,7 @@
      </property>
      <property name="icon">
       <iconset resource="resources.qrc">
-       <normaloff>:/icons/team_add_16</normaloff>:/icons/team_add_16</iconset>
+       <normaloff>:/icons/event_add_16</normaloff>:/icons/event_add_16</iconset>
      </property>
     </widget>
    </item>
