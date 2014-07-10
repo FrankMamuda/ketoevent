@@ -184,11 +184,9 @@ void Main::sort( ListTypes type ) {
         this->base.taskList.append( boldList );
         this->base.taskList.append( italicList );
 
-
         regularList.clear();
         boldList.clear();
         italicList.clear();
-        //qSort( this->base.taskList.begin(), this->base.taskList.end(), listToAscending<TaskEntry> );
     }
         break;
 

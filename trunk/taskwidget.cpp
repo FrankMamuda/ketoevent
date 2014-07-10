@@ -24,7 +24,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskwidget.h"
 #include "main.h"
 #include <QSqlQuery>
-#include <QSqlError>
 #include "gui_main.h"
 #include <QPainter>
 
@@ -327,7 +326,7 @@ void TaskWidget::comboIdChanged() {
     if ( this->hasTeam() && this->hasCombo()) {
         QPixmap px( ":/icons/star_16" );
         QPainter painter( &px );
-        painter.setFont( QFont("Arial") );
+        painter.setFont( QFont( "Times New Roman" ));
         painter.drawText( px.rect(), Qt::AlignCenter, QString( "%1" ).arg( this->getRelativeComboId( this->log()->comboId(), this->team()->id())));
         this->comboIcon->setPixmap( px );
     } else

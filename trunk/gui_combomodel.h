@@ -26,7 +26,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include <QStringListModel>
 #include <QSortFilterProxyModel>
-#include "main.h"
 
 //
 // class: Combo model (gui)

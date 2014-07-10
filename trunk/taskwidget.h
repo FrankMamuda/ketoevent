@@ -30,7 +30,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QPushButton>
 #include <QLabel>
 #include <QGridLayout>
-//#include <QLineEdit>
 #include "taskentry.h"
 #include "logentry.h"
 #include "teamentry.h"

@@ -30,8 +30,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlError>
 #include <QDir>
 #include <QCryptographicHash>
-#include <QProcess>
-#include <QApplication>
+#include <QSqlDatabase>
 
 /*
 ================

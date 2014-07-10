@@ -118,7 +118,10 @@ void Gui_Combos::fillTeams() {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
     // set to current team
-    GetPtr( Gui_Main *, mPtr, this->parent()); TestPtr( mPtr ) return;
+    Gui_Main *mPtr = qobject_cast<Gui_Main *>( this->parent());
+    if ( mPtr == NULL )
+        return;
+
     this->ui->comboTeams->setCurrentIndex( mPtr->currentTeamIndex());
 }
 

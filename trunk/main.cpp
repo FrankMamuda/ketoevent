@@ -47,18 +47,17 @@ class Main m;
 //
 // TODO:
 //
-// check private/public funcs
-// check includes
-// const and static funcs
 // verbocity for console Regular Verbose PrintEverything
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
 // allow reviewer lock
+// change icon for sort
 //
 //
 // FIXME:
 //
 // no dialog on reviewer change
+// sort broken in tasks
 //
 
 /*

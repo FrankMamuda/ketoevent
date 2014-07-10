@@ -66,12 +66,6 @@ public:
     // constructor
     SettingsVariable( const QString &key, SettingsVariable::Types bType, SettingsVariable::Class varClass = ConsoleVar );
 
-    // set initial values from cvars
-    void setState();
-
-    // save value
-    void save();
-
     // bind/unbind
     void unbind();
     void bind( QObject *objPtr, QObject *parentPtr );
@@ -80,17 +74,12 @@ public slots:
     void setKey( const QString &key ) { this->m_key = key; }
     void setType( Types bType ) { this->m_type = bType; }
     void setClass( Class varClass ) { this->m_class = varClass; }
+    void setState();
 
-    // checkBox
+private slots:
     void stateChanged( int state );
-
-    // spinBox
     void integerValueChanged( int integer );
-
-    // timeEdit
     void timeChanged( const QTime &time );
-
-    // textChanged
     void textChanged( const QString &text );
 
 private:

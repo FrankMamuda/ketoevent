@@ -59,9 +59,7 @@ private slots:
     void on_buttonRemove_clicked();
     void on_buttonImport_clicked();
     void setImported( bool import = true ) { this->m_import = import; }
-
     void on_buttonExport_clicked();
-
     void on_buttonExportCSV_clicked();
 
 private:

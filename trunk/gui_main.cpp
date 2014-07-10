@@ -21,7 +21,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include <QVariant>
 #include "main.h"
 #include "gui_main.h"
 #include "ui_gui_main.h"
@@ -172,14 +171,20 @@ void Gui_Main::teamIndexChanged( int index ) {
         this->ui->timeFinish->setTime( teamPtr->finishTime());
 
         // clean up values
-        for ( y = 0; y < lw->count(); y++ ) {
-            GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
+        for ( y = 0; y < lw->count(); y++ ) {          
+            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+            if ( taskPtr == NULL )
+                continue;
+
             taskPtr->resetTeam();
         }
 
         // display new values
         for ( y = 0; y < lw->count(); y++ ) {
-            GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( y ))); TestPtr( taskPtr ) continue;
+            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+            if ( taskPtr == NULL )
+                continue;
+
             taskPtr->setTeam( teamPtr );
 
             // trigger id change
@@ -239,7 +244,9 @@ void Gui_Main::taskIndexChanged( int row ) {
         row = this->ui->taskList->currentRow();
 
     // get task widget
-    GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( row ))); TestPtr( taskPtr ) return;
+    TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( row )));
+    if ( taskPtr == NULL )
+        return;
 
     // get log
     LogEntry *lPtr = taskPtr->log();
@@ -364,7 +371,10 @@ void Gui_Main::clearTasks() {
 
     // cannot use for loop, since items are removed from list
     while ( lw->count()) {
-        GetPtr( TaskWidget *, taskPtr, lw->itemWidget( lw->item( 0 ))); TestPtr( taskPtr ) continue;
+        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
+        if ( taskPtr == NULL )
+            continue;
+
         this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
         delete taskPtr;
         delete lw->item( 0 );
@@ -806,7 +816,7 @@ void Gui_Main::on_comboReviewers_currentIndexChanged( int index ) {
 
         case QMessageBox::No:
             //
-            // BAD CODE
+            // FIXME: BAD CODE
             //
             // DIRTY FIX
             this->setLocked();
