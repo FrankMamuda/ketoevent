@@ -116,8 +116,7 @@ void Gui_Reviewers::on_removeButton_clicked() {
     msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton( QMessageBox::Yes );
     msgBox.setIcon( QMessageBox::Warning );
-    // TODO: change icon
-    msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
+    msgBox.setWindowIcon( QIcon( ":/icons/reviewer_remove_16" ));
     state = msgBox.exec();
 
     // check options

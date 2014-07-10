@@ -414,12 +414,11 @@ void TaskWidget::toggleCombo( bool checked ) {
     if ( gui == NULL )
         return;
 
-    // TODO: change to different icons
     if ( checked ) {
         this->comboIcon->hide();
 
         this->taskName->setStyleSheet( "background-color: rgba( 0, 200, 0, 128 ); border-style: outset; border-width: 2px; border-radius: 10px; border-color: beige; font: bold; padding: 6px;" );
-        this->combo->setIcon( QIcon( ":/icons/task_remove_16" ));
+        this->combo->setIcon( QIcon( ":/icons/combo_remove_16" ));
 
         if ( !this->hasLog() || this->hasCombo())
             return;
@@ -430,7 +429,7 @@ void TaskWidget::toggleCombo( bool checked ) {
 
 
         this->taskName->setStyleSheet( "padding: 6px;" );
-        this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
+        this->combo->setIcon( QIcon( ":/icons/combo_add_16" ));
 
         if ( !this->hasLog() && gui->currentComboIndex() != -1 )
             return;

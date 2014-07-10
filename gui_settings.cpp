@@ -38,13 +38,8 @@ Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
 
     if ( m.isInitialized())
         this->bindVars();
-    else {
-        // TODO: disable stuff
-        //this->ui->groupMisc->setDisabled( true );
-        //this->ui->groupPoints->setDisabled( true );
-        //this->ui->groupTime->setDisabled( true );
-        //this->ui->groupData->setDisabled( true );
-    }
+    else
+        this->reject();
 
 #ifdef Q_OS_ANDROID
     // android fullscreen fix

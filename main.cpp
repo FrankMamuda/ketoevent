@@ -55,6 +55,11 @@ class Main m;
 //       Tasks, Teams, Gui as flags (prints out if enabled)
 // allow reviewer lock
 //
+//
+// FIXME:
+//
+// no dialog on reviewer change
+//
 
 /*
 ================

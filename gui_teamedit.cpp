@@ -162,7 +162,7 @@ void Gui_TeamEdit::on_removeTeamButton_clicked() {
         msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
         msgBox.setDefaultButton( QMessageBox::Yes );
         msgBox.setIcon( QMessageBox::Warning );
-        msgBox.setWindowIcon( QIcon( ":/icons/team_delete_16" ));
+        msgBox.setWindowIcon( QIcon( ":/icons/team_remove_16" ));
         state = msgBox.exec();
 
         // check options
