@@ -25,10 +25,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QFont>
 #include <QColor>
 
-//
-// FIXME: too frequent updates - inefficient
-//
-
 /*
 ================
 data

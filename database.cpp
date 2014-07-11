@@ -312,7 +312,7 @@ void Main::loadDatabase() {
     if ( !db.open())
         this->error( StrFatalError, this->tr( "could not load task database - \"%1\"\n" ).arg( dbInfo.fileName()));
 
-    // TODO: add compatibility layer for the 2013 event (or just stats)
+    // create database
     this->touchDatabase();
 
     // delete orphaned logs on init

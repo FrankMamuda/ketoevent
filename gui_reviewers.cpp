@@ -71,6 +71,9 @@ void Gui_Reviewers::on_addButton_clicked() {
     evAdd.exec();
     this->listModelPtr->beginReset();
     this->listModelPtr->endReset();
+
+    // select new value
+    this->ui->reviewerList->setCurrentIndex( this->listModelPtr->index( this->listModelPtr->rowCount()-1 ));
 }
 
 /*
