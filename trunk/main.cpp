@@ -22,7 +22,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 //#define FORCE_LATVIAN
-#define APPLET_DEBUG
+//#define APPLET_DEBUG
 
 //
 // includes
@@ -52,7 +52,8 @@ class Main m;
 //       Tasks, Teams, Gui as flags (prints out if enabled)
 // allow reviewer lock
 // change icon for sort
-//
+// add option to hide logged entries? or at least implement hilighting
+// add compatibility layer for the 2013 event (or just stats)
 //
 // FIXME:
 //

@@ -98,7 +98,7 @@ void TeamEntry::addComboPoints( int &counter ) {
 
 /*
 ================
-comboPoints
+calculateCombos
 ================
 */
 void TeamEntry::calculateCombos() {

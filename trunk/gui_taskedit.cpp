@@ -193,6 +193,7 @@ doneButton->clicked
 */
 void Gui_TaskEdit::on_doneButton_clicked() {
     TaskEntry *taskPtr = NULL;
+    QModelIndex lastIndex;
 
     // failsafe
     if ( this->ui->taskName->text().isEmpty()) {
@@ -212,6 +213,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
         m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()), static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));
+        lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match by id
         taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
@@ -227,6 +229,9 @@ void Gui_TaskEdit::on_doneButton_clicked() {
         taskPtr->setMulti( this->ui->taskMaxMulti->value());
         taskPtr->setType( static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));;
         taskPtr->setStyle( static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));;
+
+        // get last index
+        lastIndex = this->ui->taskList->currentIndex();
     }
 
     // reset view
@@ -234,9 +239,8 @@ void Gui_TaskEdit::on_doneButton_clicked() {
     this->setCurrentMatch();
     this->listModelPtr->endReset();
 
-    // TODO: select last added/edited value (not implemented)
-    //index = this->listModelPtr->index( m.base.taskList.indexOf( entryPtr ), 0 );
-    //this->ui->taskList->setCurrentIndex( index );
+    // select last added/edited value
+    this->ui->taskList->setCurrentIndex( lastIndex );
 }
 
 /*

@@ -196,6 +196,7 @@ doneButton->clicked
 */
 void Gui_TeamEdit::on_doneButton_clicked() {
     TeamEntry *teamPtr;
+    QModelIndex lastIndex;
 
     // failsafe
     if ( this->ui->teamNameEdit->text().isEmpty()) {
@@ -216,6 +217,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
     // alternate between Add/Edit states
     if ( this->state() == Add || this->state() == AddQuick ) {
         m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time());
+        lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match name to be sure
         teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
@@ -229,6 +231,9 @@ void Gui_TeamEdit::on_doneButton_clicked() {
         teamPtr->setName( this->ui->teamNameEdit->text());
         teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
         teamPtr->setMembers( this->ui->teamMembersEdit->value());
+
+        // get last index
+        lastIndex = this->ui->teamList->currentIndex();
     }
 
     // quick add
@@ -240,4 +245,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
     // reset view
     this->toggleAddEditWidget( NoState );
     this->listModelPtr->endReset();
+
+    // select last added/edited value
+    this->ui->teamList->setCurrentIndex( lastIndex );
 }

@@ -30,8 +30,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_reviewers.h"
 #include <QMessageBox>
 
-// TODO: fix hilight colours
-
 /*
 ================
 construct
