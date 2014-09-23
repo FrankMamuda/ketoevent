@@ -58,10 +58,12 @@ void Main::makePath( const QString &path ) {
 
     // make path id nonexistant
     QFileInfo db( fullPath );
+    QDir dir;
+    dir.setPath( db.absolutePath());
 
-    if ( !db.absoluteDir().exists()) {
-        db.absoluteDir().mkpath( fullPath );
-        if ( !db.absoluteDir().exists())
+    if ( !dir.exists()) {
+        dir.mkpath( db.absolutePath());
+        if ( !dir.exists())
             this->error( StrFatalError, this->tr( "could not create database path - \"%1\"\n" ).arg( fullPath ));
     }
 
@@ -300,6 +302,10 @@ void Main::loadDatabase() {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setHostName( "localhost" );
     db.setDatabaseName( this->path );
+
+
+    //if ( !QDir( this->path ).exists())
+    //    QDir::mkpath( this->path );
 
     // touch file if empty
     if ( !database.exists()) {
