@@ -31,6 +31,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 class TaskEntry : public DatabaseEntry {
     Q_PROPERTY( QString name READ name WRITE setName )
+    Q_PROPERTY( QString description READ description WRITE setDescription )
     Q_PROPERTY( int points READ points WRITE setPoints )
     Q_PROPERTY( int multi READ multi WRITE setMulti )
     Q_PROPERTY( Types type READ type WRITE setType )
@@ -62,6 +63,7 @@ public:
     int order() const { return this->record().value( "parent" ).toInt(); }
     int calculate( int logId ) const;
     int eventId() const { return this->record().value( "eventId" ).toInt(); }
+    QString description() const { return this->record().value( "description" ).toString(); }
 
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
@@ -71,6 +73,7 @@ public slots:
     void setStyle( Styles style = NoStyle ) { this->setValue( "style", static_cast<int>( style )); }
     void setOrder( int order = 0 ) { if ( order >= 0 ) this->setValue( "parent", order ); }
     void setEventId( int id ) { this->setValue( "eventId", id ); }
+    void setDescription( const QString &description ) { this->setValue( "description", description ); }
 };
 
 #endif // TASKENTRY_H

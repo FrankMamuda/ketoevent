@@ -202,13 +202,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="addEditLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="taskNameLabel">
-           <property name="text">
-            <string>Task name</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="1" colspan="3">
           <widget class="QLineEdit" name="taskName">
            <property name="toolTip">
@@ -219,17 +212,10 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="taskTypeLabel">
+         <item row="0" column="0">
+          <widget class="QLabel" name="taskNameLabel">
            <property name="text">
-            <string>Type</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="maxMultiLabel">
-           <property name="text">
-            <string>Max multiplier</string>
+            <string>Task name</string>
            </property>
           </widget>
          </item>
@@ -240,7 +226,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
+         <item row="4" column="0" colspan="2">
           <widget class="QPushButton" name="doneButton">
            <property name="toolTip">
             <string>Click when done editing task</string>
@@ -254,7 +240,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="2" colspan="2">
+         <item row="4" column="2" colspan="2">
           <widget class="QPushButton" name="cancelButton">
            <property name="toolTip">
             <string>Click to abort editing</string>
@@ -268,10 +254,17 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="taskPoints">
-           <property name="toolTip">
-            <string>Points for completion</string>
+         <item row="1" column="2">
+          <widget class="QLabel" name="maxMultiLabel">
+           <property name="text">
+            <string>Max multiplier</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="taskTypeLabel">
+           <property name="text">
+            <string>Type</string>
            </property>
           </widget>
          </item>
@@ -282,6 +275,13 @@
            </property>
            <property name="minimum">
             <number>2</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="taskPoints">
+           <property name="toolTip">
+            <string>Points for completion</string>
            </property>
           </widget>
          </item>
@@ -305,13 +305,6 @@
            </item>
           </widget>
          </item>
-         <item row="2" column="2">
-          <widget class="QLabel" name="styleLabel">
-           <property name="text">
-            <string>Style</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="3">
           <widget class="QComboBox" name="taskStyle">
            <property name="toolTip">
@@ -333,6 +326,23 @@
             </property>
            </item>
           </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLabel" name="styleLabel">
+           <property name="text">
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="descriptionLabel">
+           <property name="text">
+            <string>Description</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="3">
+          <widget class="QLineEdit" name="taskDescription"/>
          </item>
         </layout>
        </item>

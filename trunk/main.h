@@ -43,6 +43,13 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define ClassFunc QString( "%1::%2: " ).arg( this->metaObject()->className()).arg( __func__ )
 #endif
 
+//
+// defines
+//
+//#define FORCE_LATVIAN
+//#define APPLET_DEBUG
+//#define ENABLE_REVIEWERS
+
 // error message macros
 #define StrMsg ClassFunc
 #define StrFatalError Main::FatalError, ClassFunc
@@ -53,7 +60,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 7;
+    const static unsigned int API = 8;
     const static unsigned int MinimumAPI = 6;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
@@ -169,7 +176,7 @@ public slots:
 
     // database related
     void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
-    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle );
+    void addTask(const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle , const QString &description = QString::null );
     void addEvent( const QString &title = QString::null );
     void addReviewer( const QString &name = QString::null );
     void attachDatabase( const QString &path );

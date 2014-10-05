@@ -34,7 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 addTask
 ================
 */
-void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style ) {
+void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style, const QString &description ) {
     QSqlQuery query;
     int max = 0;
 
@@ -48,7 +48,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
         max = query.value( 0 ).toInt();
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7 )" )
+    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7, %8 )" )
                       .arg( taskName )
                       .arg( points )
                       .arg( multi )
@@ -56,6 +56,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
                       .arg( static_cast<TaskEntry::Types>( type ))
                       .arg( max + 1 )
                       .arg( m.currentEvent()->id())
+                      .arg( description )
                       )) {
         this->error( StrSoftError, QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
     }
