@@ -42,7 +42,8 @@ void Main::addTeam(const QString &teamName, int members, QTime finishTime, bool 
         return;
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', null, %5 )" )
+    // id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer
+    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', %5, %6 )" )
                       .arg( teamName )
                       .arg( members )
                       .arg( finishTime.toString( "hh:mm" ))

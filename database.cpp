@@ -274,7 +274,7 @@ void Main::touchDatabase( const QString &prefix ) {
     QSqlQuery query;
 
     // create initial table structure (if non-existant)
-    if ( !query.exec( QString( "create table if not exists %1tasks ( id integer primary key, name varchar( 256 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer )" ).arg( prefix )) ||
+    if ( !query.exec( QString( "create table if not exists %1tasks ( id integer primary key, name varchar( 128 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer, description varchar( 512 ))" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1reviewers ( id integer primary key, name varchar( 64 ))" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1events ( id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ).arg( prefix )) ||

@@ -89,6 +89,7 @@ void Gui_TaskEdit::toggleView( ViewState viewState ) {
     this->ui->closeButton->setDefault( state );
     this->ui->findTask->setEnabled( state );
     this->ui->clearText->setEnabled( state );
+    this->ui->taskDescription->setEnabled( true );
 }
 
 /*
@@ -118,6 +119,7 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->taskName->clear();
             this->ui->taskPoints->setValue( 1 );
             this->ui->taskMaxMulti->clear();
+            this->ui->taskDescription->clear();
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add task" ));
             this->ui->taskStyle->setCurrentIndex( 0 );
             break;
@@ -131,6 +133,7 @@ void Gui_TaskEdit::toggleAddEditWidget( AddEditState state ) {
             }
 
             this->ui->taskName->setText( taskPtr->name());
+            this->ui->taskDescription->setText( taskPtr->description());
             this->ui->taskPoints->setValue( taskPtr->points());
             this->ui->taskType->setCurrentIndex( static_cast<int>( taskPtr->type()));
             this->ui->taskStyle->setCurrentIndex( static_cast<int>( taskPtr->style()));
@@ -229,6 +232,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
         taskPtr->setMulti( this->ui->taskMaxMulti->value());
         taskPtr->setType( static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));;
         taskPtr->setStyle( static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));;
+        taskPtr->setDescription( this->ui->taskDescription->text());
 
         // get last index
         lastIndex = this->ui->taskList->currentIndex();

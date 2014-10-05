@@ -49,6 +49,12 @@ void Gui_Main::initialize( bool reload ) {
     // lock reviewers
     this->setLocked();
 
+#ifndef ENABLE_REVIEWERS
+    this->ui->mainToolBar->removeAction( this->ui->actionReviewers );
+    this->ui->labelReviewer->hide();
+    this->ui->comboReviewers->hide();
+#endif
+
     // disable actions on partial initialization (debug)
     if ( !m.isInitialized()) {
         this->ui->actionTeams->setDisabled( true );
