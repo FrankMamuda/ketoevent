@@ -48,7 +48,9 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
         max = query.value( 0 ).toInt();
 
     // perform database update and select last row
-    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7, %8 )" )
+    //   id integer primary key, name varchar( 128 ), points integer, multi integer, style integer,
+    //   type integer, parent integer, eventId integer, description varchar( 512 )
+    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7, '%8' )" )
                       .arg( taskName )
                       .arg( points )
                       .arg( multi )
