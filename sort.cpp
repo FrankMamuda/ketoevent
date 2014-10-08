@@ -161,28 +161,28 @@ void Main::sort( ListTypes type ) {
         QList <TaskEntry*>boldList;
         QList <TaskEntry*>italicList;
 
-        foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
             if ( taskPtr->style() == TaskEntry::Regular )
                 regularList << taskPtr;
         }
         qSort( regularList.begin(), regularList.end(), listToAscending<TaskEntry> );
 
-        foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
             if ( taskPtr->style() == TaskEntry::Bold )
                 boldList << taskPtr;
         }
         qSort( boldList.begin(), boldList.end(), listToAscending<TaskEntry> );
 
-        foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
             if ( taskPtr->style() == TaskEntry::Italic )
                 italicList << taskPtr;
         }
         qSort( italicList.begin(), italicList.end(), listToAscending<TaskEntry> );
 
-        this->base.taskList.clear();
-        this->base.taskList.append( regularList );
-        this->base.taskList.append( boldList );
-        this->base.taskList.append( italicList );
+        this->currentEvent()->taskList.clear();
+        this->currentEvent()->taskList.append( regularList );
+        this->currentEvent()->taskList.append( boldList );
+        this->currentEvent()->taskList.append( italicList );
 
         regularList.clear();
         boldList.clear();
@@ -191,7 +191,7 @@ void Main::sort( ListTypes type ) {
         break;
 
     case Teams:
-        qSort( this->base.teamList.begin(), this->base.teamList.end(), listToAscending<TeamEntry> );
+        qSort( this->currentEvent()->teamList.begin(), this->currentEvent()->teamList.end(), listToAscending<TeamEntry> );
         break;
 
     case NoType:
