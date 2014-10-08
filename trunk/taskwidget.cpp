@@ -64,8 +64,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         font.setBold( true );
     }
 
-    // set font
+    // set font & tooltip
     this->taskName->setFont( font );
+    this->taskName->setToolTip( this->task()->description());
 
     // determine type
     if ( this->task()->type() == TaskEntry::Check ) {
@@ -73,22 +74,26 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->check->setMaximumWidth( 48 );
         this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2 );
         this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
-        this->grid->addWidget( this->check, 0, 3, 1, 1 );
+        this->grid->addWidget( this->check, 0, 4, 1, 1 );
 
         // set tooltips
-        this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
+        //this->taskName->setText( this->tr( "%1 (%2 p)" ).arg( this->task()->name()).arg( this->task()->points()));
+        //this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
         this->check->setToolTip( this->tr( "Toggle task completion" ));
     } else if ( this->task()->type() == TaskEntry::Multi ) {
         this->multi = new QSpinBox();
+        this->multi->setMaximumWidth( 64 );
 
         if ( this->task()->type() == TaskEntry::Multi )
             this->multi->setMaximum( this->task()->multi());
 
         this->connect( this->multi, SIGNAL( valueChanged( int )), this, SLOT( saveLog()));
-        this->grid->addWidget( this->multi, 0, 3, 1, 1 );
+        this->grid->addWidget( this->multi, 0, 4, 1, 1 );
 
         // set tooltips
-        this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
+        //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
+        //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
+        //this->taskName->setText( this->tr( "%1 (%2x%3 p)" ).arg( this->task()->name()).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
         m.error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
@@ -197,8 +202,10 @@ void TaskWidget::saveLog() {
 
     //Gui_Main *this->parent()
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
-    if ( gui != NULL )
+    if ( gui != NULL ) {
         gui->taskIndexChanged( -1 );
+        gui->updateStatusBar();
+    }
 }
 
 /*

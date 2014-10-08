@@ -113,9 +113,11 @@ void Gui_Console::on_input_returnPressed() {
             }
         }
     } else if ( !QString::compare( cmd, "db_info", Qt::CaseInsensitive )) {
-        this->print( QString( "events - %1, teams - %2, tasks - %3, logs - %4" )
+        this->print( QString( "events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
                      .arg( m.base.eventList.count())
+                     .arg( m.currentEvent()->teamList.count())
                      .arg( m.base.teamList.count())
+                     .arg( m.currentEvent()->taskList.count())
                      .arg( m.base.taskList.count())
                      .arg( m.base.logList.count()));
     } else

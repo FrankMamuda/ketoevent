@@ -75,6 +75,9 @@ void Gui_Main::initialize( bool reload ) {
     // set title
     this->setEventTitle();
 
+    // hide statusbar for now
+    this->statusBar()->hide();
+
     // announce
     this->print( this->tr( "initialization complete\n" ));
 }
@@ -130,7 +133,7 @@ void Gui_Main::teamIndexChanged( int index ) {
         this->ui->timeFinish->setTime( teamPtr->finishTime());
 
         // clean up values
-        for ( y = 0; y < lw->count(); y++ ) {          
+        for ( y = 0; y < lw->count(); y++ ) {
             TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
             if ( taskPtr == NULL )
                 continue;
@@ -381,7 +384,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
 
     // find item from current position
     for ( y = this->currentMatch(); y < this->ui->taskList->count(); y++ ) {
-        if ( m.base.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+        if ( m.currentEvent()->taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
             match = true;
             this->setCurrentMatch( y );
             break;
@@ -391,7 +394,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
     // no match, try again from beginning
     if ( !match ) {
         for ( y = 0; y < this->ui->taskList->count(); y++ ) {
-            if ( m.base.taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+            if ( m.currentEvent()->taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -648,3 +651,19 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
             taskPtr->combo->setDisabled( true );
     }
 }
+
+/*
+================
+updateStatusBar
+================
+*/
+void Gui_Main::updateStatusBar() {
+#if 0
+    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( teamPtr != NULL )
+        this->statusBar()->showMessage( this->tr( "Tasks - %1, combos - %2 (%3), points - %3" ).arg( teamPtr->logList.count()));
+    else
+        this->statusBar()->clearMessage();
+#endif
+}
+

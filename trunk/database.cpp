@@ -129,7 +129,7 @@ static QString taskListHash( bool import ) {
     if ( import )
         list = m.import.taskList;
     else
-        list = m.base.taskList;
+        list = m.currentEvent()->taskList;
 
     // build unique taskList
     foreach ( TaskEntry *taskPtr, list ) {

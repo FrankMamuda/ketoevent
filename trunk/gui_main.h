@@ -63,6 +63,7 @@ public slots:
     void setEventTitle();
     void clearTasks();
     void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
+    void updateStatusBar();
 
 private slots:
     // team/task fill

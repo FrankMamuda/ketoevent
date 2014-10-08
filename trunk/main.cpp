@@ -44,20 +44,10 @@ class Main m;
 // verbocity for console Regular Verbose PrintEverything
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// update code to support new reviewer system
-//   - name in titlebar
-//   - lineedit in main?
-//   - team add/edit screen
-//   - settings cvar
-//   - api, sql bindings, etc.
-//   - rankings
-// change icon for sort
 // add option to hide logged entries? or at least implement hilighting
 // add compatibility layer for the 2013 event (or just stats)
 //
 // FIXME:
-//
-// sort broken in tasks
 //
 
 /*
@@ -347,6 +337,9 @@ int main( int argc, char *argv[] ) {
 
     // initialize application
     m.initialize( qobject_cast<QObject*>( &gui ));
+
+    // set stylesheet
+    //app.setStyleSheet( "QToolTip { font: 11px Lucida Grande, Lucida Sans Unicode, Arial, Verdana, sans-serif; background-color: #191919; color: #CCCCCC; border: 1px solid #CCCCCC; padding: 4px; }");
 
     // add teams
     gui.initialize();
