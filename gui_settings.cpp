@@ -40,12 +40,6 @@ Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
         this->bindVars();
     else
         this->reject();
-
-#ifdef Q_OS_ANDROID
-    // android fullscreen fix
-    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
-    this->setGeometry( wPtr->geometry());
-#endif
 }
 
 /*
@@ -72,6 +66,7 @@ void Gui_Settings::bindVars() {
     this->bindVariable( "backup/perform", this->ui->backupPerform );
     this->bindVariable( "misc/sortTasks", this->ui->sort );
     this->bindVariable( "databasePath", this->ui->dbPath );
+    this->bindVariable( "reviewerName", this->ui->rvName );
 
     // unlock vars
     this->lockVariables( false );

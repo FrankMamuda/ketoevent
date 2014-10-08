@@ -27,7 +27,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskwidget.h"
 #include "gui_event.h"
 #include "gui_combos.h"
-#include "gui_reviewers.h"
 #include <QMessageBox>
 
 /*
@@ -46,15 +45,6 @@ initialize
 ================
 */
 void Gui_Main::initialize( bool reload ) {
-    // lock reviewers
-    this->setLocked();
-
-#ifndef ENABLE_REVIEWERS
-    this->ui->mainToolBar->removeAction( this->ui->actionReviewers );
-    this->ui->labelReviewer->hide();
-    this->ui->comboReviewers->hide();
-#endif
-
     // disable actions on partial initialization (debug)
     if ( !m.isInitialized()) {
         this->ui->actionTeams->setDisabled( true );
@@ -82,23 +72,8 @@ void Gui_Main::initialize( bool reload ) {
         this->fillTasks();
     }
 
-    // no icon text for android
-#ifdef Q_OS_ANDROID
-    this->ui->mainToolBar->setToolButtonStyle( Qt::ToolButtonIconOnly );
-    this->ui->mainToolBar->removeAction( this->ui->actionExit );
-
-    // moving through teamlist is complicated on android
-    // since QComboBox is somewhat f'd up
-    QPushButton *upPtr = new QPushButton( QIcon( ":/icons/up_16" ), " " );
-    QPushButton *dwPtr = new QPushButton( QIcon( ":/icons/down_16" ), " " );
-    this->ui->teamLayout->insertWidget( 1, upPtr );
-    this->ui->teamLayout->insertWidget( 2, dwPtr );
-    this->connect( upPtr, SIGNAL( clicked()), this, SLOT( on_upButton_clicked()));
-    this->connect( dwPtr, SIGNAL( clicked()), this, SLOT( on_downButton_clicked()));
-#endif
-
     // set title
-    this->setEventTitle( m.currentEvent()->name());
+    this->setEventTitle();
 
     // announce
     this->print( this->tr( "initialization complete\n" ));
@@ -109,37 +84,17 @@ void Gui_Main::initialize( bool reload ) {
 setEventTitle
 ============
 */
-void Gui_Main::setEventTitle( const QString &name ) {
-    this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( name/* m.currentEvent()->name()*/));
-}
+void Gui_Main::setEventTitle() {
+    QString reviewer;
 
-/*
-================
-on_downButton_clicked
-================
-*/
-#ifdef Q_OS_ANDROID
-void Gui_Main::on_upButton_clicked() {
-    int index = this->ui->comboTeams->currentIndex();
-    index--;
-    if ( index >= 0 && index < this->ui->comboTeams->count())
-        this->ui->comboTeams->setCurrentIndex( index );
-}
-#endif
+    // get reviewer name
+    reviewer = m.cvar( "reviewerName" )->string();
 
-/*
-================
-on_downButton_clicked
-================
-*/
-#ifdef Q_OS_ANDROID
-void Gui_Main::on_downButton_clicked() {
-    int index = this->ui->comboTeams->currentIndex();
-    index++;
-    if ( index >= 0 && index < this->ui->comboTeams->count())
-        this->ui->comboTeams->setCurrentIndex( index );
+    if ( !reviewer.isEmpty())
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1 (%2)" ).arg( m.currentEvent()->name()).arg( reviewer ));
+    else
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( m.currentEvent()->name()));
 }
-#endif
 
 /*
 ================
@@ -209,18 +164,6 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->logButton->setEnabled( true );
         }
         this->setCurrentTeamIndex( index );
-
-        // set the right reviewer
-        this->setLocked();
-        int y;
-        int index = -1;
-        for ( y = 0; y < this->ui->comboReviewers->count(); y++ ) {
-            if ( this->ui->comboReviewers->itemData( y ).toInt() == teamPtr->reviewerId()) {
-                index = y;
-                break;
-            }
-        }
-        this->ui->comboReviewers->setCurrentIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
@@ -313,56 +256,6 @@ void Gui_Main::fillTeams( int forcedId ) {
         if ( lastId != -1 && lastId == teamPtr->id())
             this->ui->comboTeams->setCurrentIndex( this->ui->comboTeams->count()-1 );
     }
-
-    // just redo this here
-    this->fillReviewers();
-}
-
-/*
-================
-fillReviewers
-================
-*/
-void Gui_Main::fillReviewers() {
-    bool reviewerSet = false;
-
-    // abort if partially initialized
-    if ( !m.isInitialized())
-        return;
-
-    // clear list
-    this->ui->comboReviewers->clear();
-
-    // set current value
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr == NULL )
-        return;
-
-    // repopulate list
-    this->ui->comboReviewers->addItem( this->tr( "unknown reviewer" ), -1 );
-    foreach ( ReviewerEntry *reviewerPtr, m.base.reviewerList ) {
-        this->ui->comboReviewers->addItem( reviewerPtr->name(), reviewerPtr->id());
-
-        // set to team reviewer id
-        if ( teamPtr->reviewerId() == reviewerPtr->id()) {
-            this->ui->comboReviewers->setCurrentIndex( this->ui->comboReviewers->count()-1 );
-            reviewerSet = true;
-        }
-    }
-
-    // no reviewers? default to unknown
-    if ( !reviewerSet ) {
-        this->ui->comboReviewers->setCurrentIndex( 0 );
-
-        // default to zero
-        teamPtr->setReviewerId( 0 );
-    }
-
-    // store last index
-    this->setCurrentReviewerIndex( this->ui->comboReviewers->currentIndex());
-
-    // unlock reviewers
-    this->unlock();
 }
 
 /*
@@ -554,9 +447,6 @@ actionEvents->triggered
 void Gui_Main::on_actionEvents_triggered() {
     int currentEventId, newEventId;
 
-    // lock
-    this->setLocked();
-
     // store last event id
     currentEventId = m.cvar( "currentEvent" )->integer();
 
@@ -578,8 +468,7 @@ void Gui_Main::on_actionEvents_triggered() {
         m.shutdown();
     }
 
-    // unlock
-    this->unlock();
+    this->setEventTitle();
 }
 
 /*
@@ -588,15 +477,9 @@ actionCombos->triggered
 ================
 */
 void Gui_Main::on_actionCombos_triggered() {
-    // lock
-    this->setLocked();
-
     // construct dialog
     Gui_Combos combos( this );
     combos.exec();
-
-    // unlock
-    this->unlock();
 }
 
 /*
@@ -763,73 +646,5 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
         taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
         if ( taskPtr != NULL )
             taskPtr->combo->setDisabled( true );
-    }
-}
-
-/*
-================
-actionCombos->triggered
-================
-*/
-void Gui_Main::on_actionReviewers_triggered() {
-    Gui_Reviewers rd;
-    rd.exec();
-    this->setLocked();
-    this->fillReviewers();
-}
-
-/*
-================
-comboReviewers->currentIndexChanged
-================
-*/
-void Gui_Main::on_comboReviewers_currentIndexChanged( int index ) {
-    if ( !this->isLocked()) {
-        ReviewerEntry *reviewerPtr = m.reviewerForId( this->ui->comboReviewers->itemData( index ).toInt());
-        if ( reviewerPtr == NULL )
-            return;
-
-        TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-        if ( teamPtr == NULL )
-            return;
-
-        // abort if the same reviewer
-        //if ( teamPtr->reviewerId() == reviewerPtr->id())
-        //    return;
-
-        // init messagebox
-        QMessageBox msgBox;
-        int state;
-
-        // allow to reconsider
-        msgBox.setText( this->tr( "Change team \"%1\" reviewer to \"%2\"?" )
-                        .arg( teamPtr->name())
-                        .arg( reviewerPtr->name()));
-        msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
-        msgBox.setDefaultButton( QMessageBox::Yes );
-        msgBox.setIcon( QMessageBox::Warning );
-        msgBox.setWindowIcon( QIcon( ":/icons/reviewers_48" ));
-        state = msgBox.exec();
-
-        // check options
-        switch ( state ) {
-        case QMessageBox::Yes:
-            teamPtr->setReviewerId( reviewerPtr->id());
-            this->setCurrentReviewerIndex( this->ui->comboReviewers->currentIndex());
-            break;
-
-        case QMessageBox::No:
-            //
-            // FIXME: BAD CODE
-            //
-            // DIRTY FIX
-            this->setLocked();
-            this->fillReviewers();
-            //this->ui->comboReviewers->setCurrentIndex( this->currentReviewerIndex());
-            break;
-
-        default:
-            return;
-        }
     }
 }

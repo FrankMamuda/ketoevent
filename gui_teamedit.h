@@ -71,6 +71,8 @@ private slots:
     void setLastId( int id ) { this->m_lastId = id; }
     void resetLastId() { this->m_lastId = -1; }
 
+    void on_reviewerButton_clicked();
+
 private:
     Ui::Gui_TeamEdit *ui;
     AddEditState m_state;

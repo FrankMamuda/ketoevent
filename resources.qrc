@@ -26,7 +26,6 @@
         <file alias="locked_16">icons/locked_16.png</file>
         <file alias="unlocked_16">icons/unlocked_16.png</file>
         <file alias="events_48">icons/events_48.png</file>
-        <file alias="reviewers_48">icons/reviewers_48.png</file>
         <file alias="combos_48">icons/combos_48.png</file>
         <file alias="star_16">icons/star_16.png</file>
         <file alias="team_remove_16">icons/team_remove_16.png</file>
@@ -34,12 +33,9 @@
         <file alias="combo_remove_16">icons/combo_remove_16.png</file>
         <file alias="event_add_16">icons/event_add_16.png</file>
         <file alias="event_remove_16">icons/event_remove_16.png</file>
-        <file alias="reviewer_add_16">icons/reviewer_add_16.png</file>
-        <file alias="reviewer_remove_16">icons/reviewer_remove_16.png</file>
         <file alias="reviewer_edit_16">icons/reviewer_edit_16.png</file>
         <file alias="tasks_sort_16">icons/tasks_sort_16.png</file>
         <file alias="events_dialog_16">icons/events_dialog_16.png</file>
-        <file alias="reviewers_dialog_16">icons/reviewers_dialog_16.png</file>
         <file alias="combos_dialog_16">icons/combos_dialog_16.png</file>
         <file alias="settings_dialog_16">icons/settings_dialog_16.png</file>
         <file alias="rankings_dialog_16">icons/rankings_dialog_16.png</file>

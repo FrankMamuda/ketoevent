@@ -51,12 +51,6 @@ Gui_TaskEdit::Gui_TaskEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
 
     // connect
     this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));
-
-#ifdef Q_OS_ANDROID
-    // android fullscreen fix
-    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
-    this->setGeometry( wPtr->geometry());
-#endif
 }
 
 /*
@@ -204,9 +198,6 @@ void Gui_TaskEdit::on_doneButton_clicked() {
         msgBox.setText( this->tr( "Please specify task name" ));
         msgBox.setIcon( QMessageBox::Information );
         msgBox.exec();
-#ifdef Q_OS_ANDROID
-        msgBox.setGeometry( this->geometry());
-#endif
         return;
     }
 

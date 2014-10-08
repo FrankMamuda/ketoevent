@@ -47,7 +47,6 @@ public:
     enum Parent {
         NoParent = -1,
         EventDialog,
-        ReviewerDialog
     };
     enum Mode {
         NoMode = -1,

@@ -43,11 +43,7 @@ void Main::makePath( const QString &path ) {
     // default path?
     if ( path.isEmpty()) {
 #ifdef Q_OS_UNIX
-#ifdef Q_OS_ANDROID
-        fullPath = QString( "/sdcard/data/org.factory12.ketoevent3/" );
-#else
         fullPath = QString( QDir::homePath() + "/.ketoevent/" );
-#endif
 #else
         fullPath = QString( QDir::currentPath() + "/" );
 #endif
@@ -99,13 +95,6 @@ int Main::highestId( IdTypes type ) const {
         foreach ( LogEntry *logPtr, m.base.logList ) {
             if ( logPtr->id() > id )
                 id = logPtr->id();
-        }
-        break;
-
-    case ReviewerId:
-        foreach ( ReviewerEntry *reviewerPtr, m.base.reviewerList ) {
-            if ( reviewerPtr->id() > id )
-                id = reviewerPtr->id();
         }
         break;
 
@@ -194,12 +183,6 @@ void Main::attachDatabase( const QString &path ) {
         goto removeDB;
     }
 
-    // update reviewers
-    if ( !query.exec( QString( "update merge.reviewers set id=id*-1" )) || !query.exec( QString( "update merge.reviewers set id=(id*-1)+%1" ).arg( this->highestId( ReviewerId )))) {
-        this->error( StrSoftError, this->tr( "could not update reviewers, reason - \"%1\"\n" ).arg( query.lastError().text()));
-        goto removeDB;
-    }
-
     // load eventList into temporary storage
     if ( !this->loadEvents( true )) {
         this->error( StrSoftError, this->tr( "could not load database \"%1\"\n" ).arg( dbInfo.fileName()));
@@ -231,7 +214,6 @@ void Main::attachDatabase( const QString &path ) {
     query.exec( QString( "update merge.tasks set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( this->highestId( TeamId )));
     query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( this->highestId( LogId )));
-    query.exec( QString( "update merge.teams set reviewerId=reviewerId+%1" ).arg( this->highestId( ReviewerId )));
 
     // load taskList into temporary storage
     this->loadTasks( true );
@@ -241,9 +223,6 @@ void Main::attachDatabase( const QString &path ) {
         this->error( StrSoftError, this->tr( "task list mismatch\n" ));
         goto removeDB;
     }
-
-    // load logs into temporary storage
-    this->loadReviewers( true );
 
     // load teamlist into temporary storage
     this->loadTeams( true );
@@ -255,7 +234,6 @@ void Main::attachDatabase( const QString &path ) {
     this->import.teamList.clear();
     this->import.logList.clear();
     this->import.taskList.clear();
-    this->import.reviewerList.clear();
     this->import.eventList.clear();
 
 removeDB:
@@ -275,8 +253,7 @@ void Main::touchDatabase( const QString &prefix ) {
 
     // create initial table structure (if non-existant)
     if ( !query.exec( QString( "create table if not exists %1tasks ( id integer primary key, name varchar( 128 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer, description varchar( 512 ))" ).arg( prefix )) ||
-         !query.exec( QString( "create table if not exists %1teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer )" ).arg( prefix )) ||
-         !query.exec( QString( "create table if not exists %1reviewers ( id integer primary key, name varchar( 64 ))" ).arg( prefix )) ||
+         !query.exec( QString( "create table if not exists %1teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewer varchar( 64 ), eventId integer )" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1events ( id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 ), finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, lock integer )" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1logs ( id integer primary key, value integer, taskId integer, teamId integer, comboId integer )" ).arg( prefix ))) {
         this->error( StrFatalError, this->tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
@@ -326,7 +303,6 @@ void Main::loadDatabase() {
 
     // load entries
     this->loadEvents();
-    this->loadReviewers();
     this->loadTasks();
     this->loadTeams();
     this->loadLogs();

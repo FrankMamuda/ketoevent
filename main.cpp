@@ -44,14 +44,19 @@ class Main m;
 // verbocity for console Regular Verbose PrintEverything
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// allow reviewer lock
+// update code to support new reviewer system
+//   - name in titlebar
+//   - lineedit in main?
+//   - team add/edit screen
+//   - settings cvar
+//   - api, sql bindings, etc.
+//   - rankings
 // change icon for sort
 // add option to hide logged entries? or at least implement hilighting
 // add compatibility layer for the 2013 event (or just stats)
 //
 // FIXME:
 //
-// no dialog on reviewer change
 // sort broken in tasks
 //
 
@@ -81,6 +86,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
     this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
+    this->addCvar( new ConsoleVariable( "reviewerName", this->settings, "" ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -105,6 +111,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
     this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
+    this->addSvar( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
 
     // set parent
     this->setParent( parent );
@@ -336,12 +343,7 @@ int main( int argc, char *argv[] ) {
 
     // init main window
     Gui_Main gui;
-#ifdef Q_OS_ANDROID
-    app.setStyleSheet( "QTimeEdit { width: 128px; } QTimeEdit::up-button { subcontrol-position: right; width: 32px; height: 32px; } QTimeEdit::down-button { subcontrol-position: left; width: 32px; height: 32px; } QSpinBox { width: 96px; } QSpinBox::up-button { subcontrol-position: right; width: 32px; height: 32px; } QSpinBox::down-button { subcontrol-position: left; width: 32px; height: 32px; } QCheckBox::indicator { width: 32px; height: 32px; }" );
-    gui.showMaximized();
-#else
     gui.show();
-#endif
 
     // initialize application
     m.initialize( qobject_cast<QObject*>( &gui ));

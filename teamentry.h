@@ -40,7 +40,7 @@ class TeamEntry : public DatabaseEntry {
     Q_PROPERTY( int total READ total )
     Q_PROPERTY( int penalty READ penalty )
     Q_PROPERTY( int timeOnTrack READ timeOnTrack )
-    Q_PROPERTY( int reviewerId READ reviewerId WRITE setReviewerId )
+    Q_PROPERTY( QString reviewer READ reviewer WRITE setReviewer )
     Q_PROPERTY( int eventId READ eventId WRITE setEventId )
     Q_CLASSINFO( "description", "Team SQL Entry" )
 
@@ -53,7 +53,7 @@ public:
     QString name() const { return this->record().value( "name" ).toString(); }
     int members() const { return this->record().value( "members" ).toInt(); }
     QTime finishTime() const { return QTime::fromString( this->record().value( "finishTime" ).toString(), "hh:mm" ); }
-    int reviewerId() const { return this->record().value( "reviewerId" ).toInt(); }
+    QString reviewer() const { return this->record().value( "reviewer" ).toString(); }
     int eventId() const { return this->record().value( "eventId" ).toInt(); }
     bool isLocked() const { return this->record().value( "lock" ).toBool(); }
     bool isUnlocked() const { return !this->isLocked(); }
@@ -71,7 +71,7 @@ public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setMembers( int members ) { this->setValue( "members", members ); }
     void setFinishTime( const QTime &time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
-    void setReviewerId( int id ) { this->setValue( "reviewerId", id ); }
+    void setReviewer( const QString &reviewer ) { this->setValue( "reviewer", reviewer ); }
     void setEventId( int id ) { this->setValue( "eventId", id ); }
     void lock( bool lock = true ) { this->setValue( "lock", static_cast<int>( lock )); }
     void unlock( bool lock = true ) { this->setValue( "lock", static_cast<int>( !lock )); }

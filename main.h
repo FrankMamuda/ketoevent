@@ -32,7 +32,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "taskentry.h"
 #include "consolevariable.h"
 #include "evententry.h"
-#include "reviewerentry.h"
 #include "settingsvariable.h"
 #include "gui_console.h"
 
@@ -47,8 +46,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 //#define FORCE_LATVIAN
-//#define APPLET_DEBUG
-//#define ENABLE_REVIEWERS
+#define APPLET_DEBUG
 
 // error message macros
 #define StrMsg ClassFunc
@@ -60,8 +58,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespace: Common
 //
 namespace Common {
-    const static unsigned int API = 8;
-    const static unsigned int MinimumAPI = 6;
+    const static unsigned int API = 9;
+    const static unsigned int MinimumAPI = 9;
     const static unsigned int defaultMinMembers = 1;
     const static unsigned int defaultMaxMembers = 3;
     const static unsigned int defaultComboOfTwo = 1;
@@ -100,7 +98,6 @@ public:
         NoId = -1,
         TeamId,
         LogId,
-        ReviewerId,
         ComboId
     };
 
@@ -140,16 +137,12 @@ public:
     EventEntry *currentEvent();
     EventEntry *eventForId( int id );
 
-    // reviewers
-    ReviewerEntry *reviewerForId( int id );
-
     // lists
     typedef struct ketoList_s {
         QList <TeamEntry*>  teamList;
         QList <TaskEntry*>  taskList;
         QList <LogEntry*>   logList;
         QList <EventEntry*> eventList;
-        QList <ReviewerEntry*> reviewerList;
     } ketoList_t;
     ketoList_t base;
     ketoList_t import;
@@ -175,10 +168,9 @@ public slots:
     void setDebugLevel( DebugLevels debug ) { this->m_debug = debug; }
 
     // database related
-    void addTeam( const QString &teamName, int members, QTime finishTime, bool lockState = false );
-    void addTask(const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle , const QString &description = QString::null );
+    void addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName = QString::null, bool lockState = false );
+    void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle , const QString &description = QString::null );
     void addEvent( const QString &title = QString::null );
-    void addReviewer( const QString &name = QString::null );
     void attachDatabase( const QString &path );
 
     // console io
@@ -218,7 +210,6 @@ private slots:
     void loadTeams( bool import = false );
     void loadLogs(bool import = false );
     bool loadEvents( bool import = false );
-    void loadReviewers( bool import = false );
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();

@@ -72,6 +72,9 @@ QVariant Gui_RankingModel::data( const QModelIndex &index, int role ) const {
         case Time:
             return teamPtr->timeOnTrack();
 
+        case Reviewer:
+            return teamPtr->reviewer();
+
         case Penalty:
             return teamPtr->penalty();
 
@@ -136,6 +139,9 @@ QVariant Gui_RankingModel::headerData( int section, Qt::Orientation orientation,
 
         case Penalty:
             return this->tr( "Penalty\npoints" );
+
+        case Reviewer:
+            return this->tr( "Reviewer" );
 
         case Points:
             return this->tr( "Total\npoints" );

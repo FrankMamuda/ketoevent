@@ -34,7 +34,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 addTeam
 ================
 */
-void Main::addTeam(const QString &teamName, int members, QTime finishTime, bool lockState ) {
+void Main::addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
     QSqlQuery query;
 
     // avoid duplicates
@@ -42,13 +42,13 @@ void Main::addTeam(const QString &teamName, int members, QTime finishTime, bool 
         return;
 
     // perform database update and select last row
-    // id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewerId integer, eventId integer
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', %5, %6 )" )
+    // id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewer varchar( 64 ), eventId integer
+    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', '%5', %6 )" )
                       .arg( teamName )
                       .arg( members )
                       .arg( finishTime.toString( "hh:mm" ))
                       .arg( static_cast<int>( lockState ))
-                      .arg( -1 )
+                      .arg( reviewerName )
                       .arg( m.currentEvent()->id())
                       )) {
         this->error( StrSoftError, QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
@@ -140,41 +140,6 @@ void Main::loadTeams( bool import ) {
             // store the new-found team
             if ( !duplicate )
                 importedTeamPtr->store();
-
-            // find a reviewer for the team
-            duplicate = false;
-            foreach ( ReviewerEntry *importedReviewerPtr, this->import.reviewerList ) {
-                // found a match
-                if ( importedReviewerPtr->id() == importedTeamPtr->reviewerId()) {
-                    // check for duplicates
-                    foreach ( ReviewerEntry *reviewerPtr, this->base.reviewerList ) {
-                        // there's a match
-                        if ( !QString::compare( reviewerPtr->name(), importedReviewerPtr->name())) {
-                            // first time import, just append imported
-                            if ( !importedReviewerPtr->name().endsWith( " (imported)")) {
-                                importedReviewerPtr->setName( importedReviewerPtr->name() + " (imported)" );
-                            }
-                            // second time import is a no-go
-                            else {
-                                duplicate = true;
-                                m.error( StrSoftError, this->tr( "aborting double import of reviewer \"%1\"\n" ).arg( importedReviewerPtr->name()));
-                                this->import.reviewerList.removeOne( importedReviewerPtr );
-                                break;
-                            }
-                        }
-                    }
-
-                    // if duplicate test failed, set to default reviewer
-                    // otherwise, store the new one
-                    if ( duplicate )
-                        importedTeamPtr->setReviewerId( -1 );
-                    else
-                        importedReviewerPtr->store();
-
-                    // nothing to do here, break out!
-                    break;
-                }
-            }
         }
     }
 }

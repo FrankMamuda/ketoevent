@@ -31,7 +31,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // namespaces
 //
 namespace Rankings {
-    const static unsigned int NumRankingColumns = 7;
+    const static unsigned int NumRankingColumns = 8;
 }
 
 //
@@ -50,6 +50,7 @@ public:
         Total,
         Time,
         Penalty,
+        Reviewer,
         Points
     };
     Gui_RankingModel() { }
