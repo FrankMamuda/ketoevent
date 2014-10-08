@@ -84,9 +84,6 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         if ( this->task()->type() == TaskEntry::Multi )
             this->multi->setMaximum( this->task()->multi());
 
-#ifndef Q_OS_ANDROID
-        this->multi->setMaximumWidth( 48 );
-#endif
         this->connect( this->multi, SIGNAL( valueChanged( int )), this, SLOT( saveLog()));
         this->grid->addWidget( this->multi, 0, 3, 1, 1 );
 
@@ -100,12 +97,8 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // set up combo button
     this->combo = new QPushButton();
-#ifdef Q_OS_ANDROID
-    // make it larger for easier hits
-    this->combo->setMaximumWidth( 96 );
-#else
     this->combo->setMaximumWidth( 32 );
-#endif
+
     //this->setComboState( LogEntry::NoCombo );
     this->grid->addWidget( this->combo, 0, 4, 1, 1 );
 

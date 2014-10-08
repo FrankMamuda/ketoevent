@@ -20,20 +20,6 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="layoutReviewers" stretch="0,5">
-      <item>
-       <widget class="QLabel" name="labelReviewer">
-        <property name="text">
-         <string>Reviewer</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="comboReviewers"/>
-      </item>
-     </layout>
-    </item>
-    <item>
      <widget class="QGroupBox" name="layoutTeam">
       <property name="title">
        <string>Team</string>
@@ -246,7 +232,6 @@
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
    <addaction name="actionCombos"/>
-   <addaction name="actionReviewers"/>
    <addaction name="actionRankings"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
@@ -322,18 +307,6 @@
    </property>
    <property name="toolTip">
     <string>Exit applet</string>
-   </property>
-  </action>
-  <action name="actionReviewers">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/reviewers_48</normaloff>:/icons/reviewers_48</iconset>
-   </property>
-   <property name="text">
-    <string>Reviewers</string>
-   </property>
-   <property name="toolTip">
-    <string>Reviewers</string>
    </property>
   </action>
   <action name="actionEvents">

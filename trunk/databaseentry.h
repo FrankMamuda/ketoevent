@@ -29,7 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QVariant>
 
 //
-// inherited by EventEntry, LogEntry, TaskEntry, TeamEntry and ReviewerEntry
+// inherited by EventEntry, LogEntry, TaskEntry and TeamEntry
 //
 
 //

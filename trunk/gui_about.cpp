@@ -36,12 +36,6 @@ Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Abo
     // fixes ugly mac font
     this->ui->appInfo->setHtml( m_ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
 #endif
-
-#ifdef Q_OS_ANDROID
-    // android fullscreen fix
-    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
-    this->setGeometry( wPtr->geometry());
-#endif
 }
 
 /*

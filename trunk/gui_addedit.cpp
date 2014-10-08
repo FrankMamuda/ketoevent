@@ -46,31 +46,6 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
         this->ui->acceptButton->setText( this->tr( "Add team" ));
         break;
 
-    case ReviewerDialog:
-        if ( this->mode() == Edit ) {
-            if ( this->id() == -1 ) {
-                m.error( StrSoftError, this->tr( "Invalid reviewer id in edit mode\n" ));
-                this->reject();
-            } else {
-                ReviewerEntry *reviewerPtr = m.reviewerForId( this->id());
-                if ( reviewerPtr == NULL )
-                    return;
-
-                this->ui->titleEdit->setText( reviewerPtr->name());
-            }
-
-            this->ui->titleLabel->setText( this->tr( "New name" ));
-            this->setWindowTitle( this->tr( "Edit reviewer name" ));
-        } else if ( this->mode() == Add ) {
-            this->ui->titleLabel->setText( this->tr( "Reviewer name" ));
-            this->setWindowTitle( this->tr( "Add a reviewer" ));
-            this->ui->acceptButton->setText( this->tr( "Add reviewer" ));
-        } else {
-            m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
-            return;
-        }
-        break;
-
     case NoParent:
     default:
         m.error( StrSoftError, this->tr( "Dialog called without parent\n" ));
@@ -116,33 +91,6 @@ void Gui_AddEdit::on_acceptButton_clicked() {
         evPtr = qobject_cast<Gui_Event*>( this->parent());
         if ( evPtr != NULL )
             evPtr->fillEvents();
-    }
-        break;
-
-    case ReviewerDialog:
-    {
-        if ( this->mode() == Edit ) {
-            if ( this->id() == -1 ) {
-                m.error( StrSoftError, this->tr( "Invalid reviewer id in edit mode\n" ));
-                this->reject();
-            } else {
-                ReviewerEntry *reviewerPtr = m.reviewerForId( this->id());
-                if ( reviewerPtr != NULL )
-                    reviewerPtr->setName( this->ui->titleEdit->text());
-            }
-        } else if ( this->mode() == Add ) {
-            // no name - abort
-            if ( this->ui->titleEdit->text().isEmpty()) {
-                QMessageBox::warning( this, this->tr( "Set event title" ), this->tr( "Event title not specified" ));
-                return;
-            }
-
-            // just add a reviewer
-            m.addReviewer( this->ui->titleEdit->text());
-        } else {
-            m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
-            return;
-        }
     }
         break;
 

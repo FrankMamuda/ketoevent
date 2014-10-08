@@ -115,10 +115,8 @@ void Gui_Event::bindVars() {
 
     // connect for updates
     gui = qobject_cast<Gui_Main*>( this->parent());
-    if ( gui != NULL ) {
-        this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), gui, SLOT( setEventTitle( QString )));
+    if ( gui != NULL )
         this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), this, SLOT( fillEvents()));
-    }
 
     // unlock vars
     this->lockVariables( false );
@@ -274,11 +272,7 @@ buttonExport->clicked
 */
 void Gui_Event::on_buttonExport_clicked() {
     QString path;
-#ifdef Q_OS_ANDROID
-    path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), "/sdcard/", this->tr( "Database (*.db)" ));
-#else
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "Database (*.db)" ));
-#endif
     QSqlQuery query;
 
     // add extension
@@ -324,11 +318,8 @@ buttonExportCSV->clicked
 */
 void Gui_Event::on_buttonExportCSV_clicked() {
     QString path;
-#ifdef Q_OS_ANDROID
-    path = QFileDialog::getSaveFileName( this, this->tr( "Export tasks to CSV format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
-#else
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
-#endif
+
     // add extension
     if ( !path.endsWith( ".csv" ))
         path.append( ".csv" );

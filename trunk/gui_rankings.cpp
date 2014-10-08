@@ -51,17 +51,11 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     // set stats
     this->calculateStatistics();
 
-#ifdef Q_OS_ANDROID
-    // android fullscreen fix
-    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
-    this->setGeometry( wPtr->geometry());
-#else
     // scale window to contents
     this->rescaleWindow();
 
     // disable horizontal scrollbar
     this->ui->rankingView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-#endif
 }
 
 /*
@@ -125,11 +119,8 @@ exportButton
 */
 void Gui_Rankings::on_exportButton_clicked() {
     QString path;
-#ifdef Q_OS_ANDROID
-    path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), "/sdcard/", this->tr( "CSV file (*.csv)" ));
-#else
     path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
-#endif
+
     // add extension
     if ( !path.endsWith( ".csv" ))
         path.append( ".csv" );

@@ -48,13 +48,7 @@ Gui_TeamEdit::Gui_TeamEdit( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->toggleAddEditWidget( NoState );
 
     // connect
-    this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));
-
-#ifdef Q_OS_ANDROID
-    // android fullscreen fix
-    QWidget *wPtr = qobject_cast<QWidget*>( this->parent());
-    this->setGeometry( wPtr->geometry());
-#endif    
+    this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));  
 
     // reset team id
     this->resetLastId();
@@ -73,6 +67,7 @@ void Gui_TeamEdit::enableView() {
     this->ui->teamList->setEnabled( true );
     this->ui->teamList->setSelectionMode( QAbstractItemView::SingleSelection );
     this->ui->closeButton->setDefault( true );
+    //this->ui->reviewerButton->setEnabled( true );
 }
 
 /*
@@ -109,6 +104,7 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
         this->ui->closeButton->setDisabled( true );
         this->ui->doneButton->setDefault( true );
         this->ui->teamList->setDisabled( true );
+        //this->ui->reviewerButton->setDisabled( true );
 
         switch ( state ) {
         case Add:
@@ -118,6 +114,7 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->finishTimeEdit->setTime( m.currentEvent()->finishTime().addSecs( -60 ));
             this->ui->teamMembersEdit->setValue( m.currentEvent()->minMembers());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
+            this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
         }
             break;
 
@@ -133,6 +130,7 @@ void Gui_TeamEdit::toggleAddEditWidget( AddEditState state ) {
             this->ui->teamNameEdit->setText( teamPtr->name());
             this->ui->finishTimeEdit->setTime( teamPtr->finishTime());
             this->ui->teamMembersEdit->setValue( teamPtr->members());
+            this->ui->reviewerEdit->setText( teamPtr->reviewer());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit team" ));
 
             break;
@@ -204,10 +202,6 @@ void Gui_TeamEdit::on_doneButton_clicked() {
         msgBox.setText( this->tr( "Please specify team name" ));
         msgBox.setIcon( QMessageBox::Information );  
         msgBox.exec();
-
-#ifdef Q_OS_ANDROID
-        msgBox.setGeometry( this->geometry());
-#endif
         return;
     }
 
@@ -216,7 +210,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add || this->state() == AddQuick ) {
-        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time());
+        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time(), this->ui->reviewerEdit->text());
         lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match name to be sure
@@ -231,6 +225,7 @@ void Gui_TeamEdit::on_doneButton_clicked() {
         teamPtr->setName( this->ui->teamNameEdit->text());
         teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
         teamPtr->setMembers( this->ui->teamMembersEdit->value());
+        teamPtr->setReviewer( this->ui->reviewerEdit->text());
 
         // get last index
         lastIndex = this->ui->teamList->currentIndex();
@@ -248,4 +243,13 @@ void Gui_TeamEdit::on_doneButton_clicked() {
 
     // select last added/edited value
     this->ui->teamList->setCurrentIndex( lastIndex );
+}
+
+/*
+================
+reviewerButton->clicked
+================
+*/
+void Gui_TeamEdit::on_reviewerButton_clicked() {
+    this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
 }
