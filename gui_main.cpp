@@ -75,6 +75,9 @@ void Gui_Main::initialize( bool reload ) {
     // set title
     this->setEventTitle();
 
+    // test visibility of the sort button
+    this->testSortButton();
+
     // hide statusbar for now
     this->statusBar()->hide();
 
@@ -209,6 +212,14 @@ void Gui_Main::taskIndexChanged( int row ) {
     TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( row )));
     if ( taskPtr == NULL )
         return;
+
+    // should get things going faster
+    if ( taskPtr->task()->type() == TaskEntry::Check )
+        taskPtr->check->setFocus();
+    else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+        taskPtr->multi->setFocus();
+        taskPtr->multi->selectAll();
+    }
 
     // get log
     LogEntry *lPtr = taskPtr->log();

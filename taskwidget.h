@@ -75,6 +75,9 @@ public:
     QGridLayout *grid;
     QLabel *taskName;
     QLabel *comboIcon;
+#if 0
+    QLabel *description;
+#endif
     QCheckBox *check;
     QPushButton *combo;
     QSpinBox *multi;

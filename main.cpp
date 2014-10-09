@@ -29,9 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMessageBox>
 #include <QTranslator>
 #include "gui_console.h"
-#ifdef APPLET_DEBUG
-#include <QDebug>
-#endif
+
 
 //
 // classes

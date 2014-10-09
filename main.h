@@ -48,6 +48,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //#define FORCE_LATVIAN
 //#define APPLET_DEBUG
 
+#ifdef APPLET_DEBUG
+#include <QDebug>
+#endif
+
 // error message macros
 #define StrMsg ClassFunc
 #define StrFatalError Main::FatalError, ClassFunc

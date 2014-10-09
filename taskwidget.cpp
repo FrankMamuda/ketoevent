@@ -48,6 +48,14 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->grid = new QGridLayout();
     this->taskName = new QLabel( this->task()->name());
     this->comboIcon = new QLabel();
+#if 0
+    this->description = new QLabel( this->task()->description());
+    QFont descFont;
+    descFont.setPointSize( 6 );
+    this->description->setFont( descFont );
+    this->setMinimumHeight( 64 );
+    this->grid->addWidget( this->description, 1, 0, 1, 4 );
+#endif
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
 
     // fix ugly spinbox on mac, win32 (and systems with DPI!=96)

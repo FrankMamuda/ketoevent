@@ -206,7 +206,7 @@ void Gui_TaskEdit::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
-        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()), static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));
+        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()), static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
         lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match by id
