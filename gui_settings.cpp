@@ -65,6 +65,7 @@ void Gui_Settings::bindVars() {
     this->bindVariable( "backup/changes", this->ui->backupChanges );
     this->bindVariable( "backup/perform", this->ui->backupPerform );
     this->bindVariable( "misc/sortTasks", this->ui->sort );
+    this->bindVariable( "misc/hilightLogged", this->ui->hilightEntries );
     this->bindVariable( "databasePath", this->ui->dbPath );
     this->bindVariable( "reviewerName", this->ui->rvName );
 

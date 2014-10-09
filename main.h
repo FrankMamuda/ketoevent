@@ -46,7 +46,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 //#define FORCE_LATVIAN
-#define APPLET_DEBUG
+//#define APPLET_DEBUG
 
 // error message macros
 #define StrMsg ClassFunc
@@ -82,8 +82,9 @@ class Main : public QObject {
     Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
     Q_PROPERTY( DebugLevels debugLevel READ debugLevel WRITE setDebugLevel )
     Q_CLASSINFO( "description", "Applet main class" )
-    Q_FLAGS( IdTypes )
+    Q_ENUMS( IdTypes )
     Q_ENUMS( ErrorTypes )
+    Q_FLAGS( DebugLevels )
 
 public:
     // sorting types
@@ -161,6 +162,12 @@ public:
     QString transliterate( const QString &path );
     bool isInitialized() const { return this->m_init; }
     DebugLevels debugLevel() const { return this->m_debug; }
+
+    // mem debug
+#ifdef APPLET_DEBUG
+    int alloc;
+    int dealloc;
+#endif
 
 public slots:
     // init/shutdown

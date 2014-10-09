@@ -26,6 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include "main.h"
+#include "gui_main.h"
 
 // latin4 chars
 static unsigned int latin4Array[] = {
@@ -150,6 +151,38 @@ static bool listToAscending( T *ePtr0, T *ePtr1 ) {
 
 /*
 ================
+listByLogged
+================
+*/
+static bool listByLogged( TaskEntry *ePtr0, TaskEntry *ePtr1 ) {
+    bool one = false, two = false;
+
+    Gui_Main *gui = qobject_cast<Gui_Main*>( m.parent());
+    if ( gui == NULL )
+        return false;
+
+    if ( gui->currentTeamId() == -1 )
+        return false;
+
+    TeamEntry *teamPtr = m.teamForId( gui->currentTeamId());
+    if ( teamPtr == NULL )
+        return false;
+
+    foreach ( LogEntry *logPtr, teamPtr->logList ) {
+        if ( logPtr->value()) {
+            if ( logPtr->taskId() == ePtr0->id())
+                one = true;
+            if ( logPtr->taskId() == ePtr1->id())
+                two = true;
+
+        }
+    }
+
+    return one < two;
+}
+
+/*
+================
 sort
 ================
 */
@@ -184,6 +217,7 @@ void Main::sort( ListTypes type ) {
         this->currentEvent()->taskList.append( boldList );
         this->currentEvent()->taskList.append( italicList );
 
+        // clean up
         regularList.clear();
         boldList.clear();
         italicList.clear();
@@ -209,9 +243,14 @@ taskListSorted
 QList<TaskEntry*> Main::taskListSorted() {
     QList <TaskEntry*>sortedList;
 
-    // make a local copy and sort it alphabetically
+    // make a local copy and sort it alphabetically or by logs (or both)
     sortedList = this->currentEvent()->taskList;
-    qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
+
+    if ( this->cvar( "misc/sortTasks" )->isEnabled())
+        qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
+
+    if ( this->cvar( "misc/hilightLogged" )->isEnabled())
+        qSort( sortedList.begin(), sortedList.end(), listByLogged );
 
     // return sorted list
     return sortedList;
