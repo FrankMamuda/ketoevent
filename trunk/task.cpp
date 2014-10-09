@@ -77,7 +77,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
 loadTasks
 ================
 */
-void Main::loadTasks( bool import ) {
+void Main::loadTasks( bool import, bool store ) {
     QSqlQuery query;
 
     // read stuff
@@ -97,6 +97,37 @@ void Main::loadTasks( bool import ) {
             this->import.taskList << taskPtr;
         } else
             this->base.taskList << taskPtr;
+    }
+
+    // handle importing
+    if ( import ) {
+        bool duplicate = false;
+
+        // check for duplicates
+        foreach ( TaskEntry *importedTaskPtr, this->import.taskList ) {
+            duplicate = false;
+
+            foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+                // there's a match
+                if ( !QString::compare( taskPtr->name(), importedTaskPtr->name())) {
+                    // first time import, just append imported
+                    if ( !importedTaskPtr->name().endsWith( " (imported)")) {
+                        importedTaskPtr->setName( importedTaskPtr->name() + " (imported)" );
+                    }
+                    // second time import is a no-go
+                    else {
+                        duplicate = true;
+                        m.error( StrSoftError, this->tr( "aborting double import of task \"%1\"\n" ).arg( importedTaskPtr->name()));
+                        this->import.taskList.removeOne( taskPtr );
+                        continue;
+                    }
+                }
+            }
+
+            // store the new-found team
+            if ( !duplicate && store )
+                importedTaskPtr->store();
+        }
     }
 }
 

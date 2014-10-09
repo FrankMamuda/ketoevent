@@ -46,6 +46,11 @@ class Main m;
 //       Tasks, Teams, Gui as flags (prints out if enabled)
 // add option to hide logged entries? or at least implement hilighting
 // add compatibility layer for the 2013 event (or just stats)
+// alloc/dealloc counter test
+// perform pre-event tests:
+//   - stress test (any crashes while handling large amounts of data?)
+//   - integrity test (do we store exactly what we log?)
+//   - import test (do we import exactly what we need?)
 //
 // FIXME:
 //
@@ -258,7 +263,7 @@ void Main::initConsole() {
         return;
 
     this->console = new Gui_Console();
-    this->console->show();
+    this->console->hide();
 }
 
 /*

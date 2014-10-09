@@ -98,7 +98,8 @@ public:
         NoId = -1,
         TeamId,
         LogId,
-        ComboId
+        ComboId,
+        TaskId
     };
 
     // error types
@@ -114,6 +115,12 @@ public:
         GuiMain =   0x0002,
         Database =  0x0004
     };
+
+    enum Import {
+        LogImport = 0,
+        TaskImport
+    };
+
     Q_DECLARE_FLAGS( DebugLevels, DebugLevel )
 
     // database related
@@ -171,7 +178,7 @@ public slots:
     void addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName = QString::null, bool lockState = false );
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle , const QString &description = QString::null );
     void addEvent( const QString &title = QString::null );
-    void attachDatabase( const QString &path );
+    void attachDatabase( const QString &path, Import = LogImport );
 
     // console io
     void error( ErrorTypes type = SoftError, const QString &func = "", const QString &msg = "" );
@@ -185,6 +192,8 @@ public slots:
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
     void buildEventTTList();
+    void showConsole() { this->console->show(); }
+    void hideConsole() { this->console->hide(); }
 
     // combos
     int getFreeComboHandle() const;
@@ -206,9 +215,9 @@ private slots:
     void loadDatabase();
     void unloadDatabase();
     void makePath( const QString &path = QString::null );
-    void loadTasks( bool import = false );
-    void loadTeams( bool import = false );
-    void loadLogs(bool import = false );
+    void loadTasks( bool import = false, bool store = false );
+    void loadTeams( bool import = false, bool store = false );
+    void loadLogs( bool import = false, bool store = false );
     bool loadEvents( bool import = false );
     void removeTeam( const QString &teamName );
     void removeOrphanedLogs();

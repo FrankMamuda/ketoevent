@@ -98,6 +98,14 @@ int Main::highestId( IdTypes type ) const {
         }
         break;
 
+    case TaskId:
+        foreach ( TaskEntry *taskPtr, m.base.taskList ) {
+            if ( taskPtr->id() > id )
+                id = taskPtr->id();
+        }
+        break;
+
+
     case NoId:
     default:
         break;
@@ -148,9 +156,10 @@ static QString taskListHash( bool import ) {
 attachDatabase
 ================
 */
-void Main::attachDatabase( const QString &path ) {
+void Main::attachDatabase( const QString &path, Import import ) {
     QSqlQuery query;
     QString dbPath = path + "import";
+    bool store = true;
     int eventId = -1;
 
     // write backup just in case
@@ -171,16 +180,26 @@ void Main::attachDatabase( const QString &path ) {
         goto removeDB;
     }
 
-    // update teams
-    if ( !query.exec( QString( "update merge.teams set id=id*-1" )) || !query.exec( QString( "update merge.teams set id=(id*-1)+%1" ).arg( this->highestId( TeamId )))) {
-        this->error( StrSoftError, this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
-        goto removeDB;
-    }
+    if ( import == LogImport ) {
+        // update teams
+        if ( !query.exec( QString( "update merge.teams set id=id*-1" )) || !query.exec( QString( "update merge.teams set id=(id*-1)+%1" ).arg( this->highestId( TeamId )))) {
+            this->error( StrSoftError, this->tr( "could not update teams, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            goto removeDB;
+        }
 
-    // update logs
-    if ( !query.exec( QString( "update merge.logs set id=id*-1" )) || !query.exec( QString( "update merge.logs set id=(id*-1)+%1" ).arg( this->highestId( LogId )))) {
-        this->error( StrSoftError, this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
-        goto removeDB;
+        // update logs
+        if ( !query.exec( QString( "update merge.logs set id=id*-1" )) || !query.exec( QString( "update merge.logs set id=(id*-1)+%1" ).arg( this->highestId( LogId )))) {
+            this->error( StrSoftError, this->tr( "could not update logs, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            goto removeDB;
+        }
+    } else if ( import == TaskImport ) {
+        store = false;
+
+        // update tasks
+        if ( !query.exec( QString( "update merge.tasks set id=id*-1" )) || !query.exec( QString( "update merge.tasks set id=(id*-1)+%1" ).arg( this->highestId( TaskId )))) {
+            this->error( StrSoftError, this->tr( "could not update tasks, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            goto removeDB;
+        }
     }
 
     // load eventList into temporary storage
@@ -216,19 +235,21 @@ void Main::attachDatabase( const QString &path ) {
     query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( this->highestId( LogId )));
 
     // load taskList into temporary storage
-    this->loadTasks( true );
+    this->loadTasks( true, !store );
 
     // compare task hashes
-    if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
-        this->error( StrSoftError, this->tr( "task list mismatch\n" ));
-        goto removeDB;
+    if ( import == LogImport ) {
+        if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
+            this->error( StrSoftError, this->tr( "task list mismatch\n" ));
+            goto removeDB;
+        }
+
+        // load teamlist into temporary storage
+        this->loadTeams( true, store );
+
+        // load logs into temporary storage
+        this->loadLogs( true, store );
     }
-
-    // load teamlist into temporary storage
-    this->loadTeams( true );
-
-    // load logs into temporary storage
-    this->loadLogs( true );
 
     // clean up
     this->import.teamList.clear();

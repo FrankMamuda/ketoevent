@@ -92,7 +92,7 @@ void Main::removeTeam( const QString &teamName ) {
 loadTeams
 ================
 */
-void Main::loadTeams( bool import ) {
+void Main::loadTeams( bool import, bool store ) {
     QSqlQuery query;
 
     // read stuff
@@ -119,7 +119,11 @@ void Main::loadTeams( bool import ) {
         bool duplicate = false;
 
         // check for duplicates
+        // FIXME: something is very wrong here with duplicates (see task import)
+        // NOTE: might be fixed
         foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
+            duplicate = false;
+
             foreach ( TeamEntry *teamPtr, this->base.teamList ) {
                 // there's a match
                 if ( !QString::compare( teamPtr->name(), importedTeamPtr->name())) {
@@ -138,7 +142,7 @@ void Main::loadTeams( bool import ) {
             }
 
             // store the new-found team
-            if ( !duplicate )
+            if ( !duplicate && store )
                 importedTeamPtr->store();
         }
     }
