@@ -54,6 +54,11 @@ class Main m;
 //
 // FIXME:
 //
+// FUTURE:
+//
+// use listView instead of listWidget (use popups for checkboxes/spinboxes)
+//   to reduce memory footprint
+//
 
 /*
 ================
@@ -80,6 +85,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
     this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
+    this->addCvar( new ConsoleVariable( "misc/hilightLogged", this->settings, true ));
     this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
     this->addCvar( new ConsoleVariable( "reviewerName", this->settings, "" ));
 
@@ -104,6 +110,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "backup/changes", SettingsVariable::SpinBox, SettingsVariable::ConsoleVar );
     this->addSvar( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
+    this->addSvar( "misc/hilightLogged", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
     this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
     this->addSvar( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );

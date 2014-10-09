@@ -120,6 +120,12 @@ void Gui_Console::on_input_returnPressed() {
                      .arg( m.currentEvent()->taskList.count())
                      .arg( m.base.taskList.count())
                      .arg( m.base.logList.count()));
+#ifdef APPLET_DEBUG
+    } else if ( !QString::compare( cmd, "mem_info", Qt::CaseInsensitive )) {
+        this->print( QString( "meminfo: %1 allocs, %2 deallocs" )
+                     .arg( m.alloc )
+                     .arg( m.dealloc ));
+#endif
     } else
         this->print( QString( "unknown command - \"%1\"" ).arg( cmd ));
 

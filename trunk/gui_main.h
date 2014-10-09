@@ -56,6 +56,7 @@ public:
     int currentTeamIndex() const { return this->m_currentTeamIndex; }
     int currentComboIndex() const { return this->m_currentComboIndex; }
     int currentMatch() const { return this->m_currentMatch; }
+    int currentTeamId();
 
 public slots:
     void initialize( bool reload = false );
@@ -75,6 +76,7 @@ private slots:
     void updateFinishTime( QTime time );
     void setCurrentComboIndex( int index = -1 ) { this->m_currentComboIndex = index; }
     void setCurrentTeamIndex( int index = -1 ) { this->m_currentTeamIndex = index; }
+    void testSortButton();
 
     // search
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
@@ -84,7 +86,7 @@ private slots:
     void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->fillTasks(); }
     void on_actionRankings_triggered() { Gui_Rankings rankings( this ); rankings.exec(); }
     void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
-    void on_actionSettings_triggered() { Gui_Settings settings( this ); settings.exec(); this->fillTeams(); this->fillTasks(); this->setEventTitle(); }
+    void on_actionSettings_triggered();
     void on_actionExit_triggered() { m.shutdown(); }
     void on_logButton_clicked();
     void on_quickAddButton_clicked();
@@ -96,6 +98,7 @@ private slots:
     void on_actionCombos_triggered();
     void on_combineButton_toggled( bool checked );
     void on_actionConsole_toggled( bool visible );
+    void on_sortButton_clicked();
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }

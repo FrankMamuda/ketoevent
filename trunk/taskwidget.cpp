@@ -206,6 +206,11 @@ void TaskWidget::saveLog() {
         gui->taskIndexChanged( -1 );
         gui->updateStatusBar();
     }
+
+    if ( value > 0 && m.cvar( "misc/hilightLogged" )->isEnabled())
+        this->taskName->setForegroundRole( QPalette::Highlight );
+    else
+        this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
 /*
@@ -292,6 +297,11 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         this->check->setChecked( this->log()->check());
     else if ( this->task()->type() == TaskEntry::Multi )
         this->multi->setValue( this->log()->value());
+
+    if ( this->log()->value() > 0 && m.cvar( "misc/hilightLogged" )->isEnabled())
+        this->taskName->setForegroundRole( QPalette::Highlight );
+    else
+        this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
 /*

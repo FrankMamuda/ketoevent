@@ -83,6 +83,8 @@ void Gui_Main::initialize( bool reload ) {
 
 #ifdef APPLET_DEBUG
     this->ui->mainToolBar->insertAction( this->ui->actionExit, this->ui->actionConsole );
+    m.alloc = 0;
+    m.dealloc = 0;
 #endif
 }
 
@@ -288,6 +290,9 @@ void Gui_Main::clearTasks() {
         this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
         delete taskPtr;
         delete lw->item( 0 );
+#ifdef APPLET_DEBUG
+        m.dealloc +=2;
+#endif
     }
     lw->clear();
 }
@@ -309,7 +314,7 @@ void Gui_Main::fillTasks() {
     this->clearTasks();
 
     // fill with either sorted or unsorted list
-    if ( m.cvar( "misc/sortTasks" )->isEnabled())
+    if ( m.cvar( "misc/sortTasks" )->isEnabled() || m.cvar( "misc/hilightLogged" )->isEnabled())
         taskList = m.taskListSorted();
     else
         taskList = m.currentEvent()->taskList;
@@ -321,6 +326,9 @@ void Gui_Main::fillTasks() {
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
         widgetPtr->combo->hide();
+#ifdef APPLET_DEBUG
+        m.alloc +=2;
+#endif
     }
 
     // update
@@ -686,4 +694,51 @@ void Gui_Main::on_actionConsole_toggled( bool visible ) {
         m.showConsole();
     else
         m.hideConsole();
+}
+
+/*
+================
+currentTeamId
+================
+*/
+int Gui_Main::currentTeamId() {
+    if ( this->currentTeamIndex() == -1 )
+        return -1;
+
+    return this->ui->comboTeams->itemData( this->currentTeamIndex()).toInt();
+}
+
+/*
+================
+sortButton->clicked
+================
+*/
+void Gui_Main::on_sortButton_clicked() {
+    this->fillTasks();
+}
+
+/*
+================
+actionSettings->triggered
+================
+*/
+void Gui_Main::on_actionSettings_triggered() {
+    Gui_Settings settings( this );
+    settings.exec();
+    this->fillTeams();
+    this->fillTasks();
+    this->setEventTitle();
+    this->testSortButton();
+}
+
+/*
+================
+testSortButton
+================
+*/
+void Gui_Main::testSortButton() {
+   if ( m.cvar( "misc/sortLogged" )->isEnabled())
+       this->ui->sortButton->setEnabled( true );
+   else
+       this->ui->sortButton->setDisabled( true );
 }
