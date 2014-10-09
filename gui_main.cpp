@@ -80,6 +80,10 @@ void Gui_Main::initialize( bool reload ) {
 
     // announce
     this->print( this->tr( "initialization complete\n" ));
+
+#ifdef APPLET_DEBUG
+    this->ui->mainToolBar->insertAction( this->ui->actionExit, this->ui->actionConsole );
+#endif
 }
 
 /*
@@ -89,6 +93,12 @@ setEventTitle
 */
 void Gui_Main::setEventTitle() {
     QString reviewer;
+
+    // this really should not happen
+    if ( m.currentEvent() == NULL ) {
+        this->setWindowTitle( this->tr( "Ketoevent logger" ));
+        return;
+    }
 
     // get reviewer name
     reviewer = m.cvar( "reviewerName" )->string();
@@ -469,9 +479,8 @@ void Gui_Main::on_actionEvents_triggered() {
     if ( events.importPerformed()) {
         QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
         m.shutdown();
-    }
-
-    this->setEventTitle();
+    } else
+        this->setEventTitle();
 }
 
 /*
@@ -667,3 +676,14 @@ void Gui_Main::updateStatusBar() {
 #endif
 }
 
+/*
+================
+actionConsole->toggled
+================
+*/
+void Gui_Main::on_actionConsole_toggled( bool visible ) {
+    if ( visible )
+        m.showConsole();
+    else
+        m.hideConsole();
+}

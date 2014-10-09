@@ -40,6 +40,7 @@
         <file alias="settings_dialog_16">icons/settings_dialog_16.png</file>
         <file alias="rankings_dialog_16">icons/rankings_dialog_16.png</file>
         <file alias="about_dialog_16">icons/about_dialog_16.png</file>
+        <file alias="console_48">icons/console_48.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>

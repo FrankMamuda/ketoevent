@@ -256,7 +256,7 @@ void Gui_Event::on_buttonImport_clicked() {
     }
 
     // import database
-    m.attachDatabase( filePath );
+    m.attachDatabase( filePath, Main::LogImport );
 
     // mark as imported
     this->setImported();
@@ -336,9 +336,9 @@ void Gui_Event::on_buttonExportCSV_clicked() {
         out.setCodec( "UTF-8" );
 #endif
         out << this->tr( "Task name;Points;Multi;Style;Type" )
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                .append( "\r" )
-#endif
+       #endif
                .append( "\n" );
         foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
             out << QString( "%1;%2;%3;%4;%5;%6" )
@@ -347,7 +347,7 @@ void Gui_Event::on_buttonExportCSV_clicked() {
                    .arg( taskPtr->multi())
                    .arg( taskPtr->style())
                    .arg( taskPtr->type())
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                    .arg( "\r\n" );
 #else
                    .arg( "\n" );
@@ -356,3 +356,40 @@ void Gui_Event::on_buttonExportCSV_clicked() {
     }
     taskList.close();
 }
+
+/*
+================
+buttonImportTasks->clicked
+================
+*/
+void Gui_Event::on_buttonImportTasks_clicked() {
+    QString path, filePath;
+
+    // get filename from dialog
+    path = QString( QDir::currentPath() + "/" );
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+
+    // check for empty filenames
+    if ( filePath.isEmpty())
+        return;
+
+    // check if path is valid
+    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
+        return;
+
+    // avoid importing the same database
+    if ( !QString::compare( filePath, m.path )) {
+        m.error( StrSoftError, "cannot import current database\n" );
+        return;
+    }
+
+    // import database
+    m.attachDatabase( filePath, Main::TaskImport );
+
+    // mark as imported
+    this->setImported();
+
+    // close window
+    this->accept();
+}
+

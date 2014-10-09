@@ -328,6 +328,21 @@
     <string>Combos</string>
    </property>
   </action>
+  <action name="actionConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/console_48</normaloff>:/icons/console_48</iconset>
+   </property>
+   <property name="text">
+    <string>Console</string>
+   </property>
+   <property name="toolTip">
+    <string>Show console</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

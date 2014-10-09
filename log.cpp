@@ -68,7 +68,7 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
 loadLogs
 ================
 */
-void Main::loadLogs( bool import ) {
+void Main::loadLogs( bool import, bool store ) {
     QSqlQuery query;
 
     // read stuff
@@ -89,7 +89,9 @@ void Main::loadLogs( bool import ) {
         if ( import ) {
             logPtr->setImported();
             this->import.logList << logPtr;
-            logPtr->store();
+
+            if ( store )
+                logPtr->store();
         } else
             this->base.logList << logPtr;
     }

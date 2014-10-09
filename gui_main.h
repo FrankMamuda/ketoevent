@@ -95,6 +95,7 @@ private slots:
     void on_actionEvents_triggered();
     void on_actionCombos_triggered();
     void on_combineButton_toggled( bool checked );
+    void on_actionConsole_toggled( bool visible );
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }

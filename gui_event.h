@@ -62,6 +62,8 @@ private slots:
     void on_buttonExport_clicked();
     void on_buttonExportCSV_clicked();
 
+    void on_buttonImportTasks_clicked();
+
 private:
     Ui::Gui_Event *ui;
     bool m_import;
