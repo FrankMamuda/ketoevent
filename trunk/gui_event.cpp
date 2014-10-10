@@ -335,14 +335,15 @@ void Gui_Event::on_buttonExportCSV_clicked() {
 #else
         out.setCodec( "UTF-8" );
 #endif
-        out << this->tr( "Task name;Points;Multi;Style;Type" )
+        out << this->tr( "Task name;Description;Points;Multi;Style;Type" )
        #ifdef Q_OS_WIN
                .append( "\r" )
        #endif
                .append( "\n" );
         foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
-            out << QString( "%1;%2;%3;%4;%5;%6" )
+            out << QString( "%1;%2;%3;%4;%5;%6;%7" )
                    .arg( taskPtr->name())
+                   .arg( taskPtr->description())
                    .arg( taskPtr->points())
                    .arg( taskPtr->multi())
                    .arg( taskPtr->style())

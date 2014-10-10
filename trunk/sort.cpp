@@ -178,6 +178,13 @@ static bool listByLogged( TaskEntry *ePtr0, TaskEntry *ePtr1 ) {
         }
     }
 
+    if ( one == false && two == false ) {
+        if ( m.cvar( "misc/sortTasks" )->isEnabled())
+            return m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
+        else
+            return ePtr0->order() < ePtr1->order();
+    }
+
     return one < two;
 }
 

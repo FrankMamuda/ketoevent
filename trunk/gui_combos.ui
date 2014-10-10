@@ -70,7 +70,7 @@
        <item row="0" column="2">
         <widget class="QLabel" name="labelPoints">
          <property name="text">
-          <string>Bonus points:</string>
+          <string>Bonus points</string>
          </property>
         </widget>
        </item>
