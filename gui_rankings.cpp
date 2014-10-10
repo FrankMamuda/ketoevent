@@ -64,16 +64,31 @@ calculateStatistics
 ================
 */
 void Gui_Rankings::calculateStatistics() {
-    int numParcipiants = 0, numTasks = 0;
+    int numParcipiants = 0, numTasks = 0, pointsLogged = 0, maxPoints = 0;
 
-    this->ui->tTeams->setText( QString( "%1\n" ).arg( m.currentEvent()->teamList.count()));
+    // get team stats
     foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
         teamPtr->calculateCombos();
+        pointsLogged += teamPtr->points();
     }
+
+    // get max points
+    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
+        if ( taskPtr->type() == TaskEntry::Check )
+            maxPoints += taskPtr->points();
+        else if ( taskPtr->type() == TaskEntry::Multi )
+            maxPoints += taskPtr->points() * taskPtr->multi();
+    }
+
+    // display data
+    this->ui->tTeams->setText( QString( "%1\n" ).arg( m.currentEvent()->teamList.count()));
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
+    this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( m.currentEvent()->taskList.count()));
+    this->ui->tPoints->setText( QString( "%1\n" ).arg( maxPoints ));
+    this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));
 }
 
 /*

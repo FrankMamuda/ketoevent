@@ -68,17 +68,50 @@
         <property name="horizontalSpacing">
          <number>0</number>
         </property>
-        <item row="2" column="0">
+        <item row="1" column="0">
+         <widget class="QLabel" name="ttaskstotalLabel">
+          <property name="text">
+           <string>Total tasks</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="tTasksTotal">
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" rowspan="4">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="3">
          <widget class="QLabel" name="ttaskLabel">
           <property name="text">
            <string>Total tasks completed</string>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="4">
          <widget class="QLineEdit" name="tTasks">
           <property name="maximumSize">
            <size>
@@ -97,36 +130,20 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="tteamsLabel">
+        <item row="2" column="3">
+         <widget class="QLabel" name="tloggedLabel">
           <property name="text">
-           <string>Total teams</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <string>Total logged points</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="tparcLabel">
-          <property name="text">
-           <string>Total participiants</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="tPar">
+        <item row="2" column="4">
+         <widget class="QLineEdit" name="tPointsLogged">
           <property name="maximumSize">
            <size>
             <width>64</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="toolTip">
-           <string>Total number of participiants</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -136,7 +153,37 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="2" column="0">
+         <widget class="QLabel" name="tpointsLabel">
+          <property name="text">
+           <string>Maximum points</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="tPoints">
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="tteamsLabel">
+          <property name="text">
+           <string>Total teams</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
          <widget class="QLineEdit" name="tTeams">
           <property name="maximumSize">
            <size>
@@ -146,6 +193,32 @@
           </property>
           <property name="toolTip">
            <string>Total number of teams participated in this event</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QLabel" name="tparcLabel">
+          <property name="text">
+           <string>Total participiants</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLineEdit" name="tPar">
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Total number of participiants</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

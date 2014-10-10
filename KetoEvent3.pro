@@ -7,7 +7,7 @@
 QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+#CONFIG += static
 TARGET = KetoEvent3
 TEMPLATE = app
 TRANSLATIONS = i18n/ketoevent_lv_LV.ts
@@ -44,7 +44,6 @@ SOURCES += main.cpp\
     gui_combos.cpp \
     gui_combomodel.cpp \
     combo.cpp \
-    gui_addevent.cpp \
     gui_addedit.cpp
 
 HEADERS  += gui_main.h \
@@ -71,7 +70,6 @@ HEADERS  += gui_main.h \
     gui_settingsdialog.h \
     gui_combos.h \
     gui_combomodel.h \
-    gui_addevent.h \
     gui_addedit.h
 
 FORMS += gui_main.ui \
@@ -84,7 +82,6 @@ FORMS += gui_main.ui \
     gui_console.ui \
     gui_event.ui \
     gui_combos.ui \
-    gui_addevent.ui \
     gui_addedit.ui
 
 RESOURCES += \
