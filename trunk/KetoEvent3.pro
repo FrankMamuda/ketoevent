@@ -44,7 +44,8 @@ SOURCES += main.cpp\
     gui_combos.cpp \
     gui_combomodel.cpp \
     combo.cpp \
-    gui_addedit.cpp
+    gui_addedit.cpp \
+    cmd.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -70,7 +71,8 @@ HEADERS  += gui_main.h \
     gui_settingsdialog.h \
     gui_combos.h \
     gui_combomodel.h \
-    gui_addedit.h
+    gui_addedit.h \
+    cmd.h
 
 FORMS += gui_main.ui \
     gui_teamedit.ui \

@@ -26,13 +26,61 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include <QDialog>
 #include <QMouseEvent>
+#include <QKeyEvent>
+#include <QLineEdit>
 
 //
 // namespace: Ui
 //
 namespace Ui {
 class Gui_Console;
+static const int MaxConsoleHistory = 32;
 }
+
+//
+// class: ConsoleEventFilter
+//
+class ConsoleEventFilter : public QObject {
+public:
+    ConsoleEventFilter( QObject *parent = 0 ) : QObject( parent ) {}
+
+protected:
+    virtual bool eventFilter( QObject *, QEvent * );
+};
+
+//
+// class: QConsoleEdit
+//
+class QConsoleEdit : public QLineEdit {
+    Q_OBJECT
+    Q_PROPERTY( int historyOffset READ historyOffset WRITE setHistoryOffset RESET resetHistoryOffset )
+
+public:
+    QConsoleEdit( QWidget *parent = 0 ) { this->setParent( parent ); this->resetHistoryOffset(); }
+    int historyOffset() const { return this->m_historyOffset; }
+    QStringList history;
+    ~QConsoleEdit() { this->history.clear(); }
+
+public slots:
+    void setHistoryOffset( int offset ) { this->m_historyOffset = offset; }
+    void resetHistoryOffset() { this->m_historyOffset = 0; }
+    void pushHistoryOffset() { this->m_historyOffset++; }
+    void popHistoryOffset() { this->m_historyOffset--; }
+    void addToHistory( const QString &text ) {
+        if ( this->history.count()) {
+            if ( !QString::compare( this->history.last(), text ))
+                return;
+        }
+
+        if ( this->history.count() >= Ui::MaxConsoleHistory )
+            this->history.removeFirst();
+
+        this->history << text;
+    }
+
+private:
+    int m_historyOffset;
+};
 
 //
 // class: Gui_Console
@@ -47,6 +95,9 @@ public:
 
 public slots:
     void print( const QString &msg );
+    bool completeCommand();
+    void loadHistory();
+    void saveHisotry();
 
 protected:
     virtual void mousePressEvent( QMouseEvent * );
@@ -58,6 +109,7 @@ private slots:
 private:
     Ui::Gui_Console *ui;
     QPoint m_windowPos;
+    ConsoleEventFilter *eventFilter;
 };
 
 #endif // GUI_CONSOLE_H

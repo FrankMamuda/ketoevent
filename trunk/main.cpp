@@ -29,7 +29,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMessageBox>
 #include <QTranslator>
 #include "gui_console.h"
-
+#include "cmd.h"
 
 //
 // classes
@@ -86,6 +86,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "misc/hilightLogged", this->settings, true ));
     this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
     this->addCvar( new ConsoleVariable( "reviewerName", this->settings, "" ));
+    this->addCvar( new ConsoleVariable( "system/consoleHistory", this->settings, "" ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -115,6 +116,10 @@ void Main::initialize( QObject *parent ) {
 
     // set parent
     this->setParent( parent );
+
+    // init command subsystem
+    cmd.init();
+    this->console->loadHistory();
 
     // we're up
     this->setInitialized();
@@ -184,6 +189,7 @@ void Main::shutdown( bool ignoreDatabase ) {
     this->setParent( NULL );
 
     // save settings
+    this->console->saveHisotry();
     if ( this->settings != NULL ) {
         this->settings->sync();
         delete this->settings;

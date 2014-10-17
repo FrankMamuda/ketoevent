@@ -24,6 +24,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_console.h"
 #include "ui_gui_console.h"
 #include "main.h"
+#include "cmd.h"
 
 /*
 ================
@@ -34,6 +35,10 @@ Gui_Console::Gui_Console( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui
     ui->setupUi( this );
     this->setWindowFlags( Qt::CustomizeWindowHint );
     this->ui->screen->clear();
+
+    // install event filter
+    this->eventFilter = new ConsoleEventFilter();
+    this->ui->input->installEventFilter( this->eventFilter );
 }
 
 /*
@@ -42,8 +47,88 @@ destruct
 ================
 */
 Gui_Console::~Gui_Console() {
+    this->ui->input->removeEventFilter( this->eventFilter );
+    delete this->eventFilter;
     delete ui;
 }
+
+/*
+================
+completeCommand
+================
+*/
+bool Gui_Console::completeCommand() {
+    int match = 0;
+    QStringList matchedStrings;
+    int y;
+
+    // find matching commands
+    foreach( Command *cmdPtr, cmd.cmdList ) {
+        if ( cmdPtr->name().startsWith( this->ui->input->text(), Qt::CaseInsensitive ))
+            matchedStrings << cmdPtr->name();
+    }
+
+    // find matching cvars
+    foreach( ConsoleVariable *cvarPtr, m.cvarList ) {
+        if ( !QString::compare( cvarPtr->key(), "system/consoleHistory" ))
+             continue;
+
+        if ( cvarPtr->key().startsWith( this->ui->input->text(), Qt::CaseInsensitive ))
+            matchedStrings << cvarPtr->key();
+    }
+
+    // complete to shortest string
+    if ( matchedStrings.count() == 1 ) {
+        // append extra space (since it's the only match that will likely be follwed by an argument)
+        this->ui->input->setText( matchedStrings.first() + " " );
+    } else if ( matchedStrings.count() > 1 ) {
+        match = 1;
+        for ( y = 0; y < matchedStrings.count(); y++ ) {
+            // make sure we check string length
+            if ( matchedStrings.first().length() == match || matchedStrings.at( y ).length() == match )
+                break;
+
+            if ( matchedStrings.first().at( match ) == matchedStrings.at( y ).at( match )) {
+                if ( y == matchedStrings.count()-1 ) {
+                    match++;
+                    y = 0;
+                }
+            }
+        }
+        this->ui->input->setText( matchedStrings.first().left( match ));
+    } else if ( !matchedStrings.count()) {
+        return true;
+    }
+
+    // print out suggestions
+    m.print( /*Sys::cCyan +*/ this->tr( "Available commands and cvars:\n" ), Main::System );
+    foreach ( QString str, matchedStrings ) {
+        // check commands
+        Command *cmdPtr;
+        cmdPtr = cmd.find( str );
+        if ( cmdPtr != NULL ) {
+            if ( !cmdPtr->description().isEmpty()) {
+                m.print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Main::System);
+            } else {
+                m.print( QString( "  \"%1\n" ).arg( str ), Main::System);
+            }
+        }
+
+        // check variables
+        ConsoleVariable *cvarPtr = m.cvar( str );
+
+        // perform a variable print or set
+        if ( cvarPtr != m.defaultCvar )
+            m.print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( cvarPtr->key(), cvarPtr->string()), Main::System );
+    }
+
+    // add extra newline
+    m.print( "\n", Main::System );
+
+    // done
+    return true;
+}
+
 
 /*
 ================
@@ -68,6 +153,71 @@ void Gui_Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
 
 /*
 ================
+eventFilter
+================
+*/
+bool ConsoleEventFilter::eventFilter( QObject *objectPtr, QEvent *eventPtr ) {
+    QConsoleEdit *lePtr = qobject_cast<QConsoleEdit *>( objectPtr );
+    Gui_Console *cPtr = qobject_cast<Gui_Console *>( objectPtr->parent());
+    if ( cPtr == NULL || lePtr == NULL )
+        return false;
+
+    if ( lePtr->hasFocus()) {
+        if ( eventPtr->type() == QEvent::KeyPress ) {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>( eventPtr );
+
+            // history list -> up
+            if ( keyEvent->key() == Qt::Key_Up ) {
+                if ( !lePtr->history.isEmpty()) {
+                    if ( lePtr->historyOffset() < lePtr->history.count() )
+                        lePtr->pushHistoryOffset();
+
+                    int offset = lePtr->history.count() - lePtr->historyOffset();
+
+                    if ( offset > 0 )
+                        lePtr->setText( lePtr->history.at( offset ));
+                    else
+                        lePtr->setText( lePtr->history.first());
+                }
+                return true;
+
+                // history list -> down
+            } else if ( keyEvent->key() == Qt::Key_Down ) {
+                if ( !lePtr->history.isEmpty()) {
+                    int offset;
+
+                    if ( lePtr->historyOffset() > 0 )
+                        lePtr->popHistoryOffset();
+
+                    if ( lePtr->historyOffset() == 0 ) {
+                        lePtr->clear();
+                        return true;
+                    }
+
+                    offset = lePtr->history.count() - lePtr->historyOffset();
+
+                    if ( offset < lePtr->history.count())
+                        lePtr->setText( lePtr->history.at( offset ));
+                    else
+                        lePtr->setText( lePtr->history.last());
+                }
+                return true;
+
+                // complete command
+            } else if ( keyEvent->key() == Qt::Key_Tab ) {
+                // abort if no text at all
+                if ( lePtr->text().isEmpty())
+                    return true;
+
+                return cPtr->completeCommand();
+            }
+        }
+    }
+    return false;
+}
+
+/*
+================
 print
 ================
 */
@@ -81,53 +231,26 @@ input->returnPressed
 ================
 */
 void Gui_Console::on_input_returnPressed() {
-    QString cmdString = this->ui->input->text();
-    QStringList tokenList = cmdString.split( " " );
-    QString cmd = tokenList.at( 0 );
-
-    // print out
-    this->print( "> " + cmdString );
-
-    // for now, just use a highly simplified algorithm
-    if ( !QString::compare( cmd, "cv_list", Qt::CaseInsensitive )) {
-        if ( !m.cvarList.isEmpty())
-            this->print( "console variables:" );
-
-        foreach ( ConsoleVariable *cvarPtr, m.cvarList ) {
-            if ( QString::compare( cvarPtr->defaultValue().toString(), cvarPtr->value().toString()), Qt::CaseInsensitive )
-                this->print( QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( cvarPtr->key()).arg( cvarPtr->value().toString()).arg( cvarPtr->defaultValue().toString()));
-            else
-                this->print( QString( "  \"%1\" is \"%2\"" ).arg( cvarPtr->key()).arg( cvarPtr->value().toString()));
-        }
-    } else if ( !QString::compare( cmd, "cv_set", Qt::CaseInsensitive )) {
-        // TODO: must properly tokenize string
-        if ( tokenList.count() != 3 ) {
-            this->print( "invalid syntax - cv_set [key] [value]" );
-        } else {
-            ConsoleVariable *cvarPtr = m.cvar( tokenList.at( 1 ));
-            if ( QString::compare( cvarPtr->key(), tokenList.at( 1 ), Qt::CaseInsensitive ))
-                this->print( QString( "no such cvar - \"%1\"" ).arg( tokenList.at( 1 )));
-            else {
-                this->print( QString( "setting \"%1\" to \"%2\"" ).arg( cvarPtr->key()).arg( tokenList.at( 2 )));
-                cvarPtr->setValue( tokenList.at( 2 ));
-            }
-        }
-    } else if ( !QString::compare( cmd, "db_info", Qt::CaseInsensitive )) {
-        this->print( QString( "events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
-                     .arg( m.base.eventList.count())
-                     .arg( m.currentEvent()->teamList.count())
-                     .arg( m.base.teamList.count())
-                     .arg( m.currentEvent()->taskList.count())
-                     .arg( m.base.taskList.count())
-                     .arg( m.base.logList.count()));
-#ifdef APPLET_DEBUG
-    } else if ( !QString::compare( cmd, "mem_info", Qt::CaseInsensitive )) {
-        this->print( QString( "meminfo: %1 allocs, %2 deallocs" )
-                     .arg( m.alloc )
-                     .arg( m.dealloc ));
-#endif
-    } else
-        this->print( QString( "unknown command - \"%1\"" ).arg( cmd ));
+    if ( cmd.execute( this->ui->input->text()))
+        this->ui->input->addToHistory( this->ui->input->text());
 
     this->ui->input->clear();
+}
+
+/*
+================
+loadHistory
+================
+*/
+void Gui_Console::loadHistory() {
+    this->ui->input->history = m.cvar( "system/consoleHistory" )->string().split( ";" );
+}
+
+/*
+================
+saveHisotry
+================
+*/
+void Gui_Console::saveHisotry() {
+    m.cvar( "system/consoleHistory" )->setValue( this->ui->input->history.join( ";" ));
 }
