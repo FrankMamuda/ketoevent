@@ -46,7 +46,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 //#define FORCE_LATVIAN
-//#define APPLET_DEBUG
+#define APPLET_DEBUG
 
 #ifdef APPLET_DEBUG
 #include <QDebug>
@@ -190,6 +190,7 @@ public slots:
     void addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style = TaskEntry::NoStyle , const QString &description = QString::null );
     void addEvent( const QString &title = QString::null );
     void attachDatabase( const QString &path, Import = LogImport );
+    void removeTeam( const QString &teamName );
 
     // console io
     void error( ErrorTypes type = SoftError, const QString &func = "", const QString &msg = "" );
@@ -230,7 +231,6 @@ private slots:
     void loadTeams( bool import = false, bool store = false );
     void loadLogs( bool import = false, bool store = false );
     bool loadEvents( bool import = false );
-    void removeTeam( const QString &teamName );
     void removeOrphanedLogs();
     void writeBackup();
 };

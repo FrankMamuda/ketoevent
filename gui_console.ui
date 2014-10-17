@@ -74,7 +74,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="input">
+    <widget class="QConsoleEdit" name="input">
      <property name="styleSheet">
       <string notr="true">QLineEdit {background: #000000; color: rgb(0, 255, 0) ;}\n</string>
      </property>
@@ -91,6 +91,13 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QConsoleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>gui_console.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
