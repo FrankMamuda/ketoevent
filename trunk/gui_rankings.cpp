@@ -40,16 +40,17 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : QDialog( parent ), ui( new Ui::G
     this->ui->rankingView->setSortingEnabled( true );
 
     // set up sorting & view model
+    // fixme: bottleneck (proxy sort)
     this->proxyModel = new QSortFilterProxyModel( this );
     this->modelPtr = new Gui_RankingModel();
     this->proxyModel->setSourceModel( this->modelPtr );
     this->proxyModel->setDynamicSortFilter( true );
     this->ui->rankingView->setModel( proxyModel );
-    this->proxyModel->sort( Gui_RankingModel::Points, Qt::DescendingOrder );
     this->ui->rankingView->resizeColumnsToContents();
 
     // set stats
     this->calculateStatistics();
+    this->proxyModel->sort( Gui_RankingModel::Points, Qt::DescendingOrder );
 
     // scale window to contents
     this->rescaleWindow();
