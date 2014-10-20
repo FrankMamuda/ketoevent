@@ -42,6 +42,7 @@ class TeamEntry : public DatabaseEntry {
     Q_PROPERTY( int timeOnTrack READ timeOnTrack )
     Q_PROPERTY( QString reviewer READ reviewer WRITE setReviewer )
     Q_PROPERTY( int eventId READ eventId WRITE setEventId )
+    Q_PROPERTY( bool combosCalculated READ combosCalculated WRITE setCombosCalculated )
     Q_CLASSINFO( "description", "Team SQL Entry" )
 
 public:
@@ -66,6 +67,7 @@ public:
     float grade() const;
     int timeOnTrack() const;
     bool disqualified() const;
+    bool combosCalculated() { return this->m_calculated; }
 
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
@@ -76,11 +78,13 @@ public slots:
     void lock( bool lock = true ) { this->setValue( "lock", static_cast<int>( lock )); }
     void unlock( bool lock = true ) { this->setValue( "lock", static_cast<int>( !lock )); }
     void addComboPoints( int &counter );
+    void setCombosCalculated( bool calculated = true ) { this->m_calculated = calculated; }
 
 private:
     int m_combos;
     int m_total;
     int m_bonus;
+    bool m_calculated;
 };
 
 #endif // TEAMENTRY_H

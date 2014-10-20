@@ -23,6 +23,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "main.h"
 #include "cmd.h"
+#include "gui_main.h"
+
+// only available in debugging mode
+#ifdef APPLET_DEBUG
 
 //
 // classes
@@ -34,13 +38,15 @@ class Cmd cmd;
 //
 createCommand( cmd, print )
 createCommand( cmd, list )
-createCommand( cmd, listCvars )
 createCommand( cmd, cvarSet )
-createCommand( cmd, dbInfo )
 createCommand( cmd, teamAdd )
 createCommand( cmd, teamRemove )
+createCommand( cmd, stressTest )
+createSimpleCommand( cmd, dbInfo )
+createSimpleCommand( cmd, listCvars )
+createSimpleCommand( m, shutdown )
 #ifdef APPLET_DEBUG
-createCommand( cmd, memInfo )
+createSimpleCommand( cmd, memInfo )
 #endif
 
 /*
@@ -57,9 +63,9 @@ void Cmd::init() {
     this->add( "db_info", dbInfoCmd, this->tr( "display database information" ));
     this->add( "team_add", teamAddCmd, this->tr( "add a new team to the current event" ));
     this->add( "team_remove", teamRemoveCmd, this->tr( "remove a team" ));
-#ifdef APPLET_DEBUG
+    this->add( "shutdown", shutdownCmd, this->tr( "terminate the applet" ));
+    this->add( "sys_stressTest", stressTestCmd, this->tr( "stress test the applet" ));
     this->add( "mem_info", memInfoCmd, this->tr( "print alloc/dealloc count" ));
-#endif
     this->add( "help", listCmd, this->tr( "same as cmd_list" ));
 
     // we are initialized
@@ -173,9 +179,7 @@ void Cmd::list( const QStringList &args ) {
 listCvars
 ============
 */
-void Cmd::listCvars( const QStringList &args ) {
-    Q_UNUSED( args )
-
+void Cmd::listCvars() {
     if ( !m.cvarList.isEmpty())
         m.print( QString( "%1 available console variables:" ).arg( m.cvarList.count()), Main::System );
 
@@ -215,9 +219,7 @@ void Cmd::cvarSet( const QStringList &args ) {
 dbInfo
 ============
 */
-void Cmd::dbInfo( const QStringList &args ) {
-    Q_UNUSED( args )
-
+void Cmd::dbInfo() {
     m.print( QString( "events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
              .arg( m.base.eventList.count())
              .arg( m.currentEvent()->teamList.count())
@@ -233,9 +235,7 @@ memInfo
 ============
 */
 #ifdef APPLET_DEBUG
-void Cmd::memInfo( const QStringList &args ) {
-    Q_UNUSED( args )
-
+void Cmd::memInfo() {
     m.print( QString( "meminfo: %1 allocs, %2 deallocs" )
                  .arg( m.alloc )
                  .arg( m.dealloc ), Main::System );
@@ -267,6 +267,27 @@ void Cmd::teamRemove( const QStringList &args ) {
         return;
     }
     m.removeTeam( args.at( 0 ));
+}
+
+/*
+============
+stressTest
+============
+*/
+void Cmd::stressTest( const QStringList &args ) {
+    if ( args.count() > 1 ) {
+        m.print( this->tr( "usage: sys_stressTest [numTeams] - stress test the applet\n" ), Main::System );
+        return;
+    }
+
+    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
+    if ( !QString::compare( args.first(), "clear" )) {
+        gui->stressTest( -1 );
+        return;
+    }
+
+    if ( gui != NULL )
+        gui->stressTest( args.first().toInt());
 }
 
 /*
@@ -399,3 +420,5 @@ bool Cmd::execute( const QString &buffer ) {
 
     return false;
 }
+
+#endif

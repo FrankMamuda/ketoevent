@@ -52,6 +52,9 @@ class Main m;
 //
 // FIXME:
 //
+// no cleanup after team remove (logs are still hilighted)
+// urgent: sorting not performed properly in rankings
+//
 // FUTURE:
 //
 // use listView instead of listWidget (use popups for checkboxes/spinboxes)
@@ -189,7 +192,9 @@ void Main::shutdown( bool ignoreDatabase ) {
     this->setParent( NULL );
 
     // save settings
+#ifdef APPLET_DEBUG
     this->console->saveHisotry();
+#endif
     if ( this->settings != NULL ) {
         this->settings->sync();
         delete this->settings;
@@ -269,6 +274,7 @@ void Main::update() {
 initConsole
 ================
 */
+#ifdef APPLET_DEBUG
 void Main::initConsole() {
     if ( this->console != NULL )
         return;
@@ -276,6 +282,7 @@ void Main::initConsole() {
     this->console = new Gui_Console();
     this->console->hide();
 }
+#endif
 
 /*
 ================

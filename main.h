@@ -199,7 +199,9 @@ public slots:
     // misc
     void sort( ListTypes type );
     void update();
+#ifdef APPLET_DEBUG
     void initConsole();
+#endif
     void clearEvent();
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
@@ -215,7 +217,9 @@ private:
     int changesCounter;
     EventEntry *m_event;
     bool m_init;
+#ifdef APPLET_DEBUG
     Gui_Console *console;
+#endif
     DebugLevels m_debug;
 
 private slots:

@@ -26,6 +26,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "main.h"
 
+// only available in debugging mode
+#ifdef APPLET_DEBUG
+
 //
 // defines
 //
@@ -107,13 +110,14 @@ public slots:
 
     // commands
     void list( const QStringList & );
-    void listCvars( const QStringList & );
     void print( const QStringList & );
     void cvarSet( const QStringList & );
-    void dbInfo( const QStringList & );
     void teamAdd( const QStringList & );
     void teamRemove( const QStringList & );
-    void memInfo( const QStringList & );
+    void stressTest( const QStringList & );
+    void memInfo();
+    void dbInfo();
+    void listCvars();
 };
 
 //
@@ -121,4 +125,5 @@ public slots:
 //
 extern class Cmd cmd;
 
+#endif
 #endif // CMD_H

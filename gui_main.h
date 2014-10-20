@@ -65,6 +65,9 @@ public slots:
     void clearTasks();
     void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
     void updateStatusBar();
+#ifdef APPLET_DEBUG
+    void stressTest( int numTeams = 1 );
+#endif
 
 private slots:
     // team/task fill

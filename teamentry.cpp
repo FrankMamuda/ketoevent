@@ -35,6 +35,9 @@ TeamEntry::TeamEntry( const QSqlRecord &record, const QString &table ) {
     this->setRecord( record );
     this->setTable( table );
 
+    // no calculation has been peformed yet
+    this->setCombosCalculated( false );
+
     // failsafe members (min)
     if ( this->members() < m.currentEvent()->minMembers())
         this->setMembers( m.currentEvent()->minMembers());
@@ -104,6 +107,10 @@ calculateCombos
 void TeamEntry::calculateCombos() {
     QSqlQuery query;
     int id, lastId, counter = 0;
+
+    // abort if not needed
+    if ( this->combosCalculated())
+        return;
 
     // reset stats
     this->m_combos = 0;

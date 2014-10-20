@@ -138,6 +138,19 @@ void Gui_Main::teamIndexChanged( int index ) {
     QListWidget *lw = this->ui->taskList;
     int y;
 
+    // recalculate last team if required
+    if ( this->currentTeamId() != -1 ) {
+        TeamEntry *recalcPtr = m.teamForId( this->currentTeamId());
+        if ( recalcPtr != NULL ) {
+            if ( !recalcPtr->combosCalculated()) {
+                recalcPtr->calculateCombos();
+                recalcPtr->setCombosCalculated( true );
+                m.print( QString( "recalc %1\n" ).arg( recalcPtr->name()), Main::System );
+            }
+        }
+    }
+
+    // disable combine button
     this->ui->combineButton->setDisabled( true );
 
     if ( teamPtr != NULL ) {
@@ -753,3 +766,79 @@ void Gui_Main::testSortButton() {
    else
        this->ui->sortButton->setDisabled( true );
 }
+
+/*
+================
+stressTest
+
+ TODO: add should-be values (calculated on the fly)
+       add combos?
+================
+*/
+#ifdef APPLET_DEBUG
+
+static int irand( int min, int max ) {
+    qsrand( QTime::currentTime().msec() * getpid());
+
+    if ( min > max ) {
+        int temp = min;
+        min = max;
+        max = temp;
+    }
+    return (( rand() % ( max-min + 1 )) + min );
+}
+
+void Gui_Main::stressTest( int numTeams ) {
+    TeamEntry *teamPtr;
+    QListWidget *lw = this->ui->taskList;
+    int y, k;
+
+    // clear command has been given
+    if ( numTeams == -1 ) {
+        foreach ( TeamEntry *teamPtr, m.base.teamList ) {
+            if ( teamPtr->name().startsWith( "Stress test" ))
+                m.removeTeam( teamPtr->name());
+        }
+        this->fillTeams();
+        return;
+    }
+
+    // limits
+    if ( numTeams > 100 )
+        numTeams = 100;
+    else if ( numTeams < 1 )
+        numTeams = 1;
+
+    // add a few teams with random logs
+    for ( k = 0; k < numTeams; k++ ) {
+        int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
+        QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
+
+        // add a stress test team
+        m.addTeam( QString( "Stress test %1" ).arg( k ), irand( 1, 2 ), finishTime, "Stress Test", false );
+        teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
+
+        if ( teamPtr != NULL ) {
+            // select the team
+            this->fillTeams( teamPtr->id());
+
+            // log random values
+            for ( y = 0; y < lw->count(); y++ ) {
+                TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+                if ( taskPtr == NULL )
+                    continue;
+
+                if ( taskPtr->task()->type() == TaskEntry::Check )
+                    taskPtr->check->setChecked( irand( 0, 1 ));
+                else if ( taskPtr->task()->type() == TaskEntry::Multi )
+                    taskPtr->multi->setValue( irand( 0, taskPtr->task()->multi()));
+            }
+
+            // report
+            teamPtr->calculateCombos();
+            m.print( QString( "Team \"%1\" has %2 points" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()), Main::System );
+        }
+    }
+}
+
+#endif
