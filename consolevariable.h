@@ -57,10 +57,13 @@ public:
     QTime time() const { return this->value().toTime(); }
     QString timeString() const { return this->value().toTime().toString( "hh:mm" ); }
 
+signals:
+    void changed();
+
 public slots:
     void setKey( const QString &key ) { this->m_key = key; }
     void setDefaultValue( const QVariant &value ) { this->m_defaultValue = value; }
-    void setValue( const QVariant &value ) { this->s->setValue( this->key(), value ); }
+    void setValue( const QVariant &value ) { this->s->setValue( this->key(), value ); emit this->changed(); }
 
 private:
     QString m_key;

@@ -25,20 +25,70 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // includes
 //
 #include <QDialog>
-#include "gui_rankingmodel.h"
 #include <QSortFilterProxyModel>
+#include <QStandardItemModel>
+#include "gui_settingsdialog.h"
 
 //
 // namespaces
 //
 namespace Ui {
-    class Gui_Rankings;
+class Gui_Rankings;
 }
+
+namespace Rankings {
+    const static unsigned int NumRankingColumns = 9;
+    const static QString ColumnHeaders[NumRankingColumns] = {
+        QObject::trUtf8( "Rank" ),
+        QObject::trUtf8( "Team name" ),
+        QObject::trUtf8( "Tasks" ),
+        QObject::trUtf8( "Combos" ),
+        QObject::trUtf8( "Combined\ntasks" ),
+        QObject::trUtf8( "Time\n(min)" ),
+        QObject::trUtf8( "Penalty\npoints" ),
+        QObject::trUtf8( "Reviewer" ),
+        QObject::trUtf8( "Total\npoints" )
+    };
+    enum Columns {
+        Rank = 0,
+        TeamName,
+        Tasks,
+        Combos,
+        Total,
+        Time,
+        Penalty,
+        Reviewer,
+        Points
+    };
+}
+
+//
+// class: RankingsSortModel
+//
+class RankingsSortModel : public QSortFilterProxyModel {
+public:
+    RankingsSortModel( QObject *parent ) : QSortFilterProxyModel( parent ) {}
+    bool lessThan( const QModelIndex &left, const QModelIndex &right ) const {
+        QVariant leftData = this->sourceModel()->data( left );
+        QVariant rightData = sourceModel()->data( right );
+        bool n1, n2;
+        int num1, num2;
+
+        num1 = leftData.toInt( &n1 );
+        num2 = rightData.toInt( &n2 );
+
+        // these must be integers or strings
+        if ( n1 && n2 )
+            return num1 < num2;
+        else
+            return QString::localeAwareCompare( leftData.toString(), rightData.toString()) < 0;
+    }
+};
 
 //
 // class: Gui_Rankings
 //
-class Gui_Rankings : public QDialog {
+class Gui_Rankings : public Gui_SettingsDialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Team rankings dialog" )
 
@@ -50,11 +100,13 @@ private slots:
     void rescaleWindow();
     void calculateStatistics();
     void on_exportButton_clicked();
+    void fillData();
+    void bindVars();
 
 private:
     Ui::Gui_Rankings *ui;
-    Gui_RankingModel *modelPtr;
-    QSortFilterProxyModel *proxyModel;
+    QStandardItemModel *modelPtr;
+    RankingsSortModel *proxyModel;
 };
 
 #endif // GUI_RANKINGS_H
