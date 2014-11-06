@@ -48,12 +48,10 @@ class Main m;
 //   - stress test (any crashes while handling large amounts of data?)
 //   - integrity test (do we store exactly what we log?)
 //   - import test (do we import exactly what we need?)
-// option to hide teams other than current in rankings
 //
 // FIXME:
 //
 // no cleanup after team remove (logs are still hilighted)
-// file save dialog still saves on cancel (no check for empty filenames)
 //
 // FUTURE:
 //

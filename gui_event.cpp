@@ -275,6 +275,10 @@ void Gui_Event::on_buttonExport_clicked() {
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "Database (*.db)" ));
     QSqlQuery query;
 
+    // check for empty filenames
+    if ( path.isEmpty())
+        return;
+
     // add extension
     if ( !path.endsWith( ".db" ))
         path.append( ".db" );
@@ -319,6 +323,10 @@ buttonExportCSV->clicked
 void Gui_Event::on_buttonExportCSV_clicked() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
+
+    // check for empty filenames
+    if ( path.isEmpty())
+        return;
 
     // add extension
     if ( !path.endsWith( ".csv" ))
