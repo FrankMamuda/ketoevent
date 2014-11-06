@@ -28,6 +28,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_event.h"
 #include "gui_combos.h"
 #include <QMessageBox>
+#ifdef Q_OS_UNIX
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 /*
 ================
