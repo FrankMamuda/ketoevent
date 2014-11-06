@@ -52,6 +52,17 @@ class Main m;
 //   - import test (do we import exactly what we need?)
 //            - still requires testing
 //
+// FIXME:
+//
+// word wrap broken in rankings view?
+//
+// NOTE:
+//
+// stress test on 50 teams with 91 tasks takes ~10 minutes to calculate
+//   on i7-4790k and the bottleneck seems to be sql. is there a more
+//   efficient way to store these values with less commits to sql?
+//   just a thought for future updates
+//
 // FUTURE:
 //
 // use listView instead of listWidget (use popups for checkboxes/spinboxes)
@@ -82,8 +93,8 @@ void Main::initialize( QObject *parent ) {
     // init cvars
     this->addCvar( new ConsoleVariable( "backup/perform", this->settings, true ));
     this->addCvar( new ConsoleVariable( "backup/changes", this->settings, 25 ));
-    this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, false ));
-    this->addCvar( new ConsoleVariable( "misc/hilightLogged", this->settings, true ));
+    this->addCvar( new ConsoleVariable( "misc/sortTasks", this->settings, true ));
+    this->addCvar( new ConsoleVariable( "misc/hilightLogged", this->settings, false ));
     this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
     this->addCvar( new ConsoleVariable( "reviewerName", this->settings, "" ));
     this->addCvar( new ConsoleVariable( "system/consoleHistory", this->settings, "" ));

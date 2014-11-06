@@ -36,32 +36,6 @@ namespace Ui {
 class Gui_Rankings;
 }
 
-namespace Rankings {
-    const static unsigned int NumRankingColumns = 9;
-    const static QString ColumnHeaders[NumRankingColumns] = {
-        QObject::trUtf8( "Rank" ),
-        QObject::trUtf8( "Team name" ),
-        QObject::trUtf8( "Tasks" ),
-        QObject::trUtf8( "Combos" ),
-        QObject::trUtf8( "Combined\ntasks" ),
-        QObject::trUtf8( "Time\n(min)" ),
-        QObject::trUtf8( "Penalty\npoints" ),
-        QObject::trUtf8( "Reviewer" ),
-        QObject::trUtf8( "Total\npoints" )
-    };
-    enum Columns {
-        Rank = 0,
-        TeamName,
-        Tasks,
-        Combos,
-        Total,
-        Time,
-        Penalty,
-        Reviewer,
-        Points
-    };
-}
-
 //
 // class: RankingsSortModel
 //
@@ -95,6 +69,18 @@ class Gui_Rankings : public Gui_SettingsDialog {
 public:
     explicit Gui_Rankings( QWidget *parent = 0 );
     ~Gui_Rankings();
+    const static unsigned int NumRankingColumns = 9;
+    enum Columns {
+        Rank = 0,
+        TeamName,
+        Tasks,
+        Combos,
+        Total,
+        Time,
+        Penalty,
+        Reviewer,
+        Points
+    };
 
 private slots:
     void rescaleWindow();
@@ -105,6 +91,7 @@ private slots:
 
 private:
     Ui::Gui_Rankings *ui;
+    QStringList columnHeaders;
     QStandardItemModel *modelPtr;
     RankingsSortModel *proxyModel;
 };
