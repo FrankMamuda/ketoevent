@@ -81,7 +81,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         this->check = new QCheckBox();
         this->check->setMaximumWidth( 48 );
         this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2 );
-        this->connect( this->check, SIGNAL( clicked()), this, SLOT( saveLog()));
+
+        // changed from click for compatibility with the stressTest
+        this->connect( this->check, SIGNAL( stateChanged( int )), this, SLOT( saveLog()));
         this->grid->addWidget( this->check, 0, 4, 1, 1 );
 
         // set tooltips

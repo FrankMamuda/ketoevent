@@ -262,11 +262,12 @@ teamRemove
 */
 void Cmd::teamRemove( const QStringList &args ) {
     if ( args.count() < 1 ) {
-        // TODO: current EVENT!
         m.print( /*Sys::cYellow + */this->tr( "usage: team_remove [name] - remove team\n" ), Main::System );
         return;
     }
-    m.removeTeam( args.at( 0 ));
+
+    if ( m.currentEvent()->teamList.indexOf( m.teamForName( args.at( 0 ))) != -1 )
+        m.removeTeam( args.at( 0 ));
 }
 
 /*

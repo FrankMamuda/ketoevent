@@ -771,8 +771,7 @@ void Gui_Main::testSortButton() {
 ================
 stressTest
 
- TODO: add should-be values (calculated on the fly)
-       add combos?
+ TODO: add combos?
 ================
 */
 #ifdef APPLET_DEBUG
@@ -811,11 +810,18 @@ void Gui_Main::stressTest( int numTeams ) {
 
     // add a few teams with random logs
     for ( k = 0; k < numTeams; k++ ) {
+        int shouldBe = 0;
+        int rand = 0;
         int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
         QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
+        QString teamName = QString( "Stress test %1" ).arg( k );
+
+        // remove duplicates
+        if ( m.teamForName( teamName ) != NULL )
+            m.removeTeam( teamName );
 
         // add a stress test team
-        m.addTeam( QString( "Stress test %1" ).arg( k ), irand( 1, 2 ), finishTime, "Stress Test", false );
+        m.addTeam( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
         teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
 
         if ( teamPtr != NULL ) {
@@ -828,15 +834,31 @@ void Gui_Main::stressTest( int numTeams ) {
                 if ( taskPtr == NULL )
                     continue;
 
-                if ( taskPtr->task()->type() == TaskEntry::Check )
-                    taskPtr->check->setChecked( irand( 0, 1 ));
-                else if ( taskPtr->task()->type() == TaskEntry::Multi )
-                    taskPtr->multi->setValue( irand( 0, taskPtr->task()->multi()));
+                if ( taskPtr->task()->type() == TaskEntry::Check ) {
+                    rand = irand( 0, 1 );
+
+                    if ( rand ) {
+                        taskPtr->check->setChecked( static_cast<bool>( rand ));
+                        shouldBe += taskPtr->task()->points();
+                        //m.print( QString( "  logging \"%1\" with %2 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()), Main::System);
+                    }
+                } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+                    rand = irand( 0, taskPtr->task()->multi());
+
+                    if ( rand ) {
+                        taskPtr->multi->setValue( rand );
+                        shouldBe += taskPtr->task()->points() * rand;
+                        //m.print( QString( "  logging \"%1\" with %2x%3=%4 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()).arg( rand ).arg( taskPtr->task()->points() * rand ), Main::System );
+                    }
+                }
             }
+
+            // subtract penalty
+            shouldBe -= teamPtr->penalty();
 
             // report
             teamPtr->calculateCombos();
-            m.print( QString( "Team \"%1\" has %2 points" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()), Main::System );
+            m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
         }
     }
 }
