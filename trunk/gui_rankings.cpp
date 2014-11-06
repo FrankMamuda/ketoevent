@@ -296,6 +296,10 @@ void Gui_Rankings::on_exportButton_clicked() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
 
+    // check for empty filenames
+    if ( path.isEmpty())
+        return;
+
     // add extension
     if ( !path.endsWith( ".csv" ))
         path.append( ".csv" );
