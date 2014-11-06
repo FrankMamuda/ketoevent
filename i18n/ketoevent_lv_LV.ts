@@ -2,6 +2,124 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="lv_LV">
 <context>
+    <name>Cmd</name>
+    <message>
+        <location filename="../cmd.cpp" line="59"/>
+        <source>list all available commands</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="60"/>
+        <source>print text to console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="61"/>
+        <source>list all available console variables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="62"/>
+        <source>set console variable value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="63"/>
+        <source>display database information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="64"/>
+        <source>add a new team to the current event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="65"/>
+        <source>remove a team</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="66"/>
+        <source>terminate the applet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="67"/>
+        <source>stress test the applet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="68"/>
+        <source>print alloc/dealloc count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="69"/>
+        <source>same as cmd_list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="104"/>
+        <source>command &quot;%1&quot; already exists
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="135"/>
+        <source>usage: con_print [message] - print text to console
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="160"/>
+        <source>could not match any available commands
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="162"/>
+        <source>matched %1 of %2 available commands:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="164"/>
+        <source>%1 available commands:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="204"/>
+        <source>usage: cv_print [key] [value] - set console variable value
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="252"/>
+        <source>usage: team_add [name] [members] - add a new team to the current event
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="265"/>
+        <source>usage: team_remove [name] - remove team
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="280"/>
+        <source>usage: sys_stressTest [numTeams] - stress test the applet
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cmd.cpp" line="328"/>
+        <source>unknown command &quot;%1&quot;, prehaps try &quot;cmd_list&quot;
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DatabaseEntry</name>
     <message>
         <location filename="../databaseentry.cpp" line="76"/>
@@ -190,8 +308,12 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui_combos.ui" line="73"/>
-        <source>Bonus points:</source>
+        <source>Bonus points</source>
         <translation>Papildus punkti</translation>
+    </message>
+    <message>
+        <source>Bonus points:</source>
+        <translation type="vanished">Papildus punkti</translation>
     </message>
     <message>
         <location filename="../gui_combos.ui" line="91"/>
@@ -221,6 +343,20 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui_console.cpp" line="104"/>
+        <source>Available commands and cvars:
+</source>
+        <translation>Pieejamās komandas un mainīgie:
+</translation>
+    </message>
+    <message>
+        <location filename="../gui_console.cpp" line="122"/>
+        <source>  &quot;%1&quot; is &quot;%2&quot;
+</source>
+        <translation>  &quot;%1&quot; ir &quot;%2&quot;
+</translation>
     </message>
 </context>
 <context>
@@ -414,44 +550,44 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui_event.cpp" line="242"/>
-        <location filename="../gui_event.cpp" line="371"/>
+        <location filename="../gui_event.cpp" line="379"/>
         <source>Select database</source>
         <translation>Datubāzes izvēle</translation>
     </message>
     <message>
         <location filename="../gui_event.cpp" line="242"/>
         <location filename="../gui_event.cpp" line="275"/>
-        <location filename="../gui_event.cpp" line="371"/>
+        <location filename="../gui_event.cpp" line="379"/>
         <source>Database (*.db)</source>
         <translation>Datubāze (*.db)</translation>
     </message>
     <message>
         <location filename="../gui_event.cpp" line="275"/>
-        <location filename="../gui_event.cpp" line="321"/>
+        <location filename="../gui_event.cpp" line="325"/>
         <source>Export event structure</source>
         <translation>Eksportēt pasākumu</translation>
     </message>
     <message>
-        <location filename="../gui_event.cpp" line="298"/>
+        <location filename="../gui_event.cpp" line="302"/>
         <source>database &quot;%1&quot; does not exist
 </source>
         <translation>datubāze &quot;%1&quot; neeksistē
 </translation>
     </message>
     <message>
-        <location filename="../gui_event.cpp" line="304"/>
+        <location filename="../gui_event.cpp" line="308"/>
         <source>could not attach database, reason - &quot;%1&quot;
 </source>
         <translation>nebija iespējams pievienot datubāzi, iemesls - &quot;%1&quot;
 </translation>
     </message>
     <message>
-        <location filename="../gui_event.cpp" line="321"/>
+        <location filename="../gui_event.cpp" line="325"/>
         <source>CSV file (*.csv)</source>
         <translation>CSV fails (*.csv)</translation>
     </message>
     <message>
-        <location filename="../gui_event.cpp" line="338"/>
+        <location filename="../gui_event.cpp" line="346"/>
         <source>Task name;Description;Points;Multi;Style;Type</source>
         <translation>Nosaukums;Apraksts;Punkti;Multi;Stils;Tips</translation>
     </message>
@@ -765,51 +901,51 @@ p, li { white-space: pre-wrap; }
         <translation>Parādīt/slēpt konsoli</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="85"/>
+        <location filename="../gui_main.cpp" line="89"/>
         <source>initialization complete
 </source>
         <translation>inicializācija pabeigta
 </translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="104"/>
+        <location filename="../gui_main.cpp" line="108"/>
         <source>Ketoevent logger</source>
         <translation>Ketonu Kausa balķotājs</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="112"/>
+        <location filename="../gui_main.cpp" line="116"/>
         <source>Ketoevent logger - %1 (%2)</source>
         <translation>Ketonu Kausa balķotājs - %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="114"/>
+        <location filename="../gui_main.cpp" line="118"/>
         <source>Ketoevent logger - %1</source>
         <translation>Ketonu Kausa balķotājs - %1</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="173"/>
-        <location filename="../gui_main.cpp" line="466"/>
+        <location filename="../gui_main.cpp" line="190"/>
+        <location filename="../gui_main.cpp" line="483"/>
         <source>Unlock</source>
         <translation>Atslēgt</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="179"/>
-        <location filename="../gui_main.cpp" line="458"/>
+        <location filename="../gui_main.cpp" line="196"/>
+        <location filename="../gui_main.cpp" line="475"/>
         <source>Lock</source>
         <translation>Slēgt</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="499"/>
+        <location filename="../gui_main.cpp" line="516"/>
         <source>Database import</source>
         <translation>Datubāzes importēšana</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="499"/>
+        <location filename="../gui_main.cpp" line="516"/>
         <source>Database import requires restart</source>
         <translation>Nepieciešama atkārtota programmas sāknēšana</translation>
     </message>
     <message>
-        <location filename="../gui_main.cpp" line="692"/>
+        <location filename="../gui_main.cpp" line="709"/>
         <source>Tasks - %1, combos - %2 (%3), points - %3</source>
         <translation type="unfinished"></translation>
     </message>
@@ -817,15 +953,13 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Gui_RankingModel</name>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="126"/>
         <source>Team name</source>
-        <translation>Komandas
+        <translation type="vanished">Komandas
 nosaukums</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="129"/>
         <source>Tasks</source>
-        <translation>Uzdevumi</translation>
+        <translation type="vanished">Uzdevumi</translation>
     </message>
     <message>
         <source>Challenges</source>
@@ -833,45 +967,39 @@ nosaukums</translation>
 uzdevumi</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="132"/>
         <source>Combos</source>
-        <translation>Kombinācijas</translation>
+        <translation type="vanished">Kombinācijas</translation>
     </message>
     <message>
         <source>Grade</source>
         <translation type="obsolete">Atzīme</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="135"/>
         <source>Combined
 tasks</source>
-        <translation>Kombinētie
+        <translation type="vanished">Kombinētie
 uzdevumi</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="138"/>
         <source>Time
 (min)</source>
-        <translation>Laiks
+        <translation type="vanished">Laiks
 (min)</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="141"/>
         <source>Penalty
 points</source>
-        <translation>Soda
+        <translation type="vanished">Soda
 punkti</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="144"/>
         <source>Reviewer</source>
-        <translation>Vērtētājs</translation>
+        <translation type="vanished">Vērtētājs</translation>
     </message>
     <message>
-        <location filename="../gui_rankingmodel.cpp" line="147"/>
         <source>Total
 points</source>
-        <translation>Punkti
+        <translation type="vanished">Punkti
 kopā</translation>
     </message>
 </context>
@@ -899,51 +1027,56 @@ kopā</translation>
     </message>
     <message>
         <location filename="../gui_rankings.ui" line="63"/>
+        <source>Display only the current team</source>
+        <translation>Slēpt citu komandu nosaukumus</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.ui" line="70"/>
         <source>Event statistics</source>
         <translation>Pasākuma statistika</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="74"/>
+        <location filename="../gui_rankings.ui" line="81"/>
         <source>Total tasks</source>
         <translation>Uzdevumu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="110"/>
+        <location filename="../gui_rankings.ui" line="117"/>
         <source>Total tasks completed</source>
         <translation>Izpildīto uzdevumu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="123"/>
+        <location filename="../gui_rankings.ui" line="130"/>
         <source>Sum of all completed tasks from all teams</source>
         <translation>Visu komandu visu paveikto uzdevumu kopsumma</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="136"/>
+        <location filename="../gui_rankings.ui" line="143"/>
         <source>Total logged points</source>
         <translation>Piebaļķoto punktu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="159"/>
+        <location filename="../gui_rankings.ui" line="166"/>
         <source>Maximum points</source>
         <translation>Maksimāli iespējamie punkti</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="208"/>
+        <location filename="../gui_rankings.ui" line="215"/>
         <source>Total participiants</source>
         <translation>Dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="221"/>
+        <location filename="../gui_rankings.ui" line="228"/>
         <source>Total number of participiants</source>
         <translation>Visu komandu dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="195"/>
+        <location filename="../gui_rankings.ui" line="202"/>
         <source>Total number of teams participated in this event</source>
         <translation>Visu piedalījušos komandu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="239"/>
+        <location filename="../gui_rankings.ui" line="246"/>
         <source>Close rankings dialog</source>
         <translation>Aizvērt logu</translation>
     </message>
@@ -952,7 +1085,7 @@ kopā</translation>
         <translation type="obsolete">Grūto uzdevumu kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="182"/>
+        <location filename="../gui_rankings.ui" line="189"/>
         <source>Total teams</source>
         <translation>Komandu kopskaits</translation>
     </message>
@@ -961,7 +1094,7 @@ kopā</translation>
         <translation type="obsolete">Dalībnieku kopskaits</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.ui" line="242"/>
+        <location filename="../gui_rankings.ui" line="249"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
@@ -970,17 +1103,66 @@ kopā</translation>
         <translation type="vanished">Ekspoertēt statistiku csv formātā </translation>
     </message>
     <message>
-        <location filename="../gui_rankings.cpp" line="137"/>
+        <location filename="../gui_rankings.cpp" line="48"/>
+        <source>Rank</source>
+        <translation>Vieta</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="49"/>
+        <source>Team name</source>
+        <translation>Komandas nosaukums</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="50"/>
+        <source>Tasks</source>
+        <translation>Uzdevumi</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="51"/>
+        <source>Combos</source>
+        <translation>Kombinācijas</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="52"/>
+        <source>Combined
+tasks</source>
+        <translation>Kombinētie uzdevumi</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="53"/>
+        <source>Time
+(min)</source>
+        <translation>Laiks (min)</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="54"/>
+        <source>Penalty
+points</source>
+        <translation>Soda punkti</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="55"/>
+        <source>Reviewer</source>
+        <translation>Vērtētājs</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="56"/>
+        <source>Total
+points</source>
+        <translation>Punkti kopā</translation>
+    </message>
+    <message>
+        <location filename="../gui_rankings.cpp" line="310"/>
         <source>CSV file (*.csv)</source>
         <translation>CSV fails (*.csv)</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.cpp" line="137"/>
+        <location filename="../gui_rankings.cpp" line="310"/>
         <source>Export statistics to CSV format</source>
         <translation>Eksportēt statistiku CSV formātā</translation>
     </message>
     <message>
-        <location filename="../gui_rankings.cpp" line="153"/>
+        <location filename="../gui_rankings.cpp" line="330"/>
         <source>Team name;Tasks;Combos;Time;Penalty points;Total points</source>
         <translation>Nosaukums;Uzdevumi;Kombinācijas;Laiks;Soda punkti;Punkti kopā</translation>
     </message>
@@ -1551,12 +1733,12 @@ kopā</translation>
 <context>
     <name>Main</name>
     <message>
-        <location filename="../main.cpp" line="161"/>
+        <location filename="../main.cpp" line="175"/>
         <source>FATAL ERROR: %1</source>
         <translation>PILNĪGA ZIVS: %1</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="171"/>
+        <location filename="../main.cpp" line="185"/>
         <source>ERROR: %1</source>
         <translation>ZIVS: %1</translation>
     </message>
@@ -1669,14 +1851,14 @@ kopā</translation>
 </translation>
     </message>
     <message>
-        <location filename="../sort.cpp" line="233"/>
+        <location filename="../sort.cpp" line="241"/>
         <source>unknown list type &quot;%1&quot;
 </source>
         <translation>nezināms  saraksta veids - &quot;%1&quot;
 </translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="240"/>
+        <location filename="../main.cpp" line="257"/>
         <source>could not create backup path
 </source>
         <translation>nebija iespējams izveidot dublēšanas mapi</translation>
@@ -1715,7 +1897,7 @@ kopā</translation>
 </translation>
     </message>
     <message>
-        <location filename="../team.cpp" line="137"/>
+        <location filename="../team.cpp" line="138"/>
         <source>aborting double import of team &quot;%1&quot;
 </source>
         <translation>netiek veikta komandas &quot;%1&quot; dubultā importēšana
@@ -1728,6 +1910,57 @@ kopā</translation>
         <location filename="../main.h" line="59"/>
         <source>WARNING:</source>
         <translation>BRĪDINĀJUMS:</translation>
+    </message>
+    <message>
+        <source>Rank</source>
+        <translation type="vanished">Vieta</translation>
+    </message>
+    <message>
+        <source>Team name</source>
+        <translation type="vanished">Nosaukums</translation>
+    </message>
+    <message>
+        <source>Tasks</source>
+        <translation type="vanished">Uzdevumi</translation>
+    </message>
+    <message>
+        <source>Combos</source>
+        <translation type="vanished">Kombinācijas</translation>
+    </message>
+    <message>
+        <source>Combined
+tasks</source>
+        <translation type="vanished">Kombinētie
+uzdevumi</translation>
+    </message>
+    <message>
+        <source>Time
+(min)</source>
+        <translation type="vanished">Laiks
+(min)</translation>
+    </message>
+    <message>
+        <source>Penalty
+points</source>
+        <translation type="vanished">Soda
+punkti</translation>
+    </message>
+    <message>
+        <source>Reviewer</source>
+        <translation type="vanished">Vērtētājs</translation>
+    </message>
+    <message>
+        <source>Total
+points</source>
+        <translation type="vanished">Punkti
+kopā</translation>
+    </message>
+</context>
+<context>
+    <name>Rankings</name>
+    <message>
+        <source>Rank</source>
+        <translation type="vanished">Vieta</translation>
     </message>
 </context>
 <context>
@@ -1750,9 +1983,9 @@ kopā</translation>
     <name>TaskWidget</name>
     <message>
         <location filename="../taskwidget.cpp" line="43"/>
-        <location filename="../taskwidget.cpp" line="232"/>
-        <location filename="../taskwidget.cpp" line="269"/>
-        <location filename="../taskwidget.cpp" line="368"/>
+        <location filename="../taskwidget.cpp" line="237"/>
+        <location filename="../taskwidget.cpp" line="274"/>
+        <location filename="../taskwidget.cpp" line="373"/>
         <source>task not set
 </source>
         <translation>uzdevums nav uzstādīts\n</translation>
@@ -1762,7 +1995,7 @@ kopā</translation>
         <translation type="vanished">%1 punkti; atķeksē, lai ieskaitītu uzdevumu</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="90"/>
+        <location filename="../taskwidget.cpp" line="92"/>
         <source>Toggle task completion</source>
         <translation>Atķeksē uzdevuma izpildi</translation>
     </message>
@@ -1771,24 +2004,24 @@ kopā</translation>
         <translation type="vanished">%1 punkti (lielākais rezinātājs %2)</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="105"/>
+        <location filename="../taskwidget.cpp" line="107"/>
         <source>Change task multiplier</source>
         <translation>Izmaini rezinātāju</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="107"/>
-        <location filename="../taskwidget.cpp" line="167"/>
+        <location filename="../taskwidget.cpp" line="109"/>
+        <location filename="../taskwidget.cpp" line="169"/>
         <source>invalid task type &quot;%1&quot;
 </source>
         <translation>nederīgs uzdevuma tips &quot;%1&quot;\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="123"/>
+        <location filename="../taskwidget.cpp" line="125"/>
         <source>Click here to toggle combo state</source>
         <translation>Šeit klikšķini, lai izmainītu kombināciju</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="154"/>
+        <location filename="../taskwidget.cpp" line="156"/>
         <source>task or team not set
 </source>
         <translation>uzdevums vai komanda nav uzstādīta\n</translation>
@@ -1799,20 +2032,20 @@ kopā</translation>
         <translation type="vanished">nederīga kombinācija &quot;%1&quot;\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="275"/>
+        <location filename="../taskwidget.cpp" line="280"/>
         <source>log not set
 </source>
         <translation>baļķis nav pielikts
 </translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="281"/>
+        <location filename="../taskwidget.cpp" line="286"/>
         <source>team not set
 </source>
         <translation>komanda nav uzstādīta\n</translation>
     </message>
     <message>
-        <location filename="../taskwidget.cpp" line="392"/>
+        <location filename="../taskwidget.cpp" line="397"/>
         <source>task, team or log not set
 </source>
         <translation type="unfinished">uzdevums, baļķis vai komanda nav uzstādīta\n</translation>

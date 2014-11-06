@@ -43,17 +43,30 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
     else
         this->reject();
 
+    // define column headers here for now (required for proper translations)
+    this->columnHeaders <<
+        this->tr( "Rank" ) <<
+        this->tr( "Team name" ) <<
+        this->tr( "Tasks" ) <<
+        this->tr( "Combos" ) <<
+        this->tr( "Combined\ntasks" ) <<
+        this->tr( "Time\n(min)" ) <<
+        this->tr( "Penalty\npoints" ) <<
+        this->tr( "Reviewer" ) <<
+        this->tr( "Total\npoints" );
+
     // set up ranking view
     this->ui->rankingView->setEditTriggers( QAbstractItemView::NoEditTriggers );
     this->ui->rankingView->setSortingEnabled( true );
 
     // set up sorting & view model
     this->proxyModel = new RankingsSortModel( this );
-    this->modelPtr = new QStandardItemModel( m.currentEvent()->teamList.count(), Rankings::NumRankingColumns, this );
+    this->modelPtr = new QStandardItemModel( m.currentEvent()->teamList.count(), NumRankingColumns, this );
     this->proxyModel->setSourceModel( this->modelPtr );
     this->proxyModel->setDynamicSortFilter( true );
     this->ui->rankingView->verticalHeader()->hide();
     this->ui->rankingView->setModel( this->proxyModel );
+    this->ui->rankingView->setWordWrap( true );
 
     // connect
     this->connect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
@@ -61,10 +74,11 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
     // set stats
     this->calculateStatistics();
     this->fillData();
-    this->proxyModel->sort( Rankings::Points, Qt::DescendingOrder );
+    this->proxyModel->sort( Points, Qt::DescendingOrder );
 
     // scale window to contents
     this->ui->rankingView->resizeColumnsToContents();
+    this->ui->rankingView->resizeRowsToContents();
     this->rescaleWindow();
 
     // disable horizontal scrollbar
@@ -93,15 +107,15 @@ void Gui_Rankings::fillData() {
     QList<int> pointsList;
 
     // generate header
-    for ( y = 0; y < Rankings::NumRankingColumns; y++ ) {
-        QStandardItem *itemPtr = new QStandardItem( Rankings::ColumnHeaders[y] );
+    for ( y = 0; y < NumRankingColumns; y++ ) {
+        QStandardItem *itemPtr = new QStandardItem( this->columnHeaders.at( y ));
         itemPtr->setFont( boldFont );
         itemPtr->setData( Qt::AlignCenter, Qt::TextAlignmentRole );
         this->modelPtr->setHorizontalHeaderItem( y, itemPtr );
     }
 
     // fill data
-    for ( y = 0; y < Rankings::NumRankingColumns; y++ ) {
+    for ( y = 0; y < NumRankingColumns; y++ ) {
         for ( k = 0; k < m.currentEvent()->teamList.count(); k++ ) {
             TeamEntry *teamPtr = m.currentEvent()->teamList.at( k );
             Gui_Main *guiPtr = qobject_cast<Gui_Main*>( this->parent());
@@ -112,7 +126,7 @@ void Gui_Rankings::fillData() {
                 return;
 
             switch ( y ) {
-            case Rankings::TeamName:
+            case TeamName:
                 text = teamPtr->name();
 
                 if ( m.cvar( "rankings/current" )->isEnabled()) {
@@ -121,33 +135,33 @@ void Gui_Rankings::fillData() {
                 }
                 break;
 
-            case Rankings::Tasks:
+            case Tasks:
                 text = QString( "%1" ).arg( teamPtr->logList.count());
                 break;
 
-            case Rankings::Combos:
+            case Combos:
                 text = QString( "%1" ).arg( teamPtr->combos());
                 break;
 
-            case Rankings::Total:
+            case Total:
                 text = QString( "%1" ).arg( teamPtr->total());
                 break;
 
-            case Rankings::Time:
+            case Time:
                 text = QString( "%1" ).arg( teamPtr->timeOnTrack());
                 break;
 
-            case Rankings::Reviewer:
+            case Reviewer:
                 text = teamPtr->reviewer();
                 break;
 
-            case Rankings::Penalty:
+            case Penalty:
                 if ( teamPtr->penalty() > 0 )
                     itemPtr->setForeground( QColor( Qt::red ));
                 text = QString( "%1" ).arg( teamPtr->penalty());
                 break;
 
-            case Rankings::Points:
+            case Points:
                 if ( teamPtr->disqualified())
                     text = QString( "-1" );
 
@@ -168,7 +182,7 @@ void Gui_Rankings::fillData() {
             }
 
             // bold points
-            //if ( y == Rankings::Points )
+            //if ( y == Points )
             //    itemPtr->setFont( boldFont );
 
             // disqualified
@@ -187,8 +201,8 @@ void Gui_Rankings::fillData() {
 
     // second pass for rank
     for ( k = 0; k < m.currentEvent()->teamList.count(); k++ ) {
-        int rankColumn = Rankings::Rank;
-        int pointsColumn = Rankings::Points;
+        int rankColumn = Rank;
+        int pointsColumn = Points;
         this->modelPtr->item( k, rankColumn )->setText( QString( "%1" ).arg( pointsList.indexOf( this->modelPtr->item( k, pointsColumn )->text().toInt()) + 1 ));
     }
 }
@@ -240,7 +254,7 @@ void Gui_Rankings::rescaleWindow() {
       windowRect = this->geometry();
       parentRect = this->parentWidget()->geometry();
 
-      for ( y = 0; y < static_cast<int>( Rankings::NumRankingColumns ); y++ )
+      for ( y = 0; y < static_cast<int>( NumRankingColumns ); y++ )
           columnWidths += this->ui->rankingView->columnWidth( y );
 
       // this looks fairly fine
@@ -248,7 +262,8 @@ void Gui_Rankings::rescaleWindow() {
       this->ui->rankingView->setGeometry( tableRect );
       windowRect = this->geometry();
       windowRect.setWidth( 24 + tableRect.width() + this->ui->layoutTeamRankings->margin() * 2 + this->ui->groupRankings->layout()->margin() * 2 );
-      this->setFixedWidth( windowRect.width());
+      //this->setFixedWidth( windowRect.width());
+      this->setGeometry( windowRect );
 }
 
 /*
@@ -269,6 +284,7 @@ Gui_Rankings::~Gui_Rankings() {
     // delete sort and data models
     delete this->modelPtr;
     delete this->proxyModel;
+    this->columnHeaders.clear();
 }
 
 /*
