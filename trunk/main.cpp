@@ -46,12 +46,11 @@ class Main m;
 // alloc/dealloc counter test
 // perform pre-event tests:
 //   - stress test (any crashes while handling large amounts of data?)
+//            - done, no crashes even on 50 teams and 10 tasks
 //   - integrity test (do we store exactly what we log?)
+//            - while performing auto stressTest no inconstencies where found
 //   - import test (do we import exactly what we need?)
-//
-// FIXME:
-//
-// no cleanup after team remove (logs are still hilighted)
+//            - still requires testing
 //
 // FUTURE:
 //

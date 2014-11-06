@@ -85,6 +85,7 @@ void Main::removeTeam( const QString &teamName ) {
 
     // remove from display
     this->base.teamList.removeAll( teamPtr );
+    this->currentEvent()->teamList.removeAll( teamPtr );
 }
 
 /*

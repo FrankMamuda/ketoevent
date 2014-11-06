@@ -43,6 +43,7 @@ class TeamEntry : public DatabaseEntry {
     Q_PROPERTY( QString reviewer READ reviewer WRITE setReviewer )
     Q_PROPERTY( int eventId READ eventId WRITE setEventId )
     Q_PROPERTY( bool combosCalculated READ combosCalculated WRITE setCombosCalculated )
+    Q_PROPERTY( bool locked READ isLocked WRITE setLocked )
     Q_CLASSINFO( "description", "Team SQL Entry" )
 
 public:

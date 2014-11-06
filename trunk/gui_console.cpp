@@ -234,6 +234,8 @@ void Gui_Console::on_input_returnPressed() {
     if ( cmd.execute( this->ui->input->text()))
         this->ui->input->addToHistory( this->ui->input->text());
 
+    // set min offset
+    this->ui->input->setHistoryOffset( 0 );
     this->ui->input->clear();
 }
 
