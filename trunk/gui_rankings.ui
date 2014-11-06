@@ -58,6 +58,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkCurrent">
+     <property name="text">
+      <string>Display only the current team</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Event statistics</string>

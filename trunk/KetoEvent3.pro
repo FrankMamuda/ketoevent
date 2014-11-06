@@ -24,7 +24,6 @@ SOURCES += main.cpp\
     gui_teamlistmodel.cpp \
     gui_taskedit.cpp \
     gui_tasklistmodel.cpp \
-    gui_rankingmodel.cpp \
     gui_rankings.cpp \
     gui_about.cpp \
     gui_license.cpp \
@@ -57,7 +56,6 @@ HEADERS  += gui_main.h \
     gui_teamlistmodel.h \
     gui_taskedit.h \
     gui_tasklistmodel.h \
-    gui_rankingmodel.h \
     gui_rankings.h \
     gui_about.h \
     gui_license.h \

@@ -42,18 +42,18 @@ class Main m;
 // verbocity for console Regular Verbose PrintEverything
 // allow debugging of components:
 //       Tasks, Teams, Gui as flags (prints out if enabled)
-// add option to hide logged entries? or at least implement hilighting
 // add compatibility layer for the 2013 event (or just stats)
 // alloc/dealloc counter test
 // perform pre-event tests:
 //   - stress test (any crashes while handling large amounts of data?)
 //   - integrity test (do we store exactly what we log?)
 //   - import test (do we import exactly what we need?)
+// option to hide teams other than current in rankings
 //
 // FIXME:
 //
 // no cleanup after team remove (logs are still hilighted)
-// urgent: sorting not performed properly in rankings
+// file save dialog still saves on cancel (no check for empty filenames)
 //
 // FUTURE:
 //
@@ -90,6 +90,7 @@ void Main::initialize( QObject *parent ) {
     this->addCvar( new ConsoleVariable( "currentEvent", this->settings, -1 ));
     this->addCvar( new ConsoleVariable( "reviewerName", this->settings, "" ));
     this->addCvar( new ConsoleVariable( "system/consoleHistory", this->settings, "" ));
+    this->addCvar( new ConsoleVariable( "rankings/current", this->settings, true ));
 
     // add an empty car
     this->defaultCvar = new ConsoleVariable( "default", this->settings, false );
@@ -116,6 +117,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
     this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
     this->addSvar( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
+    this->addSvar( "rankings/current", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
 
     // set parent
     this->setParent( parent );
