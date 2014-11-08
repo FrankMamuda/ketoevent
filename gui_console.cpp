@@ -18,6 +18,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
+#ifdef APPLET_DEBUG
+
 //
 // includes
 //
@@ -256,3 +258,5 @@ saveHisotry
 void Gui_Console::saveHisotry() {
     m.cvar( "system/consoleHistory" )->setValue( this->ui->input->history.join( ";" ));
 }
+
+#endif

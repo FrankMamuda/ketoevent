@@ -21,6 +21,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #ifndef GUI_CONSOLE_H
 #define GUI_CONSOLE_H
 
+#ifdef APPLET_DEBUG
+
 //
 // includes
 //
@@ -112,4 +114,5 @@ private:
     ConsoleEventFilter *eventFilter;
 };
 
+#endif
 #endif // GUI_CONSOLE_H
