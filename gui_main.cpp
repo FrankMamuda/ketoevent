@@ -765,10 +765,10 @@ testSortButton
 ================
 */
 void Gui_Main::testSortButton() {
-   if ( m.cvar( "misc/sortLogged" )->isEnabled())
-       this->ui->sortButton->setEnabled( true );
-   else
-       this->ui->sortButton->setDisabled( true );
+    if ( m.cvar( "misc/sortLogged" )->isEnabled())
+        this->ui->sortButton->setEnabled( true );
+    else
+        this->ui->sortButton->setDisabled( true );
 }
 
 /*
@@ -781,7 +781,11 @@ stressTest
 #ifdef APPLET_DEBUG
 
 static int irand( int min, int max ) {
-    qsrand( QTime::currentTime().msec() * getpid());
+    qsrand( QTime::currentTime().msec()
+#ifdef Q_OS_UNIX
+            * getpid()
+#endif
+            );
 
     if ( min > max ) {
         int temp = min;
