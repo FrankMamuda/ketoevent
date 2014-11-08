@@ -45,7 +45,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // defines
 //
-//#define FORCE_LATVIAN
+#define FORCE_LATVIAN
 #define APPLET_DEBUG
 
 #ifdef APPLET_DEBUG

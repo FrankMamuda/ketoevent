@@ -106,7 +106,7 @@ calculateCombos
 */
 void TeamEntry::calculateCombos() {
     QSqlQuery query;
-    int id, lastId, counter = 0;
+    int id, lastId = -1, counter = 0;
 
     // abort if not needed
     if ( this->combosCalculated())

@@ -262,8 +262,8 @@ void Gui_Rankings::rescaleWindow() {
       this->ui->rankingView->setGeometry( tableRect );
       windowRect = this->geometry();
       windowRect.setWidth( 24 + tableRect.width() + this->ui->layoutTeamRankings->margin() * 2 + this->ui->groupRankings->layout()->margin() * 2 );
-      //this->setFixedWidth( windowRect.width());
-      this->setGeometry( windowRect );
+      this->setFixedWidth( windowRect.width());
+      //this->setGeometry( windowRect );
 }
 
 /*
