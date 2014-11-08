@@ -46,7 +46,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 #define FORCE_LATVIAN
-#define APPLET_DEBUG
+//#define APPLET_DEBUG
 
 #ifdef APPLET_DEBUG
 #include <QDebug>
@@ -206,8 +206,10 @@ public slots:
     void reloadDatabase( const QString &path ) { this->unloadDatabase(); this->makePath( path ); this->loadDatabase(); }
     bool setCurrentEvent( EventEntry *eventPtr );
     void buildEventTTList();
+#ifdef APPLET_DEBUG
     void showConsole() { this->console->show(); }
     void hideConsole() { this->console->hide(); }
+#endif
 
     // combos
     int getFreeComboHandle() const;

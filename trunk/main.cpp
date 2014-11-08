@@ -131,8 +131,10 @@ void Main::initialize( QObject *parent ) {
     this->setParent( parent );
 
     // init command subsystem
+#ifdef APPLET_DEBUG
     cmd.init();
     this->console->loadHistory();
+#endif
 
     // we're up
     this->setInitialized();
@@ -149,6 +151,7 @@ void Main::print( const QString &msg, DebugLevel debug ) {
         return;
 
     // print to console
+#ifdef APPLET_DEBUG
     if ( this->console != NULL ) {
         if ( msg.endsWith( "\n" ))
             this->console->print( msg.left( msg.length()-1 ));
@@ -156,7 +159,6 @@ void Main::print( const QString &msg, DebugLevel debug ) {
             this->console->print( msg );
     }
 
-#ifdef APPLET_DEBUG
     qDebug() << msg;
 #endif
 }

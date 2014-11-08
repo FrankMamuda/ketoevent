@@ -718,10 +718,14 @@ actionConsole->toggled
 ================
 */
 void Gui_Main::on_actionConsole_toggled( bool visible ) {
+#ifdef APPLET_DEBUG
     if ( visible )
         m.showConsole();
     else
         m.hideConsole();
+#else
+    Q_UNUSED( visible )
+#endif
 }
 
 /*
