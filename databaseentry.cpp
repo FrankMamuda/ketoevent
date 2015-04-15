@@ -72,7 +72,15 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
 
     // update database value
     if ( !this->table().isNull()) {
+#ifdef SQL_PREPARE_STATEMENTS
+        query.prepare( QString( "update %1 set %2 = :value where id = :id" ).arg( table ).arg( name ));
+        query.bindValue( ":value", update.toString());
+        query.bindValue( ":id", this->record().value( "id" ).toInt());
+
+        if ( !query.exec())
+#else
         if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( table ).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
+#endif
             m.error( StrSoftError, this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
     }
 }

@@ -46,11 +46,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 // defines
 //
 #define FORCE_LATVIAN
-//#define APPLET_DEBUG
-
-#ifdef APPLET_DEBUG
-#include <QDebug>
-#endif
+#define SQL_PREPARE_STATEMENTS
 
 // error message macros
 #define StrMsg ClassFunc
@@ -75,6 +71,13 @@ namespace Common {
     const static QString defaultFinalTime( "15:30" );
     const static QString defaultDatabase( "ketoevent.db" );
 }
+
+//
+// classes
+//
+#ifdef APPLET_DEBUG
+class Gui_Console;
+#endif
 
 //
 // class:Main

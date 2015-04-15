@@ -31,6 +31,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QDir>
 #include <QCryptographicHash>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 
 /*
 ================
@@ -300,11 +301,6 @@ void Main::loadDatabase() {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setHostName( "localhost" );
     db.setDatabaseName( this->path );
-
-
-    //if ( !QDir( this->path ).exists())
-    //    QDir::mkpath( this->path );
-
     // touch file if empty
     if ( !database.exists()) {
         database.open( QFile::WriteOnly );
@@ -321,6 +317,11 @@ void Main::loadDatabase() {
 
     // delete orphaned logs on init
     this->removeOrphanedLogs();
+
+    // enable WAL
+    QSqlQuery query;
+    if ( !query.exec( "PRAGMA journal_mode=WAL" ))
+        this->error( StrSoftError, QString( "could not enable WAL, reason: %1\n" ).arg( query.lastError().text()));
 
     // load entries
     this->loadEvents();
@@ -346,8 +347,9 @@ void Main::unloadDatabase() {
         if ( db.isOpen()) {
             open = true;
             this->removeOrphanedLogs();
-            connectionName = db.connectionName();
+            connectionName = db.connectionName();;
             db.close();
+
         }
     }
 

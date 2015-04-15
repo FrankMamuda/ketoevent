@@ -45,14 +45,25 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     }
 
     // add new log
+#ifdef SQL_PREPARE_STATEMENTS
+    query.prepare( "insert into logs values ( null, :value, :taskId, :teamId, :comboId )" );
+    query.bindValue( ":value", value );
+    query.bindValue( ":taskId", taskId );
+    query.bindValue( ":teamId", teamId );
+    query.bindValue( ":comboId", comboId );
+
+    if ( !query.exec())
+#else
     if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3, %4 )" )
                       .arg( value )
                       .arg( taskId )
                       .arg( teamId )
                       .arg( comboId )
-                      )) {
+                      ))
+#endif
         this->error( StrSoftError, QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
-    }
+
+    // select the new entry
     query.exec( QString( "select * from logs where id=%1" ).arg( query.lastInsertId().toInt() ));
 
     // get last entry and construct internal entry

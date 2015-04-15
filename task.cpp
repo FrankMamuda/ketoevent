@@ -50,6 +50,19 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
     // perform database update and select last row
     //   id integer primary key, name varchar( 128 ), points integer, multi integer, style integer,
     //   type integer, parent integer, eventId integer, description varchar( 512 )
+#ifdef SQL_PREPARE_STATEMENTS
+    query.prepare( "insert into tasks values ( null, :name, :points, :multi, :style, :type, :parent, :eventId, :description )" );
+    query.bindValue( ":name", taskName );
+    query.bindValue( ":points", points );
+    query.bindValue( ":multi", multi );
+    query.bindValue( ":style", static_cast<TaskEntry::Styles>( style ));
+    query.bindValue( ":type", static_cast<TaskEntry::Types>( type ));
+    query.bindValue( ":parent", max + 1 );
+    query.bindValue( ":eventId", m.currentEvent()->id());
+    query.bindValue( ":description", description );
+
+    if ( !query.exec())
+#else
     if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7, '%8' )" )
                       .arg( taskName )
                       .arg( points )
@@ -59,9 +72,11 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
                       .arg( max + 1 )
                       .arg( m.currentEvent()->id())
                       .arg( description )
-                      )) {
+                      ))
+#endif
         this->error( StrSoftError, QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
-    }
+
+    // select the new entry
     query.exec( QString( "select * from tasks where id=%1" ).arg( query.lastInsertId().toInt() ));
 
     // get last entry and construct internal entry

@@ -43,6 +43,17 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, cons
 
     // perform database update and select last row
     // id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewer varchar( 64 ), eventId integer
+#ifdef SQL_PREPARE_STATEMENTS
+    query.prepare( "insert into teams values ( null, :name, :members, :finishTime, :lock, :reviewer, :eventId )" );
+    query.bindValue( ":name", teamName );
+    query.bindValue( ":members", members );
+    query.bindValue( ":finishTime", finishTime.toString( "hh:mm" ));
+    query.bindValue( ":lock",  static_cast<int>( lockState ));
+    query.bindValue( ":reviewer", reviewerName );
+    query.bindValue( ":eventId", m.currentEvent()->id());
+
+    if ( !query.exec())
+#else
     if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', '%5', %6 )" )
                       .arg( teamName )
                       .arg( members )
@@ -50,9 +61,11 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, cons
                       .arg( static_cast<int>( lockState ))
                       .arg( reviewerName )
                       .arg( m.currentEvent()->id())
-                      )) {
+                      ))
+#endif
         this->error( StrSoftError, QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
-    }
+
+    // select the new entry
     query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last entry and construct internal entry

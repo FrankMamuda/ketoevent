@@ -18,8 +18,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
-#ifdef APPLET_DEBUG
-
 //
 // includes
 //
@@ -27,6 +25,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "ui_gui_console.h"
 #include "main.h"
 #include "cmd.h"
+
+#ifdef APPLET_DEBUG
 
 /*
 ================

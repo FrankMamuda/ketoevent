@@ -35,6 +35,9 @@ construct
 TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     QFont font;
 
+    //
+    this->m_log = NULL;
+
     // set task
     this->setTask( parentPtr );
 
@@ -48,14 +51,6 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->grid = new QGridLayout();
     this->taskName = new QLabel( this->task()->name());
     this->comboIcon = new QLabel();
-#if 0
-    this->description = new QLabel( this->task()->description());
-    QFont descFont;
-    descFont.setPointSize( 6 );
-    this->description->setFont( descFont );
-    this->setMinimumHeight( 64 );
-    this->grid->addWidget( this->description, 1, 0, 1, 4 );
-#endif
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
 
     // fix ugly spinbox on mac, win32 (and systems with DPI!=96)
@@ -146,7 +141,6 @@ saveLog
 */
 void TaskWidget::saveLog() {
     int value = 0;
-    QSqlQuery query;
 
     if ( !this->isActive())
         return;
@@ -172,12 +166,10 @@ void TaskWidget::saveLog() {
 
     // set to zero
     if ( value <= 0 && this->hasLog()) {
+        // we don't really care if there are multiple logs, this orphaned log will be removed on next start anyway
         this->log()->setValue( 0 );
 
-        // bugfix - muliple logs
-        query.exec( QString( "delete from logs where teamId=%1 and taskId=%2" ).arg( this->log()->teamId()).arg( this->log()->taskId()));
-
-        // remove orphans
+        // remove orphaned combos
         int count = 0;
         int badId = this->log()->comboId();
         foreach ( LogEntry *logPtr, m.base.logList ) {
@@ -190,7 +182,8 @@ void TaskWidget::saveLog() {
                     logPtr->setComboId( -1 );
             }
         }
-        this->log()->setComboId( -1 );
+        // make sure to assign new log on next value change, so invalidate this one
+        this->resetLog();
     }
 
     // no log?, no problem - create one
@@ -207,10 +200,9 @@ void TaskWidget::saveLog() {
             this->team()->logList << this->log();
         }
     }
+    // update THIS and only THIS log
     this->log()->setValue( value );
-    this->team()->logList.last()->setValue( value );
 
-    //Gui_Main *this->parent()
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
     if ( gui != NULL ) {
         gui->taskIndexChanged( -1 );
@@ -362,10 +354,6 @@ resetLog
 ================
 */
 void TaskWidget::resetLog() {
-   // if ( this->hasLog())
-   //     this->disconnect( this->log(), SIGNAL( comboIdChanged( int )));
-
-
     this->m_log = NULL;
 
     // failsafe - this really should not happen
@@ -379,9 +367,6 @@ void TaskWidget::resetLog() {
         this->check->setChecked( false );
     if ( this->task()->type() == TaskEntry::Multi )
         this->multi->setValue( 0 );
-
-    // reset combo
-    //this->setComboState( LogEntry::NoCombo );
 }
 
 /*

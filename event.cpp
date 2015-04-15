@@ -48,6 +48,26 @@ void Main::addEvent( const QString &title ) {
     if ( eventTitle.isEmpty())
         eventTitle = this->tr( "unnamed event" );
 
+    // add new event log with default/built-in values
+    // id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 )
+    // finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, comboOfFourAndMore integer
+#ifdef SQL_PREPARE_STATEMENTS
+    query.prepare( QString( "insert into events values ( null, :api, :name, :minMembers, :maxMembers, :startTime, :finishTime, :finalTime, :penalty, :comboOfTwo, :comboOfThree, :comboOfFourAndMore, :lock )" ));
+    query.bindValue( ":api", Common::API );
+    query.bindValue( ":name", eventTitle );
+    query.bindValue( ":minMembers", Common::defaultMinMembers );
+    query.bindValue( ":maxMembers", Common::defaultMaxMembers );
+    query.bindValue( ":startTime", Common::defaultStartTime );
+    query.bindValue( ":finishTime", Common::defaultFinishTime );
+    query.bindValue( ":finalTime", Common::defaultFinalTime );
+    query.bindValue( ":penalty", Common::defaultPenaltyPoints );
+    query.bindValue( ":comboOfTwo", Common::defaultComboOfTwo );
+    query.bindValue( ":comboOfThree", Common::defaultComboOfThree );
+    query.bindValue( ":comboOfFourAndMore", Common::defaultComboOfFourAndMore );
+    query.bindValue( ":lock", 0 );
+
+    if ( !query.exec())
+#else
     // compile strings
     comboString = QString( "%1, %2, %3" )
             .arg( Common::defaultComboOfTwo )
@@ -58,7 +78,7 @@ void Main::addEvent( const QString &title ) {
             .arg( Common::defaultFinishTime )
             .arg( Common::defaultFinalTime );
 
-    // add new event log with default/built-in values
+
     if ( !query.exec( QString( "insert into events values ( null, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
                       .arg( Common::API )
                       .arg( eventTitle )
@@ -66,9 +86,11 @@ void Main::addEvent( const QString &title ) {
                       .arg( Common::defaultMaxMembers )
                       .arg( timeString )
                       .arg( Common::defaultPenaltyPoints )
-                      .arg( comboString ))) {
+                      .arg( comboString )))
+#endif
         this->error( StrSoftError, QString( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
-    }
+
+    // select the new entry
     query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last sql entry and construct internal entry

@@ -21,7 +21,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #ifndef GUI_CONSOLE_H
 #define GUI_CONSOLE_H
 
-#ifdef APPLET_DEBUG
+//
+// defines
+//
+#define APPLET_DEBUG
 
 //
 // includes
@@ -30,6 +33,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QLineEdit>
+
+#ifdef APPLET_DEBUG
+#include <QDebug>
 
 //
 // namespace: Ui

@@ -149,7 +149,6 @@ void Gui_Main::teamIndexChanged( int index ) {
             if ( !recalcPtr->combosCalculated()) {
                 recalcPtr->calculateCombos();
                 recalcPtr->setCombosCalculated( true );
-                m.print( QString( "recalc %1\n" ).arg( recalcPtr->name()), Main::System );
             }
         }
     }
