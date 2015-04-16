@@ -341,7 +341,7 @@ void Gui_Main::fillTasks() {
     this->clearTasks();
 
     // fill with either sorted or unsorted list
-    if ( m.cvar( "misc/sortTasks" )->isEnabled() || m.cvar( "misc/hilightLogged" )->isEnabled())
+    if ( m.cvar( "misc/sortTasks" )->isEnabled()/* || m.cvar( "misc/hilightLogged" )->isEnabled()*/)
         taskList = m.taskListSorted();
     else
         taskList = m.currentEvent()->taskList;

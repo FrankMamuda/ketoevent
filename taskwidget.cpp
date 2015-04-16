@@ -35,8 +35,10 @@ construct
 TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     QFont font;
 
-    //
+    // reset widgets
     this->m_log = NULL;
+    this->check = NULL;
+    this->multi = NULL;
 
     // set task
     this->setTask( parentPtr );
@@ -293,9 +295,18 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
     // trigger id change
     this->comboIdChanged();
 
+
+      // m.print( "AAA", Main::System );
+  //  this->taskName->setForegroundRole( QPalette::NoRole );
+
     // just initial addition
     if ( fromDatabase )
         return;
+
+   //.. if ( this->log()->value())
+   //     QPalette pal;
+   //     pal.setColor( QPalette::Text, QColor::fromRgbF() );
+   //     this->taskName->setPalette();
 
     // set values
     if ( this->task()->type() == TaskEntry::Check )
@@ -409,6 +420,9 @@ void TaskWidget::resetTeam() {
     this->m_team = NULL;
     this->setActive( false );
     this->resetLog();
+
+    // reset hilights
+    this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
 /*
