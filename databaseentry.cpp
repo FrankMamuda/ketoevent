@@ -64,7 +64,7 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
 
     // check for strings (should be wrapped in quotes)
     if ( value.type() == QVariant::String )
-        update.setValue( QString( "'%1'" ).arg( value.toString()));
+        update.setValue( QString( "%1" ).arg( value.toString()));
 
     // update imported entries properly
     if ( this->isImported())

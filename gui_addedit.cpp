@@ -42,8 +42,14 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
     switch ( this->dialogParent()) {
     case EventDialog:
         this->ui->titleLabel->setText( this->tr( "Event title" ));
-        this->setWindowTitle( this->tr( "Add an event" ));
-        this->ui->acceptButton->setText( this->tr( "Add team" ));
+        if ( this->mode() == Rename ) {
+            this->setWindowTitle( this->tr( "Rename event" ));
+            this->ui->acceptButton->setText( this->tr( "Done" ));
+            this->ui->titleEdit->setText( m.currentEvent()->name());
+        } else if ( this->mode() == Add ) {
+            this->setWindowTitle( this->tr( "Add an event" ));
+            this->ui->acceptButton->setText( this->tr( "Add team" ));
+        }
         break;
 
     case NoParent:
@@ -84,8 +90,11 @@ void Gui_AddEdit::on_acceptButton_clicked() {
             return;
         }
 
-        // just add a new event
-        m.addEvent( this->ui->titleEdit->text());
+        if ( this->mode() == Rename )
+            m.currentEvent()->setName( this->ui->titleEdit->text());
+        else if ( this->mode() == Add )
+            // just add a new event
+            m.addEvent( this->ui->titleEdit->text());
 
         // alert parent
         evPtr = qobject_cast<Gui_Event*>( this->parent());

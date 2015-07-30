@@ -26,7 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include <QDialog>
 #include "settingsvariable.h"
-#include "gui_settingsdialog.h"
+#include "gui_dialog.h"
 
 //
 // namespaces
@@ -38,7 +38,7 @@ namespace Ui {
 //
 // class: Gui_Settings
 //
-class Gui_Settings : public Gui_SettingsDialog {
+class Gui_Settings : public Gui_Dialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Settings dialog" )
     Q_ENUMS( FileDialog )
@@ -55,6 +55,8 @@ private slots:
     void bindVars();
     void on_backupPerform_stateChanged(int arg1);
     void on_pathButton_clicked();
+
+    void on_closeButton_clicked();
 
 private:
     Ui::Gui_Settings *ui;

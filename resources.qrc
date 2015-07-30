@@ -41,6 +41,13 @@
         <file alias="rankings_dialog_16">icons/rankings_dialog_16.png</file>
         <file alias="about_dialog_16">icons/about_dialog_16.png</file>
         <file alias="console_48">icons/console_48.png</file>
+        <file alias="event_add_32">icons/event_add_32.png</file>
+        <file alias="event_remove_32">icons/event_remove_32.png</file>
+        <file alias="event_rename_32">icons/event_rename_32.png</file>
+        <file alias="event_export_32">icons/event_export_32.png</file>
+        <file alias="logs_import_32">icons/logs_import_32.png</file>
+        <file alias="tasks_export_32">icons/tasks_export_32.png</file>
+        <file alias="tasks_import_32">icons/tasks_import_32.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>

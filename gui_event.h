@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include "gui_settingsdialog.h"
-
+#include "gui_dialog.h"
+#include "ui_gui_event.h"
 
 //
 // namespace: Ui
@@ -37,7 +37,7 @@ class Gui_Event;
 //
 // class: Gui_Event
 //
-class Gui_Event : public Gui_SettingsDialog {
+class Gui_Event : public Gui_Dialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Event handling dialog" )
     Q_PROPERTY( bool import READ importPerformed WRITE setImported )
@@ -54,15 +54,17 @@ private slots:
     void bindVars();
     void on_buttonClose_clicked();
     void on_eventCombo_currentIndexChanged( int index );
-    void on_buttonAdd_clicked();
     void validate();
-    void on_buttonRemove_clicked();
-    void on_buttonImport_clicked();
     void setImported( bool import = true ) { this->m_import = import; }
-    void on_buttonExport_clicked();
-    void on_buttonExportCSV_clicked();
+    void on_actionAddEvent_triggered();
+    void on_actionRemoveEvent_triggered();
+    void on_actionImportLogs_triggered();
+    void on_actionImportTasks_triggered();
+    void on_actionExportEvent_triggered();
+    void on_actionExportTasks_triggered();
+    // FIXME: USE HOMEDIR FOR MAC
 
-    void on_buttonImportTasks_clicked();
+    void on_actionRename_triggered();
 
 private:
     Ui::Gui_Event *ui;
@@ -70,3 +72,4 @@ private:
 };
 
 #endif // GUI_EVENT_H
+

@@ -1,340 +1,398 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Gui_Event</class>
- <widget class="QDialog" name="Gui_Event">
+ <widget class="QMainWindow" name="Gui_Event">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>381</width>
-    <height>416</height>
+    <width>609</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Event management</string>
+   <string>Event manager</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/events_dialog_16</normaloff>:/icons/events_dialog_16</iconset>
+    <normaloff>:/icons/events_48</normaloff>:/icons/events_48</iconset>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupMisc">
-     <property name="title">
-      <string>Options</string>
-     </property>
-     <layout class="QGridLayout" name="miscLayout" columnstretch="1,0">
-      <property name="bottomMargin">
-       <number>6</number>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Event selector</string>
       </property>
-      <item row="2" column="1">
-       <widget class="QGroupBox" name="groupData">
-        <property name="title">
-         <string>Data</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QPushButton" name="buttonImport">
-           <property name="toolTip">
-            <string>Import log database from a different machine (beta)</string>
-           </property>
-           <property name="text">
-            <string>Import logs</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonImportTasks">
-           <property name="text">
-            <string>Import tasks</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/import_16</normaloff>:/icons/import_16</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonExport">
-           <property name="text">
-            <string>Export event</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonExportCSV">
-           <property name="toolTip">
-            <string>Export task list in CSV format</string>
-           </property>
-           <property name="text">
-            <string>Export tasks as &quot;.CSV&quot;</string>
-           </property>
-           <property name="icon">
-            <iconset resource="resources.qrc">
-             <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QGroupBox" name="groupTime">
-        <property name="title">
-         <string>Event schedule</string>
-        </property>
-        <layout class="QGridLayout" name="timeLayout">
-         <item row="0" column="1">
-          <widget class="QLabel" name="startTimeLabel">
-           <property name="text">
-            <string>Start time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QTimeEdit" name="finishTime">
-           <property name="toolTip">
-            <string>Time from which penalty is being calculated</string>
-           </property>
-           <property name="currentSection">
-            <enum>QDateTimeEdit::HourSection</enum>
-           </property>
-           <property name="displayFormat">
-            <string>HH:mm</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QTimeEdit" name="startTime">
-           <property name="toolTip">
-            <string>Start time of the event</string>
-           </property>
-           <property name="currentSection">
-            <enum>QDateTimeEdit::HourSection</enum>
-           </property>
-           <property name="displayFormat">
-            <string>HH:mm</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QTimeEdit" name="finalTime">
-           <property name="toolTip">
-            <string>Team is disqualified after this time</string>
-           </property>
-           <property name="currentSection">
-            <enum>QDateTimeEdit::HourSection</enum>
-           </property>
-           <property name="displayFormat">
-            <string>HH:mm</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="finalTimeLabel">
-           <property name="text">
-            <string>Final Time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="finishTimeLabel">
-           <property name="text">
-            <string>Finish Time</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="groupBox">
-        <property name="title">
-         <string>Members</string>
-        </property>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="formAlignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QComboBox" name="eventCombo"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupMisc">
+      <property name="title">
+       <string>Options</string>
+      </property>
+      <layout class="QGridLayout" name="miscLayout_3" columnstretch="1,0,0">
+       <property name="bottomMargin">
+        <number>6</number>
+       </property>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="groupPoints">
+         <property name="title">
+          <string>Points</string>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="minLabel">
-           <property name="text">
-            <string>Minimum</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="min">
-           <property name="toolTip">
-            <string>Minimum members in a team</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="maxLabel">
-           <property name="text">
-            <string>Maximum</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="max">
-           <property name="toolTip">
-            <string>Maximum members in a team</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+         <layout class="QGridLayout" name="pointsLayout_3">
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="dCombo">
+            <property name="toolTip">
+             <string>Points for three tasks in one picture</string>
+            </property>
+            <property name="minimum">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="dComboLabel">
+            <property name="text">
+             <string>Combo of three</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="tCombo">
+            <property name="toolTip">
+             <string>Points for four or more tasks in one picture</string>
+            </property>
+            <property name="minimum">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="tComboLabel">
+            <property name="text">
+             <string>Combo of four+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="sCombo">
+            <property name="toolTip">
+             <string>Points for two tasks in one picture</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="sComboLabel">
+            <property name="text">
+             <string>Combo of two</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="penalty">
+            <property name="toolTip">
+             <string>Penalty points for every minute past finish time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="penaltyLabel">
+            <property name="text">
+             <string>Penalty mutiplier</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QGroupBox" name="groupTime">
+         <property name="title">
+          <string>Event schedule</string>
+         </property>
+         <layout class="QGridLayout" name="timeLayout_3">
+          <item row="0" column="1">
+           <widget class="QLabel" name="startTimeLabel">
+            <property name="text">
+             <string>Start time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QTimeEdit" name="finishTime">
+            <property name="toolTip">
+             <string>Time from which penalty is being calculated</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QTimeEdit" name="startTime">
+            <property name="toolTip">
+             <string>Start time of the event</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QTimeEdit" name="finalTime">
+            <property name="toolTip">
+             <string>Team is disqualified after this time</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="finalTimeLabel">
+            <property name="text">
+             <string>Final Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="finishTimeLabel">
+            <property name="text">
+             <string>Finish Time</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Members</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="2" column="3">
+           <widget class="QSpinBox" name="max">
+            <property name="toolTip">
+             <string>Maximum members in a team</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="maxLabel">
+            <property name="text">
+             <string>Maximum</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="minLabel">
+            <property name="text">
+             <string>Minimum</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QSpinBox" name="min">
+            <property name="toolTip">
+             <string>Minimum members in a team</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="titleEdit"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="titleLabel">
+      <item>
+       <widget class="QPushButton" name="buttonClose">
         <property name="text">
-         <string>Event title</string>
+         <string>Close</string>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="groupPoints">
-        <property name="title">
-         <string>Points</string>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
         </property>
-        <layout class="QGridLayout" name="pointsLayout">
-         <item row="3" column="1">
-          <widget class="QSpinBox" name="dCombo">
-           <property name="toolTip">
-            <string>Points for three tasks in one picture</string>
-           </property>
-           <property name="minimum">
-            <number>2</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="dComboLabel">
-           <property name="text">
-            <string>Combo of three</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QSpinBox" name="tCombo">
-           <property name="toolTip">
-            <string>Points for four or more tasks in one picture</string>
-           </property>
-           <property name="minimum">
-            <number>3</number>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="tComboLabel">
-           <property name="text">
-            <string>Combo of four+</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="sCombo">
-           <property name="toolTip">
-            <string>Points for two tasks in one picture</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="sComboLabel">
-           <property name="text">
-            <string>Combo of two</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="penalty">
-           <property name="toolTip">
-            <string>Penalty points for every minute past finish time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="penaltyLabel">
-           <property name="text">
-            <string>Penalty mutiplier</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="QComboBox" name="eventCombo"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="currentEventLabel">
-     <property name="text">
-      <string>Current Event</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="3">
-    <widget class="QPushButton" name="buttonClose">
-     <property name="text">
-      <string>Close</string>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="buttonRemove">
-     <property name="text">
-      <string>Remove event</string>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/event_remove_16</normaloff>:/icons/event_remove_16</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="buttonAdd">
-     <property name="text">
-      <string>Add event</string>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/event_add_16</normaloff>:/icons/event_add_16</iconset>
-     </property>
-    </widget>
-   </item>
-  </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionAddEvent"/>
+   <addaction name="actionRemoveEvent"/>
+   <addaction name="actionRename"/>
+   <addaction name="actionExportEvent"/>
+   <addaction name="actionImportLogs"/>
+   <addaction name="actionImportTasks"/>
+   <addaction name="actionExportTasks"/>
+  </widget>
+  <action name="actionAddEvent">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/event_add_32</normaloff>:/icons/event_add_32</iconset>
+   </property>
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="actionRemoveEvent">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/event_remove_32</normaloff>:/icons/event_remove_32</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/event_rename_32</normaloff>:/icons/event_rename_32</iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
+   </property>
+  </action>
+  <action name="actionImportLogs">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/logs_import_32</normaloff>:/icons/logs_import_32</iconset>
+   </property>
+   <property name="text">
+    <string>Import logs</string>
+   </property>
+   <property name="toolTip">
+    <string>Import logs</string>
+   </property>
+  </action>
+  <action name="actionImportTasks">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/tasks_import_32</normaloff>:/icons/tasks_import_32</iconset>
+   </property>
+   <property name="text">
+    <string>Import tasks</string>
+   </property>
+  </action>
+  <action name="actionExportEvent">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/event_export_32</normaloff>:/icons/event_export_32</iconset>
+   </property>
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionExportTasks">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/tasks_export_32</normaloff>:/icons/tasks_export_32</iconset>
+   </property>
+   <property name="text">
+    <string>Export tasks</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>

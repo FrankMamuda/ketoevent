@@ -20,9 +20,7 @@ SOURCES += main.cpp\
     teamentry.cpp \
     logentry.cpp \
     taskentry.cpp \
-    gui_teamedit.cpp \
     gui_teamlistmodel.cpp \
-    gui_taskedit.cpp \
     gui_tasklistmodel.cpp \
     gui_rankings.cpp \
     gui_about.cpp \
@@ -39,12 +37,14 @@ SOURCES += main.cpp\
     variable.cpp \
     sort.cpp \
     gui_console.cpp \
-    gui_event.cpp \
     gui_combos.cpp \
     gui_combomodel.cpp \
     combo.cpp \
     gui_addedit.cpp \
-    cmd.cpp
+    cmd.cpp \
+    gui_event.cpp \
+    gui_team.cpp \
+    gui_task.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -52,9 +52,7 @@ HEADERS  += gui_main.h \
     logentry.h \
     taskentry.h \
     main.h \
-    gui_teamedit.h \
     gui_teamlistmodel.h \
-    gui_taskedit.h \
     gui_tasklistmodel.h \
     gui_rankings.h \
     gui_about.h \
@@ -65,24 +63,27 @@ HEADERS  += gui_main.h \
     gui_settings.h \
     evententry.h \
     gui_console.h \
-    gui_event.h \
-    gui_settingsdialog.h \
     gui_combos.h \
     gui_combomodel.h \
     gui_addedit.h \
-    cmd.h
+    cmd.h \
+    gui_event.h \
+    gui_team.h \
+    gui_dialog.h \
+    gui_task.h
 
 FORMS += gui_main.ui \
-    gui_teamedit.ui \
-    gui_taskedit.ui \
-    gui_rankings.ui \
     gui_about.ui \
     gui_license.ui \
-    gui_settings.ui \
     gui_console.ui \
-    gui_event.ui \
     gui_combos.ui \
-    gui_addedit.ui
+    gui_addedit.ui \
+    gui_event.ui \
+    gui_team.ui \
+    gui_task.ui \
+    gui_rankings.ui \
+    gui_settings_old.ui \
+    gui_settings.ui
 
 RESOURCES += \
     resources.qrc

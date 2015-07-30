@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui( new Ui::Gui_Rankings ) {
+Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Rankings ) {
     // set up ui
     ui->setupUi( this );
 
@@ -41,7 +41,7 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
     if ( m.isInitialized())
         this->bindVars();
     else
-        this->reject();
+        this->onRejected();
 
     // define column headers here for now (required for proper translations)
     this->columnHeaders <<
@@ -83,6 +83,9 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui
 
     // disable horizontal scrollbar
     this->ui->rankingView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+
+    // set focus
+    this->ui->closeButton->setFocus();
 }
 
 /*
@@ -279,7 +282,7 @@ Gui_Rankings::~Gui_Rankings() {
     this->modelPtr->clear();
 
     // disconnect
-    this->disconnect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
+//this->disconnect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
 
     // delete sort and data models
     delete this->modelPtr;
@@ -297,7 +300,7 @@ void Gui_Rankings::bindVars() {
     this->lockVariables();
 
     // bind vars
-    this->bindVariable( "rankings/current", this->ui->checkCurrent );
+    this->bindVariable( "rankings/current", this->ui->actionCurrentTeam );
 
     // unlock vars
     this->lockVariables( false );
@@ -305,10 +308,19 @@ void Gui_Rankings::bindVars() {
 
 /*
 ================
-exportButton
+closeButton->clicked
 ================
 */
-void Gui_Rankings::on_exportButton_clicked() {
+void Gui_Rankings::on_closeButton_clicked() {
+    this->onAccepted();
+}
+
+/*
+================
+actionExport->triggered
+================
+*/
+void Gui_Rankings::on_actionExport_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
 
@@ -362,3 +374,4 @@ void Gui_Rankings::on_exportButton_clicked() {
     }
     csv.close();
 }
+

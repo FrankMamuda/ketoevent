@@ -37,8 +37,8 @@ addEvent
 */
 void Main::addEvent( const QString &title ) {
     QSqlQuery query;
-    QString comboString;
-    QString timeString;
+    //QString comboString;
+    //QString timeString;
     QString eventTitle;
 
     // copy title
@@ -51,6 +51,13 @@ void Main::addEvent( const QString &title ) {
     // add new event log with default/built-in values
     // id integer primary key, api integer, name varchar( 64 ), minMembers integer, maxMembers integer, startTime varchar( 5 ), finishTime varchar( 5 )
     // finalTime varchar( 5 ), penalty integer, comboOfTwo integer, comboOfThree integer, comboOfFourAndMore integer, comboOfFourAndMore integer
+
+   // if ( eventTitle.startsWith( "'" ))
+   //     eventTitle.remove( 0, 1 );
+  //  else if ( eventTitle.endsWith( "'" ))
+  // ..     eventTitle.remove( eventTitle.length()-1, 1 );
+
+
 #ifdef SQL_PREPARE_STATEMENTS
     query.prepare( QString( "insert into events values ( null, :api, :name, :minMembers, :maxMembers, :startTime, :finishTime, :finalTime, :penalty, :comboOfTwo, :comboOfThree, :comboOfFourAndMore, :lock )" ));
     query.bindValue( ":api", Common::API );

@@ -51,7 +51,8 @@ public:
     enum Mode {
         NoMode = -1,
         Add,
-        Edit
+        Edit,
+        Rename
     };
     explicit Gui_AddEdit( Parent = NoParent, Mode = NoMode, int id = -1, QWidget *parent = 0 );
     ~Gui_AddEdit();

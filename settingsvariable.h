@@ -28,6 +28,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QCheckBox>
 #include <QTimeEdit>
 #include <QLineEdit>
+#include <QAction>
 
 //
 // this var can be bound to objects for live updates
@@ -51,7 +52,8 @@ public:
         CheckBox,
         SpinBox,
         TimeEdit,
-        LineEdit
+        LineEdit,
+        Action
     };
     // currently supported types
     enum Class {
@@ -81,6 +83,7 @@ private slots:
     void integerValueChanged( int integer );
     void timeChanged( const QTime &time );
     void textChanged( const QString &text );
+    void toggled( bool state );
 
 private:
     Types m_type;

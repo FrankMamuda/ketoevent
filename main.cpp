@@ -125,7 +125,7 @@ void Main::initialize( QObject *parent ) {
     this->addSvar( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
     this->addSvar( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
     this->addSvar( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
-    this->addSvar( "rankings/current", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
+    this->addSvar( "rankings/current", SettingsVariable::Action, SettingsVariable::ConsoleVar );
 
     // set parent
     this->setParent( parent );

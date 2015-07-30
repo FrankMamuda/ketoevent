@@ -27,11 +27,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QTime>
-#include "gui_teamedit.h"
-#include "gui_taskedit.h"
+#include "gui_team.h"
+#include "gui_task.h"
 #include "gui_rankings.h"
 #include "gui_about.h"
 #include "gui_settings.h"
+#include "gui_event.h"
 
 //
 // namespace: Ui
@@ -48,6 +49,7 @@ class Gui_Main : public QMainWindow {
     Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
     Q_PROPERTY( int currentComboIndex READ currentComboIndex WRITE setCurrentComboIndex )
     Q_PROPERTY( int currentMatch READ currentMatch WRITE setCurrentMatch )
+    Q_PROPERTY( int lastEventId READ lastEventId WRITE setLastEventId )
     Q_CLASSINFO( "description", "Applet main window" )
 
 public:
@@ -57,6 +59,7 @@ public:
     int currentComboIndex() const { return this->m_currentComboIndex; }
     int currentMatch() const { return this->m_currentMatch; }
     int currentTeamId();
+    int lastEventId() const { return this->m_lastEventId; }
 
 public slots:
     void initialize( bool reload = false );
@@ -79,15 +82,20 @@ private slots:
     void updateFinishTime( QTime time );
     void setCurrentComboIndex( int index = -1 ) { this->m_currentComboIndex = index; }
     void setCurrentTeamIndex( int index = -1 ) { this->m_currentTeamIndex = index; }
+    void setLastEventId( int id ) { this->m_lastEventId = id; }
     void testSortButton();
+    void eventDialogClosed( int signal );
+    void teamDialogClosed( int signal );
+    void taskDialogClosed( int signal );
+    void settingsDialogClosed( int signal );
 
     // search
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
 
     // ui elements
-    void on_actionTeams_triggered() { Gui_TeamEdit teamEdit( this ); teamEdit.exec(); this->fillTeams(); }
-    void on_actionTasks_triggered() { Gui_TaskEdit taskEdit( this ); taskEdit.exec(); this->fillTasks(); }
-    void on_actionRankings_triggered() { Gui_Rankings rankings( this ); rankings.exec(); }
+    void on_actionTeams_triggered() { this->teamDialog->show(); this->fillTeams(); }
+    void on_actionTasks_triggered() { this->taskDialog->show(); }
+    void on_actionRankings_triggered() { this->rankingsDialog->show(); }
     void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
     void on_actionSettings_triggered();
     void on_actionExit_triggered() { m.shutdown(); }
@@ -108,9 +116,15 @@ protected:
 
 private:
     Ui::Gui_Main *ui;
+    Gui_Event *eventDialog;
+    Gui_Team *teamDialog;
+    Gui_Task *taskDialog;
+    Gui_Rankings *rankingsDialog;
+    Gui_Settings *settingsDialog;
     int m_currentTeamIndex;
     int m_currentComboIndex;
     int m_currentMatch;
+    int m_lastEventId;
 };
 
 #endif // GUI_MAIN_H

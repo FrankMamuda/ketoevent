@@ -33,13 +33,13 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 construct
 ================
 */
-Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_SettingsDialog( parent ), ui( new Ui::Gui_Settings ) {
+Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
 
     if ( m.isInitialized())
         this->bindVars();
     else
-        this->reject();
+        this->onRejected();
 }
 
 /*
@@ -127,4 +127,13 @@ void Gui_Settings::on_pathButton_clicked() {
     gui = qobject_cast<Gui_Main*>( this->parent());
     if ( gui != NULL )
         gui->initialize( true );
+}
+
+/*
+================
+closeButton->clicked
+================
+*/
+void Gui_Settings::on_closeButton_clicked() {
+    this->onAccepted();
 }

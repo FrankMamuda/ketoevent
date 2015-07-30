@@ -85,6 +85,18 @@ void Gui_Main::initialize( bool reload ) {
     // hide statusbar for now
     this->statusBar()->hide();
 
+    // init dialogs
+    this->eventDialog = new Gui_Event( this );
+    this->connect( this->eventDialog, SIGNAL( closeSignal( int )), this, SLOT( eventDialogClosed( int )));
+    this->teamDialog = new Gui_Team( this );
+    this->connect( this->teamDialog, SIGNAL( closeSignal( int )), this, SLOT( teamDialogClosed( int )));
+    this->taskDialog = new Gui_Task( this );
+    this->connect( this->taskDialog, SIGNAL( closeSignal( int )), this, SLOT( taskDialogClosed( int )));
+    this->rankingsDialog = new Gui_Rankings( this );
+    this->settingsDialog = new Gui_Settings( this );
+    this->connect( this->settingsDialog, SIGNAL( closeSignal( int )), this, SLOT( settingsDialogClosed( int )));
+
+
     // announce
     this->print( this->tr( "initialization complete\n" ));
 
@@ -127,8 +139,17 @@ Gui_Main::~Gui_Main() {
     // disconnect ui elements
     this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
     this->disconnect( this->ui->timeFinish, SIGNAL( timeChanged( QTime )));
+    this->disconnect( this->eventDialog, SIGNAL( closeSignal( int )));
+    this->disconnect( this->teamDialog, SIGNAL( closeSignal( int )));
+    this->disconnect( this->taskDialog, SIGNAL( closeSignal( int )));
+    this->disconnect( this->settingsDialog, SIGNAL( closeSignal( int )));
 
     // get rid of ui
+    delete this->eventDialog;
+    delete this->teamDialog;
+    delete this->taskDialog;
+    delete this->rankingsDialog;
+    delete this->settingsDialog;
     delete ui;
 }
 
@@ -377,10 +398,8 @@ quickAddButton->clicked
 ================
 */
 void Gui_Main::on_quickAddButton_clicked() {
-    Gui_TeamEdit teamEdit( this );
-    teamEdit.toggleAddEditWidget( Gui_TeamEdit::AddQuick );
-    teamEdit.exec();
-    this->fillTeams( teamEdit.lastId());
+    this->teamDialog->toggleAddEditWidget( Gui_Team::AddQuick );
+    this->teamDialog->show();
 }
 
 /*
@@ -493,29 +512,73 @@ actionEvents->triggered
 ================
 */
 void Gui_Main::on_actionEvents_triggered() {
-    int currentEventId, newEventId;
-
     // store last event id
-    currentEventId = m.cvar( "currentEvent" )->integer();
+    this->setLastEventId( m.cvar( "currentEvent" )->integer());
 
-    // construct dialog
-    Gui_Event events( this );
-    events.exec();
+    // show dialog
+    this->eventDialog->show();
+}
+
+/*
+================
+eventDialogClosed
+================
+*/
+void Gui_Main::eventDialogClosed( int signal ) {
+    int newEventId;
 
     // get current id
     newEventId = m.cvar( "currentEvent" )->integer();
 
-    // compare these two
-    if ( newEventId != currentEventId ) {
-        this->fillTasks();
-        this->fillTeams();
-    }
-
-    if ( events.importPerformed()) {
+    if ( this->eventDialog->importPerformed()) {
         QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
         m.shutdown();
-    } else
+    }
+
+    if ( signal == Gui_Settings::Accepted ) {
+        // compare these two
+        if ( newEventId != this->lastEventId()) {
+            this->fillTasks();
+            this->fillTeams();
+        }
+
         this->setEventTitle();
+    } else {
+        m.setCurrentEvent( m.eventForId( this->lastEventId()));
+    }
+}
+
+/*
+================
+teamDialogClosed
+================
+*/
+void Gui_Main::teamDialogClosed( int ) {
+    if ( this->teamDialog->state() == Gui_Team::AddQuick )
+        this->fillTeams( this->teamDialog->lastId());
+    else
+        this->fillTeams();
+}
+
+/*
+================
+taskDialogClosed
+================
+*/
+void Gui_Main::taskDialogClosed( int ) {
+    this->fillTasks();
+}
+
+/*
+================
+settingsDialogClosed
+================
+*/
+void Gui_Main::settingsDialogClosed( int ) {
+    this->fillTeams();
+    this->fillTasks();
+    this->setEventTitle();
+    this->testSortButton();
 }
 
 /*
@@ -754,12 +817,7 @@ actionSettings->triggered
 ================
 */
 void Gui_Main::on_actionSettings_triggered() {
-    Gui_Settings settings( this );
-    settings.exec();
-    this->fillTeams();
-    this->fillTasks();
-    this->setEventTitle();
-    this->testSortButton();
+    this->settingsDialog->show();
 }
 
 /*

@@ -27,7 +27,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QDialog>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
-#include "gui_settingsdialog.h"
+#include "gui_dialog.h"
 
 //
 // namespaces
@@ -62,7 +62,7 @@ public:
 //
 // class: Gui_Rankings
 //
-class Gui_Rankings : public Gui_SettingsDialog {
+class Gui_Rankings : public Gui_Dialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Team rankings dialog" )
 
@@ -85,9 +85,10 @@ public:
 private slots:
     void rescaleWindow();
     void calculateStatistics();
-    void on_exportButton_clicked();
     void fillData();
     void bindVars();
+    void on_closeButton_clicked();
+    void on_actionExport_triggered();
 
 private:
     Ui::Gui_Rankings *ui;

@@ -30,14 +30,15 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QFileDialog>
 #include "QSqlError"
-#include <QTextStream>
+
+// FIXME: event doesnt change on MAINWINDOW
 
 /*
 ================
 construct
 ================
 */
-Gui_Event::Gui_Event( QWidget *parent ) : Gui_SettingsDialog( parent ), ui( new Ui::Gui_Event ) {
+Gui_Event::Gui_Event( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Event ) {
     // set up gui
     ui->setupUi( this );
 
@@ -84,7 +85,7 @@ destruct
 ================
 */
 Gui_Event::~Gui_Event() {
-    this->disconnect( this->ui->titleEdit, SIGNAL( textChanged( QString )));
+    //this->disconnect( this->ui->titleEdit, SIGNAL( textChanged( QString )));
     this->unbindVars();
     delete ui;
 }
@@ -111,12 +112,14 @@ void Gui_Event::bindVars() {
     this->bindVariable( "comboOfFourAndMore", this->ui->tCombo );
     this->bindVariable( "minMembers", this->ui->min );
     this->bindVariable( "maxMembers", this->ui->max );
-    this->bindVariable( "name", this->ui->titleEdit );
+    //this->bindVariable( "name", this->ui->titleEdit );
 
     // connect for updates
     gui = qobject_cast<Gui_Main*>( this->parent());
-    if ( gui != NULL )
-        this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), this, SLOT( fillEvents()));
+    //if ( gui != NULL )
+    //    this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), this, SLOT( fillEvents()));
+
+    this->ui->buttonClose->setFocus();
 
     // unlock vars
     this->lockVariables( false );
@@ -129,7 +132,7 @@ buttonClose->clicked
 */
 void Gui_Event::on_buttonClose_clicked() {
     this->validate();
-    this->accept();
+    this->onAccepted();
 }
 
 /*
@@ -156,16 +159,6 @@ void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
 
 /*
 ================
-buttonAdd->clicked
-================
-*/
-void Gui_Event::on_buttonAdd_clicked() {
-    Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Add, -1, this );
-    evAdd.exec();
-}
-
-/*
-================
 validate
 ================
 */
@@ -187,18 +180,32 @@ void Gui_Event::validate() {
 
 /*
 ================
-buttonRemove->clicked
+actionAddEvent->triggered
 ================
 */
-void Gui_Event::on_buttonRemove_clicked() {
+void Gui_Event::on_actionAddEvent_triggered() {
+    Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Add, -1, this );
+    evAdd.exec();
+}
+
+/*
+================
+actionRemoveEvent->triggered
+================
+*/
+void Gui_Event::on_actionRemoveEvent_triggered() {
+    m.print( "remove ev", Main::System );
+
     QMessageBox msgBox;
     int state;
     EventEntry *eventPtr = m.currentEvent();
     QSqlQuery query;
 
     // make sure we cannot delete all events
-    if ( m.base.eventList.count() <= 1 )
+    if ( m.base.eventList.count() <= 1 ) {
+        QMessageBox::warning( this, "Error", "Cannot remove last remaining event", QMessageBox::Ok );
         return;
+    }
 
     // allow to reconsider
     msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( m.currentEvent()->name()));
@@ -231,10 +238,10 @@ void Gui_Event::on_buttonRemove_clicked() {
 
 /*
 ================
-buttonImport->clicked
+actionImportLogs->triggered
 ================
 */
-void Gui_Event::on_buttonImport_clicked() {
+void Gui_Event::on_actionImportLogs_triggered() {
     QString path, filePath;
 
     // get filename from dialog
@@ -262,15 +269,51 @@ void Gui_Event::on_buttonImport_clicked() {
     this->setImported();
 
     // close window
-    this->accept();
+    this->onAccepted();
 }
 
 /*
 ================
-buttonExport->clicked
+actionImportTasks->triggered
 ================
 */
-void Gui_Event::on_buttonExport_clicked() {
+void Gui_Event::on_actionImportTasks_triggered() {
+    QString path, filePath;
+
+    // get filename from dialog
+    path = QString( QDir::currentPath() + "/" );
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+
+    // check for empty filenames
+    if ( filePath.isEmpty())
+        return;
+
+    // check if path is valid
+    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
+        return;
+
+    // avoid importing the same database
+    if ( !QString::compare( filePath, m.path )) {
+        m.error( StrSoftError, "cannot import current database\n" );
+        return;
+    }
+
+    // import database
+    m.attachDatabase( filePath, Main::TaskImport );
+
+    // mark as imported
+    this->setImported();
+
+    // close window
+    this->onAccepted();
+}
+
+/*
+================
+actionExportEvent->triggered
+================
+*/
+void Gui_Event::on_actionExportEvent_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "Database (*.db)" ));
     QSqlQuery query;
@@ -317,10 +360,10 @@ void Gui_Event::on_buttonExport_clicked() {
 
 /*
 ================
-buttonExportCSV->clicked
+actionExportTasks->triggered
 ================
 */
-void Gui_Event::on_buttonExportCSV_clicked() {
+void Gui_Event::on_actionExportTasks_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
 
@@ -368,37 +411,10 @@ void Gui_Event::on_buttonExportCSV_clicked() {
 
 /*
 ================
-buttonImportTasks->clicked
+actionRename->triggered
 ================
 */
-void Gui_Event::on_buttonImportTasks_clicked() {
-    QString path, filePath;
-
-    // get filename from dialog
-    path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
-
-    // check for empty filenames
-    if ( filePath.isEmpty())
-        return;
-
-    // check if path is valid
-    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
-        return;
-
-    // avoid importing the same database
-    if ( !QString::compare( filePath, m.path )) {
-        m.error( StrSoftError, "cannot import current database\n" );
-        return;
-    }
-
-    // import database
-    m.attachDatabase( filePath, Main::TaskImport );
-
-    // mark as imported
-    this->setImported();
-
-    // close window
-    this->accept();
+void Gui_Event::on_actionRename_triggered() {
+    Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Rename, -1, this );
+    evAdd.exec();
 }
-

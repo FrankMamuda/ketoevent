@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui_Task</class>
+ <widget class="QMainWindow" name="Gui_Task">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>432</width>
+    <height>507</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Task manager</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/tasks_48</normaloff>:/icons/tasks_48</iconset>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QListView" name="taskList">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>128</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>List of all event tasks</string>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="findLayout">
+      <item row="0" column="0">
+       <widget class="QLineEdit" name="findTask">
+        <property name="toolTip">
+         <string>Enter task's name and press ENTER</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Find task by name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QToolButton" name="clearText">
+        <property name="toolTip">
+         <string>Clear task name</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QDockWidget" name="addEditWidget">
+      <property name="contextMenuPolicy">
+       <enum>Qt::NoContextMenu</enum>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetClosable</set>
+      </property>
+      <property name="windowTitle">
+       <string>Add/Edit Task</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="addEditLayout">
+          <item row="0" column="1" colspan="3">
+           <widget class="QLineEdit" name="taskName">
+            <property name="toolTip">
+             <string>Type in short task description</string>
+            </property>
+            <property name="placeholderText">
+             <string>Type task name here</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="taskNameLabel">
+            <property name="text">
+             <string>Task name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="pointsLabel">
+            <property name="text">
+             <string>Points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QPushButton" name="doneButton">
+            <property name="toolTip">
+             <string>Click when done editing task</string>
+            </property>
+            <property name="text">
+             <string>Done</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/ok_16</normaloff>:/icons/ok_16</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" colspan="2">
+           <widget class="QPushButton" name="cancelButton">
+            <property name="toolTip">
+             <string>Click to abort editing</string>
+            </property>
+            <property name="text">
+             <string>Cancel</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/cancel_16</normaloff>:/icons/cancel_16</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="maxMultiLabel">
+            <property name="text">
+             <string>Max multiplier</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="taskTypeLabel">
+            <property name="text">
+             <string>Type</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QSpinBox" name="taskMaxMulti">
+            <property name="toolTip">
+             <string>Maximum point multiplier</string>
+            </property>
+            <property name="minimum">
+             <number>2</number>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="taskPoints">
+            <property name="toolTip">
+             <string>Points for completion</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="taskType">
+            <property name="toolTip">
+             <string>Task type (either checkbox or a multiplier task)</string>
+            </property>
+            <property name="maxCount">
+             <number>10</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Check</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Multi</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QComboBox" name="taskStyle">
+            <property name="toolTip">
+             <string>Style to hilight special tasks</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Regular</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Bold</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Italic</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="styleLabel">
+            <property name="text">
+             <string>Style</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="descriptionLabel">
+            <property name="text">
+             <string>Description</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="3">
+           <widget class="QLineEdit" name="taskDescription"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="closeButton">
+        <property name="toolTip">
+         <string>Close task dialog</string>
+        </property>
+        <property name="text">
+         <string>Close</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionAdd"/>
+   <addaction name="actionEdit"/>
+   <addaction name="actionRemove"/>
+   <addaction name="actionSort"/>
+   <addaction name="actionMoveUp"/>
+   <addaction name="actionMoveDown"/>
+  </widget>
+  <action name="actionAdd">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/task_add_16</normaloff>:/icons/task_add_16</iconset>
+   </property>
+   <property name="text">
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/task_edit_16</normaloff>:/icons/task_edit_16</iconset>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/task_remove_16</normaloff>:/icons/task_remove_16</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actionSort">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/tasks_sort_16</normaloff>:/icons/tasks_sort_16</iconset>
+   </property>
+   <property name="text">
+    <string>Sort</string>
+   </property>
+  </action>
+  <action name="actionMoveUp">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/up_16</normaloff>:/icons/up_16</iconset>
+   </property>
+   <property name="text">
+    <string>Move up</string>
+   </property>
+  </action>
+  <action name="actionMoveDown">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/down_16</normaloff>:/icons/down_16</iconset>
+   </property>
+   <property name="text">
+    <string>Move down</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

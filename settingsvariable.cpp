@@ -23,6 +23,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "settingsvariable.h"
 #include "gui_settings.h"
+#include "gui_rankings.h"
 #include "main.h"
 
 /*
@@ -47,6 +48,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
     QLineEdit *lPtr;
+    QAction *aPtr;
 
     // set object and parent
     this->objPtr = objPtr;
@@ -80,6 +82,11 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
         lPtr->connect( lPtr, SIGNAL( textChanged( QString )), this, SLOT( textChanged( QString )));
         break;
 
+    case Action:
+        aPtr = qobject_cast<QAction*>( this->objPtr );
+        aPtr->connect( aPtr, SIGNAL( toggled( bool)), this, SLOT( toggled( bool )));
+        break;
+
     default:
         m.error( StrSoftError, this->tr( "unknown type\n" ));
         return;
@@ -99,6 +106,7 @@ void SettingsVariable::unbind() {
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
     QLineEdit *lPtr;
+    QAction *aPtr;
 
     // connect slots
     switch ( this->type()) {
@@ -122,6 +130,11 @@ void SettingsVariable::unbind() {
         lPtr->disconnect( lPtr, SIGNAL( textChanged( QString )));
         break;
 
+    case Action:
+        aPtr = qobject_cast<QAction*>( this->objPtr );
+        aPtr->disconnect( aPtr, SIGNAL( toggled( bool )));
+        break;
+
     case NoType:
     default:
         break;
@@ -142,6 +155,7 @@ void SettingsVariable::setState() {
     QCheckBox *cPtr;
     QTimeEdit *tPtr;
     QLineEdit *lPtr;
+    QAction *aPtr;
 
     // set values to GUI
     switch ( this->type()) {
@@ -204,6 +218,24 @@ void SettingsVariable::setState() {
     }
         break;
 
+
+    case Action:
+    {
+        bool state;
+
+        if ( this->varClass() == ConsoleVar )
+            state = m.cvar( this->key())->isEnabled();
+        else
+            state = m.currentEvent()->record().value( this->key()).toBool();
+
+        aPtr = qobject_cast<QAction*>( this->objPtr );
+        if ( state )
+            aPtr->setChecked( true );
+        else
+            aPtr->setChecked( false );
+    }
+        break;
+
     case NoType:
     default:
         m.error( StrSoftError, this->tr( "unknown type\n" ));
@@ -217,7 +249,7 @@ stateChanged
 ================
 */
 void SettingsVariable::stateChanged( int state ) {
-    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
 
     if ( sParent == NULL )
         return;
@@ -240,11 +272,38 @@ void SettingsVariable::stateChanged( int state ) {
 
 /*
 ================
+toggled
+================
+*/
+void SettingsVariable::toggled( bool state ) {
+    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
+
+    if ( sParent == NULL )
+        return;
+
+    if ( sParent->variablesLocked())
+        return;
+
+    if ( this->varClass() == ConsoleVar ) {
+        if ( state == true )
+            m.cvar( this->key())->setValue( true );
+        else
+            m.cvar( this->key())->setValue( false );
+    } else {
+        if ( state == true )
+            m.currentEvent()->setValue( this->key(), true );
+        else
+            m.currentEvent()->setValue( this->key(), false );
+    }
+}
+
+/*
+================
 integerValueChanged
 ================
 */
 void SettingsVariable::integerValueChanged( int integer ) {
-    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
     if ( sParent == NULL )
         return;
@@ -264,7 +323,7 @@ timeChanged
 ================
 */
 void SettingsVariable::timeChanged( const QTime &time ) {
-    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
     if ( sParent == NULL )
         return;
@@ -284,7 +343,7 @@ textChanged
 ================
 */
 void SettingsVariable::textChanged( const QString &text ) {
-    Gui_SettingsDialog *sParent = qobject_cast<Gui_SettingsDialog*>( this->parent());
+    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
     if ( sParent == NULL )
         return;

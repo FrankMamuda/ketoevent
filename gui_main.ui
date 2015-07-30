@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>734</width>
     <height>600</height>
    </rect>
   </property>
@@ -16,6 +16,9 @@
   <property name="windowIcon">
    <iconset resource="resources.qrc">
     <normaloff>:/icons/keto_48</normaloff>:/icons/keto_48</iconset>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">

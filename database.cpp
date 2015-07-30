@@ -33,6 +33,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+// FIXME: app keeps adding '' quotes to event name on add and rename
+
 /*
 ================
 makePath
