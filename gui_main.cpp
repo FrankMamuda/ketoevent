@@ -56,10 +56,10 @@ void Gui_Main::initialize( bool reload ) {
         this->ui->actionEvents->setDisabled( true );
         this->ui->actionRankings->setDisabled( true );
         this->ui->comboTeams->setDisabled( true );
-        this->ui->quickAddButton->setDisabled( true );
+        this->ui->actionQuickAdd->setDisabled( true );
         this->ui->timeFinish->setDisabled( true );
-        this->ui->lockButton->setDisabled( true );
-        this->ui->logButton->setDisabled( true );
+        this->ui->actionLockTeam->setDisabled( true );
+        this->ui->actionLogTime->setDisabled( true );
     } else {
         // set minimum for time
         this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
@@ -96,7 +96,6 @@ void Gui_Main::initialize( bool reload ) {
     this->settingsDialog = new Gui_Settings( this );
     this->connect( this->settingsDialog, SIGNAL( closeSignal( int )), this, SLOT( settingsDialogClosed( int )));
 
-
     // announce
     this->print( this->tr( "initialization complete\n" ));
 
@@ -105,6 +104,17 @@ void Gui_Main::initialize( bool reload ) {
     m.alloc = 0;
     m.dealloc = 0;
 #endif
+
+    // prevent context menu on toolbars
+    this->ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    this->ui->toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    this->insertToolBarBreak( this->ui->toolBar );
+    this->ui->toolBar->addWidget( this->ui->comboTeams );
+
+    // add widgets to secondary toolbar
+    QAction *timeFinish = this->ui->toolBar->addWidget( this->ui->timeFinish );
+    this->ui->toolBar->insertAction( timeFinish, this->ui->actionLockTeam );
+    this->ui->toolBar->addAction( this->ui->actionLogTime );
 }
 
 /*
@@ -175,11 +185,11 @@ void Gui_Main::teamIndexChanged( int index ) {
     }
 
     // disable combine button
-    this->ui->combineButton->setDisabled( true );
+    this->ui->actionCombine->setDisabled( true );
 
     if ( teamPtr != NULL ) {
         this->ui->comboTeams->setEnabled( true );
-        this->ui->lockButton->setEnabled( true );
+        this->ui->actionLockTeam->setEnabled( true );
 
         // set time
         this->ui->timeFinish->setTime( teamPtr->finishTime());
@@ -206,25 +216,50 @@ void Gui_Main::teamIndexChanged( int index ) {
         }
 
         if ( teamPtr->isLocked()) {
-            this->ui->lockButton->setIcon( QIcon( ":/icons/unlocked_16" ));
-            this->ui->lockButton->setText( this->tr( "Unlock" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlocked_16" ));
+            this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
             this->ui->taskList->setDisabled( true );
             this->ui->timeFinish->setDisabled( true );
-            this->ui->logButton->setDisabled( true );
+            this->ui->actionLogTime->setDisabled( true );
+            this->ui->actionLockTeam->setChecked( true );
         } else {
-            this->ui->lockButton->setIcon( QIcon( ":/icons/locked_16" ));
-            this->ui->lockButton->setText( this->tr( "Lock" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/locked_16" ));
+            this->ui->actionLockTeam->setText( this->tr( "Lock" ));
             this->ui->taskList->setEnabled( true );
             this->ui->timeFinish->setEnabled( true );
-            this->ui->logButton->setEnabled( true );
+            this->ui->actionLogTime->setEnabled( true );
+            this->ui->actionLockTeam->setChecked( false );
         }
+
+
+        /*
+        // change lock state
+        if ( teamPtr->isLocked()) {
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/locked_16" ));
+            this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
+            this->ui->actionLockTeam->setChecked( true );
+
+            this->ui->timeFinish->setEnabled( true );
+            this->ui->taskList->setEnabled( true );
+            this->ui->actionLogTime->setEnabled( true );
+        } else {
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlocked_16" ));
+            this->ui->actionLockTeam->setText( this->tr( "Lock" ));
+            this->ui->actionLockTeam->setChecked( false );
+
+            this->ui->timeFinish->setDisabled( true );
+            this->ui->actionLogTime->setDisabled( true );
+            this->ui->actionCombine->setDisabled( true );
+            this->ui->taskList->setDisabled( true );
+        }*/
+
         this->setCurrentTeamIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
         this->ui->taskList->setDisabled( true );
         this->ui->comboTeams->setDisabled( true );
-        this->ui->lockButton->setDisabled( true );
-        this->ui->logButton->setDisabled( true );
+        this->ui->actionLockTeam->setDisabled( true );
+        this->ui->actionLogTime->setDisabled( true );
 
         this->setCurrentTeamIndex();
     }
@@ -265,13 +300,13 @@ void Gui_Main::taskIndexChanged( int row ) {
     if ( taskPtr->hasLog()) {
         if ( lPtr->value()) {
             // is logged - can be combined
-            this->ui->combineButton->setEnabled( true );
+            this->ui->actionCombine->setEnabled( true );
             return;
         }
     }
 
     // not logged - cannot be combined
-    this->ui->combineButton->setDisabled( true );
+    this->ui->actionCombine->setDisabled( true );
 }
 
 /*
@@ -385,25 +420,6 @@ void Gui_Main::fillTasks() {
 
 /*
 ================
-logButton->clicked
-================
-*/
-void Gui_Main::on_logButton_clicked() {
-    this->ui->timeFinish->setTime( QTime::currentTime());
-}
-
-/*
-================
-quickAddButton->clicked
-================
-*/
-void Gui_Main::on_quickAddButton_clicked() {
-    this->teamDialog->toggleAddEditWidget( Gui_Team::AddQuick );
-    this->teamDialog->show();
-}
-
-/*
-================
 clearButton->clicked
 ================
 */
@@ -474,35 +490,6 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         QPalette p( this->ui->findTaskEdit->palette());
         p.setColor( QPalette::Base, QColor( 255, 0, 0, 64 ));
         this->ui->findTaskEdit->setPalette( p );
-    }
-}
-
-/*
-================
-lockButton->clicked
-================
-*/
-void Gui_Main::on_lockButton_clicked() {
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr == NULL )
-        return;
-
-    if ( teamPtr->isLocked()) {
-        teamPtr->unlock();
-        this->ui->lockButton->setIcon( QIcon( ":/icons/locked_16" ));
-        this->ui->lockButton->setText( this->tr( "Lock" ));
-        this->ui->timeFinish->setEnabled( true );
-        this->ui->taskList->setEnabled( true );
-        this->ui->logButton->setEnabled( true );
-        //this->ui->combineButton->setEnabled( true );
-    } else {
-        teamPtr->lock();
-        this->ui->lockButton->setIcon( QIcon( ":/icons/unlocked_16" ));
-        this->ui->lockButton->setText( this->tr( "Unlock" ));
-        this->ui->taskList->setDisabled( true );
-        this->ui->timeFinish->setDisabled( true );
-        this->ui->logButton->setDisabled( true );
-        this->ui->combineButton->setDisabled( true );
     }
 }
 
@@ -594,10 +581,193 @@ void Gui_Main::on_actionCombos_triggered() {
 
 /*
 ================
-combineButton->toggled
+updateStatusBar
 ================
 */
-void Gui_Main::on_combineButton_toggled( bool checked ) {
+void Gui_Main::updateStatusBar() {
+#if 0
+    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( teamPtr != NULL )
+        this->statusBar()->showMessage( this->tr( "Tasks - %1, combos - %2 (%3), points - %3" ).arg( teamPtr->logList.count()));
+    else
+        this->statusBar()->clearMessage();
+#endif
+}
+
+/*
+================
+actionConsole->toggled
+================
+*/
+void Gui_Main::on_actionConsole_toggled( bool visible ) {
+#ifdef APPLET_DEBUG
+    if ( visible )
+        m.showConsole();
+    else
+        m.hideConsole();
+#else
+    Q_UNUSED( visible )
+#endif
+}
+
+/*
+================
+currentTeamId
+================
+*/
+int Gui_Main::currentTeamId() {
+    if ( this->currentTeamIndex() == -1 )
+        return -1;
+
+    return this->ui->comboTeams->itemData( this->currentTeamIndex()).toInt();
+}
+
+/*
+================
+actionSettings->triggered
+================
+*/
+void Gui_Main::on_actionSettings_triggered() {
+    this->settingsDialog->show();
+}
+
+/*
+================
+testSortButton
+================
+*/
+void Gui_Main::testSortButton() {
+    if ( m.cvar( "misc/sortLogged" )->isEnabled())
+        this->ui->actionSort->setEnabled( true );
+    else
+        this->ui->actionSort->setDisabled( true );
+}
+
+//
+// Stress test for debugging purposes
+//
+#ifdef APPLET_DEBUG
+
+/*
+================
+irand
+================
+*/
+static int irand( int min, int max ) {
+    qsrand( QTime::currentTime().msec()
+#ifdef Q_OS_UNIX
+            * getpid()
+#endif
+            );
+
+    if ( min > max ) {
+        int temp = min;
+        min = max;
+        max = temp;
+    }
+    return (( rand() % ( max-min + 1 )) + min );
+}
+
+/*
+================
+stressTest
+
+ TODO: add combos?
+================
+*/
+void Gui_Main::stressTest( int numTeams ) {
+    TeamEntry *teamPtr;
+    QListWidget *lw = this->ui->taskList;
+    int y, k;
+
+    // clear command has been given
+    if ( numTeams == -1 ) {
+        foreach ( TeamEntry *teamPtr, m.base.teamList ) {
+            if ( teamPtr->name().startsWith( "Stress test" ))
+                m.removeTeam( teamPtr->name());
+        }
+        this->fillTeams();
+        return;
+    }
+
+    // limits
+    if ( numTeams > 100 )
+        numTeams = 100;
+    else if ( numTeams < 1 )
+        numTeams = 1;
+
+    // add a few teams with random logs
+    for ( k = 0; k < numTeams; k++ ) {
+        int shouldBe = 0;
+        int rand = 0;
+        int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
+        QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
+        QString teamName = QString( "Stress test %1" ).arg( k );
+
+        // remove duplicates
+        if ( m.teamForName( teamName ) != NULL )
+            m.removeTeam( teamName );
+
+        // add a stress test team
+        m.addTeam( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
+        teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
+
+        if ( teamPtr != NULL ) {
+            // select the team
+            this->fillTeams( teamPtr->id());
+
+            // log random values
+            for ( y = 0; y < lw->count(); y++ ) {
+                TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+                if ( taskPtr == NULL )
+                    continue;
+
+                if ( taskPtr->task()->type() == TaskEntry::Check ) {
+                    rand = irand( 0, 1 );
+
+                    if ( rand ) {
+                        taskPtr->check->setChecked( static_cast<bool>( rand ));
+                        shouldBe += taskPtr->task()->points();
+                        //m.print( QString( "  logging \"%1\" with %2 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()), Main::System);
+                    }
+                } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+                    rand = irand( 0, taskPtr->task()->multi());
+
+                    if ( rand ) {
+                        taskPtr->multi->setValue( rand );
+                        shouldBe += taskPtr->task()->points() * rand;
+                        //m.print( QString( "  logging \"%1\" with %2x%3=%4 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()).arg( rand ).arg( taskPtr->task()->points() * rand ), Main::System );
+                    }
+                }
+            }
+
+            // subtract penalty
+            shouldBe -= teamPtr->penalty();
+
+            // report
+            teamPtr->calculateCombos();
+            m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
+        }
+    }
+}
+
+#endif
+
+/*
+================
+actionLogTime->triggered
+================
+*/
+void Gui_Main::on_actionLogTime_triggered() {
+    this->ui->timeFinish->setTime( QTime::currentTime());
+}
+
+/*
+================
+actionCombine->toggled
+================
+*/
+void Gui_Main::on_actionCombine_toggled( bool checked ) {
     QListWidget *lw;
     TeamEntry *teamPtr;
     TaskWidget *tw;
@@ -612,7 +782,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
     // failsafe
     if ( tw == NULL ) {
-        this->ui->combineButton->setChecked( false );
+        this->ui->actionCombine->setChecked( false );
         this->setCurrentComboIndex();
         return;
     }
@@ -623,7 +793,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
         // check if the active task is logged
         if ( !tw->hasLog()) {
-            this->ui->combineButton->setChecked( false );
+            this->ui->actionCombine->setChecked( false );
             this->setCurrentComboIndex();
             return;
         }
@@ -650,7 +820,7 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
             // less than two tasks - abort!
             if ( count < 2 ) {
-                this->ui->combineButton->setChecked( false );
+                this->ui->actionCombine->setChecked( false );
                 this->setCurrentComboIndex();
                 return;
             }
@@ -761,175 +931,37 @@ void Gui_Main::on_combineButton_toggled( bool checked ) {
 
 /*
 ================
-updateStatusBar
+actionQuickAdd->triggered
 ================
 */
-void Gui_Main::updateStatusBar() {
-#if 0
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr != NULL )
-        this->statusBar()->showMessage( this->tr( "Tasks - %1, combos - %2 (%3), points - %3" ).arg( teamPtr->logList.count()));
-    else
-        this->statusBar()->clearMessage();
-#endif
+void Gui_Main::on_actionQuickAdd_triggered() {
+    this->teamDialog->toggleAddEditWidget( Gui_Team::AddQuick );
+    this->teamDialog->show();
 }
 
 /*
 ================
-actionConsole->toggled
+actionSort->triggered
 ================
 */
-void Gui_Main::on_actionConsole_toggled( bool visible ) {
-#ifdef APPLET_DEBUG
-    if ( visible )
-        m.showConsole();
-    else
-        m.hideConsole();
-#else
-    Q_UNUSED( visible )
-#endif
-}
-
-/*
-================
-currentTeamId
-================
-*/
-int Gui_Main::currentTeamId() {
-    if ( this->currentTeamIndex() == -1 )
-        return -1;
-
-    return this->ui->comboTeams->itemData( this->currentTeamIndex()).toInt();
-}
-
-/*
-================
-sortButton->clicked
-================
-*/
-void Gui_Main::on_sortButton_clicked() {
+void Gui_Main::on_actionSort_triggered() {
     this->fillTasks();
 }
 
 /*
 ================
-actionSettings->triggered
+actionLockTeam->triggered
 ================
 */
-void Gui_Main::on_actionSettings_triggered() {
-    this->settingsDialog->show();
-}
-
-/*
-================
-testSortButton
-================
-*/
-void Gui_Main::testSortButton() {
-    if ( m.cvar( "misc/sortLogged" )->isEnabled())
-        this->ui->sortButton->setEnabled( true );
-    else
-        this->ui->sortButton->setDisabled( true );
-}
-
-/*
-================
-stressTest
-
- TODO: add combos?
-================
-*/
-#ifdef APPLET_DEBUG
-
-static int irand( int min, int max ) {
-    qsrand( QTime::currentTime().msec()
-#ifdef Q_OS_UNIX
-            * getpid()
-#endif
-            );
-
-    if ( min > max ) {
-        int temp = min;
-        min = max;
-        max = temp;
-    }
-    return (( rand() % ( max-min + 1 )) + min );
-}
-
-void Gui_Main::stressTest( int numTeams ) {
-    TeamEntry *teamPtr;
-    QListWidget *lw = this->ui->taskList;
-    int y, k;
-
-    // clear command has been given
-    if ( numTeams == -1 ) {
-        foreach ( TeamEntry *teamPtr, m.base.teamList ) {
-            if ( teamPtr->name().startsWith( "Stress test" ))
-                m.removeTeam( teamPtr->name());
-        }
-        this->fillTeams();
+void Gui_Main::on_actionLockTeam_triggered() {
+    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( teamPtr == NULL )
         return;
-    }
 
-    // limits
-    if ( numTeams > 100 )
-        numTeams = 100;
-    else if ( numTeams < 1 )
-        numTeams = 1;
+    if ( teamPtr->isLocked())
+        teamPtr->unlock();
+    else
+        teamPtr->lock();
 
-    // add a few teams with random logs
-    for ( k = 0; k < numTeams; k++ ) {
-        int shouldBe = 0;
-        int rand = 0;
-        int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
-        QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
-        QString teamName = QString( "Stress test %1" ).arg( k );
-
-        // remove duplicates
-        if ( m.teamForName( teamName ) != NULL )
-            m.removeTeam( teamName );
-
-        // add a stress test team
-        m.addTeam( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
-        teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
-
-        if ( teamPtr != NULL ) {
-            // select the team
-            this->fillTeams( teamPtr->id());
-
-            // log random values
-            for ( y = 0; y < lw->count(); y++ ) {
-                TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-                if ( taskPtr == NULL )
-                    continue;
-
-                if ( taskPtr->task()->type() == TaskEntry::Check ) {
-                    rand = irand( 0, 1 );
-
-                    if ( rand ) {
-                        taskPtr->check->setChecked( static_cast<bool>( rand ));
-                        shouldBe += taskPtr->task()->points();
-                        //m.print( QString( "  logging \"%1\" with %2 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()), Main::System);
-                    }
-                } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
-                    rand = irand( 0, taskPtr->task()->multi());
-
-                    if ( rand ) {
-                        taskPtr->multi->setValue( rand );
-                        shouldBe += taskPtr->task()->points() * rand;
-                        //m.print( QString( "  logging \"%1\" with %2x%3=%4 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()).arg( rand ).arg( taskPtr->task()->points() * rand ), Main::System );
-                    }
-                }
-            }
-
-            // subtract penalty
-            shouldBe -= teamPtr->penalty();
-
-            // report
-            teamPtr->calculateCombos();
-            m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
-        }
-    }
+    this->teamIndexChanged( this->currentTeamIndex());
 }
-
-#endif

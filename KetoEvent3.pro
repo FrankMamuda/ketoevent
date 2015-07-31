@@ -82,7 +82,6 @@ FORMS += gui_main.ui \
     gui_team.ui \
     gui_task.ui \
     gui_rankings.ui \
-    gui_settings_old.ui \
     gui_settings.ui
 
 RESOURCES += \

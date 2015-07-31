@@ -27,6 +27,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_main.h"
 #include <QPainter>
 
+
+//
+// TODO: fix ugly combine buttons on mac
+//
+
+
 /*
 ================
 construct
@@ -55,8 +61,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->comboIcon = new QLabel();
     this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
 
-    // fix ugly spinbox on mac, win32 (and systems with DPI!=96)
+    // fix ugly labels/spinboxes
     this->grid->setMargin( 0 );
+    this->grid->setSizeConstraint( QLayout::SetMinimumSize );
 
     // get font
     font = this->taskName->font();

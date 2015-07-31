@@ -99,17 +99,17 @@ private slots:
     void on_actionAbout_triggered() { Gui_About about( this ); about.exec(); }
     void on_actionSettings_triggered();
     void on_actionExit_triggered() { m.shutdown(); }
-    void on_logButton_clicked();
-    void on_quickAddButton_clicked();
     void on_clearButton_clicked();
     void on_findTaskEdit_textChanged( const QString & );
     void on_findTaskEdit_returnPressed();
-    void on_lockButton_clicked();
     void on_actionEvents_triggered();
     void on_actionCombos_triggered();
-    void on_combineButton_toggled( bool checked );
-    void on_actionConsole_toggled( bool visible );
-    void on_sortButton_clicked();
+    void on_actionConsole_toggled( bool );
+    void on_actionLogTime_triggered();
+    void on_actionCombine_toggled( bool );
+    void on_actionQuickAdd_triggered();
+    void on_actionSort_triggered();
+    void on_actionLockTeam_triggered();
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }
