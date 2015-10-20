@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/about_dialog_16</normaloff>:/icons/about_dialog_16</iconset>
+    <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -43,7 +43,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:20pt;&quot;&gt;Keto Event&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;logger&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;2014 edition&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;2015 edition&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignBottom|Qt::AlignHCenter</set>
@@ -74,7 +74,7 @@ p, li { white-space: pre-wrap; }
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="resources.qrc">:/icons/keto_48</pixmap>
+        <pixmap resource="resources.qrc">:/icons/app.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="resources.qrc">
-         <normaloff>:/icons/about_dialog_16</normaloff>:/icons/about_dialog_16</iconset>
+         <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -140,7 +140,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="resources.qrc">
-         <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+         <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
        </property>
        <property name="default">
         <bool>true</bool>

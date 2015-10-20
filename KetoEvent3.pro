@@ -16,7 +16,6 @@ ICON = icon.icns
 
 SOURCES += main.cpp\
         gui_main.cpp \
-    databaseentry.cpp \
     teamentry.cpp \
     logentry.cpp \
     taskentry.cpp \
@@ -44,7 +43,8 @@ SOURCES += main.cpp\
     cmd.cpp \
     gui_event.cpp \
     gui_team.cpp \
-    gui_task.cpp
+    gui_task.cpp \
+    databaseentry.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \

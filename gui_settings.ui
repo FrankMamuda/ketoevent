@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>187</height>
+    <width>393</width>
+    <height>192</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,92 +15,11 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
+    <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="0" colspan="6">
-     <widget class="QCheckBox" name="hilightEntries">
-      <property name="text">
-       <string>Highlight logged entries</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="5">
-     <widget class="QPushButton" name="closeButton">
-      <property name="toolTip">
-       <string>Close settings dialog</string>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
-      </property>
-      <property name="default">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QCheckBox" name="backupPerform">
-      <property name="text">
-       <string>Perform backups after</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="rvNameLabel">
-      <property name="text">
-       <string>Reviewer name</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="dbPathLabel">
-      <property name="text">
-       <string>Database path</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1" colspan="5">
-     <widget class="QLineEdit" name="rvName"/>
-    </item>
-    <item row="3" column="0" colspan="6">
-     <widget class="QCheckBox" name="sort">
-      <property name="text">
-       <string>Sort tasks alphabetically (main screen)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>41</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="2" colspan="4">
-     <widget class="QSpinBox" name="backupChanges">
-      <property name="suffix">
-       <string> changes</string>
-      </property>
-      <property name="minimum">
-       <number>10</number>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" colspan="5">
+    <item row="0" column="2" colspan="5">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLineEdit" name="dbPath">
@@ -123,6 +42,225 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="1" column="3" colspan="4">
+     <widget class="QSpinBox" name="backupChanges">
+      <property name="suffix">
+       <string> changes</string>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="6">
+     <widget class="QCheckBox" name="sort">
+      <property name="text">
+       <string>Sort tasks alphabetically (main screen)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2" colspan="5">
+     <widget class="QLineEdit" name="rvName"/>
+    </item>
+    <item row="1" column="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>41</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="1" colspan="6">
+     <widget class="QCheckBox" name="hilightEntries">
+      <property name="text">
+       <string>Highlight logged entries</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="6">
+     <widget class="QPushButton" name="closeButton">
+      <property name="toolTip">
+       <string>Close settings dialog</string>
+      </property>
+      <property name="text">
+       <string>Close</string>
+      </property>
+      <property name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QCheckBox" name="backupPerform">
+      <property name="text">
+       <string>Perform backups after</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="rvNameLabel">
+      <property name="text">
+       <string>Reviewer name</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="dbPathLabel">
+      <property name="text">
+       <string>Database path</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="labelBackups">
+      <property name="minimumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/icons/logs_export.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="labelHilight">
+      <property name="minimumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/icons/logs_sort.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="labelSort">
+      <property name="minimumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/icons/tasks_sort.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="labelName">
+      <property name="minimumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/icons/rename.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="5">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="labelDB">
+      <property name="minimumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="resources.qrc">:/icons/database.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

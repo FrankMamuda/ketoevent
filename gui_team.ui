@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/teams_48</normaloff>:/icons/teams_48</iconset>
+    <normaloff>:/icons/teams.png</normaloff>:/icons/teams.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
@@ -52,7 +52,20 @@
       <widget class="QWidget" name="dockWidgetContents">
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <layout class="QGridLayout" name="addEditLayout" columnstretch="1,1,1,1">
+         <layout class="QGridLayout" name="addEditLayout" columnstretch="1,0,0,0">
+          <item row="1" column="3">
+           <widget class="QTimeEdit" name="finishTimeEdit">
+            <property name="toolTip">
+             <string>Change team's finish time</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="teamNameLabel">
             <property name="text">
@@ -70,16 +83,17 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QTimeEdit" name="finishTimeEdit">
+          <item row="3" column="2" colspan="2">
+           <widget class="QPushButton" name="cancelButton">
             <property name="toolTip">
-             <string>Change team's finish time</string>
+             <string>Click to abort editing</string>
             </property>
-            <property name="currentSection">
-             <enum>QDateTimeEdit::HourSection</enum>
+            <property name="text">
+             <string>Cancel</string>
             </property>
-            <property name="displayFormat">
-             <string>HH:mm</string>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
             </property>
            </widget>
           </item>
@@ -87,6 +101,13 @@
            <widget class="QLabel" name="finishTimeLabel">
             <property name="text">
              <string>Finish time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="teamMembersLabel">
+            <property name="text">
+             <string>Members</string>
             </property>
            </widget>
           </item>
@@ -100,35 +121,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/ok_16</normaloff>:/icons/ok_16</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QPushButton" name="cancelButton">
-            <property name="toolTip">
-             <string>Click to abort editing</string>
-            </property>
-            <property name="text">
-             <string>Cancel</string>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/icons/cancel_16</normaloff>:/icons/cancel_16</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="teamMembersLabel">
-            <property name="text">
-             <string>Members</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="teamMembersEdit">
-            <property name="toolTip">
-             <string>Change number of team members</string>
+              <normaloff>:/icons/accept.png</normaloff>:/icons/accept.png</iconset>
             </property>
            </widget>
           </item>
@@ -139,6 +132,13 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="teamMembersEdit">
+            <property name="toolTip">
+             <string>Change number of team members</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="3">
            <widget class="QPushButton" name="reviewerButton">
             <property name="text">
@@ -146,7 +146,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/reviewer_edit_16</normaloff>:/icons/reviewer_edit_16</iconset>
+              <normaloff>:/icons/rename.png</normaloff>:/icons/rename.png</iconset>
             </property>
            </widget>
           </item>
@@ -184,7 +184,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+          <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -224,7 +224,7 @@
   <action name="actionAdd">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/team_add_16</normaloff>:/icons/team_add_16</iconset>
+     <normaloff>:/icons/team_add.png</normaloff>:/icons/team_add.png</iconset>
    </property>
    <property name="text">
     <string>Add</string>
@@ -233,7 +233,7 @@
   <action name="actionRemove">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/team_remove_16</normaloff>:/icons/team_remove_16</iconset>
+     <normaloff>:/icons/team_remove.png</normaloff>:/icons/team_remove.png</iconset>
    </property>
    <property name="text">
     <string>Remove</string>
@@ -242,7 +242,7 @@
   <action name="actionEdit">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/team_edit_16</normaloff>:/icons/team_edit_16</iconset>
+     <normaloff>:/icons/team_edit.png</normaloff>:/icons/team_edit.png</iconset>
    </property>
    <property name="text">
     <string>Edit</string>

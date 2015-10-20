@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/rankings_48</normaloff>:/icons/rankings_48</iconset>
+    <normaloff>:/icons/rankings.png</normaloff>:/icons/rankings.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -53,49 +53,47 @@
           <number>0</number>
          </property>
          <item row="1" column="0">
-          <widget class="QLabel" name="ttaskstotalLabel">
-           <property name="text">
-            <string>Total tasks</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="tTasksTotal">
-           <property name="maximumSize">
+          <widget class="QLabel" name="labelTotalTasks">
+           <property name="minimumSize">
             <size>
-             <width>64</width>
-             <height>16777215</height>
+             <width>24</width>
+             <height>24</height>
             </size>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
-           <property name="readOnly">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/tasks.png</pixmap>
+           </property>
+           <property name="scaledContents">
             <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="1" column="2" rowspan="4">
-          <spacer name="horizontalSpacer">
+         <item row="2" column="2">
+          <spacer name="spacerLeftPane">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Maximum</enum>
+           </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="ttaskLabel">
-           <property name="text">
-            <string>Total tasks completed</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
+         <item row="1" column="8">
           <widget class="QLineEdit" name="tTasks">
            <property name="maximumSize">
             <size>
@@ -114,14 +112,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="3">
-          <widget class="QLabel" name="tloggedLabel">
-           <property name="text">
-            <string>Total logged points</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="4">
+         <item row="2" column="8">
           <widget class="QLineEdit" name="tPointsLogged">
            <property name="maximumSize">
             <size>
@@ -137,14 +128,44 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="tpointsLabel">
+         <item row="1" column="6">
+          <widget class="QLabel" name="ttaskLabel">
            <property name="text">
-            <string>Maximum points</string>
+            <string>Total tasks completed</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="2" column="6">
+          <widget class="QLabel" name="tloggedLabel">
+           <property name="text">
+            <string>Total logged points</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="ttaskstotalLabel">
+           <property name="text">
+            <string>Total tasks</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLineEdit" name="tTasksTotal">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
           <widget class="QLineEdit" name="tPoints">
            <property name="maximumSize">
             <size>
@@ -160,40 +181,27 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="1" column="4" rowspan="4">
+          <spacer name="spacerMiddle">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="1">
           <widget class="QLabel" name="tteamsLabel">
            <property name="text">
             <string>Total teams</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="tTeams">
-           <property name="maximumSize">
-            <size>
-             <width>64</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Total number of teams participated in this event</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QLabel" name="tparcLabel">
-           <property name="text">
-            <string>Total participiants</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="4">
+         <item row="3" column="8">
           <widget class="QLineEdit" name="tPar">
            <property name="maximumSize">
             <size>
@@ -212,15 +220,189 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="tpointsLabel">
+           <property name="text">
+            <string>Maximum points</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QLineEdit" name="tTeams">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Total number of teams participated in this event</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="6">
+          <widget class="QLabel" name="tparcLabel">
+           <property name="text">
+            <string>Total participiants</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="7">
+          <spacer name="spacerRightPane">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Maximum</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelMaxPoints">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/combo.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="labelTotalTeams">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/teams.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5">
+          <widget class="QLabel" name="labelComplTasks">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/tasks.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="5">
+          <widget class="QLabel" name="labelTotalPoints">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/combo.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="5">
+          <widget class="QLabel" name="labelTotalPart">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="resources.qrc">:/icons/teams.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <spacer name="horizontalSpacer_2">
+       <spacer name="spacerCloseButton">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -242,7 +424,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+          <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -278,7 +460,7 @@
   <action name="actionExport">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/export_16</normaloff>:/icons/export_16</iconset>
+     <normaloff>:/icons/rankings_export.png</normaloff>:/icons/rankings_export.png</iconset>
    </property>
    <property name="text">
     <string>Export</string>
@@ -290,7 +472,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/teams_48</normaloff>:/icons/teams_48</iconset>
+     <normaloff>:/icons/teams.png</normaloff>:/icons/teams.png</iconset>
    </property>
    <property name="text">
     <string>Current team</string>

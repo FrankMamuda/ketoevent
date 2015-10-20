@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>609</width>
-    <height>381</height>
+    <width>448</width>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Event manager</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/icons/events_48</normaloff>:/icons/events_48</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
@@ -27,7 +27,32 @@
       <property name="title">
        <string>Event selector</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="resources.qrc">:/icons/events.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QComboBox" name="eventCombo"/>
        </item>
@@ -49,7 +74,31 @@
           <string>Points</string>
          </property>
          <layout class="QGridLayout" name="pointsLayout_3">
-          <item row="3" column="1">
+          <item row="1" column="0">
+           <widget class="QLabel" name="sComboLabel">
+            <property name="text">
+             <string>Combo of two</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QSpinBox" name="penalty">
+            <property name="toolTip">
+             <string>Penalty points for every minute past finish time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QSpinBox" name="sCombo">
+            <property name="toolTip">
+             <string>Points for two tasks in one picture</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
            <widget class="QSpinBox" name="dCombo">
             <property name="toolTip">
              <string>Points for three tasks in one picture</string>
@@ -59,14 +108,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="dComboLabel">
-            <property name="text">
-             <string>Combo of three</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
+          <item row="5" column="2">
            <widget class="QSpinBox" name="tCombo">
             <property name="toolTip">
              <string>Points for four or more tasks in one picture</string>
@@ -83,27 +125,10 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="sCombo">
-            <property name="toolTip">
-             <string>Points for two tasks in one picture</string>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="sComboLabel">
+          <item row="3" column="0">
+           <widget class="QLabel" name="dComboLabel">
             <property name="text">
-             <string>Combo of two</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="penalty">
-            <property name="toolTip">
-             <string>Penalty points for every minute past finish time</string>
+             <string>Combo of three</string>
             </property>
            </widget>
           </item>
@@ -114,6 +139,19 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
@@ -123,14 +161,7 @@
           <string>Event schedule</string>
          </property>
          <layout class="QGridLayout" name="timeLayout_3">
-          <item row="0" column="1">
-           <widget class="QLabel" name="startTimeLabel">
-            <property name="text">
-             <string>Start time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
+          <item row="1" column="3">
            <widget class="QTimeEdit" name="finishTime">
             <property name="toolTip">
              <string>Time from which penalty is being calculated</string>
@@ -143,29 +174,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QTimeEdit" name="startTime">
-            <property name="toolTip">
-             <string>Start time of the event</string>
-            </property>
-            <property name="currentSection">
-             <enum>QDateTimeEdit::HourSection</enum>
-            </property>
-            <property name="displayFormat">
-             <string>HH:mm</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QTimeEdit" name="finalTime">
-            <property name="toolTip">
-             <string>Team is disqualified after this time</string>
-            </property>
-            <property name="currentSection">
-             <enum>QDateTimeEdit::HourSection</enum>
-            </property>
-            <property name="displayFormat">
-             <string>HH:mm</string>
+          <item row="0" column="1">
+           <widget class="QLabel" name="startTimeLabel">
+            <property name="text">
+             <string>Start time</string>
             </property>
            </widget>
           </item>
@@ -182,6 +194,45 @@
              <string>Finish Time</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QTimeEdit" name="finalTime">
+            <property name="toolTip">
+             <string>Team is disqualified after this time</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QTimeEdit" name="startTime">
+            <property name="toolTip">
+             <string>Start time of the event</string>
+            </property>
+            <property name="currentSection">
+             <enum>QDateTimeEdit::HourSection</enum>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -239,19 +290,6 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="1">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
        </item>
@@ -280,7 +318,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+          <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -330,7 +368,7 @@
   <action name="actionAddEvent">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/event_add_32</normaloff>:/icons/event_add_32</iconset>
+     <normaloff>:/icons/event_add.png</normaloff>:/icons/event_add.png</iconset>
    </property>
    <property name="text">
     <string>Add</string>
@@ -339,7 +377,7 @@
   <action name="actionRemoveEvent">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/event_remove_32</normaloff>:/icons/event_remove_32</iconset>
+     <normaloff>:/icons/event_remove.png</normaloff>:/icons/event_remove.png</iconset>
    </property>
    <property name="text">
     <string>Remove</string>
@@ -348,7 +386,7 @@
   <action name="actionRename">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/event_rename_32</normaloff>:/icons/event_rename_32</iconset>
+     <normaloff>:/icons/event_rename.png</normaloff>:/icons/event_rename.png</iconset>
    </property>
    <property name="text">
     <string>Rename</string>
@@ -357,7 +395,7 @@
   <action name="actionImportLogs">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/logs_import_32</normaloff>:/icons/logs_import_32</iconset>
+     <normaloff>:/icons/logs_import.png</normaloff>:/icons/logs_import.png</iconset>
    </property>
    <property name="text">
     <string>Import logs</string>
@@ -369,7 +407,7 @@
   <action name="actionImportTasks">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks_import_32</normaloff>:/icons/tasks_import_32</iconset>
+     <normaloff>:/icons/tasks_import.png</normaloff>:/icons/tasks_import.png</iconset>
    </property>
    <property name="text">
     <string>Import tasks</string>
@@ -378,7 +416,7 @@
   <action name="actionExportEvent">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/event_export_32</normaloff>:/icons/event_export_32</iconset>
+     <normaloff>:/icons/event_export.png</normaloff>:/icons/event_export.png</iconset>
    </property>
    <property name="text">
     <string>Export</string>
@@ -387,7 +425,7 @@
   <action name="actionExportTasks">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks_export_32</normaloff>:/icons/tasks_export_32</iconset>
+     <normaloff>:/icons/tasks_export.png</normaloff>:/icons/tasks_export.png</iconset>
    </property>
    <property name="text">
     <string>Export tasks</string>

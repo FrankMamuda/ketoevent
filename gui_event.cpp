@@ -194,8 +194,6 @@ actionRemoveEvent->triggered
 ================
 */
 void Gui_Event::on_actionRemoveEvent_triggered() {
-    m.print( "remove ev", Main::System );
-
     QMessageBox msgBox;
     int state;
     EventEntry *eventPtr = m.currentEvent();
@@ -212,7 +210,7 @@ void Gui_Event::on_actionRemoveEvent_triggered() {
     msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton( QMessageBox::Yes );
     msgBox.setIcon( QMessageBox::Warning );
-    msgBox.setWindowIcon( QIcon( ":/icons/event_remove_16" ));
+    msgBox.setWindowIcon( QIcon( ":/icons/event_remove.png" ));
     state = msgBox.exec();
 
     // check options

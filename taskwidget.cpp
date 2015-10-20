@@ -56,14 +56,22 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     }
 
     // create widget
-    this->grid = new QGridLayout();
+    this->taskLayout = new QHBoxLayout();
     this->taskName = new QLabel( this->task()->name());
     this->comboIcon = new QLabel();
-    this->grid->addWidget( this->taskName, 0, 0, 1, 3 );
+    this->taskLayout->addWidget( this->taskName );
+
+    // create spacer
+    this->spacer = new QSpacerItem( 0, 0, QSizePolicy::Maximum, QSizePolicy::Minimum );
+    this->taskLayout->addSpacerItem( this->spacer );
+
+    // add icon
+    this->taskLayout->addWidget( this->comboIcon );
+    this->comboIcon->setMaximumSize( 16, 16 );
 
     // fix ugly labels/spinboxes
-    this->grid->setMargin( 0 );
-    this->grid->setSizeConstraint( QLayout::SetMinimumSize );
+    this->taskLayout->setMargin( 0 );
+    this->taskLayout->setSizeConstraint( QLayout::SetMinimumSize );
 
     // get font
     font = this->taskName->font();
@@ -88,10 +96,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
         // changed from click for compatibility with the stressTest
         this->connect( this->check, SIGNAL( stateChanged( int )), this, SLOT( saveLog()));
-        this->grid->addWidget( this->check, 0, 4, 1, 1 );
+        this->taskLayout->addWidget( this->check );
 
         // set tooltips
-        //this->taskName->setText( this->tr( "%1 (%2 p)" ).arg( this->task()->name()).arg( this->task()->points()));
         //this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
         this->check->setToolTip( this->tr( "Toggle task completion" ));
     } else if ( this->task()->type() == TaskEntry::Multi ) {
@@ -102,12 +109,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
             this->multi->setMaximum( this->task()->multi());
 
         this->connect( this->multi, SIGNAL( valueChanged( int )), this, SLOT( saveLog()));
-        this->grid->addWidget( this->multi, 0, 4, 1, 1 );
+        this->taskLayout->addWidget( this->multi );
 
         // set tooltips
         //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
-        //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
-        //this->taskName->setText( this->tr( "%1 (%2x%3 p)" ).arg( this->task()->name()).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
         m.error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
@@ -115,32 +120,65 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     }
 
     // set up combo button
-    this->combo = new QPushButton();
+    this->combo = new QPushButton( QIcon( ":/icons/add.png" ), "" );
     this->combo->setMaximumWidth( 32 );
 
-    //this->setComboState( LogEntry::NoCombo );
-    this->grid->addWidget( this->combo, 0, 4, 1, 1 );
-
-    // add icon
-    this->grid->addWidget( this->comboIcon, 0, 5, 1, 1 );
-    this->comboIcon->setMaximumSize( 16, 16 );
-
     // set tooltips
-    this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
+    //this->combo->setToolTip( this->tr( "Click here to toggle combo state" ));
 
     // disable combo button by default
-    this->combo->hide();
-    this->combo->setIcon( QIcon( ":/icons/task_add_16" ));
     this->combo->setCheckable( true );
+    //this->combo->setStyleSheet( "border-style: outset; border-width: 2px; border-radius: 10px; font: bold; padding: 6px;" );
 
     // add layout to widget
-    this->setLayout( grid );
+    this->setLayout( taskLayout );
 
     // set default stylesheet
-    this->taskName->setStyleSheet( "padding: 6px;" );
+   // this->taskName->setStyleSheet( "padding: 6px;" );
 
     // connect combo button for updates
-    this->connect( this->combo, SIGNAL( toggled( bool )) /*SIGNAL( clicked())*/, this, SLOT( toggleCombo( bool )));
+    this->connect( this->combo, SIGNAL( toggled( bool )), this, SLOT( toggleCombo( bool )));
+}
+
+/*
+================
+toggleViewState
+================
+*/
+void TaskWidget::toggleViewState( ViewState state ) {
+    // failsafe
+    if ( !this->hasTask()) {
+        m.error( StrSoftError, this->tr( "task not set\n" ));
+        return;
+    }
+
+    switch ( state ) {
+    case Log:
+        this->taskLayout->removeWidget( this->combo );
+        this->combo->setParent( NULL );
+        if ( this->task()->type() == TaskEntry::Check ) {
+            this->taskLayout->addWidget( this->check );
+        } else if ( this->task()->type() == TaskEntry::Multi ) {
+            this->taskLayout->addWidget( this->multi );
+        }
+        break;
+
+    case Combine:
+        if ( this->task()->type() == TaskEntry::Check ) {
+            this->taskLayout->removeWidget( this->check );
+            this->check->setParent( NULL );
+        } else if ( this->task()->type() == TaskEntry::Multi ) {
+            this->taskLayout->removeWidget( this->multi );
+            this->multi->setParent( NULL );
+        }
+        this->taskLayout->addWidget( this->combo );
+        break;
+
+    default:
+    case NoState:
+        m.error( StrSoftError, this->tr( "invalid view state\n" ));
+        break;
+    }
 }
 
 /*
@@ -258,8 +296,8 @@ TaskWidget::~TaskWidget() {
     if ( this->combo != NULL )
         delete this->combo;
 
-    if ( this->grid != NULL )
-        delete this->grid;
+    if ( this->taskLayout != NULL )
+        delete this->taskLayout;
 }
 
 /*
@@ -357,11 +395,15 @@ comboIdChanged
 */
 void TaskWidget::comboIdChanged() {
     if ( this->hasTeam() && this->hasCombo()) {
-        QPixmap px( ":/icons/star_16" );
+        QPixmap px( ":/icons/combo.png" );
         QPainter painter( &px );
-        painter.setFont( QFont( "Times New Roman" ));
+        QFont font( "Times New Roman" );
+        font.setPointSize( 32 );
+        font.setBold( true );
+        painter.setFont( font );
         painter.drawText( px.rect(), Qt::AlignCenter, QString( "%1" ).arg( this->getRelativeComboId( this->log()->comboId(), this->team()->id())));
         this->comboIcon->setPixmap( px );
+        this->comboIcon->setScaledContents( true );
     } else
         this->comboIcon->setPixmap( QPixmap());
 }
@@ -444,9 +486,8 @@ void TaskWidget::toggleCombo( bool checked ) {
 
     if ( checked ) {
         this->comboIcon->hide();
-
         this->taskName->setStyleSheet( "background-color: rgba( 0, 200, 0, 128 ); border-style: outset; border-width: 2px; border-radius: 10px; border-color: beige; font: bold; padding: 6px;" );
-        this->combo->setIcon( QIcon( ":/icons/combo_remove_16" ));
+        this->combo->setIcon( QIcon( ":/icons/remove.png" ));
 
         if ( !this->hasLog() || this->hasCombo() || !this->hasTeam())
             return;
@@ -457,9 +498,8 @@ void TaskWidget::toggleCombo( bool checked ) {
         this->team()->setCombosCalculated( false );
     } else {
         this->comboIcon->show();
-
         this->taskName->setStyleSheet( "padding: 6px;" );
-        this->combo->setIcon( QIcon( ":/icons/combo_add_16" ));
+        this->combo->setIcon( QIcon( ":/icons/add.png" ));
 
         if ( !this->hasLog() && gui->currentComboIndex() != -1 )
             return;

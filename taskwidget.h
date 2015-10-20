@@ -29,7 +29,8 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
-#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QSpacerItem>
 #include "taskentry.h"
 #include "logentry.h"
 #include "teamentry.h"
@@ -57,6 +58,11 @@ public:
     bool hasTask() const { return this->task() != NULL; }
     static int getRelativeComboId( int comboId, int teamId );
     bool isActive() const { return this->m_active; }
+    enum ViewState {
+        NoState = -1,
+        Log,
+        Combine
+    };
 
 private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
@@ -70,9 +76,10 @@ public slots:
     void setLog( LogEntry *logPtr, bool fromDatabase = false );
     void toggleCombo( bool );
     void comboIdChanged();
+    void toggleViewState( ViewState );
 
 public:
-    QGridLayout *grid;
+    QHBoxLayout *taskLayout;
     QLabel *taskName;
     QLabel *comboIcon;
 #if 0
@@ -81,6 +88,7 @@ public:
     QCheckBox *check;
     QPushButton *combo;
     QSpinBox *multi;
+    QSpacerItem *spacer;
     LogEntry *m_log;
     TaskEntry *m_task;
     TeamEntry *m_team;

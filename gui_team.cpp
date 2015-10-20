@@ -234,7 +234,7 @@ void Gui_Team::on_actionRemove_triggered() {
         msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
         msgBox.setDefaultButton( QMessageBox::Yes );
         msgBox.setIcon( QMessageBox::Warning );
-        msgBox.setWindowIcon( QIcon( ":/icons/team_remove_16" ));
+        msgBox.setWindowIcon( QIcon( ":/icons/team_remove.png" ));
         state = msgBox.exec();
 
         // check options

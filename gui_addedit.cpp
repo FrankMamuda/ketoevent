@@ -112,3 +112,12 @@ void Gui_AddEdit::on_acceptButton_clicked() {
     // we're done
     this->accept();
 }
+
+/*
+================
+clearButton->clicked
+================
+*/
+void Gui_AddEdit::on_clearButton_clicked() {
+    this->ui->titleEdit->clear();
+}

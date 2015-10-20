@@ -1,55 +1,48 @@
 <RCC>
-    <qresource prefix="/icons">
-        <file alias="about_48">icons/about_48.png</file>
-        <file alias="keto_48">icons/keto_48.png</file>
-        <file alias="rankings_48">icons/rankings_48.png</file>
-        <file alias="settings_48">icons/settings_48.png</file>
-        <file alias="tasks_48">icons/tasks_48.png</file>
-        <file alias="teams_48">icons/teams_48.png</file>
-        <file alias="team_add_16">icons/team_add_16.png</file>
-        <file alias="team_dialog_16">icons/team_dialog_16.png</file>
-        <file alias="team_edit_16">icons/team_edit_16.png</file>
-        <file alias="cancel_16">icons/cancel_16.png</file>
-        <file alias="ok_16">icons/ok_16.png</file>
-        <file alias="close_16">icons/close_16.png</file>
-        <file alias="task_add_16">icons/task_add_16.png</file>
-        <file alias="task_edit_16">icons/task_edit_16.png</file>
-        <file alias="task_remove_16">icons/task_remove_16.png</file>
-        <file alias="task_dialog_16">icons/task_dialog_16.png</file>
-        <file alias="up_16">icons/up_16.png</file>
-        <file alias="down_16">icons/down_16.png</file>
-        <file alias="exit_48">icons/exit_48.png</file>
-        <file alias="import_16">icons/import_16.png</file>
-        <file alias="log_16">icons/log_16.png</file>
-        <file alias="clear_22">icons/clear_22.png</file>
-        <file alias="export_16">icons/export_16.png</file>
-        <file alias="locked_16">icons/locked_16.png</file>
-        <file alias="unlocked_16">icons/unlocked_16.png</file>
-        <file alias="events_48">icons/events_48.png</file>
-        <file alias="combos_48">icons/combos_48.png</file>
-        <file alias="star_16">icons/star_16.png</file>
-        <file alias="team_remove_16">icons/team_remove_16.png</file>
-        <file alias="combo_add_16">icons/combo_add_16.png</file>
-        <file alias="combo_remove_16">icons/combo_remove_16.png</file>
-        <file alias="event_add_16">icons/event_add_16.png</file>
-        <file alias="event_remove_16">icons/event_remove_16.png</file>
-        <file alias="reviewer_edit_16">icons/reviewer_edit_16.png</file>
-        <file alias="tasks_sort_16">icons/tasks_sort_16.png</file>
-        <file alias="events_dialog_16">icons/events_dialog_16.png</file>
-        <file alias="combos_dialog_16">icons/combos_dialog_16.png</file>
-        <file alias="settings_dialog_16">icons/settings_dialog_16.png</file>
-        <file alias="rankings_dialog_16">icons/rankings_dialog_16.png</file>
-        <file alias="about_dialog_16">icons/about_dialog_16.png</file>
-        <file alias="console_48">icons/console_48.png</file>
-        <file alias="event_add_32">icons/event_add_32.png</file>
-        <file alias="event_remove_32">icons/event_remove_32.png</file>
-        <file alias="event_rename_32">icons/event_rename_32.png</file>
-        <file alias="event_export_32">icons/event_export_32.png</file>
-        <file alias="logs_import_32">icons/logs_import_32.png</file>
-        <file alias="tasks_export_32">icons/tasks_export_32.png</file>
-        <file alias="tasks_import_32">icons/tasks_import_32.png</file>
-    </qresource>
-    <qresource prefix="/i18n">
-        <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
+    <qresource prefix="/">
+        <file>icons/about.png</file>
+        <file>icons/accept.png</file>
+        <file>icons/app.png</file>
+        <file>icons/cancel.png</file>
+        <file>icons/clear.png</file>
+        <file>icons/close.png</file>
+        <file>icons/combo.png</file>
+        <file>icons/combo_add.png</file>
+        <file>icons/combo_remove.png</file>
+        <file>icons/combos.png</file>
+        <file>icons/console.png</file>
+        <file>icons/event_add.png</file>
+        <file>icons/event_export.png</file>
+        <file>icons/event_remove.png</file>
+        <file>icons/event_rename.png</file>
+        <file>icons/events.png</file>
+        <file>icons/exit.png</file>
+        <file>icons/lock.png</file>
+        <file>icons/log_time.png</file>
+        <file>icons/logs_export.png</file>
+        <file>icons/logs_import.png</file>
+        <file>icons/move_down.png</file>
+        <file>icons/move_up.png</file>
+        <file>icons/rankings.png</file>
+        <file>icons/rename.png</file>
+        <file>icons/settings.png</file>
+        <file>icons/task_add.png</file>
+        <file>icons/task_edit.png</file>
+        <file>icons/task_remove.png</file>
+        <file>icons/tasks.png</file>
+        <file>icons/tasks_export.png</file>
+        <file>icons/tasks_import.png</file>
+        <file>icons/tasks_sort.png</file>
+        <file>icons/team_add.png</file>
+        <file>icons/team_edit.png</file>
+        <file>icons/team_quick.png</file>
+        <file>icons/team_remove.png</file>
+        <file>icons/teams.png</file>
+        <file>icons/unlock.png</file>
+        <file>icons/logs_sort.png</file>
+        <file>icons/add.png</file>
+        <file>icons/remove.png</file>
+        <file>icons/rankings_export.png</file>
+        <file>icons/database.png</file>
     </qresource>
 </RCC>

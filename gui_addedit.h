@@ -63,6 +63,8 @@ public:
 private slots:
     void on_acceptButton_clicked();
 
+    void on_clearButton_clicked();
+
 private:
     Ui::Gui_AddEdit *ui;
     int m_id;

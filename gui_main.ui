@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/keto_48</normaloff>:/icons/keto_48</iconset>
+    <normaloff>:/icons/app.png</normaloff>:/icons/app.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
@@ -81,17 +81,7 @@
     </item>
     <item>
      <layout class="QGridLayout" name="findTaskLayout">
-      <item row="0" column="0">
-       <widget class="QLineEdit" name="findTaskEdit">
-        <property name="toolTip">
-         <string>Enter task's name and press ENTER</string>
-        </property>
-        <property name="placeholderText">
-         <string>Find task by name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
        <widget class="QToolButton" name="clearButton">
         <property name="toolTip">
          <string>Clear task name</string>
@@ -101,7 +91,42 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
+          <normaloff>:/icons/clear.png</normaloff>:/icons/clear.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="findTaskEdit">
+        <property name="toolTip">
+         <string>Enter task's name and press ENTER</string>
+        </property>
+        <property name="placeholderText">
+         <string>Find task by name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelTask">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/tasks.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -156,8 +181,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>16</width>
-     <height>16</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
@@ -179,7 +204,7 @@
   <action name="actionTeams">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/teams_48</normaloff>:/icons/teams_48</iconset>
+     <normaloff>:/icons/teams.png</normaloff>:/icons/teams.png</iconset>
    </property>
    <property name="text">
     <string>Teams</string>
@@ -191,7 +216,7 @@
   <action name="actionTasks">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks_48</normaloff>:/icons/tasks_48</iconset>
+     <normaloff>:/icons/tasks.png</normaloff>:/icons/tasks.png</iconset>
    </property>
    <property name="text">
     <string>Tasks</string>
@@ -203,7 +228,7 @@
   <action name="actionRankings">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/rankings_48</normaloff>:/icons/rankings_48</iconset>
+     <normaloff>:/icons/rankings.png</normaloff>:/icons/rankings.png</iconset>
    </property>
    <property name="text">
     <string>Rankings</string>
@@ -215,7 +240,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/settings_48</normaloff>:/icons/settings_48</iconset>
+     <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -227,7 +252,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/about_48</normaloff>:/icons/about_48</iconset>
+     <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -239,7 +264,7 @@
   <action name="actionExit">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/exit_48</normaloff>:/icons/exit_48</iconset>
+     <normaloff>:/icons/exit.png</normaloff>:/icons/exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -251,7 +276,7 @@
   <action name="actionEvents">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/events_48</normaloff>:/icons/events_48</iconset>
+     <normaloff>:/icons/events.png</normaloff>:/icons/events.png</iconset>
    </property>
    <property name="text">
     <string>Events</string>
@@ -260,7 +285,7 @@
   <action name="actionCombos">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/combos_48</normaloff>:/icons/combos_48</iconset>
+     <normaloff>:/icons/combos.png</normaloff>:/icons/combos.png</iconset>
    </property>
    <property name="text">
     <string>Combos</string>
@@ -272,7 +297,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/console_48</normaloff>:/icons/console_48</iconset>
+     <normaloff>:/icons/console.png</normaloff>:/icons/console.png</iconset>
    </property>
    <property name="text">
     <string>Console</string>
@@ -284,7 +309,7 @@
   <action name="actionLogTime">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/log_16</normaloff>:/icons/log_16</iconset>
+     <normaloff>:/icons/log_time.png</normaloff>:/icons/log_time.png</iconset>
    </property>
    <property name="text">
     <string> Log</string>
@@ -293,7 +318,7 @@
   <action name="actionSort">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks_sort_16</normaloff>:/icons/tasks_sort_16</iconset>
+     <normaloff>:/icons/logs_sort.png</normaloff>:/icons/logs_sort.png</iconset>
    </property>
    <property name="text">
     <string>Sort logs</string>
@@ -305,7 +330,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/combos_48</normaloff>:/icons/combos_48</iconset>
+     <normaloff>:/icons/combo_add.png</normaloff>:/icons/combo_add.png</iconset>
    </property>
    <property name="text">
     <string>Combine</string>
@@ -317,7 +342,7 @@
    </property>
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/locked_16</normaloff>:/icons/locked_16</iconset>
+     <normaloff>:/icons/lock.png</normaloff>:/icons/lock.png</iconset>
    </property>
    <property name="text">
     <string>Lock team</string>
@@ -326,7 +351,7 @@
   <action name="actionQuickAdd">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/team_add_16</normaloff>:/icons/team_add_16</iconset>
+     <normaloff>:/icons/team_quick.png</normaloff>:/icons/team_quick.png</iconset>
    </property>
    <property name="text">
     <string>Quick add</string>

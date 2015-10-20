@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/tasks_48</normaloff>:/icons/tasks_48</iconset>
+    <normaloff>:/icons/tasks.png</normaloff>:/icons/tasks.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
@@ -63,7 +63,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/clear_22</normaloff>:/icons/clear_22</iconset>
+          <normaloff>:/icons/clear.png</normaloff>:/icons/clear.png</iconset>
         </property>
        </widget>
       </item>
@@ -118,7 +118,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/ok_16</normaloff>:/icons/ok_16</iconset>
+              <normaloff>:/icons/accept.png</normaloff>:/icons/accept.png</iconset>
             </property>
            </widget>
           </item>
@@ -132,7 +132,7 @@
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/cancel_16</normaloff>:/icons/cancel_16</iconset>
+              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
             </property>
            </widget>
           </item>
@@ -260,7 +260,7 @@
         </property>
         <property name="icon">
          <iconset resource="resources.qrc">
-          <normaloff>:/icons/close_16</normaloff>:/icons/close_16</iconset>
+          <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -300,7 +300,7 @@
   <action name="actionAdd">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/task_add_16</normaloff>:/icons/task_add_16</iconset>
+     <normaloff>:/icons/task_add.png</normaloff>:/icons/task_add.png</iconset>
    </property>
    <property name="text">
     <string>Add</string>
@@ -309,7 +309,7 @@
   <action name="actionEdit">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/task_edit_16</normaloff>:/icons/task_edit_16</iconset>
+     <normaloff>:/icons/task_edit.png</normaloff>:/icons/task_edit.png</iconset>
    </property>
    <property name="text">
     <string>Edit</string>
@@ -318,7 +318,7 @@
   <action name="actionRemove">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/task_remove_16</normaloff>:/icons/task_remove_16</iconset>
+     <normaloff>:/icons/task_remove.png</normaloff>:/icons/task_remove.png</iconset>
    </property>
    <property name="text">
     <string>Remove</string>
@@ -327,7 +327,7 @@
   <action name="actionSort">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks_sort_16</normaloff>:/icons/tasks_sort_16</iconset>
+     <normaloff>:/icons/tasks_sort.png</normaloff>:/icons/tasks_sort.png</iconset>
    </property>
    <property name="text">
     <string>Sort</string>
@@ -336,7 +336,7 @@
   <action name="actionMoveUp">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/up_16</normaloff>:/icons/up_16</iconset>
+     <normaloff>:/icons/move_up.png</normaloff>:/icons/move_up.png</iconset>
    </property>
    <property name="text">
     <string>Move up</string>
@@ -345,7 +345,7 @@
   <action name="actionMoveDown">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/down_16</normaloff>:/icons/down_16</iconset>
+     <normaloff>:/icons/move_down.png</normaloff>:/icons/move_down.png</iconset>
    </property>
    <property name="text">
     <string>Move down</string>

@@ -106,8 +106,8 @@ void Gui_Main::initialize( bool reload ) {
 #endif
 
     // prevent context menu on toolbars
-    this->ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-    this->ui->toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    this->ui->mainToolBar->setContextMenuPolicy( Qt::PreventContextMenu );
+    this->ui->toolBar->setContextMenuPolicy( Qt::PreventContextMenu );
     this->insertToolBarBreak( this->ui->toolBar );
     this->ui->toolBar->addWidget( this->ui->comboTeams );
 
@@ -216,14 +216,14 @@ void Gui_Main::teamIndexChanged( int index ) {
         }
 
         if ( teamPtr->isLocked()) {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlocked_16" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlock.png" ));
             this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
             this->ui->taskList->setDisabled( true );
             this->ui->timeFinish->setDisabled( true );
             this->ui->actionLogTime->setDisabled( true );
             this->ui->actionLockTeam->setChecked( true );
         } else {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/locked_16" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/lock.png" ));
             this->ui->actionLockTeam->setText( this->tr( "Lock" ));
             this->ui->taskList->setEnabled( true );
             this->ui->timeFinish->setEnabled( true );
@@ -235,7 +235,7 @@ void Gui_Main::teamIndexChanged( int index ) {
         /*
         // change lock state
         if ( teamPtr->isLocked()) {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/locked_16" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/lock.png" ));
             this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
             this->ui->actionLockTeam->setChecked( true );
 
@@ -243,7 +243,7 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->taskList->setEnabled( true );
             this->ui->actionLogTime->setEnabled( true );
         } else {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlocked_16" ));
+            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlock.png" ));
             this->ui->actionLockTeam->setText( this->tr( "Lock" ));
             this->ui->actionLockTeam->setChecked( false );
 
@@ -408,7 +408,7 @@ void Gui_Main::fillTasks() {
         lw->addItem( itemPtr );
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
-        widgetPtr->combo->hide();
+        //widgetPtr->combo->hide();
 #ifdef APPLET_DEBUG
         m.alloc +=2;
 #endif
@@ -864,17 +864,8 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
         if ( !valueSet )
             indexList << y;
         else {
-            // enable combo button
-            taskPtr->combo->show();
-
-            // disallow modifications
-            if ( taskPtr->task()->type() == TaskEntry::Check ) {
-                if ( taskPtr->check != NULL )
-                    taskPtr->check->setDisabled( true );
-            } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
-                if ( taskPtr->multi != NULL )
-                    taskPtr->multi->setDisabled( true );
-            }
+            // switch view state and swap widgets
+            taskPtr->toggleViewState( TaskWidget::Combine );
 
             // hilight combined entries
             if ( taskPtr->hasCombo()) {
