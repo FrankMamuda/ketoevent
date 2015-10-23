@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,6 +36,11 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "teamentry.h"
 
 //
+// defines
+//
+#define UI_INFO_BUTTON_ENABLED
+
+//
 // class: TaskWidget
 //
 class TaskWidget : public QWidget {
@@ -68,6 +73,9 @@ private slots:
     void setTask( TaskEntry *taskPtr ) { this->m_task = taskPtr; }
     void resetLog();
     void setActive( bool active = true ) { this->m_active = active; }
+#ifdef UI_INFO_BUTTON_ENABLED
+    void displayInfo();
+#endif
 
 public slots:
     void setTeam( TeamEntry *teamPtr );
@@ -94,6 +102,9 @@ public:
     TeamEntry *m_team;
     bool m_changed;
     bool m_active;
+#ifdef UI_INFO_BUTTON_ENABLED
+    QPushButton *info;
+#endif
 };
 
 #endif // GUI_TASKWIDGET_H

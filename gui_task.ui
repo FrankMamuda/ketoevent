@@ -21,7 +21,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QListView" name="taskList">
       <property name="minimumSize">
@@ -81,76 +81,63 @@
        <string>Add/Edit Task</string>
       </property>
       <widget class="QWidget" name="dockWidgetContents">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QGridLayout" name="addEditLayout">
-          <item row="0" column="1" colspan="3">
-           <widget class="QLineEdit" name="taskName">
+          <item row="2" column="4">
+           <widget class="QComboBox" name="taskStyle">
             <property name="toolTip">
-             <string>Type in short task description</string>
+             <string>Style to hilight special tasks</string>
             </property>
-            <property name="placeholderText">
-             <string>Type task name here</string>
-            </property>
+            <item>
+             <property name="text">
+              <string>Regular</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Bold</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Italic</string>
+             </property>
+            </item>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="taskNameLabel">
+          <item row="2" column="3">
+           <widget class="QLabel" name="styleLabel">
             <property name="text">
-             <string>Task name</string>
+             <string>Style</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="pointsLabel">
+          <item row="3" column="0">
+           <widget class="QLabel" name="descriptionLabel">
             <property name="text">
-             <string>Points</string>
+             <string>Description</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QPushButton" name="doneButton">
-            <property name="toolTip">
-             <string>Click when done editing task</string>
-            </property>
-            <property name="text">
-             <string>Done</string>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/icons/accept.png</normaloff>:/icons/accept.png</iconset>
-            </property>
-           </widget>
+          <item row="3" column="1" colspan="4">
+           <widget class="QLineEdit" name="taskDescription"/>
           </item>
-          <item row="4" column="2" colspan="2">
-           <widget class="QPushButton" name="cancelButton">
-            <property name="toolTip">
-             <string>Click to abort editing</string>
-            </property>
-            <property name="text">
-             <string>Cancel</string>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
+          <item row="1" column="3">
            <widget class="QLabel" name="maxMultiLabel">
             <property name="text">
              <string>Max multiplier</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="taskTypeLabel">
-            <property name="text">
-             <string>Type</string>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="taskPoints">
+            <property name="toolTip">
+             <string>Points for completion</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
+          <item row="1" column="4">
            <widget class="QSpinBox" name="taskMaxMulti">
             <property name="toolTip">
              <string>Maximum point multiplier</string>
@@ -160,13 +147,6 @@
             </property>
             <property name="maximum">
              <number>999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="taskPoints">
-            <property name="toolTip">
-             <string>Points for completion</string>
             </property>
            </widget>
           </item>
@@ -190,44 +170,81 @@
             </item>
            </widget>
           </item>
-          <item row="2" column="3">
-           <widget class="QComboBox" name="taskStyle">
+          <item row="2" column="0">
+           <widget class="QLabel" name="taskTypeLabel">
+            <property name="text">
+             <string>Type</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="pointsLabel">
+            <property name="text">
+             <string>Points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="taskNameLabel">
+            <property name="text">
+             <string>Task name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="4">
+           <widget class="QLineEdit" name="taskName">
             <property name="toolTip">
-             <string>Style to hilight special tasks</string>
+             <string>Type in short task description</string>
             </property>
-            <item>
-             <property name="text">
-              <string>Regular</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Bold</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Italic</string>
-             </property>
-            </item>
+            <property name="placeholderText">
+             <string>Type task name here</string>
+            </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="styleLabel">
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="doneButton">
+            <property name="toolTip">
+             <string>Click when done editing task</string>
+            </property>
             <property name="text">
-             <string>Style</string>
+             <string>Done</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/accept.png</normaloff>:/icons/accept.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="descriptionLabel">
+          <item>
+           <widget class="QPushButton" name="cancelButton">
+            <property name="toolTip">
+             <string>Click to abort editing</string>
+            </property>
             <property name="text">
-             <string>Description</string>
+             <string>Cancel</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
             </property>
            </widget>
-          </item>
-          <item row="3" column="1" colspan="3">
-           <widget class="QLineEdit" name="taskDescription"/>
           </item>
          </layout>
         </item>
@@ -280,6 +297,12 @@
    </property>
    <property name="allowedAreas">
     <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>

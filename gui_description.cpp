@@ -21,21 +21,22 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 // includes
 //
-#include "gui_about.h"
-#include "ui_gui_about.h"
+#include "gui_description.h"
+#include "ui_gui_description.h"
 
 /*
 ================
 construct
 ================
 */
-Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_About ) {
+Gui_Description::Gui_Description( TaskEntry *taskPtr, QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Description ) {
     ui->setupUi( this );
 
-#ifdef Q_OS_MAC
-    // fixes ugly mac font
-    this->ui->appInfo->setHtml( this->ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:10pt" ));
-#endif
+    if ( taskPtr == NULL || this->parent() == NULL )
+        return;
+
+    this->ui->taskName->setText( taskPtr->name());
+    this->ui->description->setPlainText( taskPtr->description());
 }
 
 /*
@@ -43,7 +44,6 @@ Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Abo
 destruct
 ================
 */
-Gui_About::~Gui_About() {
+Gui_Description::~Gui_Description() {
     delete ui;
 }
-

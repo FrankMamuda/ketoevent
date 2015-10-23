@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -86,9 +86,13 @@ private slots:
     void rescaleWindow();
     void calculateStatistics();
     void fillData();
+    void fillHeader();
+    void currentTeamToggled();
+    void clearData();
     void bindVars();
     void on_closeButton_clicked();
     void on_actionExport_triggered();
+    void on_actionRefresh_triggered();
 
 private:
     Ui::Gui_Rankings *ui;

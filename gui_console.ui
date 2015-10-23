@@ -20,6 +20,9 @@
   <property name="windowOpacity">
    <double>0.800000000000000</double>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:rgb(43, 43, 43);</string>
+  </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
@@ -71,6 +74,9 @@
      </item>
      <item>
       <widget class="QLabel" name="title">
+       <property name="styleSheet">
+        <string notr="true">color:rgb(0, 255, 0);</string>
+       </property>
        <property name="text">
         <string>Console</string>
        </property>

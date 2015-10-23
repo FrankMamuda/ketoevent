@@ -45,15 +45,15 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
 
     // define column headers here for now (required for proper translations)
     this->columnHeaders <<
-        this->tr( "Rank" ) <<
-        this->tr( "Team name" ) <<
-        this->tr( "Tasks" ) <<
-        this->tr( "Combos" ) <<
-        this->tr( "Combined\ntasks" ) <<
-        this->tr( "Time\n(min)" ) <<
-        this->tr( "Penalty\npoints" ) <<
-        this->tr( "Reviewer" ) <<
-        this->tr( "Total\npoints" );
+                           this->tr( "Rank" ) <<
+                           this->tr( "Team name" ) <<
+                           this->tr( "Tasks" ) <<
+                           this->tr( "Combos" ) <<
+                           this->tr( "Combined\ntasks" ) <<
+                           this->tr( "Time\n(min)" ) <<
+                           this->tr( "Penalty\npoints" ) <<
+                           this->tr( "Reviewer" ) <<
+                           this->tr( "Total\npoints" );
 
     // set up ranking view
     this->ui->rankingView->setEditTriggers( QAbstractItemView::NoEditTriggers );
@@ -69,10 +69,11 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
     this->ui->rankingView->setWordWrap( true );
 
     // connect
-    this->connect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
+    this->connect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( currentTeamToggled()));
 
     // set stats
     this->calculateStatistics();
+    this->fillHeader();
     this->fillData();
     this->proxyModel->sort( Points, Qt::DescendingOrder );
 
@@ -99,15 +100,22 @@ static bool greaterThan( int a, int b ) {
 
 /*
 ================
-fillData
+clearData
 ================
 */
-void Gui_Rankings::fillData() {
-    unsigned int y;
-    int k, points;
+void Gui_Rankings::clearData() {
+    this->ui->rankingView->model()->removeRows( 0, this->ui->rankingView->model()->rowCount());
+}
+
+/*
+================
+fillHeader
+================
+*/
+void Gui_Rankings::fillHeader() {
     QFont boldFont;
+    unsigned int y;
     boldFont.setBold( true );
-    QList<int> pointsList;
 
     // generate header
     for ( y = 0; y < NumRankingColumns; y++ ) {
@@ -116,6 +124,27 @@ void Gui_Rankings::fillData() {
         itemPtr->setData( Qt::AlignCenter, Qt::TextAlignmentRole );
         this->modelPtr->setHorizontalHeaderItem( y, itemPtr );
     }
+}
+
+/*
+================
+currentTeamToggled
+================
+*/
+void Gui_Rankings::currentTeamToggled() {
+    this->clearData();
+    this->fillData();
+}
+
+/*
+================
+fillData
+================
+*/
+void Gui_Rankings::fillData() {
+    unsigned int y;
+    int k, points;
+    QList<int> pointsList;
 
     // fill data
     for ( y = 0; y < NumRankingColumns; y++ ) {
@@ -184,10 +213,6 @@ void Gui_Rankings::fillData() {
                 break;
             }
 
-            // bold points
-            //if ( y == Points )
-            //    itemPtr->setFont( boldFont );
-
             // disqualified
             if ( teamPtr->disqualified())
                 itemPtr->setForeground( QColor( Qt::red ));
@@ -240,7 +265,7 @@ void Gui_Rankings::calculateStatistics() {
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
     this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( m.currentEvent()->taskList.count()));
     this->ui->tPoints->setText( QString( "%1\n" ).arg( maxPoints ));
-    this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));    
+    this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));
 }
 
 /*
@@ -249,24 +274,24 @@ rescaleWindow
 ================
 */
 void Gui_Rankings::rescaleWindow() {
-      QRect tableRect, windowRect, parentRect;
-      int y, columnWidths = 0;
+    QRect tableRect, windowRect, parentRect;
+    int y, columnWidths = 0;
 
-      // scale window to contents
-      tableRect = this->ui->rankingView->geometry();
-      windowRect = this->geometry();
-      parentRect = this->parentWidget()->geometry();
+    // scale window to contents
+    tableRect = this->ui->rankingView->geometry();
+    windowRect = this->geometry();
+    parentRect = this->parentWidget()->geometry();
 
-      for ( y = 0; y < static_cast<int>( NumRankingColumns ); y++ )
-          columnWidths += this->ui->rankingView->columnWidth( y );
+    for ( y = 0; y < static_cast<int>( NumRankingColumns ); y++ )
+        columnWidths += this->ui->rankingView->columnWidth( y );
 
-      // this looks fairly fine
-      tableRect.setWidth( 2 + this->ui->rankingView->verticalHeader()->width() + columnWidths );
-      this->ui->rankingView->setGeometry( tableRect );
-      windowRect = this->geometry();
-      windowRect.setWidth( 24 + tableRect.width() + this->ui->layoutTeamRankings->margin() * 2 + this->ui->groupRankings->layout()->margin() * 2 );
-      this->setFixedWidth( windowRect.width());
-      //this->setGeometry( windowRect );
+    // this looks fairly fine
+    tableRect.setWidth( 2 + this->ui->rankingView->verticalHeader()->width() + columnWidths );
+    this->ui->rankingView->setGeometry( tableRect );
+    windowRect = this->geometry();
+    windowRect.setWidth( 24 + tableRect.width() + this->ui->layoutTeamRankings->margin() * 2 + this->ui->groupRankings->layout()->margin() * 2 );
+    this->setFixedWidth( windowRect.width());
+    //this->setGeometry( windowRect );
 }
 
 /*
@@ -275,6 +300,8 @@ destruct
 ================
 */
 Gui_Rankings::~Gui_Rankings() {
+    this->clearData();
+
     delete ui;
     this->unbindVars();
 
@@ -282,7 +309,7 @@ Gui_Rankings::~Gui_Rankings() {
     this->modelPtr->clear();
 
     // disconnect
-//this->disconnect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
+    //this->disconnect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
 
     // delete sort and data models
     delete this->modelPtr;
@@ -343,9 +370,9 @@ void Gui_Rankings::on_actionExport_triggered() {
         out.setCodec( "UTF-8" );
 #endif
         out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" )
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                .append( "\r" )
-#endif
+       #endif
                .append( "\n" );
         foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
             int points;
@@ -365,7 +392,7 @@ void Gui_Rankings::on_actionExport_triggered() {
                    .arg( teamPtr->timeOnTrack())
                    .arg( teamPtr->penalty())
                    .arg( points )
-#ifdef Q_OS_WIN
+       #ifdef Q_OS_WIN
                    .arg( "\r\n" );
 #else
                    .arg( "\n" );
@@ -375,3 +402,13 @@ void Gui_Rankings::on_actionExport_triggered() {
     csv.close();
 }
 
+/*
+================
+actionExport->triggered
+================
+*/
+void Gui_Rankings::on_actionRefresh_triggered() {
+    this->calculateStatistics();
+    this->clearData();
+    this->fillData();
+}

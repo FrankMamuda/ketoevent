@@ -1,8 +1,20 @@
-#-------------------------------------------------
+#===========================================================================
+# Copyright (C) 2013-2015 Avotu Briezhaudzetava
 #
-# Project created by QtCreator 2013-07-24T11:37:06
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#-------------------------------------------------
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+#===========================================================================
 
 QT       += core gui sql
 
@@ -44,7 +56,8 @@ SOURCES += main.cpp\
     gui_event.cpp \
     gui_team.cpp \
     gui_task.cpp \
-    databaseentry.cpp
+    databaseentry.cpp \
+    gui_description.cpp
 
 HEADERS  += gui_main.h \
     databaseentry.h \
@@ -70,7 +83,8 @@ HEADERS  += gui_main.h \
     gui_event.h \
     gui_team.h \
     gui_dialog.h \
-    gui_task.h
+    gui_task.h \
+    gui_description.h
 
 FORMS += gui_main.ui \
     gui_about.ui \
@@ -82,7 +96,8 @@ FORMS += gui_main.ui \
     gui_team.ui \
     gui_task.ui \
     gui_rankings.ui \
-    gui_settings.ui
+    gui_settings.ui \
+    gui_description.ui
 
 RESOURCES += \
     resources.qrc

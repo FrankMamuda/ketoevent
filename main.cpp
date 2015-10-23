@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,10 +51,16 @@ class Main m;
 //            - while performing auto stressTest no inconstencies where found
 //   - import test (do we import exactly what we need?)
 //            - still requires testing
+//            - added support for csv task list imports
+//
+//   - use only manual update on rankings? - DONE
+//   - info button on task (for user to see detailed description) - DONE
+//   - add breeze icon license in about window
 //
 // FIXME:
 //
 // word wrap broken in rankings view?
+// fix ugly combine buttons on mac (TaskWidget)
 //
 // NOTE:
 //

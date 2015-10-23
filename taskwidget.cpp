@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,12 +26,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include "gui_main.h"
 #include <QPainter>
-
-
-//
-// TODO: fix ugly combine buttons on mac
-//
-
+#include "gui_description.h"
 
 /*
 ================
@@ -65,7 +60,18 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->spacer = new QSpacerItem( 0, 0, QSizePolicy::Maximum, QSizePolicy::Minimum );
     this->taskLayout->addSpacerItem( this->spacer );
 
-    // add icon
+#ifdef UI_INFO_BUTTON_ENABLED
+    // add info button
+    this->info = new QPushButton( QIcon( ":/icons/about" ), "" );
+    this->info->setMaximumWidth( 32 );
+    this->info->setFlat( true );
+
+    if ( !this->task()->description().isEmpty()) {
+        this->taskLayout->addWidget( this->info );
+    }
+    this->connect( this->info, SIGNAL( clicked( bool )), this, SLOT( displayInfo()));
+#endif
+
     this->taskLayout->addWidget( this->comboIcon );
     this->comboIcon->setMaximumSize( 16, 16 );
 
@@ -156,6 +162,10 @@ void TaskWidget::toggleViewState( ViewState state ) {
     case Log:
         this->taskLayout->removeWidget( this->combo );
         this->combo->setParent( NULL );
+#ifdef UI_INFO_BUTTON_ENABLED
+        if ( !this->task()->description().isEmpty())
+            this->taskLayout->addWidget( this->info );
+#endif
         if ( this->task()->type() == TaskEntry::Check ) {
             this->taskLayout->addWidget( this->check );
         } else if ( this->task()->type() == TaskEntry::Multi ) {
@@ -164,6 +174,12 @@ void TaskWidget::toggleViewState( ViewState state ) {
         break;
 
     case Combine:
+#ifdef UI_INFO_BUTTON_ENABLED
+        if ( !this->task()->description().isEmpty()) {
+            this->taskLayout->removeWidget( this->info );
+            this->info->setParent( NULL );
+        }
+#endif
         if ( this->task()->type() == TaskEntry::Check ) {
             this->taskLayout->removeWidget( this->check );
             this->check->setParent( NULL );
@@ -293,8 +309,13 @@ TaskWidget::~TaskWidget() {
     if ( this->comboIcon != NULL )
         delete this->comboIcon;
 
-    if ( this->combo != NULL )
+
         delete this->combo;
+
+#ifdef UI_INFO_BUTTON_ENABLED
+    if ( this->info != NULL )
+        delete this->info;
+#endif
 
     if ( this->taskLayout != NULL )
         delete this->taskLayout;
@@ -514,3 +535,15 @@ void TaskWidget::toggleCombo( bool checked ) {
         this->team()->setCombosCalculated( false );
     }
 }
+
+/*
+================
+toggleCombo
+================
+*/
+#ifdef UI_INFO_BUTTON_ENABLED
+void TaskWidget::displayInfo() {
+    Gui_Description desc( this->task(), this );
+    desc.exec();
+}
+#endif

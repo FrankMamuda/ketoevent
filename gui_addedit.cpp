@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
             this->ui->titleEdit->setText( m.currentEvent()->name());
         } else if ( this->mode() == Add ) {
             this->setWindowTitle( this->tr( "Add an event" ));
-            this->ui->acceptButton->setText( this->tr( "Add team" ));
+            this->ui->acceptButton->setText( this->tr( "Add" ));
         }
         break;
 

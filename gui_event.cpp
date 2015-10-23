@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2014 Avotu Briezhaudzetava
+Copyright (C) 2013-2015 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QFileDialog>
 #include "QSqlError"
+#include <QStringList>
 
 // FIXME: event doesnt change on MAINWINDOW
 
@@ -96,7 +97,7 @@ bindVars
 ================
 */
 void Gui_Event::bindVars() {
-    Gui_Main *gui;
+    //Gui_Main *gui;
 
     // lock vars
     this->lockVariables();
@@ -115,7 +116,7 @@ void Gui_Event::bindVars() {
     //this->bindVariable( "name", this->ui->titleEdit );
 
     // connect for updates
-    gui = qobject_cast<Gui_Main*>( this->parent());
+    //gui = qobject_cast<Gui_Main*>( this->parent());
     //if ( gui != NULL )
     //    this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), this, SLOT( fillEvents()));
 
@@ -280,7 +281,7 @@ void Gui_Event::on_actionImportTasks_triggered() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database or csv list" ), path, this->tr( "Database or CSV list (*.db *.csv)" ));
 
     // check for empty filenames
     if ( filePath.isEmpty())
@@ -290,14 +291,59 @@ void Gui_Event::on_actionImportTasks_triggered() {
     if ( !QFileInfo( filePath ).absoluteDir().isReadable())
         return;
 
-    // avoid importing the same database
-    if ( !QString::compare( filePath, m.path )) {
-        m.error( StrSoftError, "cannot import current database\n" );
+    // importing database
+    if ( filePath.endsWith( ".db" )) {
+        // avoid importing the same database
+        if ( !QString::compare( filePath, m.path )) {
+            m.error( StrSoftError, "cannot import current database\n" );
+            return;
+        }
+
+        // import database
+        m.attachDatabase( filePath, Main::TaskImport );
+    }
+    // importing csv
+    else if ( filePath.endsWith( ".csv" )) {
+        QStringList tasks, info;
+        QFile csvList( filePath );
+        csvList.open( QFile::ReadOnly );
+        tasks = QString( csvList.readAll().constData()).split( "\n" );
+
+        // throw out header
+        tasks.takeFirst();
+
+        foreach ( QString task, tasks ) {
+            info = task.split( ";" );
+
+            if ( info.count() == 6 ) {
+                TaskEntry *taskPtr = m.taskForName( info.at( 0 ));
+
+                if ( taskPtr == NULL ) {
+                    m.print( QString( "Adding new task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
+                    m.addTask( info.at( 0 ),                // name
+                               info.at( 2 ).toInt(),        // points
+                               info.at( 3 ).toInt(),        // multi
+                               static_cast<TaskEntry::Types>
+                               ( info.at( 5 ).toInt()),     // type
+                               static_cast<TaskEntry::Styles>
+                               ( info.at( 4 ).toInt()),     // style
+                               info.at( 1 ));               // description
+                } else {
+                    m.print( QString( "Updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
+                    taskPtr->setPoints( info.at( 2 ).toInt());
+                    taskPtr->setMulti( info.at( 3 ).toInt());
+                    taskPtr->setType( static_cast<TaskEntry::Types>( info.at( 5 ).toInt()));
+                    taskPtr->setStyle( static_cast<TaskEntry::Styles>( info.at( 4 ).toInt()));
+                    taskPtr->setDescription( info.at( 1 ));
+                }
+            }
+        }
+
+        csvList.close();
+    } else {
+        m.error( StrSoftError, "unknown task storage format\n" );
         return;
     }
-
-    // import database
-    m.attachDatabase( filePath, Main::TaskImport );
 
     // mark as imported
     this->setImported();
@@ -390,9 +436,9 @@ void Gui_Event::on_actionExportTasks_triggered() {
        #endif
                .append( "\n" );
         foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
-            out << QString( "%1;%2;%3;%4;%5;%6;%7" )
-                   .arg( taskPtr->name())
-                   .arg( taskPtr->description())
+            out << QString( "%1;%2;%3;%4;%5;%6%7" )
+                   .arg( taskPtr->name().replace( ';', ',' ))
+                   .arg( taskPtr->description().replace( ';', ',' ))
                    .arg( taskPtr->points())
                    .arg( taskPtr->multi())
                    .arg( taskPtr->style())

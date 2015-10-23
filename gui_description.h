@@ -18,32 +18,34 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 ===========================================================================
 */
 
+#ifndef GUI_DESCRIPTION_H
+#define GUI_DESCRIPTION_H
+
 //
 // includes
 //
-#include "gui_about.h"
-#include "ui_gui_about.h"
+#include <QDialog>
+#include "taskentry.h"
 
-/*
-================
-construct
-================
-*/
-Gui_About::Gui_About( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_About ) {
-    ui->setupUi( this );
-
-#ifdef Q_OS_MAC
-    // fixes ugly mac font
-    this->ui->appInfo->setHtml( this->ui->appInfo->toHtml().replace( "font-size:8pt", "font-size:10pt" ));
-#endif
+//
+// namespace: Ui
+//
+namespace Ui {
+class Gui_Description;
 }
 
-/*
-================
-destruct
-================
-*/
-Gui_About::~Gui_About() {
-    delete ui;
-}
+//
+// class: Gui_Description
+//
+class Gui_Description : public QDialog {
+    Q_OBJECT
 
+public:
+    explicit Gui_Description( TaskEntry *taskPtr = 0, QWidget *parent = 0 );
+    ~Gui_Description();
+
+private:
+    Ui::Gui_Description *ui;
+};
+
+#endif // GUI_DESCRIPTION_H

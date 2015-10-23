@@ -88,7 +88,7 @@ void Gui_Task::toggleView( ViewState viewState ) {
     this->ui->closeButton->setDefault( state );
     this->ui->findTask->setEnabled( state );
     this->ui->clearText->setEnabled( state );
-    this->ui->taskDescription->setEnabled( state );
+    this->ui->taskDescription->setDisabled( state );
 }
 
 /*
@@ -112,6 +112,7 @@ void Gui_Task::toggleAddEditWidget( AddEditState state ) {
         this->ui->taskType->setCurrentIndex( 0 );
         this->changeTaskType( TaskEntry::Check );
         this->ui->doneButton->setEnabled( true );
+        this->ui->taskDescription->setEnabled( true );
 
         // refocus
         this->ui->doneButton->setFocus();

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>418</width>
-    <height>477</height>
+    <width>387</width>
+    <height>398</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,10 +50,65 @@
        <string>Add/Edit Team</string>
       </property>
       <widget class="QWidget" name="dockWidgetContents">
-       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QGridLayout" name="addEditLayout" columnstretch="1,0,0,0">
-          <item row="1" column="3">
+         <layout class="QHBoxLayout" name="teamNameLayout">
+          <item>
+           <widget class="QLabel" name="teamNameLabel">
+            <property name="text">
+             <string>Team name</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="teamNameEdit">
+            <property name="toolTip">
+             <string>Type in team's name</string>
+            </property>
+            <property name="placeholderText">
+             <string>Type team name here</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="membersFinishLayout">
+          <item>
+           <widget class="QLabel" name="teamMembersLabel">
+            <property name="text">
+             <string>Members</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="teamMembersEdit">
+            <property name="toolTip">
+             <string>Change number of team members</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="finishTimeLabel">
+            <property name="text">
+             <string>Finish time</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QTimeEdit" name="finishTimeEdit">
             <property name="toolTip">
              <string>Change team's finish time</string>
@@ -66,52 +121,36 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="teamNameLabel">
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="reviewerLayout">
+          <item>
+           <widget class="QLabel" name="reviewerLabel">
             <property name="text">
-             <string>Team name</string>
+             <string>Reviewer</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="3">
-           <widget class="QLineEdit" name="teamNameEdit">
-            <property name="toolTip">
-             <string>Type in team's name</string>
-            </property>
-            <property name="placeholderText">
-             <string>Type team name here</string>
-            </property>
-           </widget>
+          <item>
+           <widget class="QLineEdit" name="reviewerEdit"/>
           </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QPushButton" name="cancelButton">
-            <property name="toolTip">
-             <string>Click to abort editing</string>
-            </property>
+          <item>
+           <widget class="QPushButton" name="reviewerButton">
             <property name="text">
-             <string>Cancel</string>
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
+              <normaloff>:/icons/rename.png</normaloff>:/icons/rename.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="finishTimeLabel">
-            <property name="text">
-             <string>Finish time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="teamMembersLabel">
-            <property name="text">
-             <string>Members</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="buttonLayout">
+          <item>
            <widget class="QPushButton" name="doneButton">
             <property name="toolTip">
              <string>Click when done editing team</string>
@@ -125,33 +164,19 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="reviewerLabel">
-            <property name="text">
-             <string>Reviewer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="teamMembersEdit">
+          <item>
+           <widget class="QPushButton" name="cancelButton">
             <property name="toolTip">
-             <string>Change number of team members</string>
+             <string>Click to abort editing</string>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QPushButton" name="reviewerButton">
             <property name="text">
-             <string/>
+             <string>Cancel</string>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
-              <normaloff>:/icons/rename.png</normaloff>:/icons/rename.png</iconset>
+              <normaloff>:/icons/cancel.png</normaloff>:/icons/cancel.png</iconset>
             </property>
            </widget>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="QLineEdit" name="reviewerEdit"/>
           </item>
          </layout>
         </item>
@@ -204,6 +229,12 @@
    </property>
    <property name="allowedAreas">
     <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
