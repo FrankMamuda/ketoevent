@@ -338,7 +338,7 @@ void Main::clearEvent() {
         delete taskPtr;
     }
     this->base.taskList.clear();
-    this->taskListSorted().clear();
+    //this->taskListSorted().clear();
 }
 
 /*
@@ -378,9 +378,6 @@ int main( int argc, char *argv[] ) {
 
     // initialize application
     m.initialize( qobject_cast<QObject*>( &gui ));
-
-    // set stylesheet
-    //app.setStyleSheet( "QToolTip { font: 11px Lucida Grande, Lucida Sans Unicode, Arial, Verdana, sans-serif; background-color: #191919; color: #CCCCCC; border: 1px solid #CCCCCC; padding: 4px; }");
 
     // add teams
     gui.initialize();

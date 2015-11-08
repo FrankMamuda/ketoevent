@@ -41,6 +41,9 @@ construct
 Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_Main ) {
     ui->setupUi( this );
     this->setCurrentComboIndex();
+
+    // disable for now
+    this->ui->toolBar->removeAction( this->ui->actionSort );
 }
 
 /*

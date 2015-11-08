@@ -44,5 +44,6 @@
         <file>icons/remove.png</file>
         <file>icons/rankings_export.png</file>
         <file>icons/database.png</file>
+        <file>i18n/ketoevent_lv_LV.qm</file>
     </qresource>
 </RCC>

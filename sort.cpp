@@ -251,8 +251,14 @@ taskListSorted
 QList<TaskEntry*> Main::taskListSorted() {
     QList <TaskEntry*>sortedList;
 
+    if ( this->currentEvent() == NULL )
+        return sortedList;
+
     // make a local copy and sort it alphabetically or by logs (or both)
     sortedList = this->currentEvent()->taskList;
+
+    if ( sortedList.isEmpty())
+        return sortedList;
 
     if ( this->cvar( "misc/sortTasks" )->isEnabled())
         qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );

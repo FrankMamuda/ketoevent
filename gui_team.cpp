@@ -120,7 +120,10 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
             this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
 
             // refocus
-            this->ui->doneButton->setFocus();
+            if ( state == Add )
+                this->ui->doneButton->setFocus();
+            else
+                this->ui->teamNameEdit->setFocus();
         }
             break;
 
