@@ -276,7 +276,7 @@ stressTest
 ============
 */
 void Cmd::stressTest( const QStringList &args ) {
-    if ( args.count() > 1 ) {
+    if ( args.count() < 1 ) {
         m.print( this->tr( "usage: sys_stressTest [numTeams] - stress test the applet\n" ), Main::System );
         return;
     }

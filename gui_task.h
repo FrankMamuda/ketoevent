@@ -84,6 +84,7 @@ private slots:
     void on_taskType_currentIndexChanged(int index);
     void changeTaskType( TaskEntry::Types type );
     void toggleAddEditWidget( AddEditState state );
+    void changeUpDownState( const QModelIndex &index );
 
     // search
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
@@ -95,6 +96,7 @@ private slots:
     void on_actionSort_triggered();
     void on_actionMoveUp_triggered() { this->move( Up ); }
     void on_actionMoveDown_triggered() { this->move( Down ); }
+    void on_taskList_clicked(const QModelIndex &index);
 
 private:
     Ui::Gui_Task *ui;
@@ -104,6 +106,7 @@ private:
     void move( MoveDirection direction );
 
 protected:
+    virtual void closeEvent( QCloseEvent * );
     virtual void keyPressEvent( QKeyEvent * );
 };
 

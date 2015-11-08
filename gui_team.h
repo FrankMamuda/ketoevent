@@ -72,6 +72,9 @@ private slots:
     void on_actionRemove_triggered();
     void on_actionEdit_triggered() { this->toggleAddEditWidget( Edit ); }
 
+protected:
+    virtual void closeEvent( QCloseEvent * );
+
 private:
     Ui::Gui_Team *ui;
     AddEditState m_state;

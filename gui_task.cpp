@@ -52,6 +52,10 @@ Gui_Task::Gui_Task( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Ta
     // connect
     this->connect( this->ui->closeButton, SIGNAL( clicked()), this, SLOT( close()));
 
+    // disable up/down buttons
+    this->ui->actionMoveUp->setDisabled( true );
+    this->ui->actionMoveDown->setDisabled( true );
+
     // set focus
     this->ui->closeButton->setFocus();
 }
@@ -99,7 +103,7 @@ toggleAddEditWidget
 void Gui_Task::toggleAddEditWidget( AddEditState state ) {
     this->setState( state );
 
-    if ( !this->ui->addEditWidget->isHidden()) {
+    if ( !this->ui->addEditWidget->isHidden() || state == NoState ) {
         this->ui->addEditWidget->close();
         this->ui->taskList->setEnabled( true );
         this->toggleView();
@@ -399,6 +403,9 @@ void Gui_Task::move( MoveDirection direction ) {
     index = this->listModelPtr->index( k, 0 );
     this->ui->taskList->setCurrentIndex( index );
     this->setCurrentMatch( k );
+
+    // check the buttons!
+    this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
 /*
@@ -457,4 +464,52 @@ void Gui_Task::on_actionSort_triggered() {
 
     // end reset
     this->listModelPtr->endReset();
+}
+
+/*
+================
+closeEvent
+================
+*/
+void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
+    this->toggleAddEditWidget( NoState );
+    ePtr->accept();
+}
+
+/*
+================
+changeUpDownState
+================
+*/
+void Gui_Task::changeUpDownState( const QModelIndex &index ) {
+    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    if ( taskPtr == NULL ) {
+        this->ui->actionMoveUp->setDisabled( true );
+        this->ui->actionMoveDown->setDisabled( true );
+        return;
+    }
+
+    if ( m.currentEvent()->taskList.count() > 1 && index.row() == 0 ) {
+        this->ui->actionMoveUp->setDisabled( true );
+        this->ui->actionMoveDown->setEnabled( true );
+        return;
+    }
+
+    if ( index.row() > 0 && index.row() == m.currentEvent()->taskList.count() - 1 ) {
+        this->ui->actionMoveUp->setEnabled( true );
+        this->ui->actionMoveDown->setDisabled( true );
+        return;
+    }
+
+    this->ui->actionMoveUp->setEnabled( true );
+    this->ui->actionMoveDown->setEnabled( true );
+}
+
+/*
+================
+taskList->clicked
+================
+*/
+void Gui_Task::on_taskList_clicked( const QModelIndex &index ) {
+    this->changeUpDownState( index );
 }

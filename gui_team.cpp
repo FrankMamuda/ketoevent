@@ -92,7 +92,7 @@ toggleAddEditWidget
 void Gui_Team::toggleAddEditWidget( AddEditState state ) {
     this->setState( state );
 
-    if ( !this->ui->addEditWidget->isHidden()) {
+    if ( !this->ui->addEditWidget->isHidden() || state == NoState ) {
         this->ui->addEditWidget->close();
         this->ui->teamList->setEnabled( true );
         this->enableView();
@@ -261,4 +261,15 @@ void Gui_Team::on_actionRemove_triggered() {
         }
     }
 }
+
+/*
+================
+closeEvent
+================
+*/
+void Gui_Team::closeEvent( QCloseEvent *ePtr ) {
+    this->toggleAddEditWidget( NoState );
+    ePtr->accept();
+}
+
 
