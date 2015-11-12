@@ -218,6 +218,9 @@ void Gui_Task::on_doneButton_clicked() {
 
     // select last added/edited value
     this->ui->taskList->setCurrentIndex( lastIndex );
+
+    // reset this
+    this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
 /*
@@ -296,6 +299,9 @@ void Gui_Task::findTask() {
         p.setColor( QPalette::Base, QColor( 255, 0, 0, 64 ));
         this->ui->findTask->setPalette( p );
     }
+
+    // reset this
+    this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
 /*
@@ -440,6 +446,9 @@ void Gui_Task::on_actionRemove_triggered() {
 
     // end reset
     this->listModelPtr->endReset();
+
+    // reset this
+    this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
 /*
@@ -474,6 +483,10 @@ closeEvent
 void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
+
+    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
+    if ( gui != NULL )
+        gui->fillTasks();
 }
 
 /*

@@ -55,7 +55,6 @@ private slots:
     void bindVars();
     void on_backupPerform_stateChanged(int arg1);
     void on_pathButton_clicked();
-
     void on_closeButton_clicked();
 
 private:

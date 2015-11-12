@@ -71,11 +71,11 @@ public slots:
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );
 #endif
-
-private slots:
     // team/task fill
     void fillTeams( int focedId = -1 );
     void fillTasks();
+
+private slots:
 
     // misc
     void teamIndexChanged( int index );

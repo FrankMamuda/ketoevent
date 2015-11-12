@@ -523,9 +523,10 @@ void Gui_Main::eventDialogClosed( int signal ) {
     if ( this->eventDialog->importPerformed()) {
         QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
         m.shutdown();
+        return;
     }
 
-    if ( signal == Gui_Settings::Accepted ) {
+    if ( signal == Gui_Dialog::Accepted ) {
         // compare these two
         if ( newEventId != this->lastEventId()) {
             this->fillTasks();

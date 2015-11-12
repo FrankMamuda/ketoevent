@@ -31,6 +31,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QFileDialog>
 #include "QSqlError"
 #include <QStringList>
+#include <QTextStream>
 
 // FIXME: event doesnt change on MAINWINDOW
 
@@ -301,13 +302,25 @@ void Gui_Event::on_actionImportTasks_triggered() {
 
         // import database
         m.attachDatabase( filePath, Main::TaskImport );
+
+        // mark as imported
+        this->setImported();
     }
     // importing csv
     else if ( filePath.endsWith( ".csv" )) {
         QStringList tasks, info;
         QFile csvList( filePath );
+
         csvList.open( QFile::ReadOnly );
-        tasks = QString( csvList.readAll().constData()).split( "\n" );
+        QTextStream in( &csvList );
+
+#ifdef Q_OS_WIN
+        in.setCodec( "Windows-1257" );
+#else
+        in.setCodec( "UTF-8" );
+#endif
+
+        tasks = QString( in.readAll().constData()).split( "\n" );
 
         // throw out header
         tasks.takeFirst();
@@ -340,13 +353,14 @@ void Gui_Event::on_actionImportTasks_triggered() {
         }
 
         csvList.close();
+
+        Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
+        if ( gui != NULL )
+            gui->fillTasks();
     } else {
         m.error( StrSoftError, "unknown task storage format\n" );
         return;
     }
-
-    // mark as imported
-    this->setImported();
 
     // close window
     this->onAccepted();

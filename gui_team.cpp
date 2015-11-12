@@ -27,6 +27,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 #include <QMessageBox>
 #include <QSqlQuery>
+#include "gui_main.h"
 
 /*
 ================
@@ -273,6 +274,8 @@ closeEvent
 void Gui_Team::closeEvent( QCloseEvent *ePtr ) {
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
+
+    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
+    if ( gui != NULL )
+        gui->fillTeams();
 }
-
-
