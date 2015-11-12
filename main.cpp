@@ -36,44 +36,18 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 class Main m;
 
-//
-// TODO:
-//
-// verbocity for console Regular Verbose PrintEverything
-// allow debugging of components:
-//       Tasks, Teams, Gui as flags (prints out if enabled)
-// add compatibility layer for the 2013 event (or just stats)
-// alloc/dealloc counter test
-// perform pre-event tests:
-//   - stress test (any crashes while handling large amounts of data?)
-//            - done, no crashes even on 50 teams and 10 tasks
-//   - integrity test (do we store exactly what we log?)
-//            - while performing auto stressTest no inconstencies where found
-//   - import test (do we import exactly what we need?)
-//            - still requires testing
-//            - added support for csv task list imports
-//
-//   - use only manual update on rankings? - DONE
-//   - info button on task (for user to see detailed description) - DONE
-//   - add breeze icon license in about window
-//
-// FIXME:
-//
-// word wrap broken in rankings view?
-// fix ugly combine buttons on mac (TaskWidget)
-//
-// NOTE:
-//
-// stress test on 50 teams with 91 tasks takes ~10 minutes to calculate
-//   on i7-4790k and the bottleneck seems to be sql. is there a more
-//   efficient way to store these values with less commits to sql?
-//   just a thought for future updates
-//
-// FUTURE:
-//
-// use listView instead of listWidget (use popups for checkboxes/spinboxes)
-//   to reduce memory footprint
-//
+/*
+TODO:
+- stress, integrity, import tests:
+  - done in r89 (after a few fixes everything is stable - logs, combos, importing, etc.)
+
+FUTURE:
+- use listView instead of listWidget to reduce memory footprint
+- verbocity for console Regular Verbose PrintEverything
+- allow debugging of components (Tasks, Teams, Gui as flags)
+- add compatibility layer for the 2013 event (or just stats)
+- use homedir for mac (if applicable)
+*/
 
 /*
 ================
@@ -111,7 +85,6 @@ void Main::initialize( QObject *parent ) {
     this->defaultSvar = new SettingsVariable( "default", SettingsVariable::NoType, SettingsVariable::NoClass );
 
     // load database entries
-    // skip this for now
     this->loadDatabase();
 
     // create settings variables
@@ -166,6 +139,8 @@ void Main::print( const QString &msg, DebugLevel debug ) {
     }
 
     qDebug() << msg;
+#else
+    Q_UNUSED( msg );
 #endif
 }
 

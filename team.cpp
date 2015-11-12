@@ -42,7 +42,6 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, cons
         return;
 
     // perform database update and select last row
-    // id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewer varchar( 64 ), eventId integer
 #ifdef SQL_PREPARE_STATEMENTS
     query.prepare( "insert into teams values ( null, :name, :members, :finishTime, :lock, :reviewer, :eventId )" );
     query.bindValue( ":name", teamName );
@@ -133,8 +132,6 @@ void Main::loadTeams( bool import, bool store ) {
         bool duplicate = false;
 
         // check for duplicates
-        // FIXME: something is very wrong here with duplicates (see task import)
-        // NOTE: might be fixed
         foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
             duplicate = false;
 

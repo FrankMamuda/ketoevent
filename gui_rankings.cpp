@@ -247,6 +247,7 @@ void Gui_Rankings::calculateStatistics() {
     foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
+        teamPtr->setCombosCalculated( false );
         teamPtr->calculateCombos();
         pointsLogged += teamPtr->points();
     }
@@ -291,7 +292,6 @@ void Gui_Rankings::rescaleWindow() {
     windowRect = this->geometry();
     windowRect.setWidth( 24 + tableRect.width() + this->ui->layoutTeamRankings->margin() * 2 + this->ui->groupRankings->layout()->margin() * 2 );
     this->setFixedWidth( windowRect.width());
-    //this->setGeometry( windowRect );
 }
 
 /*
@@ -307,9 +307,6 @@ Gui_Rankings::~Gui_Rankings() {
 
     // this should trigger deletion of QStandardItems
     this->modelPtr->clear();
-
-    // disconnect
-    //this->disconnect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( fillData()));
 
     // delete sort and data models
     delete this->modelPtr;

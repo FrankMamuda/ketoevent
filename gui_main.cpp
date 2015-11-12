@@ -233,29 +233,6 @@ void Gui_Main::teamIndexChanged( int index ) {
             this->ui->actionLogTime->setEnabled( true );
             this->ui->actionLockTeam->setChecked( false );
         }
-
-
-        /*
-        // change lock state
-        if ( teamPtr->isLocked()) {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/lock.png" ));
-            this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
-            this->ui->actionLockTeam->setChecked( true );
-
-            this->ui->timeFinish->setEnabled( true );
-            this->ui->taskList->setEnabled( true );
-            this->ui->actionLogTime->setEnabled( true );
-        } else {
-            this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlock.png" ));
-            this->ui->actionLockTeam->setText( this->tr( "Lock" ));
-            this->ui->actionLockTeam->setChecked( false );
-
-            this->ui->timeFinish->setDisabled( true );
-            this->ui->actionLogTime->setDisabled( true );
-            this->ui->actionCombine->setDisabled( true );
-            this->ui->taskList->setDisabled( true );
-        }*/
-
         this->setCurrentTeamIndex( index );
     } else {
         this->ui->timeFinish->setDisabled( true );
@@ -411,7 +388,7 @@ void Gui_Main::fillTasks() {
         lw->addItem( itemPtr );
         TaskWidget *widgetPtr = new TaskWidget( taskPtr );
         lw->setItemWidget( itemPtr, widgetPtr );
-        //widgetPtr->combo->hide();
+
 #ifdef APPLET_DEBUG
         m.alloc +=2;
 #endif
@@ -674,6 +651,51 @@ static int irand( int min, int max ) {
 
 /*
 ================
+testTeam
+================
+*/
+void Gui_Main::testTeam( TeamEntry *teamPtr ) {
+    int shouldBe = 0;
+    int rand = 0;
+    QListWidget *lw = this->ui->taskList;
+    int y;
+
+    // select the team
+    this->fillTeams( teamPtr->id());
+
+    // log random values
+    for ( y = 0; y < lw->count(); y++ ) {
+        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        if ( taskPtr == NULL )
+            continue;
+
+        if ( taskPtr->task()->type() == TaskEntry::Check ) {
+            rand = irand( 0, 1 );
+
+            if ( rand ) {
+                taskPtr->check->setChecked( static_cast<bool>( rand ));
+                shouldBe += taskPtr->task()->points();
+            }
+        } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+            rand = irand( 0, taskPtr->task()->multi());
+
+            if ( rand ) {
+                taskPtr->multi->setValue( rand );
+                shouldBe += taskPtr->task()->points() * rand;
+            }
+        }
+    }
+
+    // subtract penalty
+    shouldBe -= teamPtr->penalty();
+
+    // report
+    teamPtr->calculateCombos();
+    m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
+}
+
+/*
+================
 stressTest
 
  TODO: add combos?
@@ -681,8 +703,7 @@ stressTest
 */
 void Gui_Main::stressTest( int numTeams ) {
     TeamEntry *teamPtr;
-    QListWidget *lw = this->ui->taskList;
-    int y, k;
+    int k;
 
     // clear command has been given
     if ( numTeams == -1 ) {
@@ -691,6 +712,15 @@ void Gui_Main::stressTest( int numTeams ) {
                 m.removeTeam( teamPtr->name());
         }
         this->fillTeams();
+        return;
+    } else if ( numTeams == -2 ) {
+        if ( !m.currentEvent()->teamList.isEmpty())
+            m.print( this->tr( "Performing stress test for %1 custom teams" ).arg( m.currentEvent()->teamList.count()), Main::System );
+        else
+            m.print( this->tr( "No teams to perform stress test on" ), Main::System );
+
+        foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList )
+            this->testTeam( teamPtr );
         return;
     }
 
@@ -702,8 +732,6 @@ void Gui_Main::stressTest( int numTeams ) {
 
     // add a few teams with random logs
     for ( k = 0; k < numTeams; k++ ) {
-        int shouldBe = 0;
-        int rand = 0;
         int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
         QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
         QString teamName = QString( "Stress test %1" ).arg( k );
@@ -716,45 +744,10 @@ void Gui_Main::stressTest( int numTeams ) {
         m.addTeam( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
         teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
 
-        if ( teamPtr != NULL ) {
-            // select the team
-            this->fillTeams( teamPtr->id());
-
-            // log random values
-            for ( y = 0; y < lw->count(); y++ ) {
-                TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-                if ( taskPtr == NULL )
-                    continue;
-
-                if ( taskPtr->task()->type() == TaskEntry::Check ) {
-                    rand = irand( 0, 1 );
-
-                    if ( rand ) {
-                        taskPtr->check->setChecked( static_cast<bool>( rand ));
-                        shouldBe += taskPtr->task()->points();
-                        //m.print( QString( "  logging \"%1\" with %2 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()), Main::System);
-                    }
-                } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
-                    rand = irand( 0, taskPtr->task()->multi());
-
-                    if ( rand ) {
-                        taskPtr->multi->setValue( rand );
-                        shouldBe += taskPtr->task()->points() * rand;
-                        //m.print( QString( "  logging \"%1\" with %2x%3=%4 points\n" ).arg( taskPtr->task()->name()).arg( taskPtr->task()->points()).arg( rand ).arg( taskPtr->task()->points() * rand ), Main::System );
-                    }
-                }
-            }
-
-            // subtract penalty
-            shouldBe -= teamPtr->penalty();
-
-            // report
-            teamPtr->calculateCombos();
-            m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
-        }
+        if ( teamPtr != NULL )
+            this->testTeam( teamPtr );
     }
 }
-
 #endif
 
 /*

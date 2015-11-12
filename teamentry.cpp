@@ -134,6 +134,8 @@ void TeamEntry::calculateCombos() {
         counter++;
         this->m_total++;
     }
+   // m.print( QString( "  total %1\n" ).arg( this->m_total ));
+
     this->addComboPoints( counter );
 }
 

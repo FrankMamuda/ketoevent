@@ -55,12 +55,14 @@ public:
 protected:
     virtual bool eventFilter( QObject *, QEvent * );
 };
+#endif
 
 //
 // class: QConsoleEdit
 //
 class QConsoleEdit : public QLineEdit {
     Q_OBJECT
+#ifdef APPLET_DEBUG
     Q_PROPERTY( int historyOffset READ historyOffset WRITE setHistoryOffset RESET resetHistoryOffset )
 
 public:
@@ -88,7 +90,14 @@ public slots:
 
 private:
     int m_historyOffset;
+#else
+public:
+    QConsoleEdit( QWidget *parent = 0 ) { Q_UNUSED( parent ) }
+    ~QConsoleEdit() { }
+#endif
 };
+
+#ifdef APPLET_DEBUG
 
 //
 // class: Gui_Console

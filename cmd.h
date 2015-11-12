@@ -89,6 +89,7 @@ class Cmd : public QObject {
     Q_OBJECT
     Q_PROPERTY( bool initialized READ hasInitialized WRITE setInitialized )
     Q_CLASSINFO( "description", "Command subsystem" )
+    Q_ENUMS( ComboCount )
 
 public:
     void add( const QString &, cmdCommand_t, const QString & = QString::null );
@@ -98,6 +99,12 @@ public:
     QList<Command*> cmdList;
     Command *find( const QString & ) const;
     bool tokenize( const QString &string, QString &command, QStringList &arguments );
+    enum ComboCount {
+        C0 = 0,
+        C2,
+        C23,
+        C234
+    };
 
 private:
     bool executeTokenized( const QString &, const QStringList & );
@@ -117,6 +124,8 @@ public slots:
     void stressTest( const QStringList & );
     void memInfo();
     void dbInfo();
+    void clearLogs();
+    void clearCombos();
     void listCvars();
 };
 

@@ -62,8 +62,6 @@ private slots:
     void on_actionImportTasks_triggered();
     void on_actionExportEvent_triggered();
     void on_actionExportTasks_triggered();
-    // FIXME: USE HOMEDIR FOR MAC
-
     void on_actionRename_triggered();
 
 private:

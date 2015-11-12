@@ -20,7 +20,7 @@ QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 #CONFIG += static
-TARGET = KetoEvent3
+TARGET = ketoevent
 TEMPLATE = app
 TRANSLATIONS = i18n/ketoevent_lv_LV.ts
 win32:RC_FILE = icon.rc

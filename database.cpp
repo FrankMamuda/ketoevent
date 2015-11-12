@@ -33,8 +33,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
-// FIXME: app keeps adding '' quotes to event name on add and rename
-
 /*
 ================
 makePath
@@ -147,7 +145,7 @@ static QString taskListHash( bool import ) {
         if ( taskPtr->eventId() != eventId )
             continue;
 
-        taskString.append( QString( "%1%2%3%4" ).arg( taskPtr->name()).arg( taskPtr->points()).arg( taskPtr->multi()).arg( taskPtr->type()));
+        taskString.append( QString( "%1%2%3%4" ).arg( taskPtr->name().remove( " (imported)")).arg( taskPtr->points()).arg( taskPtr->multi()).arg( taskPtr->type()));
     }
 
     // generate taskList checksum (to avoid mismatches)
@@ -235,15 +233,19 @@ void Main::attachDatabase( const QString &path, Import import ) {
     query.exec( QString( "update merge.teams set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.tasks set eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "update merge.logs set teamId=teamId+%1" ).arg( this->highestId( TeamId )));
-    query.exec( QString( "update merge.logs set comboId=comboId+%1" ).arg( this->highestId( LogId )));
+    query.exec( QString( "update merge.logs set comboId=comboId+%1 where comboId!=-1" ).arg( this->highestId( LogId )));
 
     // load taskList into temporary storage
     this->loadTasks( true, !store );
 
     // compare task hashes
     if ( import == LogImport ) {
-        if ( QString::compare( taskListHash( true ), taskListHash( false ))) {
-            this->error( StrSoftError, this->tr( "task list mismatch\n" ));
+        QString one = taskListHash( true );
+        QString two = taskListHash( false );
+
+        if ( QString::compare( one, two )) {
+            this->error( StrSoftError, this->tr( "task list mismatch \"%1\", \"%2\"\n" )
+                         .arg( one ).arg( two ));
             goto removeDB;
         }
 
@@ -303,6 +305,7 @@ void Main::loadDatabase() {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setHostName( "localhost" );
     db.setDatabaseName( this->path );
+
     // touch file if empty
     if ( !database.exists()) {
         database.open( QFile::WriteOnly );

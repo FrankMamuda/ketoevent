@@ -134,13 +134,9 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
 
     // disable combo button by default
     this->combo->setCheckable( true );
-    //this->combo->setStyleSheet( "border-style: outset; border-width: 2px; border-radius: 10px; font: bold; padding: 6px;" );
 
     // add layout to widget
     this->setLayout( taskLayout );
-
-    // set default stylesheet
-   // this->taskName->setStyleSheet( "padding: 6px;" );
 
     // connect combo button for updates
     this->connect( this->combo, SIGNAL( toggled( bool )), this, SLOT( toggleCombo( bool )));
@@ -361,18 +357,9 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
     // trigger id change
     this->comboIdChanged();
 
-
-      // m.print( "AAA", Main::System );
-  //  this->taskName->setForegroundRole( QPalette::NoRole );
-
     // just initial addition
     if ( fromDatabase )
         return;
-
-   //.. if ( this->log()->value())
-   //     QPalette pal;
-   //     pal.setColor( QPalette::Text, QColor::fromRgbF() );
-   //     this->taskName->setPalette();
 
     // set values
     if ( this->task()->type() == TaskEntry::Check )

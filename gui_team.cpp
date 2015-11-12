@@ -71,7 +71,6 @@ void Gui_Team::enableView() {
     this->ui->teamList->setEnabled( true );
     this->ui->teamList->setSelectionMode( QAbstractItemView::SingleSelection );
     this->ui->closeButton->setDefault( true );
-    //this->ui->reviewerButton->setEnabled( true );
 }
 
 /*
@@ -108,7 +107,6 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
         this->ui->closeButton->setDisabled( true );
         this->ui->doneButton->setDefault( true );
         this->ui->teamList->setDisabled( true );
-        //this->ui->reviewerButton->setDisabled( true );
 
         switch ( state ) {
         case Add:
@@ -272,10 +270,19 @@ closeEvent
 ================
 */
 void Gui_Team::closeEvent( QCloseEvent *ePtr ) {
+    bool quick = false;
+
+    if ( this->state() == AddQuick )
+        quick = true;
+
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
 
     Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
-    if ( gui != NULL )
-        gui->fillTeams();
+    if ( gui != NULL ) {
+        if ( quick && !m.currentEvent()->teamList.isEmpty())
+            gui->fillTeams( m.currentEvent()->teamList.last()->id());
+        else
+            gui->fillTeams();
+    }
 }

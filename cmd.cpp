@@ -24,6 +24,7 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 #include "cmd.h"
 #include "gui_main.h"
+#include <QSqlQuery>
 
 // only available in debugging mode
 #ifdef APPLET_DEBUG
@@ -43,6 +44,8 @@ createCommand( cmd, teamAdd )
 createCommand( cmd, teamRemove )
 createCommand( cmd, stressTest )
 createSimpleCommand( cmd, dbInfo )
+createSimpleCommand( cmd, clearLogs )
+createSimpleCommand( cmd, clearCombos )
 createSimpleCommand( cmd, listCvars )
 createSimpleCommand( m, shutdown )
 #ifdef APPLET_DEBUG
@@ -61,6 +64,8 @@ void Cmd::init() {
     this->add( "cv_list", listCvarsCmd, this->tr( "list all available console variables" ));
     this->add( "cv_set", cvarSetCmd, this->tr( "set console variable value" ));
     this->add( "db_info", dbInfoCmd, this->tr( "display database information" ));
+    this->add( "logs_clear", clearLogsCmd, this->tr( "clear logs for current event" ));
+    this->add( "combos_clear", clearCombosCmd, this->tr( "clear combos for current event" ));
     this->add( "team_add", teamAddCmd, this->tr( "add a new team to the current event" ));
     this->add( "team_remove", teamRemoveCmd, this->tr( "remove a team" ));
     this->add( "shutdown", shutdownCmd, this->tr( "terminate the applet" ));
@@ -185,7 +190,7 @@ void Cmd::listCvars() {
 
     foreach ( ConsoleVariable *cvarPtr, m.cvarList ) {
         if ( !QString::compare( cvarPtr->key(), "system/consoleHistory" ))
-             continue;
+            continue;
 
         if ( QString::compare( cvarPtr->defaultValue().toString(), cvarPtr->value().toString()), Qt::CaseInsensitive )
             m.print( QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( cvarPtr->key()).arg( cvarPtr->value().toString()).arg( cvarPtr->defaultValue().toString()), Main::System );
@@ -231,14 +236,42 @@ void Cmd::dbInfo() {
 
 /*
 ============
+clearLogs
+============
+*/
+void Cmd::clearLogs() {
+    QSqlQuery query;
+
+    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+        foreach ( LogEntry *logPtr, teamPtr->logList ) {
+            logPtr->setValue( 0 );
+            query.exec( QString( "delete from logs where value=%1" ).arg( logPtr->id()));
+        }
+    }
+}
+
+/*
+============
+clearCombos
+============
+*/
+void Cmd::clearCombos() {
+    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+        foreach ( LogEntry *logPtr, teamPtr->logList )
+            logPtr->setComboId( -1 );
+    }
+}
+
+/*
+============
 memInfo
 ============
 */
 #ifdef APPLET_DEBUG
 void Cmd::memInfo() {
     m.print( QString( "meminfo: %1 allocs, %2 deallocs" )
-                 .arg( m.alloc )
-                 .arg( m.dealloc ), Main::System );
+             .arg( m.alloc )
+             .arg( m.dealloc ), Main::System );
 }
 #endif
 
@@ -284,6 +317,64 @@ void Cmd::stressTest( const QStringList &args ) {
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
     if ( !QString::compare( args.first(), "clear" )) {
         gui->stressTest( -1 );
+        return;
+    }
+
+    if ( !QString::compare( args.first(), "custom" )) {
+        gui->stressTest( -2 );
+        return;
+    }
+
+    if ( !QString::compare( args.first(), "combos" )) {
+        foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+            int numLogs = 0;
+
+            foreach ( LogEntry *logPtr, teamPtr->logList ) {
+                if ( logPtr->value() == 0 )
+                    continue;
+
+                // do something
+                numLogs++;
+            }
+
+            ComboCount comboCount = C0;
+
+            // don't like hard coding, but for stress test this should be ok
+            if ( numLogs >= 3 && numLogs < 8 )
+                comboCount = C2;
+            else if ( numLogs >= 8 && numLogs < 11 )
+                comboCount = C23;
+            else if ( numLogs >= 11 )
+                comboCount = C234;
+
+            QList <LogEntry*> logList;
+
+            foreach ( LogEntry *logPtr, teamPtr->logList ) {
+                if ( logPtr->value() == 0 )
+                    continue;
+
+                if ( comboCount == C0 )
+                    break;
+
+                // first fill the largest pool
+                logList << logPtr;
+
+                if ( comboCount == C234 && logList.count() == 4 )
+                    comboCount = C23;
+                else if ( comboCount == C23 && logList.count() == 3 )
+                    comboCount = C2;
+                else if ( comboCount == C2 && logList.count() == 2 )
+                    comboCount = C0;
+                else
+                    continue;
+
+                int freeHandle = m.getFreeComboHandle();
+                foreach ( LogEntry *logPtr, logList )
+                    logPtr->setComboId( freeHandle );
+
+                logList.clear();
+            }
+        }
         return;
     }
 

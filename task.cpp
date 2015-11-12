@@ -48,8 +48,6 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
         max = query.value( 0 ).toInt();
 
     // perform database update and select last row
-    //   id integer primary key, name varchar( 128 ), points integer, multi integer, style integer,
-    //   type integer, parent integer, eventId integer, description varchar( 512 )
 #ifdef SQL_PREPARE_STATEMENTS
     query.prepare( "insert into tasks values ( null, :name, :points, :multi, :style, :type, :parent, :eventId, :description )" );
     query.bindValue( ":name", taskName );

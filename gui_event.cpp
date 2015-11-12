@@ -33,8 +33,6 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QStringList>
 #include <QTextStream>
 
-// FIXME: event doesnt change on MAINWINDOW
-
 /*
 ================
 construct
@@ -104,7 +102,6 @@ void Gui_Event::bindVars() {
     this->lockVariables();
 
     // bind vars
-    //this->bindVariable( "key", object );
     this->bindVariable( "startTime", this->ui->startTime );
     this->bindVariable( "finishTime", this->ui->finishTime );
     this->bindVariable( "finalTime", this->ui->finalTime );
@@ -114,13 +111,8 @@ void Gui_Event::bindVars() {
     this->bindVariable( "comboOfFourAndMore", this->ui->tCombo );
     this->bindVariable( "minMembers", this->ui->min );
     this->bindVariable( "maxMembers", this->ui->max );
-    //this->bindVariable( "name", this->ui->titleEdit );
 
-    // connect for updates
-    //gui = qobject_cast<Gui_Main*>( this->parent());
-    //if ( gui != NULL )
-    //    this->connect( this->ui->titleEdit, SIGNAL( textChanged( QString )), this, SLOT( fillEvents()));
-
+    // refocus
     this->ui->buttonClose->setFocus();
 
     // unlock vars
@@ -162,6 +154,8 @@ void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
 /*
 ================
 validate
+
+  NOTE: as for combos - do as you please
 ================
 */
 void Gui_Event::validate() {
@@ -176,8 +170,6 @@ void Gui_Event::validate() {
     // minMembers <= maxMembers!
     if ( this->ui->min->value() > this->ui->max->value())
         this->ui->min->setValue( this->ui->max->value());
-
-    // as for combos - do as you please
 }
 
 /*
@@ -319,7 +311,6 @@ void Gui_Event::on_actionImportTasks_triggered() {
 #else
         in.setCodec( "UTF-8" );
 #endif
-
         tasks = QString( in.readAll().constData()).split( "\n" );
 
         // throw out header
@@ -332,7 +323,6 @@ void Gui_Event::on_actionImportTasks_triggered() {
                 TaskEntry *taskPtr = m.taskForName( info.at( 0 ));
 
                 if ( taskPtr == NULL ) {
-                    m.print( QString( "Adding new task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
                     m.addTask( info.at( 0 ),                // name
                                info.at( 2 ).toInt(),        // points
                                info.at( 3 ).toInt(),        // multi
@@ -342,7 +332,9 @@ void Gui_Event::on_actionImportTasks_triggered() {
                                ( info.at( 4 ).toInt()),     // style
                                info.at( 1 ));               // description
                 } else {
-                    m.print( QString( "Updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
+#ifdef APPLET_DEBUG
+                    m.print( this->tr( "Updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
+#endif
                     taskPtr->setPoints( info.at( 2 ).toInt());
                     taskPtr->setMulti( info.at( 3 ).toInt());
                     taskPtr->setType( static_cast<TaskEntry::Types>( info.at( 5 ).toInt()));
@@ -358,7 +350,7 @@ void Gui_Event::on_actionImportTasks_triggered() {
         if ( gui != NULL )
             gui->fillTasks();
     } else {
-        m.error( StrSoftError, "unknown task storage format\n" );
+        m.error( StrSoftError, this->tr( "unknown task storage format\n" ));
         return;
     }
 
@@ -390,7 +382,7 @@ void Gui_Event::on_actionExportEvent_triggered() {
 
     // forbid overwrite of the current database
     if ( !QString::compare( path, m.path )) {
-        m.error( StrSoftError, "cannot overwrite current database\n" );
+        m.error( StrSoftError, this->tr( "cannot overwrite current database\n" ));
         return;
     }
 

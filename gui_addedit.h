@@ -62,7 +62,6 @@ public:
 
 private slots:
     void on_acceptButton_clicked();
-
     void on_clearButton_clicked();
 
 private:

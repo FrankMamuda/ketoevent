@@ -70,6 +70,7 @@ public slots:
     void updateStatusBar();
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );
+    void testTeam( TeamEntry *teamPtr );
 #endif
     // team/task fill
     void fillTeams( int focedId = -1 );
