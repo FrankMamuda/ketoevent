@@ -437,7 +437,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
         return;
 
     // advance
-    if ( this->currentMatch() >= this->ui->taskList->count() - 1 || this->currentMatch() <= 0 )
+    if ( this->currentMatch() >= this->ui->taskList->count() - 1 || this->currentMatch() < 0 )
         this->setCurrentMatch();
     else
         this->setCurrentMatch( this->currentMatch() + 1 );
