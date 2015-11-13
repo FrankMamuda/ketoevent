@@ -444,7 +444,13 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
 
     // find item from current position
     for ( y = this->currentMatch(); y < this->ui->taskList->count(); y++ ) {
-        if ( m.currentEvent()->taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
+        if ( taskPtr == NULL )
+            continue;
+
+        QString taskName = taskPtr->taskName->text();
+
+        if ( taskName.contains( matchString, Qt::CaseInsensitive )) {
             match = true;
             this->setCurrentMatch( y );
             break;
@@ -454,7 +460,13 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
     // no match, try again from beginning
     if ( !match ) {
         for ( y = 0; y < this->ui->taskList->count(); y++ ) {
-            if ( m.currentEvent()->taskList.at( y )->name().contains( matchString, Qt::CaseInsensitive )) {
+            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
+            if ( taskPtr == NULL )
+                continue;
+
+            QString taskName = taskPtr->taskName->text();
+
+            if ( taskName.contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -465,6 +477,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
     // matched?
     if ( match ) {
         this->ui->taskList->setCurrentRow( y );
+        this->ui->findTaskEdit->setFocus();
     } else {
         this->ui->taskList->clearSelection();
         QPalette p( this->ui->findTaskEdit->palette());
