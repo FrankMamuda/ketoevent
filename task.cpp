@@ -150,7 +150,8 @@ taskForId
 ================
 */
 TaskEntry *Main::taskForId( int id ) {
-    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+    // search current event ONLY
+    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList /*this->base.taskList*/ ) {
         if ( taskPtr->id() == id )
             return taskPtr;
     }
@@ -163,7 +164,8 @@ taskForName
 ================
 */
 TaskEntry *Main::taskForName( const QString &name ) {
-    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+    // search current event ONLY
+    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList/* this->base.taskList*/ ) {
         if ( !QString::compare( name, taskPtr->name()))
             return taskPtr;
     }

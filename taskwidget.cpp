@@ -241,6 +241,10 @@ void TaskWidget::saveLog() {
                     logPtr->setComboId( -1 );
             }
         }
+
+        // this must be done here
+        this->log()->setComboId( -1 );
+
         // make sure to assign new log on next value change, so invalidate this one
         this->resetLog();
     }

@@ -432,8 +432,10 @@ void Gui_Task::on_actionRemove_triggered() {
     // begin reset
     this->listModelPtr->beginReset();
 
-    // remove from internal list
+    // remove from internal list (both base and current event - there should be
+    //   no mismatches, since eventId differs for tasks)
     m.currentEvent()->taskList.removeOne( taskPtr );
+    m.base.taskList.removeOne( taskPtr );
 
     // remove from database
     query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
