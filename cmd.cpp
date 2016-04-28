@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -73,8 +73,8 @@ void Cmd::init() {
     this->add( "mem_info", memInfoCmd, this->tr( "print alloc/dealloc count" ));
     this->add( "help", listCmd, this->tr( "same as cmd_list" ));
 
-    // we are initialized
-    this->setInitialized();
+    // we are initialised
+    this->setInitialised();
 }
 
 /*
@@ -84,10 +84,10 @@ shutdown
 */
 void Cmd::shutdown() {
     // failsafe
-    if ( !this->hasInitialized())
+    if ( !this->hasInitialised())
         return;
     else
-        this->setInitialized( false );
+        this->setInitialised( false );
 
     // announce
     //m.print( StrMsg + this->tr( "shutting down command subsystem\n" ), Main::System );

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
     ui->setupUi( this );
 
     // failsafe
-    if ( m.isInitialized())
+    if ( m.isInitialised())
         this->bindVars();
     else
         this->onRejected();

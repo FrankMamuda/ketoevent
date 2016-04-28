@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ construct
 Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
 
-    if ( m.isInitialized())
+    if ( m.isInitialised())
         this->bindVars();
     else
         this->onRejected();
@@ -123,10 +123,10 @@ void Gui_Settings::on_pathButton_clicked() {
     // reload database
     m.reloadDatabase( m.cvar( "databasePath" )->string());
 
-    // reinitialize gui
+    // reinitialise gui
     gui = qobject_cast<Gui_Main*>( this->parent());
     if ( gui != NULL )
-        gui->initialize( true );
+        gui->initialise( true );
 }
 
 /*

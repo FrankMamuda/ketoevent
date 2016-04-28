@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,6 +37,16 @@ addTask
 void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style, const QString &description ) {
     QSqlQuery query;
     int max = 0;
+
+    // announce
+    m.print( StrMsg + this->tr( "adding a new task - name - '%1'; points - %2; multi - %3; type - %4; style - %5; description - '%6'\n" )
+             .arg( taskName )
+             .arg( points )
+             .arg( multi )
+             .arg( type )
+             .arg( style )
+             .arg( description ),
+             Main::Task );
 
     // avoid duplicates
     if ( this->taskForName( taskName ) != NULL )
@@ -92,6 +102,9 @@ loadTasks
 */
 void Main::loadTasks( bool import, bool store ) {
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "loading tasks from database\n" ), Main::Task );
 
     // read stuff
     if ( import )

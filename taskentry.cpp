@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -53,6 +53,10 @@ TaskEntry::TaskEntry( const QSqlRecord &record, const QString &table ) {
         this->setType();
     }
 
+    // set defaults
+    this->m_reindex = false;
+    this->m_order = this->order( true );
+
     // perform updates
     this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
 }
@@ -91,4 +95,35 @@ int TaskEntry::calculate( int logId ) const {
 
     // we're done
     return value;
+}
+
+/*
+================
+calculate
+================
+*/
+void TaskEntry::setOrder( int order, bool direct ) {
+    if ( order < 0 )
+        return;
+
+    if ( direct ) {
+        this->setValue( "parent", order );
+        this->m_reindex = false;
+        this->m_order = order;
+    } else {
+        this->m_order = order;
+        this->m_reindex = true;
+    }
+}
+
+/*
+================
+order
+================
+*/
+int TaskEntry::order( bool sql ) const {
+    if ( sql )
+        return this->record().value( "parent" ).toInt();
+
+    return this->m_order;
 }

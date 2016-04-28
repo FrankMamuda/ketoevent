@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -441,6 +441,8 @@ void Gui_Task::on_actionRemove_triggered() {
     query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
 
     // reindex database (yes, it is very unfortunate)
+    // NOTE: this is done in-memory, actual changes are written to disk
+    //       only when requested
     foreach ( TaskEntry *reorderPtr, m.currentEvent()->taskList ) {
         reorderPtr->setOrder( y );
         y++;
@@ -486,6 +488,10 @@ void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
 
+    // reindex tasks here
+    m.reindexTasks();
+
+    // refill tasks in gui
     Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
     if ( gui != NULL )
         gui->fillTasks();

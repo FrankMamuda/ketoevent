@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -163,6 +163,9 @@ void Main::attachDatabase( const QString &path, Import import ) {
     bool store = true;
     int eventId = -1;
 
+    // announce
+    m.print( StrMsg + this->tr( "attaching database %1\n" ).arg( path ), Main::Database );
+
     // write backup just in case
     this->writeBackup();
 
@@ -277,6 +280,14 @@ void Main::touchDatabase( const QString &prefix ) {
     // create query
     QSqlQuery query;
 
+    // announce
+    m.print( StrMsg + this->tr( "creating an empty database '%1'\n" ).arg( this->cvar( "databasePath" )->string()), Main::Database );
+
+    // failafe
+    QFile db( this->cvar( "databasePath" )->string());
+    if ( !db.exists())
+        this->error( StrFatalError, this->tr( "unable to create database file\n" ));
+
     // create initial table structure (if non-existant)
     if ( !query.exec( QString( "create table if not exists %1tasks ( id integer primary key, name varchar( 128 ), points integer, multi integer, style integer, type integer, parent integer, eventId integer, description varchar( 512 ))" ).arg( prefix )) ||
          !query.exec( QString( "create table if not exists %1teams ( id integer primary key, name varchar( 64 ), members integer, finishTime varchar( 5 ), lock integer, reviewer varchar( 64 ), eventId integer )" ).arg( prefix )) ||
@@ -296,6 +307,9 @@ void Main::loadDatabase() {
     QFile database( this->path );
     QFileInfo dbInfo( database );
     QSqlDatabase db = QSqlDatabase::database();
+
+    // announce
+    m.print( StrMsg + this->tr( "loading database '%1'\n" ).arg( this->cvar( "databasePath" )->string()), Main::Database );
 
     // failsafe
     if ( !db.isDriverAvailable( "QSQLITE" ))
@@ -336,6 +350,28 @@ void Main::loadDatabase() {
     this->buildEventTTList();
 }
 
+
+/*
+================
+reindexTasks
+================
+*/
+void Main::reindexTasks() {
+    bool reindex = false;
+
+    // here we perform scheduled writes to disk
+    foreach ( TaskEntry *taskPtr, m.base.taskList ) {
+        if ( taskPtr->reindexRequired()) {
+            taskPtr->setOrder( taskPtr->order(), true );
+            reindex = true;
+        }
+    }
+
+    // announce reindexing
+    if ( reindex )
+        m.print( StrMsg + this->tr( "performed task reindexing\n" ), Main::Database );
+}
+
 /*
 ================
 unloadDatabase
@@ -344,6 +380,9 @@ unloadDatabase
 void Main::unloadDatabase() {
     QString connectionName;
     bool open = false;
+
+    // announce
+    m.print( StrMsg + this->tr( "unloading database\n" ), Main::Database );
 
     // close database if open and delete orphaned logs on shutdown
     // according to Qt5 documentation, this must be out of scope

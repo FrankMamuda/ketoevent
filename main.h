@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -54,6 +54,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #define StrSoftError Main::SoftError, ClassFunc
 #define StrWarn QObject::trUtf8( "WARNING:" ) + ClassFunc
 
+// quickly print to DEBUG
+#define QMD( msg ) m.print( StrMsg + QString( "%1\n" ).arg( msg ), Main::Debug );
+#define QMD1( msg, arg1 ) m.print( StrMsg + QString( "%1 %2\n" ).arg( msg ).arg( arg1 ), Main::Debug );
+#define QMD2( msg, arg1, arg2 ) m.print( StrMsg + QString( "%1 %2 %3\n" ).arg( msg ).arg( arg1 ).arg( arg2 ), Main::Debug );
+#define QMD3( msg, arg1, arg2, arg3 ) m.print( StrMsg + QString( "%1 %2 %3 %4\n" ).arg( msg ).arg( arg1 ).arg( arg2 ).arg( arg3 ), Main::Debug );
+
 //
 // namespace: Common
 //
@@ -86,7 +92,7 @@ class Main : public QObject {
     Q_OBJECT
     Q_ENUMS( ListTypes )
     Q_ENUMS( ErrorTypes )
-    Q_PROPERTY( bool initialized READ isInitialized WRITE setInitialized )
+    Q_PROPERTY( bool initialised READ isInitialised WRITE setInitialised )
     Q_PROPERTY( DebugLevels debugLevel READ debugLevel WRITE setDebugLevel )
     Q_CLASSINFO( "description", "Applet main class" )
     Q_ENUMS( IdTypes )
@@ -121,7 +127,12 @@ public:
         NoDebug =   0x0,
         System =    0x0001,
         GuiMain =   0x0002,
-        Database =  0x0004
+        Database =  0x0004,
+        Log =       0x0008,
+        Task =      0x0010,
+        Team =      0x0020,
+        Event =     0x0040,
+        Debug =     0x0080
     };
 
     enum Import {
@@ -167,7 +178,7 @@ public:
 
     // misc
     QString transliterate( const QString &path );
-    bool isInitialized() const { return this->m_init; }
+    bool isInitialised() const { return this->m_init; }
     DebugLevels debugLevel() const { return this->m_debug; }
 
     // mem debug
@@ -178,8 +189,8 @@ public:
 
 public slots:
     // init/shutdown
-    void initialize( QObject *parent );
-    void setInitialized( bool init = true ) { this->m_init = init; }
+    void initialise( QObject *parent );
+    void setInitialised( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
     // database
@@ -194,6 +205,7 @@ public slots:
     void addEvent( const QString &title = QString::null );
     void attachDatabase( const QString &path, Import = LogImport );
     void removeTeam( const QString &teamName );
+    void reindexTasks();
 
     // console io
     void error( ErrorTypes type = SoftError, const QString &func = "", const QString &msg = "" );

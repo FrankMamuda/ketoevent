@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ private:
 //
 class Cmd : public QObject {
     Q_OBJECT
-    Q_PROPERTY( bool initialized READ hasInitialized WRITE setInitialized )
+    Q_PROPERTY( bool initialised READ hasInitialised WRITE setInitialised )
     Q_CLASSINFO( "description", "Command subsystem" )
     Q_ENUMS( ComboCount )
 
@@ -95,7 +95,7 @@ public:
     void add( const QString &, cmdCommand_t, const QString & = QString::null );
     void remove( const QString & );
     bool execute( const QString & );
-    bool hasInitialized() const { return this->m_initialized; }
+    bool hasInitialised() const { return this->m_initialised; }
     QList<Command*> cmdList;
     Command *find( const QString & ) const;
     bool tokenize( const QString &string, QString &command, QStringList &arguments );
@@ -108,12 +108,12 @@ public:
 
 private:
     bool executeTokenized( const QString &, const QStringList & );
-    bool m_initialized;
+    bool m_initialised;
 
 public slots:
     void init();
     void shutdown();
-    void setInitialized( bool intialized = true ) { this->m_initialized = intialized; }
+    void setInitialised( bool intialised = true ) { this->m_initialised = intialised; }
 
     // commands
     void list( const QStringList & );

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,12 +48,12 @@ Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_M
 
 /*
 ================
-initialize
+initialise
 ================
 */
-void Gui_Main::initialize( bool reload ) {
-    // disable actions on partial initialization (debug)
-    if ( !m.isInitialized()) {
+void Gui_Main::initialise( bool reload ) {
+    // disable actions on partial initialisation (debug)
+    if ( !m.isInitialised()) {
         this->ui->actionTeams->setDisabled( true );
         this->ui->actionTasks->setDisabled( true );
         this->ui->actionEvents->setDisabled( true );
@@ -100,7 +100,7 @@ void Gui_Main::initialize( bool reload ) {
     this->connect( this->settingsDialog, SIGNAL( closeSignal( int )), this, SLOT( settingsDialogClosed( int )));
 
     // announce
-    this->print( this->tr( "initialization complete\n" ));
+    this->print( this->tr( "initialisation complete\n" ));
 
 #ifdef APPLET_DEBUG
     this->ui->mainToolBar->insertAction( this->ui->actionExit, this->ui->actionConsole );
@@ -312,8 +312,8 @@ fillTeams
 void Gui_Main::fillTeams( int forcedId ) {
     int lastId = forcedId;
 
-    // abort if partially initialized
-    if ( !m.isInitialized())
+    // abort if partially initialised
+    if ( !m.isInitialised())
         return;
 
     // store last team id
@@ -369,8 +369,8 @@ void Gui_Main::fillTasks() {
     QListWidget *lw = this->ui->taskList;
     QList <TaskEntry*>taskList;
 
-    // abort if partially initialized
-    if ( !m.isInitialized())
+    // abort if partially initialised
+    if ( !m.isInitialised())
         return;
 
     // clear tasks

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ ConsoleVariable *Main::cvar( const QString &key ) {
         if ( !QString::compare( varPtr->key(), key ))
             return varPtr;
     }
+
     return this->defaultCvar;
 }
 

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ public:
     int lastEventId() const { return this->m_lastEventId; }
 
 public slots:
-    void initialize( bool reload = false );
+    void initialise( bool reload = false );
     void taskIndexChanged( int row );
     void setEventTitle();
     void clearTasks();

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ addLog
 LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     LogEntry *logPtr = NULL;
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Main::Log );
 
     // avoid duplicates
     foreach ( logPtr, this->base.logList ) {
@@ -81,6 +84,9 @@ loadLogs
 */
 void Main::loadLogs( bool import, bool store ) {
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "loading logs form database\n" ), Main::Log );
 
     // read stuff
     if ( import )
@@ -146,6 +152,9 @@ removeOrphanedLogs
 void Main::removeOrphanedLogs() {
     // create query
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "removing orphaned logs\n" ), Main::Log );
 
     // remove orphaned logs (fixes crash with invalid teamId/taskId)
     if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))

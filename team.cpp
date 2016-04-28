@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ addTeam
 */
 void Main::addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Main::Team );
 
     // avoid duplicates
     if ( this->teamForName( teamName ) != NULL )
@@ -84,6 +87,9 @@ void Main::removeTeam( const QString &teamName ) {
     TeamEntry *teamPtr = NULL;
     QSqlQuery query;
 
+    // announce
+    m.print( StrMsg + this->tr( "removing team '%1'\n" ).arg( teamName ), Main::Team );
+
     // find team
     teamPtr = this->teamForName( teamName );
 
@@ -107,6 +113,9 @@ loadTeams
 */
 void Main::loadTeams( bool import, bool store ) {
     QSqlQuery query;
+
+    // announce
+    m.print( StrMsg + this->tr( "loading teams form database\n" ), Main::Team );
 
     // read stuff
     if ( import )

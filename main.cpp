@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,32 +38,31 @@ class Main m;
 
 /*
 TODO:
-- stress, integrity, import tests:
-  - done in r89 (after a few fixes everything is stable - logs, combos, importing, etc.)
-
 FUTURE:
 - use listView instead of listWidget to reduce memory footprint
-- verbocity for console Regular Verbose PrintEverything
-- allow debugging of components (Tasks, Teams, Gui as flags)
+- output verbocity levels per subsystem
 - add compatibility layer for the 2013 event (or just stats)
 - use homedir for mac (if applicable)
 */
 
 /*
 ================
-initialize
+initialise
 ================
 */
-void Main::initialize( QObject *parent ) {
+void Main::initialise( QObject *parent ) {
+    // announce
+    m.print( StrMsg + this->tr( "initialising system\n" ), Main::System );
+
     // init counters
     this->changesCounter = 0;
-    this->setInitialized( false );
+    this->setInitialised( false );
 
-    // initialize settings
-    this->settings = new QSettings( "avoti", "ketoevent3" );
+    // initialise settings
+    this->settings = new QSettings( "avoti", "ketoevent" );
     this->settings->setDefaultFormat( QSettings::NativeFormat );
 
-    // initialize this first
+    // initialise this first
     this->addCvar( new ConsoleVariable( "databasePath", this->settings, this->path ));
 
     // make default path
@@ -116,7 +115,7 @@ void Main::initialize( QObject *parent ) {
 #endif
 
     // we're up
-    this->setInitialized();
+    this->setInitialised();
 }
 
 /*
@@ -125,20 +124,26 @@ print
 ============
 */
 void Main::print( const QString &msg, DebugLevel debug ) {
-    // are we debugging current subsystem
-    if ( !this->debugLevel().testFlag( debug ))
-        return;
+    QString out = msg;
 
-    // print to console
+    if ( msg.endsWith( "\n" ))
+        out = msg.left( msg.length()-1 );
+
 #ifdef APPLET_DEBUG
-    if ( this->console != NULL ) {
-        if ( msg.endsWith( "\n" ))
-            this->console->print( msg.left( msg.length()-1 ));
-        else
-            this->console->print( msg );
+    // EVERYTHING is printed to the console
+    if ( this->console != NULL )
+        this->console->print( out );
+
+    // subsystem messages may be skipped
+    if ( debug == Main::NoDebug )
+        return;
+    else {
+        if ( !this->debugLevel().testFlag( debug ))
+            return;
     }
 
-    qDebug() << msg;
+    // output to QDebug
+    qDebug() << out;
 #else
     Q_UNUSED( msg );
 #endif
@@ -164,7 +169,7 @@ void Main::error( ErrorTypes type, const QString &func, const QString &msg ) {
         if ( guiPtr != NULL )
             QMessageBox::critical( guiPtr, "Fatal error", dialogMsg, QMessageBox::Close );
 
-        this->shutdown( true );        
+        this->shutdown( true );
     } else {
         if ( guiPtr != NULL )
             QMessageBox::warning( guiPtr, "Error", dialogMsg, QMessageBox::Close );
@@ -181,6 +186,9 @@ shutdown
 ================
 */
 void Main::shutdown( bool ignoreDatabase ) {    
+    // announce
+    m.print( StrMsg + this->tr( "performing shutdown\n" ), Main::System );
+
     // clear parent
     this->setParent( NULL );
 
@@ -219,8 +227,8 @@ void Main::shutdown( bool ignoreDatabase ) {
     if ( !ignoreDatabase )
         this->unloadDatabase();
 
-    // reset initialization state
-    this->setInitialized( false );
+    // reset initialisation state
+    this->setInitialised( false );
 
     // close applet
     QApplication::quit();
@@ -269,6 +277,9 @@ initConsole
 */
 #ifdef APPLET_DEBUG
 void Main::initConsole() {
+    // announce
+    m.print( StrMsg + this->tr( "initilising console\n" ), Main::System );
+
     if ( this->console != NULL )
         return;
 
@@ -326,10 +337,15 @@ int main( int argc, char *argv[] ) {
 
     // init app
     QCoreApplication::setOrganizationName( "avoti" );
-    QCoreApplication::setApplicationName( "ketoevent3" );
+    QCoreApplication::setApplicationName( "ketoevent" );
 
     // set debug level
-    m.setDebugLevel( Main::GuiMain | Main::System );
+#ifdef APPLET_DEBUG
+    m.setDebugLevel( Main::Debug );
+    //m.setDebugLevel( Main::DebugLevel( 0x00FF ));
+#else
+    m.setDebugLevel( Main::NoDebug );
+#endif
 
     // i18n
     QTranslator translator;
@@ -351,11 +367,11 @@ int main( int argc, char *argv[] ) {
     Gui_Main gui;
     gui.show();
 
-    // initialize application
-    m.initialize( qobject_cast<QObject*>( &gui ));
+    // initialise application
+    m.initialise( qobject_cast<QObject*>( &gui ));
 
     // add teams
-    gui.initialize();
+    gui.initialise();
 
     // exec app
     return app.exec();

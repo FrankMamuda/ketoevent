@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ Gui_Event::Gui_Event( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_
     ui->setupUi( this );
 
     // bind settings vars
-    if ( m.isInitialized())
+    if ( m.isInitialised())
         this->bindVars();
 
     this->fillEvents();

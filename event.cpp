@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2013-2015 Avotu Briezhaudzetava
+Copyright (C) 2013-2016 Avotu Briezhaudzetava
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,6 +38,9 @@ addEvent
 void Main::addEvent( const QString &title ) {
     QSqlQuery query;
     QString eventTitle;
+
+    // announce
+    m.print( StrMsg + this->tr( "adding a new event - '%1'\n" ).arg( title ), Main::Event );
 
     // copy title
     eventTitle = title;
@@ -107,6 +110,9 @@ loadEvents
 bool Main::loadEvents( bool import ) {
     QSqlQuery query;
 
+    // announce
+    m.print( StrMsg + this->tr( "loading events from database\n" ), Main::Event );
+
     // read all event entries
     if ( import )
         query.exec( "select * from merge.events" );
@@ -153,8 +159,15 @@ bool Main::loadEvents( bool import ) {
             this->error( StrFatalError, this->tr( "could not create event\n" ));
         }
 
+
+        // fixes crash on empty database
+        // NOTE: rather ugly code
+        EventEntry *eventPtr = this->eventForId( this->cvar( "currentEvent" )->integer());
+        if ( eventPtr == NULL )
+            eventPtr = this->base.eventList.first();
+
         // for now - resort to indexes?? (use list indexof)
-        if ( !this->setCurrentEvent( this->eventForId( this->cvar( "currentEvent" )->integer())))
+        if ( !this->setCurrentEvent( eventPtr ))
             this->setCurrentEvent( this->base.eventList.first());
     }
 
@@ -179,6 +192,9 @@ setCurrentEvent
 ================
 */
 bool Main::setCurrentEvent( EventEntry *eventPtr ) {
+    // announce
+    m.print( StrMsg + this->tr( "setting '%1' as current event\n" ).arg( eventPtr->name()), Main::Event );
+
     foreach ( EventEntry *entry, this->base.eventList ) {
         if ( entry == eventPtr ) {
             this->m_event = entry;
@@ -199,6 +215,7 @@ EventEntry *Main::eventForId( int id ) {
         if ( eventPtr->id() == id )
             return eventPtr;
     }
+
     return NULL;
 }
 
@@ -208,6 +225,9 @@ buildEventTTList
 ================
 */
 void Main::buildEventTTList() {
+    // announce
+    m.print( StrMsg + this->tr( "building event TTList\n" ), Main::Event );
+
     foreach ( EventEntry *eventPtr, this->base.eventList ) {
         eventPtr->teamList.clear();
         eventPtr->taskList.clear();
