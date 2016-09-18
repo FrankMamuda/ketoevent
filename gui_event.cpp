@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -33,11 +31,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QStringList>
 #include <QTextStream>
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Event::Gui_Event
+ * @param parent
+ */
 Gui_Event::Gui_Event( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Event ) {
     // set up gui
     ui->setupUi( this );
@@ -50,14 +47,12 @@ Gui_Event::Gui_Event( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_
     this->setImported( false );
 }
 
-/*
-================
-fillEvents
-================
-*/
+/**
+ * @brief Gui_Event::fillEvents
+ */
 void Gui_Event::fillEvents() {
     int y = 0, id = -1;
-    EventEntry *eventPtr;
+    Event *eventPtr;
 
     if ( this->variablesLocked())
         return;
@@ -71,7 +66,7 @@ void Gui_Event::fillEvents() {
         id = eventPtr->id();
 
     // fill the combobox with events
-    foreach ( EventEntry *ePtr, m.base.eventList ) {
+    foreach ( Event *ePtr, m.base.eventList ) {
         this->ui->eventCombo->addItem( ePtr->name(), ePtr->id());
         if ( ePtr->id() == id )
             this->ui->eventCombo->setCurrentIndex( y );
@@ -79,22 +74,18 @@ void Gui_Event::fillEvents() {
     }
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Event::~Gui_Event
+ */
 Gui_Event::~Gui_Event() {
     //this->disconnect( this->ui->titleEdit, SIGNAL( textChanged( QString )));
     this->unbindVars();
     delete ui;
 }
 
-/*
-================
-bindVars
-================
-*/
+/**
+ * @brief Gui_Event::bindVars
+ */
 void Gui_Event::bindVars() {
     //Gui_Main *gui;
 
@@ -119,21 +110,18 @@ void Gui_Event::bindVars() {
     this->lockVariables( false );
 }
 
-/*
-================
-buttonClose->clicked
-================
-*/
+/**
+ * @brief Gui_Event::on_buttonClose_clicked
+ */
 void Gui_Event::on_buttonClose_clicked() {
     this->validate();
     this->onAccepted();
 }
 
-/*
-================
-eventCombo->currentIndexChanged
-================
-*/
+/**
+ * @brief Gui_Event::on_eventCombo_currentIndexChanged
+ * @param index
+ */
 void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
     if ( index == -1 )
         return;
@@ -142,7 +130,7 @@ void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
     this->validate();
 
     // set current event
-    EventEntry *eventPtr = m.eventForId( this->ui->eventCombo->itemData( index ).toInt());
+    Event *eventPtr = m.eventForId( this->ui->eventCombo->itemData( index ).toInt());
     if ( eventPtr != NULL && eventPtr != m.currentEvent()) {
         m.setCurrentEvent( eventPtr );
         this->lockVariables();
@@ -151,13 +139,9 @@ void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
     }
 }
 
-/*
-================
-validate
-
-  NOTE: as for combos - do as you please
-================
-*/
+/**
+ * @brief Gui_Event::validate
+ */
 void Gui_Event::validate() {
     // start time must be earlier than finish/final times
     if ( this->ui->startTime->time() > this->ui->finishTime->time() || this->ui->startTime->time() > this->ui->finalTime->time())
@@ -172,25 +156,21 @@ void Gui_Event::validate() {
         this->ui->min->setValue( this->ui->max->value());
 }
 
-/*
-================
-actionAddEvent->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionAddEvent_triggered
+ */
 void Gui_Event::on_actionAddEvent_triggered() {
     Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Add, -1, this );
     evAdd.exec();
 }
 
-/*
-================
-actionRemoveEvent->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionRemoveEvent_triggered
+ */
 void Gui_Event::on_actionRemoveEvent_triggered() {
     QMessageBox msgBox;
     int state;
-    EventEntry *eventPtr = m.currentEvent();
+    Event *eventPtr = m.currentEvent();
     QSqlQuery query;
 
     // make sure we cannot delete all events
@@ -228,11 +208,9 @@ void Gui_Event::on_actionRemoveEvent_triggered() {
     }
 }
 
-/*
-================
-actionImportLogs->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionImportLogs_triggered
+ */
 void Gui_Event::on_actionImportLogs_triggered() {
     QString path, filePath;
 
@@ -264,11 +242,9 @@ void Gui_Event::on_actionImportLogs_triggered() {
     this->onAccepted();
 }
 
-/*
-================
-actionImportTasks->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionImportTasks_triggered
+ */
 void Gui_Event::on_actionImportTasks_triggered() {
     QString path, filePath;
 
@@ -320,15 +296,15 @@ void Gui_Event::on_actionImportTasks_triggered() {
             info = task.split( ";" );
 
             if ( info.count() == 6 ) {
-                TaskEntry *taskPtr = m.taskForName( info.at( 0 ));
+                Task *taskPtr = m.taskForName( info.at( 0 ));
 
                 if ( taskPtr == NULL ) {
                     m.addTask( info.at( 0 ),                // name
                                info.at( 2 ).toInt(),        // points
                                info.at( 3 ).toInt(),        // multi
-                               static_cast<TaskEntry::Types>
+                               static_cast<Task::Types>
                                ( info.at( 5 ).toInt()),     // type
-                               static_cast<TaskEntry::Styles>
+                               static_cast<Task::Styles>
                                ( info.at( 4 ).toInt()),     // style
                                info.at( 1 ));               // description
                 } else {
@@ -337,8 +313,8 @@ void Gui_Event::on_actionImportTasks_triggered() {
 #endif
                     taskPtr->setPoints( info.at( 2 ).toInt());
                     taskPtr->setMulti( info.at( 3 ).toInt());
-                    taskPtr->setType( static_cast<TaskEntry::Types>( info.at( 5 ).toInt()));
-                    taskPtr->setStyle( static_cast<TaskEntry::Styles>( info.at( 4 ).toInt()));
+                    taskPtr->setType( static_cast<Task::Types>( info.at( 5 ).toInt()));
+                    taskPtr->setStyle( static_cast<Task::Styles>( info.at( 4 ).toInt()));
                     taskPtr->setDescription( info.at( 1 ));
                 }
             }
@@ -358,11 +334,9 @@ void Gui_Event::on_actionImportTasks_triggered() {
     this->onAccepted();
 }
 
-/*
-================
-actionExportEvent->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionExportEvent_triggered
+ */
 void Gui_Event::on_actionExportEvent_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "Database (*.db)" ));
@@ -402,17 +376,15 @@ void Gui_Event::on_actionExportEvent_triggered() {
         return;
     }
 
-    m.touchDatabase( "export." );
+    m.createDatabaseStructure( "export." );
     query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( m.currentEvent()->id()));
     query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( m.currentEvent()->id()));
     query.exec( "detach export" );
 }
 
-/*
-================
-actionExportTasks->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionExportTasks_triggered
+ */
 void Gui_Event::on_actionExportTasks_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export event structure" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
@@ -441,7 +413,7 @@ void Gui_Event::on_actionExportTasks_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
+        foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( taskPtr->name().replace( ';', ',' ))
                    .arg( taskPtr->description().replace( ';', ',' ))
@@ -459,11 +431,9 @@ void Gui_Event::on_actionExportTasks_triggered() {
     taskList.close();
 }
 
-/*
-================
-actionRename->triggered
-================
-*/
+/**
+ * @brief Gui_Event::on_actionRename_triggered
+ */
 void Gui_Event::on_actionRename_triggered() {
     Gui_AddEdit evAdd( Gui_AddEdit::EventDialog, Gui_AddEdit::Rename, -1, this );
     evAdd.exec();

@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -28,11 +26,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 
 #ifdef APPLET_DEBUG
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Console::Gui_Console
+ * @param parent
+ */
 Gui_Console::Gui_Console( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Console ) {
     ui->setupUi( this );
     this->setWindowFlags( Qt::CustomizeWindowHint );
@@ -43,22 +40,19 @@ Gui_Console::Gui_Console( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui
     this->ui->input->installEventFilter( this->eventFilter );
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Console::~Gui_Console
+ */
 Gui_Console::~Gui_Console() {
     this->ui->input->removeEventFilter( this->eventFilter );
     delete this->eventFilter;
     delete ui;
 }
 
-/*
-================
-completeCommand
-================
-*/
+/**
+ * @brief Gui_Console::completeCommand
+ * @return
+ */
 bool Gui_Console::completeCommand() {
     int match = 0;
     QStringList matchedStrings;
@@ -131,21 +125,18 @@ bool Gui_Console::completeCommand() {
     return true;
 }
 
-
-/*
-================
-mousePressEvent
-================
-*/
+/**
+ * @brief Gui_Console::mousePressEvent
+ * @param eventPtr
+ */
 void Gui_Console::mousePressEvent( QMouseEvent *eventPtr ){
     this->m_windowPos = eventPtr->pos();
 }
 
-/*
-================
-mouseMoveEvent
-================
-*/
+/**
+ * @brief Gui_Console::mouseMoveEvent
+ * @param eventPtr
+ */
 void Gui_Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
     QPoint out;
 
@@ -153,11 +144,12 @@ void Gui_Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
         this->move( this->pos() + eventPtr->pos() - this->m_windowPos );
 }
 
-/*
-================
-eventFilter
-================
-*/
+/**
+ * @brief ConsoleEventFilter::eventFilter
+ * @param objectPtr
+ * @param eventPtr
+ * @return
+ */
 bool ConsoleEventFilter::eventFilter( QObject *objectPtr, QEvent *eventPtr ) {
     QConsoleEdit *lePtr = qobject_cast<QConsoleEdit *>( objectPtr );
     Gui_Console *cPtr = qobject_cast<Gui_Console *>( objectPtr->parent());
@@ -218,20 +210,17 @@ bool ConsoleEventFilter::eventFilter( QObject *objectPtr, QEvent *eventPtr ) {
     return false;
 }
 
-/*
-================
-print
-================
-*/
+/**
+ * @brief Gui_Console::print
+ * @param msg
+ */
 void Gui_Console::print( const QString &msg ) {
     this->ui->screen->append( msg );
 }
 
-/*
-================
-input->returnPressed
-================
-*/
+/**
+ * @brief Gui_Console::on_input_returnPressed
+ */
 void Gui_Console::on_input_returnPressed() {
     if ( cmd.execute( this->ui->input->text()))
         this->ui->input->addToHistory( this->ui->input->text());
@@ -241,20 +230,16 @@ void Gui_Console::on_input_returnPressed() {
     this->ui->input->clear();
 }
 
-/*
-================
-loadHistory
-================
-*/
+/**
+ * @brief Gui_Console::loadHistory
+ */
 void Gui_Console::loadHistory() {
     this->ui->input->history = m.cvar( "system/consoleHistory" )->string().split( ";" );
 }
 
-/*
-================
-saveHisotry
-================
-*/
+/**
+ * @brief Gui_Console::saveHisotry
+ */
 void Gui_Console::saveHisotry() {
     m.cvar( "system/consoleHistory" )->setValue( this->ui->input->history.join( ";" ));
 }

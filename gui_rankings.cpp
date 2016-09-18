@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -27,12 +25,15 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QTextStream>
 #include "main.h"
 #include "gui_main.h"
+#ifdef APPLET_DEBUG
+#include <QListView>
+#include <QHBoxLayout>
+#endif
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Rankings::Gui_Rankings Team ranking and event statistics display (constructor)
+ * @param parent parent widget
+ */
 Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Rankings ) {
     // set up ui
     ui->setupUi( this );
@@ -87,31 +88,32 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
 
     // set focus
     this->ui->closeButton->setFocus();
+
+#ifndef APPLET_DEBUG
+    this->ui->toolBar->removeAction( this->ui->actionNoLogs );
+#endif
 }
 
-/*
-================
-lessThan
-================
-*/
+/**
+ * @brief greaterThan quick integer compare for sorting purposes
+ * @param a first integer
+ * @param b second integer
+ * @return
+ */
 static bool greaterThan( int a, int b ) {
     return a > b;
 }
 
-/*
-================
-clearData
-================
-*/
+/**
+ * @brief Gui_Rankings::clearData clears stats from rankingView
+ */
 void Gui_Rankings::clearData() {
     this->ui->rankingView->model()->removeRows( 0, this->ui->rankingView->model()->rowCount());
 }
 
-/*
-================
-fillHeader
-================
-*/
+/**
+ * @brief Gui_Rankings::fillHeader feeds header data to rankingView (team name, points, etc.)
+ */
 void Gui_Rankings::fillHeader() {
     QFont boldFont;
     unsigned int y;
@@ -126,21 +128,17 @@ void Gui_Rankings::fillHeader() {
     }
 }
 
-/*
-================
-currentTeamToggled
-================
-*/
+/**
+ * @brief Gui_Rankings::currentTeamToggled refreshes view (hiding other teams, if toggled)
+ */
 void Gui_Rankings::currentTeamToggled() {
     this->clearData();
     this->fillData();
 }
 
-/*
-================
-fillData
-================
-*/
+/**
+ * @brief Gui_Rankings::fillData feeds data to rankingView
+ */
 void Gui_Rankings::fillData() {
     unsigned int y;
     int k, points;
@@ -149,7 +147,7 @@ void Gui_Rankings::fillData() {
     // fill data
     for ( y = 0; y < NumRankingColumns; y++ ) {
         for ( k = 0; k < m.currentEvent()->teamList.count(); k++ ) {
-            TeamEntry *teamPtr = m.currentEvent()->teamList.at( k );
+            Team *teamPtr = m.currentEvent()->teamList.at( k );
             Gui_Main *guiPtr = qobject_cast<Gui_Main*>( this->parent());
             QStandardItem *itemPtr = new QStandardItem();
             QString text;
@@ -235,16 +233,14 @@ void Gui_Rankings::fillData() {
     }
 }
 
-/*
-================
-calculateStatistics
-================
-*/
+/**
+ * @brief Gui_Rankings::calculateStatistics recalculates event stats
+ */
 void Gui_Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0, pointsLogged = 0, maxPoints = 0;
 
     // get team stats
-    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+    foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
         teamPtr->setCombosCalculated( false );
@@ -253,10 +249,10 @@ void Gui_Rankings::calculateStatistics() {
     }
 
     // get max points
-    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
-        if ( taskPtr->type() == TaskEntry::Check )
+    foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
+        if ( taskPtr->type() == Task::Check )
             maxPoints += taskPtr->points();
-        else if ( taskPtr->type() == TaskEntry::Multi )
+        else if ( taskPtr->type() == Task::Multi )
             maxPoints += taskPtr->points() * taskPtr->multi();
     }
 
@@ -269,11 +265,9 @@ void Gui_Rankings::calculateStatistics() {
     this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));
 }
 
-/*
-================
-rescaleWindow
-================
-*/
+/**
+ * @brief Gui_Rankings::rescaleWindow recalculates window geometry to minimum
+ */
 void Gui_Rankings::rescaleWindow() {
     QRect tableRect, windowRect, parentRect;
     int y, columnWidths = 0;
@@ -294,11 +288,9 @@ void Gui_Rankings::rescaleWindow() {
     this->setFixedWidth( windowRect.width());
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Rankings::~Gui_Rankings destructor
+ */
 Gui_Rankings::~Gui_Rankings() {
     this->clearData();
 
@@ -314,11 +306,9 @@ Gui_Rankings::~Gui_Rankings() {
     this->columnHeaders.clear();
 }
 
-/*
-================
-bindVars
-================
-*/
+/**
+ * @brief Gui_Rankings::bindVars connects console/settings variables for updates
+ */
 void Gui_Rankings::bindVars() {
     // lock vars
     this->lockVariables();
@@ -330,20 +320,16 @@ void Gui_Rankings::bindVars() {
     this->lockVariables( false );
 }
 
-/*
-================
-closeButton->clicked
-================
-*/
+/**
+ * @brief Gui_Rankings::on_closeButton_clicked closes rankings display
+ */
 void Gui_Rankings::on_closeButton_clicked() {
     this->onAccepted();
 }
 
-/*
-================
-actionExport->triggered
-================
-*/
+/**
+ * @brief Gui_Rankings::on_actionExport_triggered exports event stats to a CSV file
+ */
 void Gui_Rankings::on_actionExport_triggered() {
     QString path;
     path = QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" ));
@@ -371,7 +357,7 @@ void Gui_Rankings::on_actionExport_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+        foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
             int points;
 
             if ( teamPtr->disqualified())
@@ -399,13 +385,69 @@ void Gui_Rankings::on_actionExport_triggered() {
     csv.close();
 }
 
-/*
-================
-actionExport->triggered
-================
-*/
+/**
+ * @brief Gui_Rankings::on_actionRefresh_triggered recalculates statistics and repopulates rankingView
+ */
 void Gui_Rankings::on_actionRefresh_triggered() {
     this->calculateStatistics();
     this->clearData();
     this->fillData();
+}
+
+/**
+ * @brief listToAscending
+ * @param ePtr0
+ * @param ePtr1
+ * @return
+ */
+static bool listToAscending( const QString s0, const QString s1 ) {
+    return m.transliterate( s0.toLower()) < m.transliterate( s1.toLower());
+}
+
+/**
+ * @brief Gui_Rankings::on_actionNoLogs_triggered opens a dialog that shows tasks that have not been logged by any team
+ */
+void Gui_Rankings::on_actionNoLogs_triggered() {
+#ifdef APPLET_DEBUG
+    QStringList taskList;
+
+    Event *event = m.currentEvent();
+    if ( event == NULL )
+        return;
+
+    // build event taskList
+    foreach ( Task *task, m.base.taskList ) {
+        if ( task->eventId() == event->id())
+            taskList << task->name();
+    }
+
+    // remove tasks if logged by any team
+    foreach ( Log *log, m.base.logList ) {
+        Task *task = m.taskForId( log->taskId());
+        if ( task == NULL )
+            continue;
+
+        if ( task->eventId() != event->id())
+            continue;
+
+        if ( log->value() <= 0 )
+            continue;
+
+        taskList.removeOne( task->name());
+    }
+
+    qSort( taskList.begin(), taskList.end(), listToAscending );
+
+    QDialog dialog;
+    QHBoxLayout *layout = new QHBoxLayout();
+    QListView *taskListView = new QListView();
+    QStringListModel *stringListModel = new QStringListModel( taskList );
+    taskListView->setModel( stringListModel );
+    taskListView->setAlternatingRowColors( true );
+    layout->addWidget( taskListView );
+    layout->setMargin( 0 );
+    dialog.setWindowTitle( this->tr( "Unlogged tasks" ));
+    dialog.setLayout( layout );
+    dialog.exec();
+#endif
 }

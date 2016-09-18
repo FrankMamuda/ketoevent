@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 #ifndef GUI_MAIN_H
 #define GUI_MAIN_H
@@ -41,9 +39,9 @@ namespace Ui {
 class Gui_Main;
 }
 
-//
-// class: Gui_Main
-//
+/**
+ * @brief The Gui_Main class
+ */
 class Gui_Main : public QMainWindow {
     Q_OBJECT
     Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
@@ -67,10 +65,10 @@ public slots:
     void setEventTitle();
     void clearTasks();
     void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
-    void updateStatusBar();
+    void lock();
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );
-    void testTeam( TeamEntry *teamPtr );
+    void testTeam( Team *teamPtr );
 #endif
     // team/task fill
     void fillTeams( int focedId = -1 );

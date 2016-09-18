@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -48,11 +46,11 @@ static comboColour_t colours[] = {
 };
 static int numColors = sizeof( colours ) / sizeof( comboColour_t );
 
-/*
-================
-colourForId
-================
-*/
+/**
+ * @brief colourForId
+ * @param id
+ * @return
+ */
 static comboColour_t colourForId( int id ) {
     if ( id < 0 )
         return colours[0];
@@ -63,11 +61,12 @@ static comboColour_t colourForId( int id ) {
     return colours[id];
 }
 
-/*
-================
-data
-================
-*/
+/**
+ * @brief Gui_ComboModel::data
+ * @param index
+ * @param role
+ * @return
+ */
 QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
@@ -93,11 +92,11 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
         return QVariant();
 }
 
-/*
-================
-flags
-================
-*/
+/**
+ * @brief Gui_ComboModel::flags
+ * @param index
+ * @return
+ */
 Qt::ItemFlags Gui_ComboModel::flags( const QModelIndex &index ) const {
     if ( !index.isValid())
         return Qt::ItemIsEnabled;
@@ -105,11 +104,10 @@ Qt::ItemFlags Gui_ComboModel::flags( const QModelIndex &index ) const {
     return QAbstractItemModel::flags( index );
 }
 
-/*
-================
-rowCount
-================
-*/
+/**
+ * @brief Gui_ComboModel::rowCount
+ * @return
+ */
 int Gui_ComboModel::rowCount( const QModelIndex & ) const {
     // get dialog parent
     Gui_Combos *cPtr = qobject_cast<Gui_Combos *>( this->listParent );

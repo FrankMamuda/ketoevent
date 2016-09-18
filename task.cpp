@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // task.cpp (main.cpp is too crowded)
@@ -29,12 +27,16 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 
-/*
-================
-addTask
-================
-*/
-void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::Types type, TaskEntry::Styles style, const QString &description ) {
+/**
+ * @brief Main::addTask
+ * @param taskName
+ * @param points
+ * @param multi
+ * @param type
+ * @param style
+ * @param description
+ */
+void Main::addTask( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
     QSqlQuery query;
     int max = 0;
 
@@ -46,7 +48,7 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
              .arg( type )
              .arg( style )
              .arg( description ),
-             Main::Task );
+             Main::TaskDebug );
 
     // avoid duplicates
     if ( this->taskForName( taskName ) != NULL )
@@ -63,8 +65,8 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
     query.bindValue( ":name", taskName );
     query.bindValue( ":points", points );
     query.bindValue( ":multi", multi );
-    query.bindValue( ":style", static_cast<TaskEntry::Styles>( style ));
-    query.bindValue( ":type", static_cast<TaskEntry::Types>( type ));
+    query.bindValue( ":style", static_cast<Task::Styles>( style ));
+    query.bindValue( ":type", static_cast<Task::Types>( type ));
     query.bindValue( ":parent", max + 1 );
     query.bindValue( ":eventId", m.currentEvent()->id());
     query.bindValue( ":description", description );
@@ -89,22 +91,22 @@ void Main::addTask( const QString &taskName, int points, int multi, TaskEntry::T
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->base.taskList << new TaskEntry( query.record(), "tasks" );
+        this->base.taskList << new Task( query.record(), "tasks" );
 
     // add to event
     this->currentEvent()->taskList << this->base.taskList.last();
 }
 
-/*
-================
-loadTasks
-================
-*/
+/**
+ * @brief Main::loadTasks
+ * @param import
+ * @param store
+ */
 void Main::loadTasks( bool import, bool store ) {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading tasks from database\n" ), Main::Task );
+    m.print( StrMsg + this->tr( "loading tasks from database\n" ), Main::TaskDebug );
 
     // read stuff
     if ( import )
@@ -114,7 +116,7 @@ void Main::loadTasks( bool import, bool store ) {
 
     // store entries
     while ( query.next()) {
-        TaskEntry *taskPtr = new TaskEntry( query.record(), "tasks" );
+        Task *taskPtr = new Task( query.record(), "tasks" );
 
         // since we're just checking hash and not adding any new tasks on import
         // there is no need for reindexing
@@ -130,10 +132,10 @@ void Main::loadTasks( bool import, bool store ) {
         bool duplicate = false;
 
         // check for duplicates
-        foreach ( TaskEntry *importedTaskPtr, this->import.taskList ) {
+        foreach ( Task *importedTaskPtr, this->import.taskList ) {
             duplicate = false;
 
-            foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+            foreach ( Task *taskPtr, this->base.taskList ) {
                 // there's a match
                 if ( !QString::compare( taskPtr->name(), importedTaskPtr->name())) {
                     // first time import, just append imported
@@ -157,28 +159,28 @@ void Main::loadTasks( bool import, bool store ) {
     }
 }
 
-/*
-================
-taskForId
-================
-*/
-TaskEntry *Main::taskForId( int id ) {
+/**
+ * @brief Main::taskForId
+ * @param id
+ * @return
+ */
+Task *Main::taskForId( int id ) {
     // search current event ONLY
-    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList /*this->base.taskList*/ ) {
+    foreach ( Task *taskPtr, m.currentEvent()->taskList /*this->base.taskList*/ ) {
         if ( taskPtr->id() == id )
             return taskPtr;
     }
     return NULL;
 }
 
-/*
-================
-taskForName
-================
-*/
-TaskEntry *Main::taskForName( const QString &name ) {
+/**
+ * @brief Main::taskForName
+ * @param name
+ * @return
+ */
+Task *Main::taskForName( const QString &name ) {
     // search current event ONLY
-    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList/* this->base.taskList*/ ) {
+    foreach ( Task *taskPtr, m.currentEvent()->taskList/* this->base.taskList*/ ) {
         if ( !QString::compare( name, taskPtr->name()))
             return taskPtr;
     }

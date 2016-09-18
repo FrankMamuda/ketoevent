@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -26,11 +24,12 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "gui_rankings.h"
 #include "main.h"
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief SettingsVariable::SettingsVariable
+ * @param key
+ * @param bType
+ * @param varClass
+ */
 SettingsVariable::SettingsVariable( const QString &key, SettingsVariable::Types bType, SettingsVariable::Class varClass ) {
     // set data and type
     this->setType( bType );
@@ -38,11 +37,11 @@ SettingsVariable::SettingsVariable( const QString &key, SettingsVariable::Types 
     this->setKey( key );
 }
 
-/*
-================
-bind
-================
-*/
+/**
+ * @brief SettingsVariable::bind
+ * @param objPtr
+ * @param parentPtr
+ */
 void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
@@ -96,11 +95,9 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     this->setState();
 }
 
-/*
-================
-unbind
-================
-*/
+/**
+ * @brief SettingsVariable::unbind
+ */
 void SettingsVariable::unbind() {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
@@ -145,11 +142,9 @@ void SettingsVariable::unbind() {
     this->setParent( NULL );
 }
 
-/*
-================
-setState
-================
-*/
+/**
+ * @brief SettingsVariable::setState
+ */
 void SettingsVariable::setState() {
     QSpinBox *sPtr;
     QCheckBox *cPtr;
@@ -243,11 +238,10 @@ void SettingsVariable::setState() {
     }
 }
 
-/*
-================
-stateChanged
-================
-*/
+/**
+ * @brief SettingsVariable::stateChanged
+ * @param state
+ */
 void SettingsVariable::stateChanged( int state ) {
     Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
 
@@ -270,11 +264,10 @@ void SettingsVariable::stateChanged( int state ) {
     }
 }
 
-/*
-================
-toggled
-================
-*/
+/**
+ * @brief SettingsVariable::toggled
+ * @param state
+ */
 void SettingsVariable::toggled( bool state ) {
     Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
@@ -297,11 +290,10 @@ void SettingsVariable::toggled( bool state ) {
     }
 }
 
-/*
-================
-integerValueChanged
-================
-*/
+/**
+ * @brief SettingsVariable::integerValueChanged
+ * @param integer
+ */
 void SettingsVariable::integerValueChanged( int integer ) {
     Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
@@ -317,11 +309,10 @@ void SettingsVariable::integerValueChanged( int integer ) {
         m.currentEvent()->setValue( this->key(), integer );
 }
 
-/*
-================
-timeChanged
-================
-*/
+/**
+ * @brief SettingsVariable::timeChanged
+ * @param time
+ */
 void SettingsVariable::timeChanged( const QTime &time ) {
     Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 
@@ -337,11 +328,10 @@ void SettingsVariable::timeChanged( const QTime &time ) {
         m.currentEvent()->setValue( this->key(), time.toString( "hh:mm" ));
 }
 
-/*
-================
-textChanged
-================
-*/
+/**
+ * @brief SettingsVariable::textChanged
+ * @param text
+ */
 void SettingsVariable::textChanged( const QString &text ) {
     Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
 

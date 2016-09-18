@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 #ifndef LOGENTRY_H
 #define LOGENTRY_H
@@ -26,10 +24,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "databaseentry.h"
 
-//
-// class: LogEntry
-//
-class LogEntry : public DatabaseEntry {
+/**
+ * @brief The Log class
+ */
+class Log : public DatabaseEntry {
     Q_OBJECT
     Q_PROPERTY( int value READ value WRITE setValue )
     Q_PROPERTY( int check READ check )
@@ -40,7 +38,7 @@ class LogEntry : public DatabaseEntry {
     Q_CLASSINFO( "description", "Log SQL Entry" )
 
 public:
-    LogEntry( const QSqlRecord &record, const QString &table );
+    Log( const QSqlRecord &record, const QString &table );
     int value() const { return this->record().value( "value" ).toInt(); }
     bool check() const { return static_cast<bool>( this->value()); }
     int points() const;

@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -25,20 +23,20 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "ui_gui_combos.h"
 #include "gui_main.h"
 
-/*
-================
-listByCombos
-================
-*/
-static bool listByCombos( LogEntry *lPtr0, LogEntry *lPtr1 ) {
+/**
+ * @brief listByCombos
+ * @param lPtr0
+ * @param lPtr1
+ * @return
+ */
+static bool listByCombos( Log *lPtr0, Log *lPtr1 ) {
     return lPtr0->comboId() < lPtr1->comboId();
 }
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Combos::Gui_Combos
+ * @param parent
+ */
 Gui_Combos::Gui_Combos( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_Combos ) {
     ui->setupUi( this );
 
@@ -53,11 +51,9 @@ Gui_Combos::Gui_Combos( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui_C
     this->fillTeams();
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Combos::~Gui_Combos
+ */
 Gui_Combos::~Gui_Combos() {
     // clean up
     this->logListSorted.clear();
@@ -66,13 +62,12 @@ Gui_Combos::~Gui_Combos() {
     delete ui;
 }
 
-/*
-================
-currentTeamIndexChanged
-================
-*/
+/**
+ * @brief Gui_Combos::currentTeamIndexChanged
+ * @param index
+ */
 void Gui_Combos::currentTeamIndexChanged( int index ) {
-    TeamEntry *teamPtr;
+    Team *teamPtr;
 
     // abort on invalid indexes
     if ( index == -1 )
@@ -91,7 +86,7 @@ void Gui_Combos::currentTeamIndexChanged( int index ) {
     this->logListSorted = teamPtr->logList;
     qSort( this->logListSorted.begin(), this->logListSorted.end(), listByCombos );
 
-    foreach ( LogEntry *logPtr, this->logListSorted ) {
+    foreach ( Log *logPtr, this->logListSorted ) {
         if ( logPtr->comboId() == -1 )
             this->logListSorted.removeOne( logPtr );
     }
@@ -104,17 +99,15 @@ void Gui_Combos::currentTeamIndexChanged( int index ) {
     this->comboModelPtr->endReset();
 }
 
-/*
-================
-fillTeams
-================
-*/
+/**
+ * @brief Gui_Combos::fillTeams
+ */
 void Gui_Combos::fillTeams() {
     // clear list
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList )
+    foreach ( Team *teamPtr, m.currentEvent()->teamList )
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
     // set to current team
@@ -125,11 +118,9 @@ void Gui_Combos::fillTeams() {
     this->ui->comboTeams->setCurrentIndex( mPtr->currentTeamIndex());
 }
 
-/*
-================
-buttonClose->clicked
-================
-*/
+/**
+ * @brief Gui_Combos::on_buttonClose_clicked
+ */
 void Gui_Combos::on_buttonClose_clicked() {
     this->accept();
 }

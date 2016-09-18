@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -28,12 +26,11 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QPainter>
 #include "gui_description.h"
 
-/*
-================
-construct
-================
-*/
-TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
+/**
+ * @brief TaskWidget::TaskWidget
+ * @param parentPtr
+ */
+TaskWidget::TaskWidget( Task *parentPtr ) {
     QFont font;
 
     // reset widgets
@@ -83,10 +80,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     font = this->taskName->font();
 
     // set appropriate font
-    if ( this->task()->style() == TaskEntry::Italic ) {
+    if ( this->task()->style() == Task::Italic ) {
         font.setItalic( true );
         this->taskName->setFont( font );
-    } else if ( this->task()->style() == TaskEntry::Bold ) {
+    } else if ( this->task()->style() == Task::Bold ) {
         font.setBold( true );
     }
 
@@ -95,7 +92,7 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->taskName->setToolTip( this->task()->description());
 
     // determine type
-    if ( this->task()->type() == TaskEntry::Check ) {
+    if ( this->task()->type() == Task::Check ) {
         this->check = new QCheckBox();
         this->check->setMaximumWidth( 48 );
         this->check->setGeometry( this->check->x(), this->check->y(), this->check->width(), this->check->height() * 2 );
@@ -107,11 +104,11 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
         // set tooltips
         //this->taskName->setToolTip( this->tr( "%1 points, click checkbox to enable/disable" ).arg( this->task()->points()));
         this->check->setToolTip( this->tr( "Toggle task completion" ));
-    } else if ( this->task()->type() == TaskEntry::Multi ) {
+    } else if ( this->task()->type() == Task::Multi ) {
         this->multi = new QSpinBox();
         this->multi->setMaximumWidth( 64 );
 
-        if ( this->task()->type() == TaskEntry::Multi )
+        if ( this->task()->type() == Task::Multi )
             this->multi->setMaximum( this->task()->multi());
 
         this->connect( this->multi, SIGNAL( valueChanged( int )), this, SLOT( saveLog()));
@@ -142,11 +139,10 @@ TaskWidget::TaskWidget( TaskEntry *parentPtr ) {
     this->connect( this->combo, SIGNAL( toggled( bool )), this, SLOT( toggleCombo( bool )));
 }
 
-/*
-================
-toggleViewState
-================
-*/
+/**
+ * @brief TaskWidget::toggleViewState
+ * @param state
+ */
 void TaskWidget::toggleViewState( ViewState state ) {
     // failsafe
     if ( !this->hasTask()) {
@@ -155,16 +151,16 @@ void TaskWidget::toggleViewState( ViewState state ) {
     }
 
     switch ( state ) {
-    case Log:
+    case LogView:
         this->taskLayout->removeWidget( this->combo );
         this->combo->setParent( NULL );
 #ifdef UI_INFO_BUTTON_ENABLED
         if ( !this->task()->description().isEmpty())
             this->taskLayout->addWidget( this->info );
 #endif
-        if ( this->task()->type() == TaskEntry::Check ) {
+        if ( this->task()->type() == Task::Check ) {
             this->taskLayout->addWidget( this->check );
-        } else if ( this->task()->type() == TaskEntry::Multi ) {
+        } else if ( this->task()->type() == Task::Multi ) {
             this->taskLayout->addWidget( this->multi );
         }
         break;
@@ -176,10 +172,10 @@ void TaskWidget::toggleViewState( ViewState state ) {
             this->info->setParent( NULL );
         }
 #endif
-        if ( this->task()->type() == TaskEntry::Check ) {
+        if ( this->task()->type() == Task::Check ) {
             this->taskLayout->removeWidget( this->check );
             this->check->setParent( NULL );
-        } else if ( this->task()->type() == TaskEntry::Multi ) {
+        } else if ( this->task()->type() == Task::Multi ) {
             this->taskLayout->removeWidget( this->multi );
             this->multi->setParent( NULL );
         }
@@ -193,11 +189,9 @@ void TaskWidget::toggleViewState( ViewState state ) {
     }
 }
 
-/*
-================
-saveLog
-================
-*/
+/**
+ * @brief TaskWidget::saveLog
+ */
 void TaskWidget::saveLog() {
     int value = 0;
 
@@ -211,12 +205,12 @@ void TaskWidget::saveLog() {
     }
 
     // determine type
-    if ( this->task()->type() == TaskEntry::Check ) {
+    if ( this->task()->type() == Task::Check ) {
         if ( this->check->checkState() == Qt::Checked )
             value = true;
         else
             value = false;
-    } else if ( this->task()->type() == TaskEntry::Multi ) {
+    } else if ( this->task()->type() == Task::Multi ) {
         value = this->multi->value();
     } else {
         m.error( StrFatalError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
@@ -231,12 +225,12 @@ void TaskWidget::saveLog() {
         // remove orphaned combos
         int count = 0;
         int badId = this->log()->comboId();
-        foreach ( LogEntry *logPtr, m.base.logList ) {
+        foreach ( Log *logPtr, m.base.logList ) {
             if ( logPtr->comboId() == badId )
                 count++;
         }
         if ( count == 2 ) {
-            foreach ( LogEntry *logPtr, m.base.logList ) {
+            foreach ( Log *logPtr, m.base.logList ) {
                 if ( logPtr->comboId() == badId )
                     logPtr->setComboId( -1 );
             }
@@ -253,7 +247,7 @@ void TaskWidget::saveLog() {
     if ( !this->hasLog()) {
         // check for local logs
         // set log
-        LogEntry *logPtr = m.logForIds( this->team()->id(), this->task()->id());
+        Log *logPtr = m.logForIds( this->team()->id(), this->task()->id());
         if ( logPtr != NULL ) {
             this->setLog( logPtr, false );
         } else {
@@ -267,10 +261,8 @@ void TaskWidget::saveLog() {
     this->log()->setValue( value );
 
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
-    if ( gui != NULL ) {
+    if ( gui != NULL )
         gui->taskIndexChanged( -1 );
-        gui->updateStatusBar();
-    }
 
     // changes made - must recalculate combos
     this->team()->setCombosCalculated( false );
@@ -281,11 +273,9 @@ void TaskWidget::saveLog() {
         this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief TaskWidget::~TaskWidget
+ */
 TaskWidget::~TaskWidget() {
     // failsafe
     if ( !this->hasTask()) {
@@ -294,10 +284,10 @@ TaskWidget::~TaskWidget() {
     }
 
     // disconnect buttons and spinboxes
-    if ( this->task()->type() == TaskEntry::Check && this->check != NULL ) {
+    if ( this->task()->type() == Task::Check && this->check != NULL ) {
         this->disconnect( this->check, SIGNAL( clicked()));
         delete this->check;
-    } else if ( this->task()->type() == TaskEntry::Multi && this->multi != NULL ) {
+    } else if ( this->task()->type() == Task::Multi && this->multi != NULL ) {
         this->disconnect( this->multi, SIGNAL( valueChanged( int )));
         delete this->multi;
     }
@@ -321,12 +311,12 @@ TaskWidget::~TaskWidget() {
         delete this->taskLayout;
 }
 
-/*
-================
-setLog
-================
-*/
-void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
+/**
+ * @brief TaskWidget::setLog
+ * @param logPtr
+ * @param fromDatabase
+ */
+void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
     this->m_log = logPtr;
 
     // failsafe
@@ -347,7 +337,7 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         return;
     }
 
-    TaskEntry *taskPtr = m.taskForId( logPtr->taskId());
+    Task *taskPtr = m.taskForId( logPtr->taskId());
     if ( taskPtr == NULL )
         return;
 
@@ -366,9 +356,9 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         return;
 
     // set values
-    if ( this->task()->type() == TaskEntry::Check )
+    if ( this->task()->type() == Task::Check )
         this->check->setChecked( this->log()->check());
-    else if ( this->task()->type() == TaskEntry::Multi )
+    else if ( this->task()->type() == Task::Multi )
         this->multi->setValue( this->log()->value());
 
     if ( this->log()->value() > 0 && m.cvar( "misc/hilightLogged" )->isEnabled())
@@ -377,18 +367,19 @@ void TaskWidget::setLog( LogEntry *logPtr, bool fromDatabase ) {
         this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
-/*
-================
-getRelativeComboId
-================
-*/
+/**
+ * @brief TaskWidget::getRelativeComboId
+ * @param comboId
+ * @param teamId
+ * @return
+ */
 int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
-    TeamEntry *teamPtr = m.teamForId( teamId );
+    Team *teamPtr = m.teamForId( teamId );
     if ( teamPtr == NULL )
         return -1;
 
     QList <int>combos;
-    foreach ( LogEntry *logPtr, teamPtr->logList ) {
+    foreach ( Log *logPtr, teamPtr->logList ) {
         int id = logPtr->comboId();
 
         if ( id == -1 )
@@ -400,11 +391,9 @@ int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
     return combos.indexOf( comboId ) + 1;
 }
 
-/*
-================
-comboIdChanged
-================
-*/
+/**
+ * @brief TaskWidget::comboIdChanged
+ */
 void TaskWidget::comboIdChanged() {
     if ( this->hasTeam() && this->hasCombo()) {
         QPixmap px( ":/icons/combo.png" );
@@ -420,11 +409,9 @@ void TaskWidget::comboIdChanged() {
         this->comboIcon->setPixmap( QPixmap());
 }
 
-/*
-================
-resetLog
-================
-*/
+/**
+ * @brief TaskWidget::resetLog
+ */
 void TaskWidget::resetLog() {
     this->m_log = NULL;
 
@@ -435,18 +422,17 @@ void TaskWidget::resetLog() {
     }
 
     // reset values
-    if ( this->task()->type() == TaskEntry::Check )
+    if ( this->task()->type() == Task::Check )
         this->check->setChecked( false );
-    if ( this->task()->type() == TaskEntry::Multi )
+    if ( this->task()->type() == Task::Multi )
         this->multi->setValue( 0 );
 }
 
-/*
-================
-setTeam
-================
-*/
-void TaskWidget::setTeam( TeamEntry *teamPtr ) {
+/**
+ * @brief TaskWidget::setTeam
+ * @param teamPtr
+ */
+void TaskWidget::setTeam( Team *teamPtr ) {
     this->m_team = teamPtr;
 
     // failsafe
@@ -456,8 +442,8 @@ void TaskWidget::setTeam( TeamEntry *teamPtr ) {
     }
 
     // find appropriate log
-    foreach ( LogEntry *logPtr, teamPtr->logList ) {
-        TaskEntry *taskPtr = m.taskForId( logPtr->taskId());
+    foreach ( Log *logPtr, teamPtr->logList ) {
+        Task *taskPtr = m.taskForId( logPtr->taskId());
 
         if ( taskPtr == NULL )
             continue;
@@ -472,11 +458,9 @@ void TaskWidget::setTeam( TeamEntry *teamPtr ) {
     this->setActive();
 }
 
-/*
-================
-resetTeam
-================
-*/
+/**
+ * @brief TaskWidget::resetTeam
+ */
 void TaskWidget::resetTeam() {
     this->m_team = NULL;
     this->setActive( false );
@@ -486,11 +470,10 @@ void TaskWidget::resetTeam() {
     this->taskName->setForegroundRole( QPalette::NoRole );
 }
 
-/*
-================
-toggleCombo
-================
-*/
+/**
+ * @brief TaskWidget::toggleCombo
+ * @param checked
+ */
 void TaskWidget::toggleCombo( bool checked ) {    
     Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
     if ( gui == NULL )
@@ -527,12 +510,10 @@ void TaskWidget::toggleCombo( bool checked ) {
     }
 }
 
-/*
-================
-toggleCombo
-================
-*/
 #ifdef UI_INFO_BUTTON_ENABLED
+/**
+ * @brief TaskWidget::displayInfo
+ */
 void TaskWidget::displayInfo() {
     Gui_Description desc( this->task(), this );
     desc.exec();

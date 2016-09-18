@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // event.cpp (main.cpp is too crowded)
@@ -30,17 +28,16 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlError>
 #include <QFile>
 
-/*
-================
-addEvent
-================
-*/
+/**
+ * @brief Main::addEvent adds a new event
+ * @param title event title
+ */
 void Main::addEvent( const QString &title ) {
     QSqlQuery query;
     QString eventTitle;
 
     // announce
-    m.print( StrMsg + this->tr( "adding a new event - '%1'\n" ).arg( title ), Main::Event );
+    m.print( StrMsg + this->tr( "adding a new event - '%1'\n" ).arg( title ), Main::EventDebug );
 
     // copy title
     eventTitle = title;
@@ -97,21 +94,22 @@ void Main::addEvent( const QString &title ) {
 
     // get last sql entry and construct internal entry
     while ( query.next()) {
-        this->base.eventList << new EventEntry( query.record(), "events" );
+        this->base.eventList << new Event( query.record(), "events" );
         break;
     }
 }
 
-/*
-================
-loadEvents
-================
-*/
+/**
+ * @brief Main::loadEvents loads events from database
+ * @param import import toggle
+ * @return success
+ */
 bool Main::loadEvents( bool import ) {
     QSqlQuery query;
+    //int numEvents;
 
     // announce
-    m.print( StrMsg + this->tr( "loading events from database\n" ), Main::Event );
+    m.print( StrMsg + this->tr( "loading events from database\n" ), Main::EventDebug );
 
     // read all event entries
     if ( import )
@@ -121,7 +119,7 @@ bool Main::loadEvents( bool import ) {
 
     // store entries
     while ( query.next()) {
-        EventEntry *eventPtr = new EventEntry( query.record(), "events" );
+        Event *eventPtr = new Event( query.record(), "events" );
 
         if ( import ) {
             eventPtr->setImported();
@@ -147,7 +145,13 @@ bool Main::loadEvents( bool import ) {
             this->loadDatabase();
             return false;
         }
+        //numEvents++;
     }
+
+    //if ( !numEvents ) {
+    //    this->error( StrSoftError, this->tr( "No events found. Must be a pre 2015 database, aborting\n" ));
+    //    return false;
+    //}
 
     if ( !import ) {
         // no event entry? - create one
@@ -159,10 +163,9 @@ bool Main::loadEvents( bool import ) {
             this->error( StrFatalError, this->tr( "could not create event\n" ));
         }
 
-
         // fixes crash on empty database
         // NOTE: rather ugly code
-        EventEntry *eventPtr = this->eventForId( this->cvar( "currentEvent" )->integer());
+        Event *eventPtr = this->eventForId( this->cvar( "currentEvent" )->integer());
         if ( eventPtr == NULL )
             eventPtr = this->base.eventList.first();
 
@@ -174,28 +177,27 @@ bool Main::loadEvents( bool import ) {
     return true;
 }
 
-/*
-================
-currentEvent
-================
-*/
-EventEntry *Main::currentEvent() {
+/**
+ * @brief Main::currentEvent returns currently active event
+ * @return current event entry
+ */
+Event *Main::currentEvent() {
     if ( m_event == NULL )
         this->error( StrFatalError, this->tr( "no valid events\n" ));
 
     return this->m_event;
 }
 
-/*
-================
-setCurrentEvent
-================
-*/
-bool Main::setCurrentEvent( EventEntry *eventPtr ) {
+/**
+ * @brief Main::setCurrentEvent sets active event
+ * @param eventPtr event entry
+ * @return success
+ */
+bool Main::setCurrentEvent( Event *eventPtr ) {
     // announce
-    m.print( StrMsg + this->tr( "setting '%1' as current event\n" ).arg( eventPtr->name()), Main::Event );
+    m.print( StrMsg + this->tr( "setting '%1' as current event\n" ).arg( eventPtr->name()), Main::EventDebug );
 
-    foreach ( EventEntry *entry, this->base.eventList ) {
+    foreach ( Event *entry, this->base.eventList ) {
         if ( entry == eventPtr ) {
             this->m_event = entry;
             this->cvar( "currentEvent" )->setValue( eventPtr->id());
@@ -205,13 +207,13 @@ bool Main::setCurrentEvent( EventEntry *eventPtr ) {
     return false;
 }
 
-/*
-================
-eventForId
-================
-*/
-EventEntry *Main::eventForId( int id ) {
-    foreach ( EventEntry *eventPtr, this->base.eventList ) {
+/**
+ * @brief Main::eventForId returns event entry for given id
+ * @param id event id
+ * @return event entry
+ */
+Event *Main::eventForId( int id ) {
+    foreach ( Event *eventPtr, this->base.eventList ) {
         if ( eventPtr->id() == id )
             return eventPtr;
     }
@@ -219,25 +221,23 @@ EventEntry *Main::eventForId( int id ) {
     return NULL;
 }
 
-/*
-================
-buildEventTTList
-================
-*/
+/**
+ * @brief Main::buildEventTTList builds event task and team list
+ */
 void Main::buildEventTTList() {
     // announce
-    m.print( StrMsg + this->tr( "building event TTList\n" ), Main::Event );
+    m.print( StrMsg + this->tr( "building event TTList\n" ), Main::EventDebug );
 
-    foreach ( EventEntry *eventPtr, this->base.eventList ) {
+    foreach ( Event *eventPtr, this->base.eventList ) {
         eventPtr->teamList.clear();
         eventPtr->taskList.clear();
 
-        foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+        foreach ( Team *teamPtr, this->base.teamList ) {
             if ( teamPtr->eventId() == eventPtr->id())
                 eventPtr->teamList << teamPtr;
         }
 
-        foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+        foreach ( Task *taskPtr, this->base.taskList ) {
             if ( taskPtr->eventId() == eventPtr->id())
                 eventPtr->taskList << taskPtr;
         }

@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -33,11 +31,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <unistd.h>
 #endif
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Main::Gui_Main
+ * @param parent
+ */
 Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_Main ) {
     ui->setupUi( this );
     this->setCurrentComboIndex();
@@ -46,11 +43,10 @@ Gui_Main::Gui_Main( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Gui_M
     this->ui->toolBar->removeAction( this->ui->actionSort );
 }
 
-/*
-================
-initialise
-================
-*/
+/**
+ * @brief Gui_Main::initialise
+ * @param reload
+ */
 void Gui_Main::initialise( bool reload ) {
     // disable actions on partial initialisation (debug)
     if ( !m.isInitialised()) {
@@ -120,11 +116,9 @@ void Gui_Main::initialise( bool reload ) {
     this->ui->toolBar->addAction( this->ui->actionLogTime );
 }
 
-/*
-============
-setEventTitle
-============
-*/
+/**
+ * @brief Gui_Main::setEventTitle
+ */
 void Gui_Main::setEventTitle() {
     QString reviewer;
 
@@ -143,11 +137,9 @@ void Gui_Main::setEventTitle() {
         this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( m.currentEvent()->name()));
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Main::~Gui_Main
+ */
 Gui_Main::~Gui_Main() {
     // disconnect ui elements
     this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
@@ -166,19 +158,18 @@ Gui_Main::~Gui_Main() {
     delete ui;
 }
 
-/*
-================
-teamIndexChanged
-================
-*/
+/**
+ * @brief Gui_Main::teamIndexChanged
+ * @param index
+ */
 void Gui_Main::teamIndexChanged( int index ) {
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( index ).toInt());
+    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( index ).toInt());
     QListWidget *lw = this->ui->taskList;
     int y;
 
     // recalculate last team if required
     if ( this->currentTeamId() != -1 ) {
-        TeamEntry *recalcPtr = m.teamForId( this->currentTeamId());
+        Team *recalcPtr = m.teamForId( this->currentTeamId());
         if ( recalcPtr != NULL ) {
             if ( !recalcPtr->combosCalculated()) {
                 recalcPtr->calculateCombos();
@@ -245,14 +236,10 @@ void Gui_Main::teamIndexChanged( int index ) {
     }
 }
 
-/*
-================
-taskIndexChanged
-
-  checks if selected task/log can be combined and
-  enables/disables the "combine button"
-================
-*/
+/**
+ * @brief Gui_Main::taskIndexChanged checks if selected task/log can be combined and enables/disables the "combine button"
+ * @param row
+ */
 void Gui_Main::taskIndexChanged( int row ) {
     QListWidget *lw = this->ui->taskList;
 
@@ -266,15 +253,15 @@ void Gui_Main::taskIndexChanged( int row ) {
         return;
 
     // should get things going faster
-    if ( taskPtr->task()->type() == TaskEntry::Check )
+    if ( taskPtr->task()->type() == Task::Check )
         taskPtr->check->setFocus();
-    else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+    else if ( taskPtr->task()->type() == Task::Multi ) {
         taskPtr->multi->setFocus();
         taskPtr->multi->selectAll();
     }
 
     // get log
-    LogEntry *lPtr = taskPtr->log();
+    Log *lPtr = taskPtr->log();
 
     // check for value
     if ( taskPtr->hasLog()) {
@@ -289,13 +276,12 @@ void Gui_Main::taskIndexChanged( int row ) {
     this->ui->actionCombine->setDisabled( true );
 }
 
-/*
-================
-updateFinishTime
-================
-*/
+/**
+ * @brief Gui_Main::updateFinishTime
+ * @param time
+ */
 void Gui_Main::updateFinishTime( QTime time ) {
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
     if ( teamPtr != NULL ) {
         if ( time == teamPtr->finishTime())
             return;
@@ -304,11 +290,10 @@ void Gui_Main::updateFinishTime( QTime time ) {
     }
 }
 
-/*
-================
-fillTeams
-================
-*/
+/**
+ * @brief Gui_Main::fillTeams
+ * @param forcedId
+ */
 void Gui_Main::fillTeams( int forcedId ) {
     int lastId = forcedId;
 
@@ -318,7 +303,7 @@ void Gui_Main::fillTeams( int forcedId ) {
 
     // store last team id
     if ( this->ui->comboTeams->count() && forcedId == -1 ) {
-        TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
         if ( teamPtr != NULL )
             lastId = teamPtr->id();
     }
@@ -327,7 +312,7 @@ void Gui_Main::fillTeams( int forcedId ) {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList ) {
+    foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
         // resore last id if any
@@ -336,11 +321,9 @@ void Gui_Main::fillTeams( int forcedId ) {
     }
 }
 
-/*
-================
-clearTasks
-================
-*/
+/**
+ * @brief Gui_Main::clearTasks
+ */
 void Gui_Main::clearTasks() {
     QListWidget *lw = this->ui->taskList;
 
@@ -360,14 +343,30 @@ void Gui_Main::clearTasks() {
     lw->clear();
 }
 
-/*
-================
-fillTasks
-================
-*/
+/**
+ * @brief Gui_Main::lock
+ */
+void Gui_Main::lock() {
+    this->ui->actionAbout->setDisabled( true );
+    this->ui->actionCombos->setDisabled( true );
+    this->ui->actionEvents->setDisabled( true );
+    this->ui->actionLogTime->setDisabled( true );
+    this->ui->actionRankings->setDisabled( true );
+    this->ui->actionSettings->setDisabled( true );
+    this->ui->actionSort->setDisabled( true );
+    this->ui->actionTasks->setDisabled( true );
+    this->ui->actionTeams->setDisabled( true );
+    this->ui->toolBar->removeAction( this->ui->actionQuickAdd );
+    this->ui->toolBar->removeAction( this->ui->actionLockTeam );
+    this->ui->toolBar->removeAction(  this->ui->actionCombine );
+}
+
+/**
+ * @brief Gui_Main::fillTasks
+ */
 void Gui_Main::fillTasks() {
     QListWidget *lw = this->ui->taskList;
-    QList <TaskEntry*>taskList;
+    QList <Task*>taskList;
 
     // abort if partially initialised
     if ( !m.isInitialised())
@@ -382,7 +381,7 @@ void Gui_Main::fillTasks() {
     else
         taskList = m.currentEvent()->taskList;
 
-    foreach ( TaskEntry *taskPtr, taskList ) {
+    foreach ( Task *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
         lw->addItem( itemPtr );
@@ -398,20 +397,16 @@ void Gui_Main::fillTasks() {
     this->teamIndexChanged( this->ui->comboTeams->currentIndex());
 }
 
-/*
-================
-clearButton->clicked
-================
-*/
+/**
+ * @brief Gui_Main::on_clearButton_clicked
+ */
 void Gui_Main::on_clearButton_clicked() {
     this->ui->findTaskEdit->clear();
 }
 
-/*
-================
-findTaskEdit->textChanged
-================
-*/
+/**
+ * @brief Gui_Main::on_findTaskEdit_textChanged
+ */
 void Gui_Main::on_findTaskEdit_textChanged( const QString & ) {
     if ( this->ui->findTaskEdit->palette().color( QPalette::Base ) == QColor( 255, 0, 0, 64 )) {
         QPalette p( this->ui->findTaskEdit->palette());
@@ -420,11 +415,9 @@ void Gui_Main::on_findTaskEdit_textChanged( const QString & ) {
     }
 }
 
-/*
-================
-findTaskEdit->returnPressed
-================
-*/
+/**
+ * @brief Gui_Main::on_findTaskEdit_returnPressed
+ */
 void Gui_Main::on_findTaskEdit_returnPressed() {
     int y;
     QString matchString;
@@ -486,11 +479,9 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
     }
 }
 
-/*
-================
-actionEvents->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionEvents_triggered
+ */
 void Gui_Main::on_actionEvents_triggered() {
     // store last event id
     this->setLastEventId( m.cvar( "currentEvent" )->integer());
@@ -499,11 +490,10 @@ void Gui_Main::on_actionEvents_triggered() {
     this->eventDialog->show();
 }
 
-/*
-================
-eventDialogClosed
-================
-*/
+/**
+ * @brief Gui_Main::eventDialogClosed
+ * @param signal
+ */
 void Gui_Main::eventDialogClosed( int signal ) {
     int newEventId;
 
@@ -529,11 +519,9 @@ void Gui_Main::eventDialogClosed( int signal ) {
     }
 }
 
-/*
-================
-teamDialogClosed
-================
-*/
+/**
+ * @brief Gui_Main::teamDialogClosed
+ */
 void Gui_Main::teamDialogClosed( int ) {
     if ( this->teamDialog->state() == Gui_Team::AddQuick )
         this->fillTeams( this->teamDialog->lastId());
@@ -541,20 +529,16 @@ void Gui_Main::teamDialogClosed( int ) {
         this->fillTeams();
 }
 
-/*
-================
-taskDialogClosed
-================
-*/
+/**
+ * @brief Gui_Main::taskDialogClosed
+ */
 void Gui_Main::taskDialogClosed( int ) {
     this->fillTasks();
 }
 
-/*
-================
-settingsDialogClosed
-================
-*/
+/**
+ * @brief Gui_Main::settingsDialogClosed
+ */
 void Gui_Main::settingsDialogClosed( int ) {
     this->fillTeams();
     this->fillTasks();
@@ -562,37 +546,19 @@ void Gui_Main::settingsDialogClosed( int ) {
     this->testSortButton();
 }
 
-/*
-================
-actionCombos->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionCombos_triggered
+ */
 void Gui_Main::on_actionCombos_triggered() {
     // construct dialog
     Gui_Combos combos( this );
     combos.exec();
 }
 
-/*
-================
-updateStatusBar
-================
-*/
-void Gui_Main::updateStatusBar() {
-#if 0
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr != NULL )
-        this->statusBar()->showMessage( this->tr( "Tasks - %1, combos - %2 (%3), points - %3" ).arg( teamPtr->logList.count()));
-    else
-        this->statusBar()->clearMessage();
-#endif
-}
-
-/*
-================
-actionConsole->toggled
-================
-*/
+/**
+ * @brief Gui_Main::on_actionConsole_toggled
+ * @param visible
+ */
 void Gui_Main::on_actionConsole_toggled( bool visible ) {
 #ifdef APPLET_DEBUG
     if ( visible )
@@ -604,11 +570,10 @@ void Gui_Main::on_actionConsole_toggled( bool visible ) {
 #endif
 }
 
-/*
-================
-currentTeamId
-================
-*/
+/**
+ * @brief Gui_Main::currentTeamId
+ * @return
+ */
 int Gui_Main::currentTeamId() {
     if ( this->currentTeamIndex() == -1 )
         return -1;
@@ -616,20 +581,16 @@ int Gui_Main::currentTeamId() {
     return this->ui->comboTeams->itemData( this->currentTeamIndex()).toInt();
 }
 
-/*
-================
-actionSettings->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionSettings_triggered
+ */
 void Gui_Main::on_actionSettings_triggered() {
     this->settingsDialog->show();
 }
 
-/*
-================
-testSortButton
-================
-*/
+/**
+ * @brief Gui_Main::testSortButton
+ */
 void Gui_Main::testSortButton() {
     if ( m.cvar( "misc/sortLogged" )->isEnabled())
         this->ui->actionSort->setEnabled( true );
@@ -642,11 +603,12 @@ void Gui_Main::testSortButton() {
 //
 #ifdef APPLET_DEBUG
 
-/*
-================
-irand
-================
-*/
+/**
+ * @brief irand
+ * @param min
+ * @param max
+ * @return
+ */
 static int irand( int min, int max ) {
     qsrand( QTime::currentTime().msec()
 #ifdef Q_OS_UNIX
@@ -662,12 +624,11 @@ static int irand( int min, int max ) {
     return (( rand() % ( max-min + 1 )) + min );
 }
 
-/*
-================
-testTeam
-================
-*/
-void Gui_Main::testTeam( TeamEntry *teamPtr ) {
+/**
+ * @brief Gui_Main::testTeam
+ * @param teamPtr
+ */
+void Gui_Main::testTeam( Team *teamPtr ) {
     int shouldBe = 0;
     int rand = 0;
     QListWidget *lw = this->ui->taskList;
@@ -682,14 +643,14 @@ void Gui_Main::testTeam( TeamEntry *teamPtr ) {
         if ( taskPtr == NULL )
             continue;
 
-        if ( taskPtr->task()->type() == TaskEntry::Check ) {
+        if ( taskPtr->task()->type() == Task::Check ) {
             rand = irand( 0, 1 );
 
             if ( rand ) {
                 taskPtr->check->setChecked( static_cast<bool>( rand ));
                 shouldBe += taskPtr->task()->points();
             }
-        } else if ( taskPtr->task()->type() == TaskEntry::Multi ) {
+        } else if ( taskPtr->task()->type() == Task::Multi ) {
             rand = irand( 0, taskPtr->task()->multi());
 
             if ( rand ) {
@@ -707,20 +668,17 @@ void Gui_Main::testTeam( TeamEntry *teamPtr ) {
     m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
 }
 
-/*
-================
-stressTest
-
- TODO: add combos?
-================
-*/
+/**
+ * @brief Gui_Main::stressTest
+ * @param numTeams
+ */
 void Gui_Main::stressTest( int numTeams ) {
-    TeamEntry *teamPtr;
+    Team *teamPtr;
     int k;
 
     // clear command has been given
     if ( numTeams == -1 ) {
-        foreach ( TeamEntry *teamPtr, m.base.teamList ) {
+        foreach ( Team *teamPtr, m.base.teamList ) {
             if ( teamPtr->name().startsWith( "Stress test" ))
                 m.removeTeam( teamPtr->name());
         }
@@ -732,7 +690,7 @@ void Gui_Main::stressTest( int numTeams ) {
         else
             m.print( this->tr( "No teams to perform stress test on" ), Main::System );
 
-        foreach ( TeamEntry *teamPtr, m.currentEvent()->teamList )
+        foreach ( Team *teamPtr, m.currentEvent()->teamList )
             this->testTeam( teamPtr );
         return;
     }
@@ -763,23 +721,20 @@ void Gui_Main::stressTest( int numTeams ) {
 }
 #endif
 
-/*
-================
-actionLogTime->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionLogTime_triggered
+ */
 void Gui_Main::on_actionLogTime_triggered() {
     this->ui->timeFinish->setTime( QTime::currentTime());
 }
 
-/*
-================
-actionCombine->toggled
-================
-*/
+/**
+ * @brief Gui_Main::on_actionCombine_toggled
+ * @param checked
+ */
 void Gui_Main::on_actionCombine_toggled( bool checked ) {
     QListWidget *lw;
-    TeamEntry *teamPtr;
+    Team *teamPtr;
     TaskWidget *tw;
     QList<int> indexList;
     bool valueSet;
@@ -799,7 +754,7 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
 
     // check if any reason to combine (>= logged tasks & active task is logged)
     if ( checked ) {
-        LogEntry *logPtr = NULL;
+        Log *logPtr = NULL;
 
         // check if the active task is logged
         if ( !tw->hasLog()) {
@@ -835,7 +790,6 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
                 return;
             }
         }
-
     }
 
     int count = 0;
@@ -853,7 +807,7 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
         valueSet = true;
 
         // get log
-        LogEntry *lPtr = taskPtr->log();
+        Log *lPtr = taskPtr->log();
         // check for value
         if ( lPtr == NULL )
             valueSet = false;
@@ -898,7 +852,7 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
                     continue;
 
                 // get log
-                LogEntry *lPtr = taskPtr->log();
+                Log *lPtr = taskPtr->log();
                 // check for value
                 if ( lPtr == NULL )
                     continue;
@@ -915,7 +869,15 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
 
     // remove items that cannot be combined
     for ( y = 0; y < indexList.count(); y++ ) {
-        lw->takeItem( indexList.at( y ) - k );
+        QListWidgetItem *item = lw->takeItem( indexList.at( y ) - k );
+
+        // delete the unused item
+        delete item;
+
+#ifdef APPLET_DEBUG
+        m.dealloc +=2;
+#endif
+
         k++;
     }
 
@@ -930,32 +892,26 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
     }
 }
 
-/*
-================
-actionQuickAdd->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionQuickAdd_triggered
+ */
 void Gui_Main::on_actionQuickAdd_triggered() {
     this->teamDialog->toggleAddEditWidget( Gui_Team::AddQuick );
     this->teamDialog->show();
 }
 
-/*
-================
-actionSort->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionSort_triggered
+ */
 void Gui_Main::on_actionSort_triggered() {
     this->fillTasks();
 }
 
-/*
-================
-actionLockTeam->triggered
-================
-*/
+/**
+ * @brief Gui_Main::on_actionLockTeam_triggered
+ */
 void Gui_Main::on_actionLockTeam_triggered() {
-    TeamEntry *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
     if ( teamPtr == NULL )
         return;
 

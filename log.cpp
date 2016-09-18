@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // log.cpp (main.cpp is too crowded)
@@ -29,17 +27,20 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 
-/*
-================
-addLog
-================
-*/
-LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
-    LogEntry *logPtr = NULL;
+/**
+ * @brief Main::addLog
+ * @param taskId
+ * @param teamId
+ * @param value
+ * @param comboId
+ * @return
+ */
+Log *Main::addLog( int taskId, int teamId, int value, int comboId ) {
+    Log *logPtr = NULL;
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Main::Log );
+    m.print( StrMsg + this->tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Main::LogDebug );
 
     // avoid duplicates
     foreach ( logPtr, this->base.logList ) {
@@ -71,22 +72,22 @@ LogEntry *Main::addLog( int taskId, int teamId, int value, int comboId ) {
 
     // get last entry and construct internal entry
     while ( query.next()) {
-        logPtr = new LogEntry( query.record(), "logs" );
+        logPtr = new Log( query.record(), "logs" );
         this->base.logList << logPtr;
     }
     return logPtr;
 }
 
-/*
-================
-loadLogs
-================
-*/
+/**
+ * @brief Main::loadLogs
+ * @param import
+ * @param store
+ */
 void Main::loadLogs( bool import, bool store ) {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading logs form database\n" ), Main::Log );
+    m.print( StrMsg + this->tr( "loading logs form database\n" ), Main::LogDebug );
 
     // read stuff
     if ( import )
@@ -96,8 +97,8 @@ void Main::loadLogs( bool import, bool store ) {
 
     // store entries
     while ( query.next()) {
-        LogEntry *logPtr = new LogEntry( query.record(), "logs" );
-        TeamEntry *teamPtr = this->teamForId( logPtr->teamId(), import );
+        Log *logPtr = new Log( query.record(), "logs" );
+        Team *teamPtr = this->teamForId( logPtr->teamId(), import );
         if ( teamPtr == NULL )
             return;
 
@@ -114,47 +115,46 @@ void Main::loadLogs( bool import, bool store ) {
     }
 }
 
-/*
-================
-logForId
-================
-*/
-LogEntry *Main::logForId( int id ) {
-    foreach ( LogEntry *logPtr, this->base.logList ) {
+/**
+ * @brief Main::logForId
+ * @param id
+ * @return
+ */
+Log *Main::logForId( int id ) {
+    foreach ( Log *logPtr, this->base.logList ) {
         if ( logPtr->id() == id )
             return logPtr;
     }
     return NULL;
 }
 
-/*
-================
-logForIds
-================
-*/
-LogEntry *Main::logForIds( int teamId, int taskId ) {
-    TeamEntry *teamPtr = this->teamForId( teamId );
+/**
+ * @brief Main::logForIds
+ * @param teamId
+ * @param taskId
+ * @return
+ */
+Log *Main::logForIds( int teamId, int taskId ) {
+    Team *teamPtr = this->teamForId( teamId );
     if ( teamPtr == NULL )
         return NULL;
 
-    foreach ( LogEntry *logPtr, teamPtr->logList ) {
+    foreach ( Log *logPtr, teamPtr->logList ) {
         if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
             return logPtr;
     }
     return NULL;
 }
 
-/*
-================
-removeOrphanedLogs
-================
-*/
+/**
+ * @brief Main::removeOrphanedLogs
+ */
 void Main::removeOrphanedLogs() {
     // create query
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "removing orphaned logs\n" ), Main::Log );
+    m.print( StrMsg + this->tr( "removing orphaned logs\n" ), Main::LogDebug );
 
     // remove orphaned logs (fixes crash with invalid teamId/taskId)
     if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))

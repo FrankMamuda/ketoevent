@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // variable.cpp (main.cpp is too crowded)
@@ -27,11 +25,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 //
 #include "main.h"
 
-/*
-================
-addCvar
-================
-*/
+/**
+ * @brief Main::addCvar
+ * @param varPtr
+ */
 void Main::addCvar( ConsoleVariable *varPtr ) {
     // avoid duplicates
     if ( this->cvar( varPtr->key())) {
@@ -42,20 +39,21 @@ void Main::addCvar( ConsoleVariable *varPtr ) {
     this->cvarList << varPtr;
 }
 
-/*
-================
-addSvar
-================
-*/
+/**
+ * @brief Main::addSvar
+ * @param key
+ * @param type
+ * @param varClass
+ */
 void Main::addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass ) {
     this->svarList << new SettingsVariable( key, type, varClass );
 }
 
-/*
-================
-cvar
-================
-*/
+/**
+ * @brief Main::cvar
+ * @param key
+ * @return
+ */
 ConsoleVariable *Main::cvar( const QString &key ) {
     foreach ( ConsoleVariable *varPtr, this->cvarList ) {
         if ( !QString::compare( varPtr->key(), key ))
@@ -65,11 +63,11 @@ ConsoleVariable *Main::cvar( const QString &key ) {
     return this->defaultCvar;
 }
 
-/*
-================
-svar
-================
-*/
+/**
+ * @brief Main::svar
+ * @param key
+ * @return
+ */
 SettingsVariable *Main::svar( const QString &key ) {
     foreach ( SettingsVariable *varPtr, this->svarList ) {
         if ( !QString::compare( varPtr->key(), key ))

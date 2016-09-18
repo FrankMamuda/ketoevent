@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -29,11 +27,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include "gui_main.h"
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Team::Gui_Team
+ * @param parent
+ */
 Gui_Team::Gui_Team( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Team ) {
     ui->setupUi( this );
 
@@ -58,11 +55,9 @@ Gui_Team::Gui_Team( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Te
     this->ui->closeButton->setFocus();
 }
 
-/*
-================
-enableView
-================
-*/
+/**
+ * @brief Gui_Team::enableView
+ */
 void Gui_Team::enableView() {
     this->ui->actionAdd->setEnabled( true );
     this->ui->actionRemove->setEnabled( true );
@@ -73,22 +68,19 @@ void Gui_Team::enableView() {
     this->ui->closeButton->setDefault( true );
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Team::~Gui_Team
+ */
 Gui_Team::~Gui_Team() {
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
     delete ui;
     delete this->listModelPtr;
 }
 
-/*
-================
-toggleAddEditWidget
-================
-*/
+/**
+ * @brief Gui_Team::toggleAddEditWidget
+ * @param state
+ */
 void Gui_Team::toggleAddEditWidget( AddEditState state ) {
     this->setState( state );
 
@@ -97,7 +89,7 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
         this->ui->teamList->setEnabled( true );
         this->enableView();
     } else {
-        TeamEntry *teamPtr = NULL;
+        Team *teamPtr = NULL;
 
         // disable everything
         this->ui->addEditWidget->show();
@@ -153,13 +145,11 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
     }
 }
 
-/*
-================
-doneButton->clicked
-================
-*/
+/**
+ * @brief Gui_Team::on_doneButton_clicked
+ */
 void Gui_Team::on_doneButton_clicked() {
-    TeamEntry *teamPtr;
+    Team *teamPtr;
     QModelIndex lastIndex;
 
     // failsafe
@@ -211,23 +201,19 @@ void Gui_Team::on_doneButton_clicked() {
     this->ui->teamList->setCurrentIndex( lastIndex );
 }
 
-/*
-================
-reviewerButton->clicked
-================
-*/
+/**
+ * @brief Gui_Team::on_reviewerButton_clicked
+ */
 void Gui_Team::on_reviewerButton_clicked() {
     this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
 }
 
-/*
-================
-actionRemove->triggered
-================
-*/
+/**
+ * @brief Gui_Team::on_actionRemove_triggered
+ */
 void Gui_Team::on_actionRemove_triggered() {
     int state;
-    TeamEntry *teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+    Team *teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
     QSqlQuery query;
 
     if ( teamPtr != NULL ) {
@@ -264,11 +250,10 @@ void Gui_Team::on_actionRemove_triggered() {
     }
 }
 
-/*
-================
-closeEvent
-================
-*/
+/**
+ * @brief Gui_Team::closeEvent
+ * @param ePtr
+ */
 void Gui_Team::closeEvent( QCloseEvent *ePtr ) {
     bool quick = false;
 

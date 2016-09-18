@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -28,11 +26,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include "main.h"
 #include "gui_main.h"
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Settings::Gui_Settings
+ * @param parent
+ */
 Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Settings ) {
     ui->setupUi( this );
 
@@ -42,21 +39,17 @@ Gui_Settings::Gui_Settings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
         this->onRejected();
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Settings::~Gui_Settings
+ */
 Gui_Settings::~Gui_Settings() {
     this->unbindVars();
     delete ui;
 }
 
-/*
-================
-bindVars
-================
-*/
+/**
+ * @brief Gui_Settings::bindVars
+ */
 void Gui_Settings::bindVars() {
     // lock vars
     this->lockVariables();
@@ -73,11 +66,10 @@ void Gui_Settings::bindVars() {
     this->lockVariables( false );
 }
 
-/*
-================
-backupPerform->stateChanged
-================
-*/
+/**
+ * @brief Gui_Settings::on_backupPerform_stateChanged
+ * @param state
+ */
 void Gui_Settings::on_backupPerform_stateChanged( int state ) {
     if ( state == Qt::Checked )
         this->ui->backupChanges->setEnabled( true );
@@ -85,11 +77,9 @@ void Gui_Settings::on_backupPerform_stateChanged( int state ) {
         this->ui->backupChanges->setDisabled( true );
 }
 
-/*
-================
-pathButton->clicked
-================
-*/
+/**
+ * @brief Gui_Settings::on_pathButton_clicked
+ */
 void Gui_Settings::on_pathButton_clicked() {
     Gui_Main *gui;
     QString path, filePath;
@@ -129,11 +119,9 @@ void Gui_Settings::on_pathButton_clicked() {
         gui->initialise( true );
 }
 
-/*
-================
-closeButton->clicked
-================
-*/
+/**
+ * @brief Gui_Settings::on_closeButton_clicked
+ */
 void Gui_Settings::on_closeButton_clicked() {
     this->onAccepted();
 }

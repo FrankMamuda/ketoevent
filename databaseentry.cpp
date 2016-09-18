@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -26,11 +24,9 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlError>
 #include "main.h"
 
-/*
-================
-import
-================
-*/
+/**
+ * @brief DatabaseEntry::store forces database update
+ */
 void DatabaseEntry::store() {
     if ( !this->isImported())
         return;
@@ -39,11 +35,11 @@ void DatabaseEntry::store() {
     query.exec( QString( "insert into %1 select * from merge.%1 where id = %2" ).arg( this->table()).arg( this->id()));
 }
 
-/*
-================
-setValue
-================
-*/
+/**
+ * @brief DatabaseEntry::setValue sets value to database entry
+ * @param name key
+ * @param value value
+ */
 void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
     QSqlQuery query;
     QVariant update;

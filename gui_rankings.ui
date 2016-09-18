@@ -463,6 +463,7 @@
    <addaction name="actionExport"/>
    <addaction name="actionCurrentTeam"/>
    <addaction name="actionRefresh"/>
+   <addaction name="actionNoLogs"/>
   </widget>
   <action name="actionExport">
    <property name="icon">
@@ -492,6 +493,18 @@
    </property>
    <property name="text">
     <string>Refresh data</string>
+   </property>
+  </action>
+  <action name="actionNoLogs">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/tasks.png</normaloff>:/icons/tasks.png</iconset>
+   </property>
+   <property name="text">
+    <string>Unlogged tasks</string>
+   </property>
+   <property name="toolTip">
+    <string>Tasks that have no logs from any team</string>
    </property>
   </action>
  </widget>

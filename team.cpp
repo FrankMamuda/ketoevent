@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // team.cpp (main.cpp is too crowded)
@@ -29,16 +27,19 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QSqlQuery>
 #include <QSqlError>
 
-/*
-================
-addTeam
-================
-*/
+/**
+ * @brief Main::addTeam
+ * @param teamName
+ * @param members
+ * @param finishTime
+ * @param reviewerName
+ * @param lockState
+ */
 void Main::addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Main::Team );
+    m.print( StrMsg + this->tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Main::TeamDebug );
 
     // avoid duplicates
     if ( this->teamForName( teamName ) != NULL )
@@ -72,23 +73,22 @@ void Main::addTeam( const QString &teamName, int members, QTime finishTime, cons
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->base.teamList << new TeamEntry( query.record(), "teams" );
+        this->base.teamList << new Team( query.record(), "teams" );
 
     // add to event
     this->currentEvent()->teamList << this->base.teamList.last();
 }
 
-/*
-================
-removeTeam
-================
-*/
+/**
+ * @brief Main::removeTeam
+ * @param teamName
+ */
 void Main::removeTeam( const QString &teamName ) {
-    TeamEntry *teamPtr = NULL;
+    Team *teamPtr = NULL;
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "removing team '%1'\n" ).arg( teamName ), Main::Team );
+    m.print( StrMsg + this->tr( "removing team '%1'\n" ).arg( teamName ), Main::TeamDebug );
 
     // find team
     teamPtr = this->teamForName( teamName );
@@ -106,16 +106,16 @@ void Main::removeTeam( const QString &teamName ) {
     this->currentEvent()->teamList.removeAll( teamPtr );
 }
 
-/*
-================
-loadTeams
-================
-*/
+/**
+ * @brief Main::loadTeams
+ * @param import
+ * @param store
+ */
 void Main::loadTeams( bool import, bool store ) {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading teams form database\n" ), Main::Team );
+    m.print( StrMsg + this->tr( "loading teams form database\n" ), Main::TeamDebug );
 
     // read stuff
     if ( import )
@@ -125,7 +125,7 @@ void Main::loadTeams( bool import, bool store ) {
 
     // store entries
     while ( query.next()) {
-        TeamEntry *teamPtr = new TeamEntry( query.record(), "teams" );
+        Team *teamPtr = new Team( query.record(), "teams" );
 
         if ( import ) {
             teamPtr->setImported();
@@ -141,10 +141,10 @@ void Main::loadTeams( bool import, bool store ) {
         bool duplicate = false;
 
         // check for duplicates
-        foreach ( TeamEntry *importedTeamPtr, this->import.teamList ) {
+        foreach ( Team *importedTeamPtr, this->import.teamList ) {
             duplicate = false;
 
-            foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+            foreach ( Team *teamPtr, this->base.teamList ) {
                 // there's a match
                 if ( !QString::compare( teamPtr->name(), importedTeamPtr->name())) {
                     // first time import, just append imported
@@ -168,33 +168,34 @@ void Main::loadTeams( bool import, bool store ) {
     }
 }
 
-/*
-================
-teamForId
-================
-*/
-TeamEntry *Main::teamForId( int id, bool import ) {
-    QList <TeamEntry*> teamList;
+/**
+ * @brief Main::teamForId
+ * @param id
+ * @param import
+ * @return
+ */
+Team *Main::teamForId( int id, bool import ) {
+    QList <Team*> teamList;
 
     if ( import )
         teamList = m.import.teamList;
     else
         teamList = m.base.teamList;
 
-    foreach ( TeamEntry *teamPtr, teamList ) {
+    foreach ( Team *teamPtr, teamList ) {
         if ( teamPtr->id() == id )
             return teamPtr;
     }
     return NULL;
 }
 
-/*
-================
-teamForName
-================
-*/
-TeamEntry *Main::teamForName( const QString &name ) {
-    foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+/**
+ * @brief Main::teamForName
+ * @param name
+ * @return
+ */
+Team *Main::teamForName( const QString &name ) {
+    foreach ( Team *teamPtr, this->base.teamList ) {
         if ( !QString::compare( name, teamPtr->name()))
             return teamPtr;
     }

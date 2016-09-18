@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -43,16 +41,22 @@ FUTURE:
 - output verbocity levels per subsystem
 - add compatibility layer for the 2013 event (or just stats)
 - use homedir for mac (if applicable)
+- combos for stressTest
+- gui list of tasks with zero logs
+- richText styling? html?
+- unify task and team dialogs (create superclass - less dup code)
 */
 
-/*
-================
-initialise
-================
-*/
-void Main::initialise( QObject *parent ) {
+/**
+ * @brief Main::initialise
+ * @param parent
+ */
+bool Main::initialise( QObject *parent ) {
     // announce
     m.print( StrMsg + this->tr( "initialising system\n" ), Main::System );
+
+    // set parent
+    this->setParent( parent );
 
     // init counters
     this->changesCounter = 0;
@@ -84,7 +88,8 @@ void Main::initialise( QObject *parent ) {
     this->defaultSvar = new SettingsVariable( "default", SettingsVariable::NoType, SettingsVariable::NoClass );
 
     // load database entries
-    this->loadDatabase();
+    if ( !this->loadDatabase())
+        return false;
 
     // create settings variables
     this->addSvar( "startTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
@@ -105,9 +110,6 @@ void Main::initialise( QObject *parent ) {
     this->addSvar( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
     this->addSvar( "rankings/current", SettingsVariable::Action, SettingsVariable::ConsoleVar );
 
-    // set parent
-    this->setParent( parent );
-
     // init command subsystem
 #ifdef APPLET_DEBUG
     cmd.init();
@@ -116,13 +118,16 @@ void Main::initialise( QObject *parent ) {
 
     // we're up
     this->setInitialised();
+
+    // success
+    return true;
 }
 
-/*
-============
-print
-============
-*/
+/**
+ * @brief Main::print
+ * @param msg
+ * @param debug
+ */
 void Main::print( const QString &msg, DebugLevel debug ) {
     QString out = msg;
 
@@ -149,11 +154,12 @@ void Main::print( const QString &msg, DebugLevel debug ) {
 #endif
 }
 
-/*
-============
-error
-============
-*/
+/**
+ * @brief Main::error
+ * @param type
+ * @param func
+ * @param msg
+ */
 void Main::error( ErrorTypes type, const QString &func, const QString &msg ) {
     Gui_Main *guiPtr;
     guiPtr = qobject_cast<Gui_Main*>( this->parent());
@@ -166,10 +172,30 @@ void Main::error( ErrorTypes type, const QString &func, const QString &msg ) {
     if ( type == FatalError ) {
         this->print( this->tr( "FATAL ERROR: %1" ).arg( func + msg ), System );
 
-        if ( guiPtr != NULL )
-            QMessageBox::critical( guiPtr, "Fatal error", dialogMsg, QMessageBox::Close );
+        if ( guiPtr != NULL ) {
+            guiPtr->lock();
+            QMessageBox msgBox;
+            msgBox.setWindowTitle( this->tr( "Fatal error" ));
+            msgBox.setText( dialogMsg + "\n" + this->tr( "Do you want to reset the database (requires restart)?" ));
+            msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+            msgBox.setIcon( QMessageBox::Critical );
+            int state = msgBox.exec();
 
-        this->shutdown( true );
+            // check options
+            switch ( state ) {
+            case QMessageBox::Yes:
+                m.unloadDatabase();
+                QFile::rename( m.cvar( "databasePath" )->string(), QString( "%1_badDB_%2.db" ).arg( m.cvar( "databasePath" )->string().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                guiPtr->close();
+                break;
+
+            case QMessageBox::No:
+            default:
+                ;
+            }
+        } else {
+            exit( 0 );
+        }
     } else {
         if ( guiPtr != NULL )
             QMessageBox::warning( guiPtr, "Error", dialogMsg, QMessageBox::Close );
@@ -178,67 +204,67 @@ void Main::error( ErrorTypes type, const QString &func, const QString &msg ) {
     }
 }
 
-/*
-================
-shutdown
-
-  garbage collection
-================
-*/
+/**
+ * @brief Main::shutdown perform garbage collection
+ * @param ignoreDatabase
+ */
 void Main::shutdown( bool ignoreDatabase ) {    
     // announce
     m.print( StrMsg + this->tr( "performing shutdown\n" ), Main::System );
 
-    // clear parent
-    this->setParent( NULL );
+    if ( this->isInitialised()) {
+        // clear parent
+        this->setParent( NULL );
 
-    // save settings
-#ifdef APPLET_DEBUG
-    this->console->saveHisotry();
-#endif
-    if ( this->settings != NULL ) {
-        this->settings->sync();
-        delete this->settings;
+        // save settings
+    #ifdef APPLET_DEBUG
+        this->console->saveHisotry();
+    #endif
+        if ( this->settings != NULL ) {
+            this->settings->sync();
+            delete this->settings;
+        }
+
+        // clear entries
+        this->clearEvent();
+
+        // clear console vars
+        foreach ( ConsoleVariable *varPtr, this->cvarList )
+            delete varPtr;
+        this->cvarList.clear();
+        if ( this->defaultCvar != NULL )
+            delete this->defaultCvar;
+
+        // ckear settings vars
+        foreach ( SettingsVariable *varPtr, this->svarList )
+            delete varPtr;
+        this->svarList.clear();
+        if ( this->defaultSvar != NULL )
+            delete this->defaultSvar;
+
+        // close console
+    #ifdef APPLET_DEBUG
+        this->console->close();
+    #endif
+
+        // close database
+        if ( !ignoreDatabase )
+            this->unloadDatabase();
+
+        // reset initialisation state
+        this->setInitialised( false );
+
+        // close applet
+        QApplication::quit();
+    } else {
+        m.unloadDatabase();
+        exit( 0 );
     }
-
-    // clear entries
-    this->clearEvent();
-
-    // clear console vars
-    foreach ( ConsoleVariable *varPtr, this->cvarList )
-        delete varPtr;
-    this->cvarList.clear();
-    if ( this->defaultCvar != NULL )
-        delete this->defaultCvar;
-
-    // ckear settings vars
-    foreach ( SettingsVariable *varPtr, this->svarList )
-        delete varPtr;
-    this->svarList.clear();
-    if ( this->defaultSvar != NULL )
-        delete this->defaultSvar;
-
-    // close console
-#ifdef APPLET_DEBUG
-    this->console->close();
-#endif
-
-    // close database
-    if ( !ignoreDatabase )
-        this->unloadDatabase();
-
-    // reset initialisation state
-    this->setInitialised( false );
-
-    // close applet
-    QApplication::quit();
 }
 
-/*
-================
-writeBackup
-================
-*/
+/**
+ * @brief Main::writeBackup
+ */
 void Main::writeBackup() {
     QString backupPath;
 
@@ -256,11 +282,9 @@ void Main::writeBackup() {
     QFile::copy( this->path, QString( "%1%2_%3.db" ).arg( backupPath ).arg( QFileInfo( this->path ).fileName().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }
 
-/*
-================
-update
-================
-*/
+/**
+ * @brief Main::update
+ */
 void Main::update() {
     this->changesCounter++;
 
@@ -270,12 +294,10 @@ void Main::update() {
     }
 }
 
-/*
-================
-initConsole
-================
-*/
 #ifdef APPLET_DEBUG
+/**
+ * @brief Main::initConsole
+ */
 void Main::initConsole() {
     // announce
     m.print( StrMsg + this->tr( "initilising console\n" ), Main::System );
@@ -288,13 +310,9 @@ void Main::initConsole() {
 }
 #endif
 
-/*
-================
-clearEvent
-
-  garbage collection
-================
-*/
+/**
+ * @brief Main::clearEvent perform garbage collection
+ */
 void Main::clearEvent() {
     // get main screen
     Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
@@ -305,21 +323,21 @@ void Main::clearEvent() {
     gui->clearTasks();
 
     // clear teams (logs should be cleaned automatically on destruct)
-    foreach ( TeamEntry *teamPtr, this->base.teamList ) {
+    foreach ( Team *teamPtr, this->base.teamList ) {
         this->base.teamList.removeOne( teamPtr );
         delete teamPtr;
     }
     this->base.teamList.clear();
 
     // clear events
-    foreach ( EventEntry *eventPtr, this->base.eventList ) {
+    foreach ( Event *eventPtr, this->base.eventList ) {
         this->base.eventList.removeOne( eventPtr );
         delete eventPtr;
     }
     this->base.eventList.clear();
 
     // clear tasks
-    foreach ( TaskEntry *taskPtr, this->base.taskList ) {
+    foreach ( Task *taskPtr, this->base.taskList ) {
         this->base.taskList.removeOne( taskPtr );
         delete taskPtr;
     }
@@ -327,11 +345,12 @@ void Main::clearEvent() {
     //this->taskListSorted().clear();
 }
 
-/*
-================
-entry point
-================
-*/
+/**
+ * @brief main
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main( int argc, char *argv[] ) {
     QApplication app( argc, argv );
 
@@ -368,10 +387,11 @@ int main( int argc, char *argv[] ) {
     gui.show();
 
     // initialise application
-    m.initialise( qobject_cast<QObject*>( &gui ));
+    if ( m.initialise( qobject_cast<QObject*>( &gui ))) {
 
-    // add teams
-    gui.initialise();
+        // add teams
+        gui.initialise();
+    }
 
     // exec app
     return app.exec();

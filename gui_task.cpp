@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // includes
@@ -28,11 +26,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 #include <QMessageBox>
 #include <QSqlQuery>
 
-/*
-================
-construct
-================
-*/
+/**
+ * @brief Gui_Task::Gui_Task
+ * @param parent
+ */
 Gui_Task::Gui_Task( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Task ) {
     ui->setupUi( this );
 
@@ -60,21 +57,18 @@ Gui_Task::Gui_Task( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Ta
     this->ui->closeButton->setFocus();
 }
 
-/*
-================
-destruct
-================
-*/
+/**
+ * @brief Gui_Task::~Gui_Task
+ */
 Gui_Task::~Gui_Task() {
     delete ui;
     delete this->listModelPtr;
 }
 
-/*
-================
-toggleView
-================
-*/
+/**
+ * @brief Gui_Task::toggleView
+ * @param viewState
+ */
 void Gui_Task::toggleView( ViewState viewState ) {
     bool state = false;
 
@@ -95,11 +89,10 @@ void Gui_Task::toggleView( ViewState viewState ) {
     this->ui->taskDescription->setDisabled( state );
 }
 
-/*
-================
-toggleAddEditWidget
-================
-*/
+/**
+ * @brief Gui_Task::toggleAddEditWidget
+ * @param state
+ */
 void Gui_Task::toggleAddEditWidget( AddEditState state ) {
     this->setState( state );
 
@@ -108,13 +101,13 @@ void Gui_Task::toggleAddEditWidget( AddEditState state ) {
         this->ui->taskList->setEnabled( true );
         this->toggleView();
     } else {
-        TaskEntry *taskPtr = NULL;
+        Task *taskPtr = NULL;
 
         // disable everything
         this->ui->addEditWidget->show();
         this->toggleView( Disabled );
         this->ui->taskType->setCurrentIndex( 0 );
-        this->changeTaskType( TaskEntry::Check );
+        this->changeTaskType( Task::Check );
         this->ui->doneButton->setEnabled( true );
         this->ui->taskDescription->setEnabled( true );
 
@@ -147,7 +140,7 @@ void Gui_Task::toggleAddEditWidget( AddEditState state ) {
             this->ui->taskMaxMulti->setValue( taskPtr->multi());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit task" ));
 
-            if ( taskPtr->type() == TaskEntry::Check ) {
+            if ( taskPtr->type() == Task::Check ) {
                 this->ui->taskMaxMulti->setValue( 2 );
                 this->ui->taskMaxMulti->setDisabled( true );
             }
@@ -165,13 +158,11 @@ void Gui_Task::toggleAddEditWidget( AddEditState state ) {
     }
 }
 
-/*
-================
-doneButton->clicked
-================
-*/
+/**
+ * @brief Gui_Task::on_doneButton_clicked
+ */
 void Gui_Task::on_doneButton_clicked() {
-    TaskEntry *taskPtr = NULL;
+    Task *taskPtr = NULL;
     QModelIndex lastIndex;
 
     // failsafe
@@ -188,7 +179,7 @@ void Gui_Task::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
-        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()), static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
+        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<Task::Types>( this->ui->taskType->currentIndex()), static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
         lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match by id
@@ -203,8 +194,8 @@ void Gui_Task::on_doneButton_clicked() {
         taskPtr->setName( this->ui->taskName->text());
         taskPtr->setPoints( this->ui->taskPoints->value());
         taskPtr->setMulti( this->ui->taskMaxMulti->value());
-        taskPtr->setType( static_cast<TaskEntry::Types>( this->ui->taskType->currentIndex()));;
-        taskPtr->setStyle( static_cast<TaskEntry::Styles>( this->ui->taskStyle->currentIndex()));;
+        taskPtr->setType( static_cast<Task::Types>( this->ui->taskType->currentIndex()));;
+        taskPtr->setStyle( static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()));;
         taskPtr->setDescription( this->ui->taskDescription->text());
 
         // get last index
@@ -223,11 +214,10 @@ void Gui_Task::on_doneButton_clicked() {
     this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
-/*
-================
-keyPressEvent
-================
-*/
+/**
+ * @brief Gui_Task::keyPressEvent
+ * @param ePtr
+ */
 void Gui_Task::keyPressEvent( QKeyEvent *ePtr ) {
     // ignore close button to search for a task
     if ( ePtr->key() == Qt::Key_Return && this->ui->findTask->hasFocus()) {
@@ -237,18 +227,16 @@ void Gui_Task::keyPressEvent( QKeyEvent *ePtr ) {
     Gui_Dialog::keyPressEvent( ePtr );
 }
 
-/*
-================
-findTask
-
-  reuse code from Gui_Main?
-================
-*/
+/**
+ * @brief Gui_Task::findTask
+ */
 void Gui_Task::findTask() {
     int y;
     QString matchString;
     QModelIndex index;
     bool match = false;
+
+    // TODO: reuse code from Gui_Main?
 
     matchString = this->ui->findTask->text();
 
@@ -304,20 +292,16 @@ void Gui_Task::findTask() {
     this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
-/*
-================
-clearText->clicked
-================
-*/
+/**
+ * @brief Gui_Task::on_clearText_clicked
+ */
 void Gui_Task::on_clearText_clicked() {
     this->ui->findTask->clear();
 }
 
-/*
-================
-findTask->textChanged
-================
-*/
+/**
+ * @brief Gui_Task::on_findTask_textChanged
+ */
 void Gui_Task::on_findTask_textChanged( const QString & ) {
     if ( this->ui->findTask->palette().color( QPalette::Base ) == QColor( 255, 0, 0, 64 )) {
         QPalette p( this->ui->findTask->palette());
@@ -326,19 +310,18 @@ void Gui_Task::on_findTask_textChanged( const QString & ) {
     }
 }
 
-/*
-================
-changeTaskType
-================
-*/
-void Gui_Task::changeTaskType( TaskEntry::Types type ) {
+/**
+ * @brief Gui_Task::changeTaskType
+ * @param type
+ */
+void Gui_Task::changeTaskType( Task::Types type ) {
     switch ( type ) {
-    case TaskEntry::Check:
+    case Task::Check:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setDisabled( true );
         break;
 
-    case TaskEntry::Multi:
+    case Task::Multi:
         this->ui->taskPoints->setEnabled( true );
         this->ui->taskMaxMulti->setEnabled( true );
         break;
@@ -348,23 +331,21 @@ void Gui_Task::changeTaskType( TaskEntry::Types type ) {
     }
 }
 
-/*
-================
-taskType->currentIndexChanged
-================
-*/
+/**
+ * @brief Gui_Task::on_taskType_currentIndexChanged
+ * @param index
+ */
 void Gui_Task::on_taskType_currentIndexChanged( int index ) {
-    TaskEntry::Types type = static_cast<TaskEntry::Types>( index );
+    Task::Types type = static_cast<Task::Types>( index );
     this->changeTaskType( type );
 }
 
-/*
-================
-move
-================
-*/
+/**
+ * @brief Gui_Task::move
+ * @param direction
+ */
 void Gui_Task::move( MoveDirection direction ) {
-    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     QModelIndex index;
     int y, t0, t1;
     int k = 0;
@@ -414,14 +395,12 @@ void Gui_Task::move( MoveDirection direction ) {
     this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
-/*
-================
-actionRemove->triggered
-================
-*/
+/**
+ * @brief Gui_Task::on_actionRemove_triggered
+ */
 void Gui_Task::on_actionRemove_triggered() {
     QSqlQuery query;
-    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     int y = 1;
 
     if ( taskPtr == NULL ) {
@@ -440,10 +419,9 @@ void Gui_Task::on_actionRemove_triggered() {
     // remove from database
     query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
 
-    // reindex database (yes, it is very unfortunate)
-    // NOTE: this is done in-memory, actual changes are written to disk
-    //       only when requested
-    foreach ( TaskEntry *reorderPtr, m.currentEvent()->taskList ) {
+    // database reindexing must be performed, however this is done in-memory,
+    // actual changes are written to disk only when requested
+    foreach ( Task *reorderPtr, m.currentEvent()->taskList ) {
         reorderPtr->setOrder( y );
         y++;
     }
@@ -455,11 +433,9 @@ void Gui_Task::on_actionRemove_triggered() {
     this->changeUpDownState( this->ui->taskList->currentIndex());
 }
 
-/*
-================
-actionSort->triggered
-================
-*/
+/**
+ * @brief Gui_Task::on_actionSort_triggered
+ */
 void Gui_Task::on_actionSort_triggered() {
     int y = 0;
 
@@ -470,7 +446,7 @@ void Gui_Task::on_actionSort_triggered() {
     m.sort( Main::Tasks );
 
     // reindex whole list
-    foreach ( TaskEntry *taskPtr, m.currentEvent()->taskList ) {
+    foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
         taskPtr->setOrder( y );
         y++;
     }
@@ -479,11 +455,10 @@ void Gui_Task::on_actionSort_triggered() {
     this->listModelPtr->endReset();
 }
 
-/*
-================
-closeEvent
-================
-*/
+/**
+ * @brief Gui_Task::closeEvent
+ * @param ePtr
+ */
 void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
@@ -497,13 +472,12 @@ void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
         gui->fillTasks();
 }
 
-/*
-================
-changeUpDownState
-================
-*/
+/**
+ * @brief Gui_Task::changeUpDownState
+ * @param index
+ */
 void Gui_Task::changeUpDownState( const QModelIndex &index ) {
-    TaskEntry *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     if ( taskPtr == NULL ) {
         this->ui->actionMoveUp->setDisabled( true );
         this->ui->actionMoveDown->setDisabled( true );
@@ -526,11 +500,10 @@ void Gui_Task::changeUpDownState( const QModelIndex &index ) {
     this->ui->actionMoveDown->setEnabled( true );
 }
 
-/*
-================
-taskList->clicked
-================
-*/
+/**
+ * @brief Gui_Task::on_taskList_clicked
+ * @param index
+ */
 void Gui_Task::on_taskList_clicked( const QModelIndex &index ) {
     this->changeUpDownState( index );
 }

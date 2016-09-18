@@ -1,22 +1,20 @@
 /*
-===========================================================================
-Copyright (C) 2013-2016 Avotu Briezhaudzetava
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see http://www.gnu.org/licenses/.
-
-===========================================================================
-*/
+ * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 //
 // sort.cpp (main.cpp is too crowded)
@@ -120,11 +118,11 @@ static char latin1Array[] = {
     'Z'  // ZH
 };
 
-/*
-============
-transliterate
-============
-*/
+/**
+ * @brief Main::transliterate
+ * @param path
+ * @return
+ */
 QString Main::transliterate( const QString &path ) {
     int y;
     QString out;
@@ -139,22 +137,24 @@ QString Main::transliterate( const QString &path ) {
     return out;
 }
 
-/*
-================
-listToAscending
-================
-*/
+/**
+ * @brief listToAscending
+ * @param ePtr0
+ * @param ePtr1
+ * @return
+ */
 template <class T>
 static bool listToAscending( T *ePtr0, T *ePtr1 ) {
     return m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
 }
 
-/*
-================
-listByLogged
-================
-*/
-static bool listByLogged( TaskEntry *ePtr0, TaskEntry *ePtr1 ) {
+/**
+ * @brief listByLogged
+ * @param ePtr0
+ * @param ePtr1
+ * @return
+ */
+static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
     bool one = false, two = false;
 
     Gui_Main *gui = qobject_cast<Gui_Main*>( m.parent());
@@ -164,11 +164,11 @@ static bool listByLogged( TaskEntry *ePtr0, TaskEntry *ePtr1 ) {
     if ( gui->currentTeamId() == -1 )
         return false;
 
-    TeamEntry *teamPtr = m.teamForId( gui->currentTeamId());
+    Team *teamPtr = m.teamForId( gui->currentTeamId());
     if ( teamPtr == NULL )
         return false;
 
-    foreach ( LogEntry *logPtr, teamPtr->logList ) {
+    foreach ( Log *logPtr, teamPtr->logList ) {
         if ( logPtr->value()) {
             if ( logPtr->taskId() == ePtr0->id())
                 one = true;
@@ -189,36 +189,35 @@ static bool listByLogged( TaskEntry *ePtr0, TaskEntry *ePtr1 ) {
     return one < two;
 }
 
-/*
-================
-sort
-================
-*/
+/**
+ * @brief Main::sort
+ * @param type
+ */
 void Main::sort( ListTypes type ) {
     switch ( type ) {
     case Tasks:
     {
-        QList <TaskEntry*>regularList;
-        QList <TaskEntry*>boldList;
-        QList <TaskEntry*>italicList;
+        QList <Task*>regularList;
+        QList <Task*>boldList;
+        QList <Task*>italicList;
 
-        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Regular )
+        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+            if ( taskPtr->style() == Task::Regular )
                 regularList << taskPtr;
         }
-        qSort( regularList.begin(), regularList.end(), listToAscending<TaskEntry> );
+        qSort( regularList.begin(), regularList.end(), listToAscending<Task> );
 
-        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Bold )
+        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+            if ( taskPtr->style() == Task::Bold )
                 boldList << taskPtr;
         }
-        qSort( boldList.begin(), boldList.end(), listToAscending<TaskEntry> );
+        qSort( boldList.begin(), boldList.end(), listToAscending<Task> );
 
-        foreach ( TaskEntry *taskPtr, this->currentEvent()->taskList ) {
-            if ( taskPtr->style() == TaskEntry::Italic )
+        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+            if ( taskPtr->style() == Task::Italic )
                 italicList << taskPtr;
         }
-        qSort( italicList.begin(), italicList.end(), listToAscending<TaskEntry> );
+        qSort( italicList.begin(), italicList.end(), listToAscending<Task> );
 
         this->currentEvent()->taskList.clear();
         this->currentEvent()->taskList.append( regularList );
@@ -233,7 +232,7 @@ void Main::sort( ListTypes type ) {
         break;
 
     case Teams:
-        qSort( this->currentEvent()->teamList.begin(), this->currentEvent()->teamList.end(), listToAscending<TeamEntry> );
+        qSort( this->currentEvent()->teamList.begin(), this->currentEvent()->teamList.end(), listToAscending<Team> );
         break;
 
     case NoType:
@@ -243,13 +242,12 @@ void Main::sort( ListTypes type ) {
     }
 }
 
-/*
-================
-taskListSorted
-================
-*/
-QList<TaskEntry*> Main::taskListSorted() {
-    QList <TaskEntry*>sortedList;
+/**
+ * @brief Main::taskListSorted
+ * @return
+ */
+QList<Task*> Main::taskListSorted() {
+    QList <Task*>sortedList;
 
     if ( this->currentEvent() == NULL )
         return sortedList;
@@ -261,7 +259,7 @@ QList<TaskEntry*> Main::taskListSorted() {
         return sortedList;
 
     if ( this->cvar( "misc/sortTasks" )->isEnabled())
-        qSort( sortedList.begin(), sortedList.end(), listToAscending<TaskEntry> );
+        qSort( sortedList.begin(), sortedList.end(), listToAscending<Task> );
 
     if ( this->cvar( "misc/hilightLogged" )->isEnabled())
         qSort( sortedList.begin(), sortedList.end(), listByLogged );
