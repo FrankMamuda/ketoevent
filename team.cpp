@@ -194,6 +194,7 @@ Team *Main::teamForId( int id, bool import ) {
  * @param name
  * @return
  */
+// TODO: shouldn't this be event specific?
 Team *Main::teamForName( const QString &name ) {
     foreach ( Team *teamPtr, this->base.teamList ) {
         if ( !QString::compare( name, teamPtr->name()))

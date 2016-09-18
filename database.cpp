@@ -114,11 +114,11 @@ int Main::highestId( IdTypes type ) const {
 }
 
 /**
- * @brief encrypt returns md5 of a string
+ * @brief Main::stringToHash returns md5 of a string
  * @param input text string
  * @return md5 of the given string
  */
-static QString encrypt( const QString &input ) {
+QString Main::stringToHash( const QString &input ) {
     QCryptographicHash *hash = new QCryptographicHash( QCryptographicHash::Md5 );
     hash->addData( input.toLatin1().constData(), input.length());
     return QString( hash->result().toHex().constData());
@@ -129,7 +129,7 @@ static QString encrypt( const QString &input ) {
  * @param import database input toggle
  * @return task list md5 hash
  */
-static QString taskListHash( bool import ) {
+QString Main::taskListHash( bool import ) {
     QList<Task*> list;
     QString taskString;
     int eventId = m.currentEvent()->id();
@@ -148,7 +148,7 @@ static QString taskListHash( bool import ) {
     }
 
     // generate taskList checksum (to avoid mismatches)
-    return encrypt( taskString );
+    return Main::stringToHash( taskString );
 }
 
 /**
@@ -242,8 +242,8 @@ void Main::attachDatabase( const QString &path, Import import ) {
 
     // compare task hashes
     if ( import == LogImport ) {
-        QString one = taskListHash( true );
-        QString two = taskListHash( false );
+        QString one = Main::taskListHash( true );
+        QString two = Main::taskListHash( false );
 
         if ( QString::compare( one, two )) {
             this->error( StrSoftError, this->tr( "task list mismatch \"%1\", \"%2\"\n" )

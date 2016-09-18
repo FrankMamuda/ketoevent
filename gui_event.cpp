@@ -30,6 +30,7 @@
 #include "QSqlError"
 #include <QStringList>
 #include <QTextStream>
+#include <QXmlStreamReader>
 
 /**
  * @brief Gui_Event::Gui_Event
@@ -216,7 +217,7 @@ void Gui_Event::on_actionImportLogs_triggered() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database or XML (2012)" ), path, this->tr( "Database or 2012 XML (*.db *.xml)" ));
 
     // check for empty filenames
     if ( filePath.isEmpty())
@@ -226,17 +227,83 @@ void Gui_Event::on_actionImportLogs_triggered() {
     if ( !QFileInfo( filePath ).absoluteDir().isReadable())
         return;
 
-    // avoid importing the same database
-    if ( !QString::compare( filePath, m.path )) {
-        m.error( StrSoftError, "cannot import current database\n" );
-        return;
+    // importing database
+    if ( filePath.endsWith( ".db" )) {
+
+        // avoid importing the same database
+        if ( !QString::compare( filePath, m.path )) {
+            m.error( StrSoftError, "cannot import current database\n" );
+            return;
+        }
+
+        // import database
+        m.attachDatabase( filePath, Main::LogImport );
+
+        // mark as imported
+        this->setImported();
+    } else if ( filePath.endsWith( ".xml" )) {
+        // FIXME: no updates in GUI
+        QFile xmlList( filePath );
+        xmlList.open( QFile::ReadOnly );
+
+        QXmlStreamReader xml( &xmlList );
+
+        if ( xml.readNextStartElement()) {
+            if ( !QString::compare( xml.name().toString(), "team", Qt::CaseInsensitive )) {
+                QString name = xml.attributes().value( "name" ).toString();
+
+                qDebug() << "team" << name;
+
+
+
+                int hour = xml.attributes().value( "hour" ).toInt();
+                int minute = xml.attributes().value( "minute" ).toInt();
+                int members = xml.attributes().value( "members" ).toInt();
+                bool lock = static_cast<bool>( xml.attributes().value( "lock" ).toInt());
+                m.addTeam( name, members, QTime::fromString( QString( "%1:%2" ).arg( hour ).arg( minute ), "HH:mm" ), "imported", lock );
+                int id = m.teamForName( name )->id();
+
+                if ( id < 1 ) {
+                    qDebug() << "bad id";
+                    return;
+                }
+
+                while ( xml.readNextStartElement()) {
+                    if ( !QString::compare( xml.name().toString(), "log", Qt::CaseInsensitive )) {
+                        QString hash = xml.attributes().value( "hash" ).toString();
+                        int value = xml.attributes().value( "value" ).toInt();
+                        // TODO: combos
+                        //int combo = xml.attributes().value( "combo" ).toInt();
+
+                        qDebug() << "found log" << hash;
+
+
+                        bool found = false;
+                        foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
+                            if ( !QString::compare( Main::stringToHash( taskPtr->name()), hash, Qt::CaseInsensitive )) {
+                                qDebug() << taskPtr->id() << id << value;
+                                m.addLog( taskPtr->id(), id, value );
+                                found = true;
+                            }
+                        }
+
+                        if ( !found ) {
+                            m.print( this->tr( "Unknown task with hash %1\n" ).arg( hash ), Main::Database );
+                                qDebug() << this->tr( "Unknown task with hash %1\n" ).arg( hash );
+                        }
+
+                        xml.readNext();
+                    } else {
+                        xml.skipCurrentElement();
+                    }
+                }
+            } else {
+                m.error( StrSoftError, this->tr( "invalid XML file\n" ));
+            }
+        }
+
+        xmlList.close();
     }
-
-    // import database
-    m.attachDatabase( filePath, Main::LogImport );
-
-    // mark as imported
-    this->setImported();
 
     // close window
     this->onAccepted();
@@ -250,7 +317,7 @@ void Gui_Event::on_actionImportTasks_triggered() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database or csv list" ), path, this->tr( "Database or CSV list (*.db *.csv)" ));
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database, csv list or XML (2012)" ), path, this->tr( "Database, CSV list or 2012 XML (*.db *.csv *.xml)" ));
 
     // check for empty filenames
     if ( filePath.isEmpty())
@@ -325,6 +392,55 @@ void Gui_Event::on_actionImportTasks_triggered() {
         Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
         if ( gui != NULL )
             gui->fillTasks();
+    }
+    // importing XML (2012 event)
+    // FIXME: no updates in main GUI after task import
+    else if ( filePath.endsWith( ".xml" )) {
+        QFile xmlList( filePath );
+        xmlList.open( QFile::ReadOnly );
+
+        QXmlStreamReader xml( &xmlList );
+
+        if ( xml.readNextStartElement()) {
+            if ( !QString::compare( xml.name().toString(), "tasks", Qt::CaseInsensitive )) {
+                while ( xml.readNextStartElement()) {
+                    if ( !QString::compare( xml.name().toString(), "task", Qt::CaseInsensitive )) {
+                        QString name = xml.attributes().value( "name" ).toString();
+                        int type = xml.attributes().value( "type" ).toInt();
+                        int points = xml.attributes().value( "points" ).toInt();
+                        bool challenge = static_cast<bool>( xml.attributes().value( "challenge" ).toInt());
+                        int max;
+                        Task::Types taskType;
+                        Task::Styles style = Task::Regular;
+
+                        if ( type > 0 ) {
+                            taskType = Task::Multi;
+
+                            if ( type == 2 ) {
+                                max = 10;
+                                points = 1;
+                                style = Task::Italic;
+                            } else
+                                max  = xml.attributes().value( "challenge" ).toInt();
+                        } else
+                            taskType = Task::Check;
+
+                        if ( challenge )
+                            style = Task::Bold;
+
+                        m.addTask( name, points, max, taskType, style );
+
+                        xml.readNext();
+                    } else {
+                        xml.skipCurrentElement();
+                    }
+                }
+            } else {
+                m.error( StrSoftError, this->tr( "invalid XML file\n" ));
+            }
+        }
+
+        xmlList.close();
     } else {
         m.error( StrSoftError, this->tr( "unknown task storage format\n" ));
         return;

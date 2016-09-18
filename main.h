@@ -301,6 +301,10 @@ public:
     int dealloc;
 #endif
 
+    // hashing
+    static QString taskListHash( bool import );
+    static QString stringToHash( const QString &input );
+
 public slots:
     // init/shutdown
     bool initialise( QObject *parent );
