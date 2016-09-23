@@ -23,6 +23,7 @@
 #include "ui_gui_console.h"
 #include "main.h"
 #include "cmd.h"
+#include <QScrollBar>
 
 #ifdef APPLET_DEBUG
 
@@ -38,6 +39,9 @@ Gui_Console::Gui_Console( QWidget *parent ) : QDialog( parent ), ui( new Ui::Gui
     // install event filter
     this->eventFilter = new ConsoleEventFilter();
     this->ui->input->installEventFilter( this->eventFilter );
+
+    // style the scrollbar
+    //this->ui->screen->verticalScrollBar()->setStyleSheet( QString::fromUtf8( "QScrollBar:vertical { border: 0px solid #000000; background:rgb(43, 43, 43); width:10px; margin: 0px 0px 0px 0px; };" ));
 }
 
 /**
@@ -65,7 +69,7 @@ bool Gui_Console::completeCommand() {
     }
 
     // find matching cvars
-    foreach( ConsoleVariable *cvarPtr, m.cvarList ) {
+    foreach( Variable *cvarPtr, m.cvarList ) {
         if ( !QString::compare( cvarPtr->key(), "system/consoleHistory" ))
              continue;
 
@@ -97,29 +101,29 @@ bool Gui_Console::completeCommand() {
     }
 
     // print out suggestions
-    m.print( /*Sys::cCyan +*/ this->tr( "Available commands and cvars:\n" ), Main::System );
+    Common::print( this->tr( "Available commands and cvars:\n" ), Common::System );
     foreach ( QString str, matchedStrings ) {
         // check commands
         Command *cmdPtr;
         cmdPtr = cmd.find( str );
         if ( cmdPtr != NULL ) {
             if ( !cmdPtr->description().isEmpty()) {
-                m.print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Main::System);
+                Common::print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Common::System);
             } else {
-                m.print( QString( "  \"%1\n" ).arg( str ), Main::System);
+                Common::print( QString( "  \"%1\n" ).arg( str ), Common::System );
             }
         }
 
         // check variables
-        ConsoleVariable *cvarPtr = m.cvar( str );
+        Variable *cvarPtr = Variable::find( str );
 
         // perform a variable print or set
-        if ( cvarPtr != m.defaultCvar )
-            m.print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( cvarPtr->key(), cvarPtr->string()), Main::System );
+        if ( cvarPtr != NULL )
+            Common::print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( cvarPtr->key(), cvarPtr->string()), Common::System );
     }
 
     // add extra newline
-    m.print( "\n", Main::System );
+    Common::print( "\n", Common::System );
 
     // done
     return true;
@@ -216,6 +220,11 @@ bool ConsoleEventFilter::eventFilter( QObject *objectPtr, QEvent *eventPtr ) {
  */
 void Gui_Console::print( const QString &msg ) {
     this->ui->screen->append( msg );
+
+    // move cursor
+    QTextCursor cursor( this->ui->screen->textCursor());
+    cursor.movePosition( QTextCursor::End );
+    this->ui->screen->verticalScrollBar()->setValue( this->ui->screen->verticalScrollBar()->maximum());
 }
 
 /**
@@ -234,14 +243,42 @@ void Gui_Console::on_input_returnPressed() {
  * @brief Gui_Console::loadHistory
  */
 void Gui_Console::loadHistory() {
-    this->ui->input->history = m.cvar( "system/consoleHistory" )->string().split( ";" );
+    this->ui->input->history = Variable::string( "system/consoleHistory" ).split( ";" );
 }
 
 /**
  * @brief Gui_Console::saveHisotry
  */
 void Gui_Console::saveHisotry() {
-    m.cvar( "system/consoleHistory" )->setValue( this->ui->input->history.join( ";" ));
+    Variable::setValue( "system/consoleHistory", this->ui->input->history.join( ";" ));
+}
+
+/**
+ * @brief Gui_Console::init
+ */
+void Gui_Console::init() {
+    // announce
+    Common::print( CLMsg + QObject::tr( "initilising console\n" ), Common::System );
+
+    if ( m.console != NULL )
+        return;
+
+    m.console = new Gui_Console();
+    m.console->hide();
+}
+
+/**
+ * @brief show
+ */
+void Gui_Console::show() {
+    m.console->window()->show();
+}
+
+/**
+ * @brief show
+ */
+void Gui_Console::hide() {
+    m.console->window()->hide();
 }
 
 #endif

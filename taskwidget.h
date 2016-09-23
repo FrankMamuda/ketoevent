@@ -25,9 +25,9 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QSpacerItem>
-#include "taskentry.h"
-#include "logentry.h"
-#include "teamentry.h"
+#include "task.h"
+#include "log.h"
+#include "team.h"
 
 //
 // defines

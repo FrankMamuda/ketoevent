@@ -27,9 +27,6 @@ ICON = icon.icns
 
 SOURCES += main.cpp\
         gui_main.cpp \
-    teamentry.cpp \
-    logentry.cpp \
-    taskentry.cpp \
     gui_teamlistmodel.cpp \
     gui_tasklistmodel.cpp \
     gui_rankings.cpp \
@@ -38,12 +35,6 @@ SOURCES += main.cpp\
     taskwidget.cpp \
     settingsvariable.cpp \
     gui_settings.cpp \
-    evententry.cpp \
-    database.cpp \
-    team.cpp \
-    log.cpp \
-    task.cpp \
-    event.cpp \
     variable.cpp \
     sort.cpp \
     gui_console.cpp \
@@ -55,14 +46,16 @@ SOURCES += main.cpp\
     gui_event.cpp \
     gui_team.cpp \
     gui_task.cpp \
+    gui_description.cpp \
+    team.cpp \
+    task.cpp \
+    event.cpp \
+    log.cpp \
+    database.cpp \
     databaseentry.cpp \
-    gui_description.cpp
+    common.cpp
 
 HEADERS  += gui_main.h \
-    databaseentry.h \
-    teamentry.h \
-    logentry.h \
-    taskentry.h \
     main.h \
     gui_teamlistmodel.h \
     gui_tasklistmodel.h \
@@ -70,10 +63,8 @@ HEADERS  += gui_main.h \
     gui_about.h \
     gui_license.h \
     taskwidget.h \
-    consolevariable.h \
     settingsvariable.h \
     gui_settings.h \
-    evententry.h \
     gui_console.h \
     gui_combos.h \
     gui_combomodel.h \
@@ -83,7 +74,16 @@ HEADERS  += gui_main.h \
     gui_team.h \
     gui_dialog.h \
     gui_task.h \
-    gui_description.h
+    gui_description.h \
+    team.h \
+    task.h \
+    event.h \
+    log.h \
+    combo.h \
+    database.h \
+    databaseentry.h \
+    common.h \
+    variable.h
 
 FORMS += gui_main.ui \
     gui_about.ui \

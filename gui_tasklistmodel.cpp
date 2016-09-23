@@ -32,19 +32,19 @@ QVariant Gui_TaskListModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
-    if ( index.row() >= m.currentEvent()->taskList.count())
+    if ( index.row() >= Event::active()->taskList.count())
         return QVariant();
 
     // just supply view with team names from global list
     if ( role == Qt::DisplayRole ) {
-        Task *taskPtr = m.currentEvent()->taskList.at( index.row());
+        Task *taskPtr = Event::active()->taskList.at( index.row());
 
         if ( taskPtr->type() == Task::Multi )
             return QString( "%1 (%2x%3)" ).arg( taskPtr->name()).arg( taskPtr->points()).arg( taskPtr->multi());
         else
             return QString( "%1 (%2)" ).arg( taskPtr->name()).arg( taskPtr->points());
     } else if ( role == Qt::FontRole ) {
-        Task *taskPtr = m.currentEvent()->taskList.at( index.row());
+        Task *taskPtr = Event::active()->taskList.at( index.row());
         QFont font;
 
         if ( taskPtr->style() == Task::Bold )
@@ -54,7 +54,7 @@ QVariant Gui_TaskListModel::data( const QModelIndex &index, int role ) const {
 
         return font;
     } else if ( role == Qt::UserRole ) {
-        return m.currentEvent()->taskList.at( index.row())->id();
+        return Event::active()->taskList.at( index.row())->id();
     }
 
     return QVariant();

@@ -16,21 +16,26 @@
  *
  */
 
-#ifndef EVENTENTRY_H
-#define EVENTENTRY_H
+#ifndef EVENT_H
+#define EVENT_H
 
 //
 // includes
 //
-#include "databaseentry.h"
-#include "taskentry.h"
-#include "teamentry.h"
+#include "task.h"
+#include "team.h"
+#include "database.h"
 #include <QTime>
+
+class Team;
+class Task;
 
 /**
  * @brief The Event class
  */
 class Event : public DatabaseEntry {
+    friend class Main;
+
     Q_PROPERTY( QString name READ name WRITE setName )
     Q_PROPERTY( int minMembers READ minMembers WRITE setMinMembers )
     Q_PROPERTY( int maxMembers READ maxMembers WRITE setMaxMembers )
@@ -60,6 +65,14 @@ public:
     QList <Team*> teamList;
     QList <Task*> taskList;
 
+    // static functions
+    static Event *active();
+    static Event *forId( int id );
+    static void add( const QString &title = QString::null );
+    static bool setActive( Event *eventPtr );
+    static void buildTTList();
+    static bool loadEvents();
+
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setMinMembers( int minMembers ) { this->setValue( "minMembers", minMembers ); }
@@ -72,6 +85,9 @@ public slots:
     void setStartTime( QTime time ) { this->setValue( "startTime", time.toString( "hh:mm" )); }
     void setFinishTime( QTime time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
     void setFinalTime( QTime time ) { this->setValue( "setFinalTime", time.toString( "hh:mm" )); }
+
+private:
+    //static Event *activeEvent;
 };
 
-#endif // EVENTENTRY_H
+#endif // EVENT_H

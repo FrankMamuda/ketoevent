@@ -16,13 +16,13 @@
  *
  */
 
-#ifndef LOGENTRY_H
-#define LOGENTRY_H
+#ifndef LOG_H
+#define LOG_H
 
 //
 // includes
 //
-#include "databaseentry.h"
+#include "database.h"
 
 /**
  * @brief The Log class
@@ -46,6 +46,12 @@ public:
     int taskId() const { return this->record().value( "taskId" ).toInt(); }
     int comboId() const { return this->record().value( "comboId" ).toInt(); }
 
+    // static functions
+    static Log *add( int taskId, int teamId, int value = 0, int comboId = -1 );
+    static Log *forId( int id );
+    static Log *forIds( int teamId, int taskId );
+    static void loadLogs();
+
 signals:
     void comboIdChanged();
 
@@ -56,4 +62,4 @@ public slots:
     void setComboId( int id ) { this->DatabaseEntry::setValue( "comboId", id ); emit this->comboIdChanged(); }
 };
 
-#endif // LOGENTRY_H
+#endif // LOG_H

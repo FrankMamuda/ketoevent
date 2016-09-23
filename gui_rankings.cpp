@@ -62,7 +62,7 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
 
     // set up sorting & view model
     this->proxyModel = new RankingsSortModel( this );
-    this->modelPtr = new QStandardItemModel( m.currentEvent()->teamList.count(), NumRankingColumns, this );
+    this->modelPtr = new QStandardItemModel( Event::active()->teamList.count(), NumRankingColumns, this );
     this->proxyModel->setSourceModel( this->modelPtr );
     this->proxyModel->setDynamicSortFilter( true );
     this->ui->rankingView->verticalHeader()->hide();
@@ -70,7 +70,7 @@ Gui_Rankings::Gui_Rankings( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui
     this->ui->rankingView->setWordWrap( true );
 
     // connect
-    this->connect( m.cvar( "rankings/current" ), SIGNAL( changed()), this, SLOT( currentTeamToggled()));
+    this->connect( Variable::find( "rankings/current" ), SIGNAL( changed()), this, SLOT( currentTeamToggled()));
 
     // set stats
     this->calculateStatistics();
@@ -146,8 +146,8 @@ void Gui_Rankings::fillData() {
 
     // fill data
     for ( y = 0; y < NumRankingColumns; y++ ) {
-        for ( k = 0; k < m.currentEvent()->teamList.count(); k++ ) {
-            Team *teamPtr = m.currentEvent()->teamList.at( k );
+        for ( k = 0; k < Event::active()->teamList.count(); k++ ) {
+            Team *teamPtr = Event::active()->teamList.at( k );
             Gui_Main *guiPtr = qobject_cast<Gui_Main*>( this->parent());
             QStandardItem *itemPtr = new QStandardItem();
             QString text;
@@ -159,8 +159,8 @@ void Gui_Rankings::fillData() {
             case TeamName:
                 text = teamPtr->name();
 
-                if ( m.cvar( "rankings/current" )->isEnabled()) {
-                    if ( teamPtr != m.teamForId( guiPtr->currentTeamId()))
+                if ( Variable::isEnabled( "rankings/current" )) {
+                    if ( teamPtr != Team::forId( guiPtr->currentTeamId()))
                         text = "";
                 }
                 break;
@@ -226,7 +226,7 @@ void Gui_Rankings::fillData() {
     qSort( pointsList.begin(), pointsList.end(), greaterThan );
 
     // second pass for rank
-    for ( k = 0; k < m.currentEvent()->teamList.count(); k++ ) {
+    for ( k = 0; k < Event::active()->teamList.count(); k++ ) {
         int rankColumn = Rank;
         int pointsColumn = Points;
         this->modelPtr->item( k, rankColumn )->setText( QString( "%1" ).arg( pointsList.indexOf( this->modelPtr->item( k, pointsColumn )->text().toInt()) + 1 ));
@@ -240,7 +240,7 @@ void Gui_Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0, pointsLogged = 0, maxPoints = 0;
 
     // get team stats
-    foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
+    foreach ( Team *teamPtr, Event::active()->teamList ) {
         numParcipiants += teamPtr->members();
         numTasks += teamPtr->logList.count();
         teamPtr->setCombosCalculated( false );
@@ -249,7 +249,7 @@ void Gui_Rankings::calculateStatistics() {
     }
 
     // get max points
-    foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
+    foreach ( Task *taskPtr, Event::active()->taskList ) {
         if ( taskPtr->type() == Task::Check )
             maxPoints += taskPtr->points();
         else if ( taskPtr->type() == Task::Multi )
@@ -257,10 +257,10 @@ void Gui_Rankings::calculateStatistics() {
     }
 
     // display data
-    this->ui->tTeams->setText( QString( "%1\n" ).arg( m.currentEvent()->teamList.count()));
+    this->ui->tTeams->setText( QString( "%1\n" ).arg( Event::active()->teamList.count()));
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
-    this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( m.currentEvent()->taskList.count()));
+    this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( Event::active()->taskList.count()));
     this->ui->tPoints->setText( QString( "%1\n" ).arg( maxPoints ));
     this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));
 }
@@ -357,7 +357,7 @@ void Gui_Rankings::on_actionExport_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
+        foreach ( Team *teamPtr, Event::active()->teamList ) {
             int points;
 
             if ( teamPtr->disqualified())
@@ -411,19 +411,19 @@ void Gui_Rankings::on_actionNoLogs_triggered() {
 #ifdef APPLET_DEBUG
     QStringList taskList;
 
-    Event *event = m.currentEvent();
+    Event *event = Event::active();
     if ( event == NULL )
         return;
 
     // build event taskList
-    foreach ( Task *task, m.base.taskList ) {
+    foreach ( Task *task, m.taskList ) {
         if ( task->eventId() == event->id())
             taskList << task->name();
     }
 
     // remove tasks if logged by any team
-    foreach ( Log *log, m.base.logList ) {
-        Task *task = m.taskForId( log->taskId());
+    foreach ( Log *log, m.logList ) {
+        Task *task = Task::forId( log->taskId());
         if ( task == NULL )
             continue;
 

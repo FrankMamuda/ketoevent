@@ -108,6 +108,11 @@ public:
     explicit Gui_Console( QWidget *parent = 0 );
     ~Gui_Console();
 
+    // static functions
+    static void init();
+    static void show();
+    static void hide();
+
 public slots:
     void print( const QString &msg );
     bool completeCommand();

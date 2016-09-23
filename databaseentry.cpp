@@ -27,13 +27,13 @@
 /**
  * @brief DatabaseEntry::store forces database update
  */
-void DatabaseEntry::store() {
+/*void DatabaseEntry::store() {
     if ( !this->isImported())
         return;
 
     QSqlQuery query;
     query.exec( QString( "insert into %1 select * from merge.%1 where id = %2" ).arg( this->table()).arg( this->id()));
-}
+}*/
 
 /**
  * @brief DatabaseEntry::setValue sets value to database entry
@@ -63,20 +63,18 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
         update.setValue( QString( "%1" ).arg( value.toString()));
 
     // update imported entries properly
-    if ( this->isImported())
-        table.prepend( "merge." );
+    //if ( this->isImported())
+    //    table.prepend( "merge." );
 
     // update database value
     if ( !this->table().isNull()) {
-#ifdef SQL_PREPARE_STATEMENTS
         query.prepare( QString( "update %1 set %2 = :value where id = :id" ).arg( table ).arg( name ));
         query.bindValue( ":value", update.toString());
         query.bindValue( ":id", this->record().value( "id" ).toInt());
 
-        if ( !query.exec())
-#else
-        if ( !query.exec( QString( "update %1 set %2 = %3 where id=%4" ).arg( table ).arg( name ).arg( update.toString()).arg( this->record().value( "id" ).toInt())))
-#endif
-            m.error( StrSoftError, this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        if ( !query.exec()) {
+            Common::error( StrSoftError, this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            return;
+        }
     }
 }

@@ -17,81 +17,220 @@
  */
 
 //
-// team.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
+#include "team.h"
 #include "main.h"
 #include <QSqlQuery>
 #include <QSqlError>
 
 /**
- * @brief Main::addTeam
+ * @brief Team::Team
+ * @param record
+ * @param table
+ */
+Team::Team( const QSqlRecord &record, const QString &table ) {
+    // bind to sql
+    this->setRecord( record );
+    this->setTable( table );
+
+    // no calculation has been peformed yet
+    this->setCombosCalculated( false );
+
+    // failsafe members (min)
+    if ( this->members() < Event::active()->minMembers())
+        this->setMembers( Event::active()->minMembers());
+
+    // failsafe members (max)
+    if ( this->members() > Event::active()->maxMembers())
+        this->setMembers( Event::active()->maxMembers());
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+}
+
+/**
+ * @brief Team::~Team
+ */
+Team::~Team() {
+    foreach ( Log *logPtr, this->logList ) {
+        m.logList.removeOne( logPtr );
+        delete logPtr;
+    }
+    this->logList.clear();
+}
+
+/**
+ * @brief Team::points
+ * @return
+ */
+int Team::points() const {
+    int points = 0;
+
+    if ( this->disqualified())
+        return 0;
+
+    foreach ( Log *logPtr, this->logList )
+        points += logPtr->points();
+
+    return points + this->bonus();
+}
+
+/**
+ * @brief Team::addComboPoints
+ * @param counter
+ */
+void Team::addComboPoints( int &counter ) {
+    if ( counter >= 2 )
+        this->m_combos++;
+
+    if ( counter == 2 )
+        this->m_bonus += Event::active()->comboOfTwo();
+    else if ( counter == 3 )
+        this->m_bonus += Event::active()->comboOfThree();
+    else if ( counter >= 4 )
+        this->m_bonus += Event::active()->comboOfFourAndMore();
+
+    counter = 0;
+}
+
+/**
+ * @brief Team::calculateCombos
+ */
+void Team::calculateCombos() {
+    QSqlQuery query;
+    int id, lastId = -1, counter = 0;
+
+    // abort if not needed
+    if ( this->combosCalculated())
+        return;
+
+    // reset stats
+    this->m_combos = 0;
+    this->m_bonus = 0;
+    this->m_total = 0;
+
+    // get combos for the team
+    query.exec( QString( "select * from logs where teamId=%1 and comboId!=-1 and value>0 order by comboId asc" ).arg( this->id()));
+
+    // go through list
+    while ( query.next()) {
+        id = query.record().value( "comboId" ).toInt();
+
+        if ( this->total() == 0 )
+            lastId = id;
+
+        if ( id != lastId ) {
+            lastId = id;
+            this->addComboPoints( counter );
+        }
+        counter++;
+        this->m_total++;
+    }
+
+    this->addComboPoints( counter );
+}
+
+/**
+ * @brief Team::timeOnTrack
+ * @return
+ */
+int Team::timeOnTrack() const {
+    return Event::active()->startTime().secsTo( this->finishTime()) / 60;
+}
+
+/**
+ * @brief Team::penalty
+ * @return
+ */
+int Team::penalty() const {
+    int overTime = Event::active()->finishTime().secsTo( this->finishTime()) / 60 + 1;
+    if ( overTime > 0 )
+        return overTime * Event::active()->penalty();
+
+    return 0;
+}
+
+/**
+ * @brief Team::disqualified
+ * @return
+ */
+bool Team::disqualified() const {
+    if (( Event::active()->finalTime().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
+        return true;
+
+    return false;
+}
+
+/**
+ * @brief Team::forId
+ * @return
+ */
+Team *Team::forId( int id ) {
+    foreach ( Team *teamPtr, m.teamList ) {
+        if ( teamPtr->id() == id )
+            return teamPtr;
+    }
+    return NULL;
+}
+
+/**
+ * @brief Team::add
  * @param teamName
  * @param members
  * @param finishTime
  * @param reviewerName
  * @param lockState
  */
-void Main::addTeam( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
+void Team::add( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Main::TeamDebug );
+    Common::print( CLMsg + QObject::tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Common::TeamDebug );
 
     // avoid duplicates
-    if ( this->teamForName( teamName ) != NULL )
+    if ( Team::forName( teamName, true ) != NULL )
         return;
 
     // perform database update and select last row
-#ifdef SQL_PREPARE_STATEMENTS
+    // NOTE: this is sensitive to API changes, cannot avoid hardcoding unless we use addTeam( QVariantList ), which is also not ideal
     query.prepare( "insert into teams values ( null, :name, :members, :finishTime, :lock, :reviewer, :eventId )" );
     query.bindValue( ":name", teamName );
     query.bindValue( ":members", members );
     query.bindValue( ":finishTime", finishTime.toString( "hh:mm" ));
     query.bindValue( ":lock",  static_cast<int>( lockState ));
     query.bindValue( ":reviewer", reviewerName );
-    query.bindValue( ":eventId", m.currentEvent()->id());
+    query.bindValue( ":eventId", Event::active()->id());
 
-    if ( !query.exec())
-#else
-    if ( !query.exec( QString( "insert into teams values ( null, '%1', %2, '%3', '%4', '%5', %6 )" )
-                      .arg( teamName )
-                      .arg( members )
-                      .arg( finishTime.toString( "hh:mm" ))
-                      .arg( static_cast<int>( lockState ))
-                      .arg( reviewerName )
-                      .arg( m.currentEvent()->id())
-                      ))
-#endif
-        this->error( StrSoftError, QString( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+    if ( !query.exec()) {
+        Common::error( CLSoftError, QObject::tr( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+        return;
+    }
 
     // select the new entry
     query.exec( QString( "select * from teams where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->base.teamList << new Team( query.record(), "teams" );
+        m.teamList << new Team( query.record(), "teams" );
 
     // add to event
-    this->currentEvent()->teamList << this->base.teamList.last();
+    Event::active()->teamList << m.teamList.last();
 }
 
 /**
- * @brief Main::removeTeam
+ * @brief Team::remove
  * @param teamName
  */
-void Main::removeTeam( const QString &teamName ) {
+void Team::remove( const QString &teamName ) {
     Team *teamPtr = NULL;
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "removing team '%1'\n" ).arg( teamName ), Main::TeamDebug );
+    Common::print( CLMsg + QObject::tr( "removing team '%1'\n" ).arg( teamName ), Common::TeamDebug );
 
     // find team
-    teamPtr = this->teamForName( teamName );
+    teamPtr = Team::forName( teamName, true );
 
     // failsafe
     if ( teamPtr == NULL )
@@ -102,101 +241,47 @@ void Main::removeTeam( const QString &teamName ) {
     query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
 
     // remove from display
-    this->base.teamList.removeAll( teamPtr );
-    this->currentEvent()->teamList.removeAll( teamPtr );
+    m.teamList.removeAll( teamPtr );
+    Event::active()->teamList.removeAll( teamPtr );
 }
 
 /**
- * @brief Main::loadTeams
+ * @brief Team::loadTeams
  * @param import
  * @param store
  */
-void Main::loadTeams( bool import, bool store ) {
+void Team::loadTeams() {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading teams form database\n" ), Main::TeamDebug );
+    Common::print( CLMsg + QObject::tr( "loading teams form database\n" ), Common::TeamDebug );
 
-    // read stuff
-    if ( import )
-        query.exec( "select * from merge.teams" );
-    else
-        query.exec( "select * from teams" );
+    // read all team entries
+    query.exec( "select * from teams" );
 
     // store entries
-    while ( query.next()) {
-        Team *teamPtr = new Team( query.record(), "teams" );
-
-        if ( import ) {
-            teamPtr->setImported();
-            this->import.teamList << teamPtr;
-        } else
-            this->base.teamList << teamPtr;
-    }
+    while ( query.next())
+        m.teamList << new Team( query.record(), "teams" );
 
     // sort alphabetically
-    if ( !import )
-        this->sort( Main::Teams );
-    else {
-        bool duplicate = false;
-
-        // check for duplicates
-        foreach ( Team *importedTeamPtr, this->import.teamList ) {
-            duplicate = false;
-
-            foreach ( Team *teamPtr, this->base.teamList ) {
-                // there's a match
-                if ( !QString::compare( teamPtr->name(), importedTeamPtr->name())) {
-                    // first time import, just append imported
-                    if ( !importedTeamPtr->name().endsWith( " (imported)")) {
-                        importedTeamPtr->setName( importedTeamPtr->name() + " (imported)" );
-                    }
-                    // second time import is a no-go
-                    else {
-                        duplicate = true;
-                        m.error( StrSoftError, this->tr( "aborting double import of team \"%1\"\n" ).arg( importedTeamPtr->name()));
-                        this->import.teamList.removeOne( teamPtr );
-                        continue;
-                    }
-                }
-            }
-
-            // store the new-found team
-            if ( !duplicate && store )
-                importedTeamPtr->store();
-        }
-    }
+    m.sort( Main::Teams );
 }
 
 /**
- * @brief Main::teamForId
- * @param id
- * @param import
+ * @brief Team::teamForName
+ * @param name
+ * @param currentEvent
  * @return
  */
-Team *Main::teamForId( int id, bool import ) {
+Team *Team::forName( const QString &name, bool currentEvent ) {
     QList <Team*> teamList;
 
-    if ( import )
-        teamList = m.import.teamList;
+    if ( currentEvent )
+        teamList = Event::active()->teamList;
     else
-        teamList = m.base.teamList;
+        teamList = m.teamList;
 
     foreach ( Team *teamPtr, teamList ) {
-        if ( teamPtr->id() == id )
-            return teamPtr;
-    }
-    return NULL;
-}
-
-/**
- * @brief Main::teamForName
- * @param name
- * @return
- */
-// TODO: shouldn't this be event specific?
-Team *Main::teamForName( const QString &name ) {
-    foreach ( Team *teamPtr, this->base.teamList ) {
         if ( !QString::compare( name, teamPtr->name()))
             return teamPtr;
     }

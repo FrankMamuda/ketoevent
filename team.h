@@ -16,15 +16,17 @@
  *
  */
 
-#ifndef TEAMENTRY_H
-#define TEAMENTRY_H
+#ifndef TEAM_H
+#define TEAM_H
 
 //
 // includes
 //
-#include "databaseentry.h"
-#include "logentry.h"
+#include "database.h"
+#include "log.h"
 #include <QTime>
+
+class Log;
 
 /**
  * @brief The Team class
@@ -67,6 +69,13 @@ public:
     int timeOnTrack() const;
     bool disqualified() const;
     bool combosCalculated() { return this->m_calculated; }
+
+    // static functions
+    static Team *forId( int id );
+    static void add( const QString &teamName, int members, QTime finishTime, const QString &reviewerName = QString::null, bool lockState = false );
+    static Team *forName( const QString &name, bool currentEvent = false );
+    static void remove( const QString &teamName );
+    static void loadTeams();
 
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }

@@ -21,7 +21,7 @@
 //
 #include "gui_team.h"
 #include "ui_gui_team.h"
-#include "teamentry.h"
+#include "team.h"
 #include "main.h"
 #include <QMessageBox>
 #include <QSqlQuery>
@@ -38,9 +38,9 @@ Gui_Team::Gui_Team( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_Te
     this->listModelPtr = new Gui_TeamListModel( this );
     this->ui->teamList->setModel( listModelPtr );
     this->ui->teamList->setAlternatingRowColors( true );
-    this->ui->finishTimeEdit->setMinimumTime( m.currentEvent()->startTime());
-    this->ui->teamMembersEdit->setMinimum( m.currentEvent()->minMembers());
-    this->ui->teamMembersEdit->setMaximum( m.currentEvent()->maxMembers());
+    this->ui->finishTimeEdit->setMinimumTime( Event::active()->startTime());
+    this->ui->teamMembersEdit->setMinimum( Event::active()->minMembers());
+    this->ui->teamMembersEdit->setMaximum( Event::active()->maxMembers());
 
     // hide add/edit widget
     this->toggleAddEditWidget( NoState );
@@ -105,10 +105,10 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
         case AddQuick:
         {
             this->ui->teamNameEdit->clear();
-            this->ui->finishTimeEdit->setTime( m.currentEvent()->finishTime().addSecs( -60 ));
-            this->ui->teamMembersEdit->setValue( m.currentEvent()->minMembers());
+            this->ui->finishTimeEdit->setTime( Event::active()->finishTime().addSecs( -60 ));
+            this->ui->teamMembersEdit->setValue( Event::active()->minMembers());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
-            this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
+            this->ui->reviewerEdit->setText( Variable::string( "reviewerName" ));
 
             // refocus
             if ( state == Add )
@@ -120,7 +120,7 @@ void Gui_Team::toggleAddEditWidget( AddEditState state ) {
 
         case Edit:
             // match by id
-            teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+            teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
             if ( teamPtr == NULL ) {
                 this->toggleAddEditWidget( NoState );
@@ -166,11 +166,11 @@ void Gui_Team::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add || this->state() == AddQuick ) {
-        m.addTeam( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time(), this->ui->reviewerEdit->text());
+        Team::add( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time(), this->ui->reviewerEdit->text());
         lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match name to be sure
-        teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+        teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
         if ( teamPtr == NULL ) {
             this->toggleAddEditWidget( NoState );
@@ -189,7 +189,7 @@ void Gui_Team::on_doneButton_clicked() {
 
     // quick add
     if ( this->state() == AddQuick ) {
-        this->setLastId( m.base.teamList.last()->id());
+        this->setLastId( m.teamList.last()->id());
         this->close();
     }
 
@@ -205,7 +205,7 @@ void Gui_Team::on_doneButton_clicked() {
  * @brief Gui_Team::on_reviewerButton_clicked
  */
 void Gui_Team::on_reviewerButton_clicked() {
-    this->ui->reviewerEdit->setText( m.cvar( "reviewerName" )->string());
+    this->ui->reviewerEdit->setText( Variable::string( "reviewerName" ));
 }
 
 /**
@@ -213,7 +213,7 @@ void Gui_Team::on_reviewerButton_clicked() {
  */
 void Gui_Team::on_actionRemove_triggered() {
     int state;
-    Team *teamPtr = m.teamForId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+    Team *teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
     QSqlQuery query;
 
     if ( teamPtr != NULL ) {
@@ -232,8 +232,8 @@ void Gui_Team::on_actionRemove_triggered() {
             this->listModelPtr->beginReset();
 
             // remove from memory
-            m.base.teamList.removeOne( teamPtr );
-            m.currentEvent()->teamList.removeOne( teamPtr );
+            m.teamList.removeOne( teamPtr );
+            Event::active()->teamList.removeOne( teamPtr );
 
             // remove from database
             // fortunately teams are listed alphabetically, so there is no need to update order
@@ -265,8 +265,8 @@ void Gui_Team::closeEvent( QCloseEvent *ePtr ) {
 
     Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
     if ( gui != NULL ) {
-        if ( quick && !m.currentEvent()->teamList.isEmpty())
-            gui->fillTeams( m.currentEvent()->teamList.last()->id());
+        if ( quick && !Event::active()->teamList.isEmpty())
+            gui->fillTeams( Event::active()->teamList.last()->id());
         else
             gui->fillTeams();
     }

@@ -16,13 +16,13 @@
  *
  */
 
-#ifndef TASKENTRY_H
-#define TASKENTRY_H
+#ifndef TASK_H
+#define TASK_H
 
 //
 // includes
 //
-#include "databaseentry.h"
+#include "database.h"
 
 /**
  * @brief The Task class
@@ -65,6 +65,12 @@ public:
     QString description() const { return this->record().value( "description" ).toString(); }
     bool reindexRequired() const { return this->m_reindex; }
 
+    // static functions
+    static Task *forId( int id );
+    static Task *forName( const QString &name , bool currentEvent = true );
+    static void loadTasks();
+    static void add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Task::NoStyle , const QString &description = QString::null );
+
 public slots:
     void setName( const QString &name ) { this->setValue( "name", name ); }
     void setPoints( int points = 0 ) { this->setValue( "points", points ); }
@@ -80,4 +86,4 @@ private:
     int m_order;
 };
 
-#endif // TASKENTRY_H
+#endif // TASK_H

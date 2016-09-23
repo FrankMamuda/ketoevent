@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef CONSOLEVARIABLE_H
-#define CONSOLEVARIABLE_H
+#ifndef VARIABLE_H
+#define VARIABLE_H
 
 //
 // includes
@@ -27,9 +27,9 @@
 #include <QTime>
 
 /**
- * @brief The ConsoleVariable class
+ * @brief The Variable class
  */
-class ConsoleVariable : public QObject {
+class Variable : public QObject {
     Q_OBJECT
     Q_PROPERTY( QString key READ key WRITE setKey )
     Q_PROPERTY( QVariant defaultValue READ defaultValue WRITE setDefaultValue )
@@ -43,7 +43,7 @@ class ConsoleVariable : public QObject {
     Q_CLASSINFO( "description", "Console variable" )
 
 public:
-    explicit ConsoleVariable( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) { this->setKey( key ); this->s = settingsPtr; this->setDefaultValue( defaultValue ); }
+    explicit Variable( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) { this->setKey( key ); this->s = settingsPtr; this->setDefaultValue( defaultValue ); }
     QString key() const { return this->m_key; }
     QVariant defaultValue() const { return this->m_defaultValue; }
     QVariant value() const { if ( this->s == NULL ) return QVariant(); return this->s->value( this->key(), this->defaultValue()); }
@@ -54,6 +54,20 @@ public:
     QString string() const { return this->value().toString(); }
     QTime time() const { return this->value().toTime(); }
     QString timeString() const { return this->value().toTime().toString( "hh:mm" ); }
+
+    // static functions
+    static Variable *find( const QString &key );
+    static QVariant defaultValue( const QString &key ) { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QVariant(); return cvar->defaultValue(); }
+    static QVariant value( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QVariant(); return cvar->value(); }
+    static int integer( const QString &key )           { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return 0; return cvar->integer(); }
+    static bool isEnabled( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return false; return cvar->isEnabled(); }
+    static bool isDisabled( const QString &key )       { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return true; return cvar->isDisabled(); }
+    static float floatValue( const QString &key )      { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return 0.0f; return cvar->floatValue(); }
+    static QString string( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QString::null; return cvar->string(); }
+    static QTime time( const QString &key )            { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QTime(); return cvar->time(); }
+    static QString timeString( const QString &key )    { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QString::null; return cvar->timeString(); }
+    static void setValue( const QString &key, const QVariant &value ) { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return; cvar->s->setValue( key, value ); emit cvar->changed(); }
+    static void add( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue = QVariant());
 
 signals:
     void changed();
@@ -69,4 +83,4 @@ private:
     QSettings *s;
 };
 
-#endif // CONSOLEVARIABLE_H
+#endif // VARIABLE_H

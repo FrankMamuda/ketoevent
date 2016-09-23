@@ -126,7 +126,7 @@ void Gui_Task::toggleAddEditWidget( AddEditState state ) {
 
         case Edit:
             // match by id
-            taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+            taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
             if ( taskPtr == NULL ) {
                 this->toggleAddEditWidget( NoState );
                 return;
@@ -179,11 +179,11 @@ void Gui_Task::on_doneButton_clicked() {
 
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
-        m.addTask( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<Task::Types>( this->ui->taskType->currentIndex()), static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
+        Task::add( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<Task::Types>( this->ui->taskType->currentIndex()), static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
         lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match by id
-        taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
+        taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
 
         if ( taskPtr == NULL ) {
             this->toggleAddEditWidget( NoState );
@@ -255,7 +255,7 @@ void Gui_Task::findTask() {
         index = this->listModelPtr->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
-            if ( m.currentEvent()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+            if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -269,7 +269,7 @@ void Gui_Task::findTask() {
             index = this->listModelPtr->index( y, 0 );
             if ( index.isValid()) {
                 // list must be the same as in App_Main, don't match by display role
-                if ( m.currentEvent()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+                if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                     match = true;
                     this->setCurrentMatch( y );
                     break;
@@ -345,7 +345,7 @@ void Gui_Task::on_taskType_currentIndexChanged( int index ) {
  * @param direction
  */
 void Gui_Task::move( MoveDirection direction ) {
-    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     QModelIndex index;
     int y, t0, t1;
     int k = 0;
@@ -357,30 +357,30 @@ void Gui_Task::move( MoveDirection direction ) {
     if ( taskPtr == NULL )
         return;
 
-    y = m.currentEvent()->taskList.indexOf( taskPtr );
+    y = Event::active()->taskList.indexOf( taskPtr );
 
     if ( direction == Up && y != 0 ) {
         k = y - 1;
 
         // move in database
-        t0 = m.currentEvent()->taskList.at( y )->order();
-        t1 = m.currentEvent()->taskList.at( k )->order();
-        m.currentEvent()->taskList.at( y )->setOrder( t1 );
-        m.currentEvent()->taskList.at( k )->setOrder( t0 );
+        t0 = Event::active()->taskList.at( y )->order();
+        t1 = Event::active()->taskList.at( k )->order();
+        Event::active()->taskList.at( y )->setOrder( t1 );
+        Event::active()->taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        m.currentEvent()->taskList.move( y, k );
-    } else if ( direction == Down && y != m.currentEvent()->taskList.count() - 1 ) {
+        Event::active()->taskList.move( y, k );
+    } else if ( direction == Down && y != Event::active()->taskList.count() - 1 ) {
         k = y + 1;
 
         // move in database
-        t0 = m.currentEvent()->taskList.at( y )->order();
-        t1 = m.currentEvent()->taskList.at( k )->order();
-        m.currentEvent()->taskList.at( y )->setOrder( t1 );
-        m.currentEvent()->taskList.at( k )->setOrder( t0 );
+        t0 = Event::active()->taskList.at( y )->order();
+        t1 = Event::active()->taskList.at( k )->order();
+        Event::active()->taskList.at( y )->setOrder( t1 );
+        Event::active()->taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        m.currentEvent()->taskList.move( y, k );
+        Event::active()->taskList.move( y, k );
     }
 
     // end reset
@@ -400,7 +400,7 @@ void Gui_Task::move( MoveDirection direction ) {
  */
 void Gui_Task::on_actionRemove_triggered() {
     QSqlQuery query;
-    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     int y = 1;
 
     if ( taskPtr == NULL ) {
@@ -413,15 +413,15 @@ void Gui_Task::on_actionRemove_triggered() {
 
     // remove from internal list (both base and current event - there should be
     //   no mismatches, since eventId differs for tasks)
-    m.currentEvent()->taskList.removeOne( taskPtr );
-    m.base.taskList.removeOne( taskPtr );
+    Event::active()->taskList.removeOne( taskPtr );
+    m.taskList.removeOne( taskPtr );
 
     // remove from database
     query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
 
     // database reindexing must be performed, however this is done in-memory,
     // actual changes are written to disk only when requested
-    foreach ( Task *reorderPtr, m.currentEvent()->taskList ) {
+    foreach ( Task *reorderPtr, Event::active()->taskList ) {
         reorderPtr->setOrder( y );
         y++;
     }
@@ -446,7 +446,7 @@ void Gui_Task::on_actionSort_triggered() {
     m.sort( Main::Tasks );
 
     // reindex whole list
-    foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
+    foreach ( Task *taskPtr, Event::active()->taskList ) {
         taskPtr->setOrder( y );
         y++;
     }
@@ -464,7 +464,7 @@ void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
     ePtr->accept();
 
     // reindex tasks here
-    m.reindexTasks();
+    Database::reindexTasks();
 
     // refill tasks in gui
     Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
@@ -477,20 +477,20 @@ void Gui_Task::closeEvent( QCloseEvent *ePtr ) {
  * @param index
  */
 void Gui_Task::changeUpDownState( const QModelIndex &index ) {
-    Task *taskPtr = m.taskForId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     if ( taskPtr == NULL ) {
         this->ui->actionMoveUp->setDisabled( true );
         this->ui->actionMoveDown->setDisabled( true );
         return;
     }
 
-    if ( m.currentEvent()->taskList.count() > 1 && index.row() == 0 ) {
+    if ( Event::active()->taskList.count() > 1 && index.row() == 0 ) {
         this->ui->actionMoveUp->setDisabled( true );
         this->ui->actionMoveDown->setEnabled( true );
         return;
     }
 
-    if ( index.row() > 0 && index.row() == m.currentEvent()->taskList.count() - 1 ) {
+    if ( index.row() > 0 && index.row() == Event::active()->taskList.count() - 1 ) {
         this->ui->actionMoveUp->setEnabled( true );
         this->ui->actionMoveDown->setDisabled( true );
         return;

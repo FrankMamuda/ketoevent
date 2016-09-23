@@ -101,7 +101,7 @@ void Gui_Settings::on_pathButton_clicked() {
         filePath.append( ".db" );
 
     // don't reload the same database
-    if ( !QString::compare( filePath, m.cvar( "databasePath" )->string()))
+    if ( !QString::compare( filePath, Variable::string( "databasePath" )))
         return;
 
     // store database path
@@ -111,7 +111,7 @@ void Gui_Settings::on_pathButton_clicked() {
     m.clearEvent();
 
     // reload database
-    m.reloadDatabase( m.cvar( "databasePath" )->string());
+    Database::reload( Variable::string( "databasePath" ));
 
     // reinitialise gui
     gui = qobject_cast<Gui_Main*>( this->parent());

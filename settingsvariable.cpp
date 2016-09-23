@@ -55,7 +55,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
 
     // failsafe
     if ( this->parent() == NULL || this->objPtr == NULL ) {
-        m.error( StrSoftError, QString( this->tr( "unable to bind settings var '%1\n" )).arg( this->key()));
+        Common::error( StrSoftError, this->tr( "unable to bind settings variable \"%1\"\n" ).arg( this->key()));
         return;
     }
 
@@ -87,7 +87,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
         break;
 
     default:
-        m.error( StrSoftError, this->tr( "unknown type\n" ));
+        Common::error( StrSoftError, this->tr( "unknown type\n" ));
         return;
     }
 
@@ -159,9 +159,9 @@ void SettingsVariable::setState() {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
-            state = m.cvar( this->key())->isEnabled();
+            state = Variable::isEnabled( this->key());
         else
-            state = m.currentEvent()->record().value( this->key()).toBool();
+            state = Event::active()->record().value( this->key()).toBool();
 
         cPtr = qobject_cast<QCheckBox*>( this->objPtr );
         if ( state )
@@ -176,9 +176,9 @@ void SettingsVariable::setState() {
         int value;
 
         if ( this->varClass() == ConsoleVar )
-            value = m.cvar( this->key())->integer();
+            value = Variable::integer( this->key());
         else
-            value = m.currentEvent()->record().value( this->key()).toInt();
+            value = Event::active()->record().value( this->key()).toInt();
 
         sPtr = qobject_cast<QSpinBox*>( this->objPtr );
         sPtr->setValue( value );
@@ -190,9 +190,9 @@ void SettingsVariable::setState() {
         QTime time;
 
         if ( this->varClass() == ConsoleVar )
-            time = m.cvar( this->key())->time();
+            time = Variable::time( this->key());
         else
-            time = QTime::fromString( m.currentEvent()->record().value( this->key()).toString(), "hh:mm" );
+            time = QTime::fromString( Event::active()->record().value( this->key()).toString(), "hh:mm" );
 
         tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
         tPtr->setTime( time );
@@ -204,9 +204,9 @@ void SettingsVariable::setState() {
         QString text;
 
         if ( this->varClass() == ConsoleVar )
-            text = m.cvar( this->key())->string();
+            text = Variable::string( this->key());
         else
-            text = m.currentEvent()->record().value( this->key()).toString();
+            text = Event::active()->record().value( this->key()).toString();
 
         lPtr = qobject_cast<QLineEdit*>( this->objPtr );
         lPtr->setText( text );
@@ -219,9 +219,9 @@ void SettingsVariable::setState() {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
-            state = m.cvar( this->key())->isEnabled();
+            state = Variable::isEnabled( this->key());
         else
-            state = m.currentEvent()->record().value( this->key()).toBool();
+            state = Event::active()->record().value( this->key()).toBool();
 
         aPtr = qobject_cast<QAction*>( this->objPtr );
         if ( state )
@@ -233,7 +233,7 @@ void SettingsVariable::setState() {
 
     case NoType:
     default:
-        m.error( StrSoftError, this->tr( "unknown type\n" ));
+        Common::error( StrSoftError, this->tr( "unknown settings variable type" ));
         return;
     }
 }
@@ -253,14 +253,14 @@ void SettingsVariable::stateChanged( int state ) {
 
     if ( this->varClass() == ConsoleVar ) {
         if ( state == Qt::Checked )
-            m.cvar( this->key())->setValue( true );
+            Variable::setValue( this->key(), true );
         else
-            m.cvar( this->key())->setValue( false );
+            Variable::setValue( this->key(), false );
     } else {
         if ( state == Qt::Checked )
-            m.currentEvent()->setValue( this->key(), true );
+            Event::active()->setValue( this->key(), true );
         else
-            m.currentEvent()->setValue( this->key(), false );
+            Event::active()->setValue( this->key(), false );
     }
 }
 
@@ -278,15 +278,12 @@ void SettingsVariable::toggled( bool state ) {
         return;
 
     if ( this->varClass() == ConsoleVar ) {
-        if ( state == true )
-            m.cvar( this->key())->setValue( true );
-        else
-            m.cvar( this->key())->setValue( false );
+        Variable::setValue( this->key(), state );
     } else {
         if ( state == true )
-            m.currentEvent()->setValue( this->key(), true );
+            Event::active()->setValue( this->key(), true );
         else
-            m.currentEvent()->setValue( this->key(), false );
+            Event::active()->setValue( this->key(), false );
     }
 }
 
@@ -304,9 +301,9 @@ void SettingsVariable::integerValueChanged( int integer ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.cvar( this->key())->setValue( integer );
+        Variable::setValue( this->key(), integer );
     else
-        m.currentEvent()->setValue( this->key(), integer );
+        Event::active()->setValue( this->key(), integer );
 }
 
 /**
@@ -323,9 +320,9 @@ void SettingsVariable::timeChanged( const QTime &time ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.cvar( this->key())->setValue( time );
+        Variable::setValue( this->key(), time );
     else
-        m.currentEvent()->setValue( this->key(), time.toString( "hh:mm" ));
+        Event::active()->setValue( this->key(), time.toString( "hh:mm" ));
 }
 
 /**
@@ -342,7 +339,32 @@ void SettingsVariable::textChanged( const QString &text ) {
         return;
 
     if ( this->varClass() == ConsoleVar )
-        m.cvar( this->key())->setValue( text );
+        Variable::setValue( this->key(), text );
     else
-        m.currentEvent()->setValue( this->key(), text );
+        Event::active()->setValue( this->key(), text );
+}
+
+/**
+ * @brief Variable::add
+ * @param varPtr
+ */
+void SettingsVariable::add( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass ) {
+    // avoid duplicates
+    if ( SettingsVariable::find( key ) != NULL )
+        return;
+
+    m.svarList << new SettingsVariable( key, type, varClass );
+}
+
+/**
+ * @brief find
+ * @param key
+ * @return
+ */
+SettingsVariable *SettingsVariable::find( const QString &key ) {
+    foreach ( SettingsVariable *varPtr, m.svarList ) {
+        if ( !QString::compare( varPtr->key(), key ))
+            return varPtr;
+    }
+    return NULL;
 }

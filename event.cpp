@@ -17,190 +17,152 @@
  */
 
 //
-// event.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
 #include "main.h"
+#include "event.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QFile>
 
 /**
- * @brief Main::addEvent adds a new event
+ * @brief Event::Event event entry structure (constructor)
+ * @param record bound record
+ * @param table bound table
+ */
+Event::Event( const QSqlRecord &record, const QString &table ) {
+    // bind to sql
+    this->setRecord( record );
+    this->setTable( table );
+}
+
+/**
+ * @brief Event::add adds a new event
  * @param title event title
  */
-void Main::addEvent( const QString &title ) {
+void Event::add( const QString &title ) {
     QSqlQuery query;
     QString eventTitle;
 
     // announce
-    m.print( StrMsg + this->tr( "adding a new event - '%1'\n" ).arg( title ), Main::EventDebug );
+    Common::print( CLMsg + QObject::tr( "adding a new event - '%1'\n" ).arg( title ), Common::EventDebug );
 
     // copy title
     eventTitle = title;
 
     // set title if none
     if ( eventTitle.isEmpty())
-        eventTitle = this->tr( "unnamed event" );
+        eventTitle = QObject::tr( "unnamed event" );
 
     // add new event log with default/built-in values
-#ifdef SQL_PREPARE_STATEMENTS
     query.prepare( QString( "insert into events values ( null, :api, :name, :minMembers, :maxMembers, :startTime, :finishTime, :finalTime, :penalty, :comboOfTwo, :comboOfThree, :comboOfFourAndMore, :lock )" ));
-    query.bindValue( ":api", Common::API );
+    query.bindValue( ":api", KetoEvent::API );
     query.bindValue( ":name", eventTitle );
-    query.bindValue( ":minMembers", Common::defaultMinMembers );
-    query.bindValue( ":maxMembers", Common::defaultMaxMembers );
-    query.bindValue( ":startTime", Common::defaultStartTime );
-    query.bindValue( ":finishTime", Common::defaultFinishTime );
-    query.bindValue( ":finalTime", Common::defaultFinalTime );
-    query.bindValue( ":penalty", Common::defaultPenaltyPoints );
-    query.bindValue( ":comboOfTwo", Common::defaultComboOfTwo );
-    query.bindValue( ":comboOfThree", Common::defaultComboOfThree );
-    query.bindValue( ":comboOfFourAndMore", Common::defaultComboOfFourAndMore );
+    query.bindValue( ":minMembers", KetoEvent::defaultMinMembers );
+    query.bindValue( ":maxMembers", KetoEvent::defaultMaxMembers );
+    query.bindValue( ":startTime", KetoEvent::defaultStartTime );
+    query.bindValue( ":finishTime", KetoEvent::defaultFinishTime );
+    query.bindValue( ":finalTime", KetoEvent::defaultFinalTime );
+    query.bindValue( ":penalty", KetoEvent::defaultPenaltyPoints );
+    query.bindValue( ":comboOfTwo", KetoEvent::defaultComboOfTwo );
+    query.bindValue( ":comboOfThree", KetoEvent::defaultComboOfThree );
+    query.bindValue( ":comboOfFourAndMore", KetoEvent::defaultComboOfFourAndMore );
     query.bindValue( ":lock", 0 );
 
-    if ( !query.exec())
-#else
-    QString comboString;
-    QString timeString;
-
-    // compile strings
-    comboString = QString( "%1, %2, %3" )
-            .arg( Common::defaultComboOfTwo )
-            .arg( Common::defaultComboOfThree )
-            .arg( Common::defaultComboOfFourAndMore );
-    timeString = QString( "'%1', '%2', '%3'" )
-            .arg( Common::defaultStartTime )
-            .arg( Common::defaultFinishTime )
-            .arg( Common::defaultFinalTime );
-
-
-    if ( !query.exec( QString( "insert into events values ( null, %1, '%2', %3, %4, %5, %6, %7, '0' )" )
-                      .arg( Common::API )
-                      .arg( eventTitle )
-                      .arg( Common::defaultMinMembers )
-                      .arg( Common::defaultMaxMembers )
-                      .arg( timeString )
-                      .arg( Common::defaultPenaltyPoints )
-                      .arg( comboString )))
-#endif
-        this->error( StrSoftError, QString( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
+    if ( !query.exec()) {
+        Common::error( CLFatalError, QObject::tr( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        return;
+    }
 
     // select the new entry
     query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
 
     // get last sql entry and construct internal entry
     while ( query.next()) {
-        this->base.eventList << new Event( query.record(), "events" );
+        m.eventList << new Event( query.record(), "events" );
         break;
     }
 }
 
 /**
- * @brief Main::loadEvents loads events from database
- * @param import import toggle
+ * @brief Event::loadEvents loads events from database
  * @return success
  */
-bool Main::loadEvents( bool import ) {
+bool Event::loadEvents() {
     QSqlQuery query;
-    //int numEvents;
 
     // announce
-    m.print( StrMsg + this->tr( "loading events from database\n" ), Main::EventDebug );
+    Common::print( CLMsg + QObject::tr( "loading events from database\n" ), Common::EventDebug );
 
     // read all event entries
-    if ( import )
-        query.exec( "select * from merge.events" );
-    else
-        query.exec( "select * from events" );
+    query.exec( "select * from events" );
 
     // store entries
     while ( query.next()) {
         Event *eventPtr = new Event( query.record(), "events" );
-
-        if ( import ) {
-            eventPtr->setImported();
-            this->import.eventList << eventPtr;
-        } else
-            this->base.eventList << eventPtr;
+        m.eventList << eventPtr;
 
         // failsafe - api check
-        if ( static_cast<unsigned int>( this->base.eventList.last()->api()) < Common::MinimumAPI ) {
-            this->error( StrSoftError,
-                         this->tr( "incompatible API - '%1', minimum supported '%2'\n" )
-                         .arg( this->base.eventList.last()->api())
-                         .arg( Common::MinimumAPI ));
-            this->base.eventList.removeLast();
-
-            if ( import )
-                return false;
+        if ( static_cast<unsigned int>( m.eventList.last()->api()) < KetoEvent::MinimumAPI ) {
+            Common::error( CLSoftError,
+                     QObject::tr( "incompatible API - '%1', minimum supported '%2'\n" )
+                     .arg( m.eventList.last()->api())
+                     .arg( KetoEvent::MinimumAPI ));
+            m.eventList.removeLast();
 
             // rename database
-            this->unloadDatabase();
-            QFile::rename( this->cvar( "databasePath" )->string(), QString( "%1_badAPI_%2.db" ).arg( this->cvar( "databasePath" )->string().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
-            this->makePath( this->cvar( "databasePath" )->defaultValue().toString());
-            this->loadDatabase();
+            Database::unload();
+            QFile::rename( Variable::string( "databasePath" ), QString( "%1_badAPI_%2.db" ).arg( Variable::string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+            Database::makePath( Variable::defaultValue( "databasePath" ).toString());
+            Database::load();
             return false;
         }
-        //numEvents++;
     }
 
-    //if ( !numEvents ) {
-    //    this->error( StrSoftError, this->tr( "No events found. Must be a pre 2015 database, aborting\n" ));
-    //    return false;
-    //}
+    // no event entry? - create one
+    if ( m.eventList.isEmpty())
+        Event::add();
 
-    if ( !import ) {
-        // no event entry? - create one
-        if ( this->base.eventList.isEmpty())
-            this->addEvent();
-
-        // still nothing?
-        if ( this->base.eventList.isEmpty()) {
-            this->error( StrFatalError, this->tr( "could not create event\n" ));
-        }
-
-        // fixes crash on empty database
-        // NOTE: rather ugly code
-        Event *eventPtr = this->eventForId( this->cvar( "currentEvent" )->integer());
-        if ( eventPtr == NULL )
-            eventPtr = this->base.eventList.first();
-
-        // for now - resort to indexes?? (use list indexof)
-        if ( !this->setCurrentEvent( eventPtr ))
-            this->setCurrentEvent( this->base.eventList.first());
+    // still nothing?
+    if ( m.eventList.isEmpty()) {
+        Common::error( CLFatalError, QObject::tr( "could not create event\n" ));
     }
+
+    // fixes crash on empty database
+    Event *eventPtr = Event::forId( Variable::integer( "currentEvent" ));
+    if ( eventPtr == NULL )
+        eventPtr = m.eventList.first();
+
+    if ( !Event::setActive( eventPtr ))
+        Event::setActive( m.eventList.first());
 
     return true;
 }
 
 /**
- * @brief Main::currentEvent returns currently active event
+ * @brief Event::active returns currently active event
  * @return current event entry
  */
-Event *Main::currentEvent() {
-    if ( m_event == NULL )
-        this->error( StrFatalError, this->tr( "no valid events\n" ));
+Event *Event::active() {
+    if ( m.activeEvent == NULL )
+        Common::error( CLFatalError, QObject::tr( "no valid events\n" ));
 
-    return this->m_event;
+    return m.activeEvent;
 }
 
 /**
- * @brief Main::setCurrentEvent sets active event
+ * @brief Event::setActive sets active event
  * @param eventPtr event entry
  * @return success
  */
-bool Main::setCurrentEvent( Event *eventPtr ) {
+bool Event::setActive( Event *eventPtr ) {
     // announce
-    m.print( StrMsg + this->tr( "setting '%1' as current event\n" ).arg( eventPtr->name()), Main::EventDebug );
+    Common::print( CLMsg + QObject::tr( "setting '%1' as active event\n" ).arg( eventPtr->name()), Common::EventDebug );
 
-    foreach ( Event *entry, this->base.eventList ) {
+    foreach ( Event *entry, m.eventList ) {
         if ( entry == eventPtr ) {
-            this->m_event = entry;
-            this->cvar( "currentEvent" )->setValue( eventPtr->id());
+            m.activeEvent = entry;
+            Variable::setValue( "currentEvent", eventPtr->id());
             return true;
         }
     }
@@ -208,12 +170,12 @@ bool Main::setCurrentEvent( Event *eventPtr ) {
 }
 
 /**
- * @brief Main::eventForId returns event entry for given id
+ * @brief Event::forId returns event entry for given id
  * @param id event id
  * @return event entry
  */
-Event *Main::eventForId( int id ) {
-    foreach ( Event *eventPtr, this->base.eventList ) {
+Event *Event::forId( int id ) {
+    foreach ( Event *eventPtr, m.eventList ) {
         if ( eventPtr->id() == id )
             return eventPtr;
     }
@@ -222,22 +184,22 @@ Event *Main::eventForId( int id ) {
 }
 
 /**
- * @brief Main::buildEventTTList builds event task and team list
+ * @brief Event::buildTTList builds event task and team list
  */
-void Main::buildEventTTList() {
+void Event::buildTTList() {
     // announce
-    m.print( StrMsg + this->tr( "building event TTList\n" ), Main::EventDebug );
+    Common::print( CLMsg + QObject::tr( "building event TTList\n" ), Common::EventDebug );
 
-    foreach ( Event *eventPtr, this->base.eventList ) {
+    foreach ( Event *eventPtr, m.eventList ) {
         eventPtr->teamList.clear();
         eventPtr->taskList.clear();
 
-        foreach ( Team *teamPtr, this->base.teamList ) {
+        foreach ( Team *teamPtr, m.teamList ) {
             if ( teamPtr->eventId() == eventPtr->id())
                 eventPtr->teamList << teamPtr;
         }
 
-        foreach ( Task *taskPtr, this->base.taskList ) {
+        foreach ( Task *taskPtr, m.taskList ) {
             if ( taskPtr->eventId() == eventPtr->id())
                 eventPtr->taskList << taskPtr;
         }

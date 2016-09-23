@@ -22,7 +22,7 @@
 #include "gui_event.h"
 #include "ui_gui_event.h"
 #include "gui_main.h"
-#include "evententry.h"
+#include "event.h"
 #include "gui_addedit.h"
 #include <QMessageBox>
 #include <QSqlQuery>
@@ -45,7 +45,7 @@ Gui_Event::Gui_Event( QWidget *parent ) : Gui_Dialog( parent ), ui( new Ui::Gui_
         this->bindVars();
 
     this->fillEvents();
-    this->setImported( false );
+    //this->setImported( false );
 }
 
 /**
@@ -62,12 +62,12 @@ void Gui_Event::fillEvents() {
     this->ui->eventCombo->clear();
 
     // set last event
-    eventPtr = m.eventForId( m.cvar( "currentEvent" )->integer());
+    eventPtr = Event::forId( Variable::integer( "currentEvent" ));
     if ( eventPtr != NULL )
         id = eventPtr->id();
 
     // fill the combobox with events
-    foreach ( Event *ePtr, m.base.eventList ) {
+    foreach ( Event *ePtr, m.eventList ) {
         this->ui->eventCombo->addItem( ePtr->name(), ePtr->id());
         if ( ePtr->id() == id )
             this->ui->eventCombo->setCurrentIndex( y );
@@ -131,9 +131,9 @@ void Gui_Event::on_eventCombo_currentIndexChanged( int index ) {
     this->validate();
 
     // set current event
-    Event *eventPtr = m.eventForId( this->ui->eventCombo->itemData( index ).toInt());
-    if ( eventPtr != NULL && eventPtr != m.currentEvent()) {
-        m.setCurrentEvent( eventPtr );
+    Event *eventPtr = Event::forId( this->ui->eventCombo->itemData( index ).toInt());
+    if ( eventPtr != NULL && eventPtr != Event::active()) {
+        Event::setActive( eventPtr );
         this->lockVariables();
         this->updateVars();
         this->lockVariables( false );
@@ -171,17 +171,17 @@ void Gui_Event::on_actionAddEvent_triggered() {
 void Gui_Event::on_actionRemoveEvent_triggered() {
     QMessageBox msgBox;
     int state;
-    Event *eventPtr = m.currentEvent();
+    Event *eventPtr = Event::active();
     QSqlQuery query;
 
     // make sure we cannot delete all events
-    if ( m.base.eventList.count() <= 1 ) {
+    if ( m.eventList.count() <= 1 ) {
         QMessageBox::warning( this, "Error", "Cannot remove last remaining event", QMessageBox::Ok );
         return;
     }
 
     // allow to reconsider
-    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( m.currentEvent()->name()));
+    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( Event::active()->name()));
     msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton( QMessageBox::Yes );
     msgBox.setIcon( QMessageBox::Warning );
@@ -192,8 +192,8 @@ void Gui_Event::on_actionRemoveEvent_triggered() {
     switch ( state ) {
     case QMessageBox::Yes:
         // remove from memory
-        m.base.eventList.removeOne( m.currentEvent());
-        m.setCurrentEvent( m.base.eventList.first());
+        m.eventList.removeOne( Event::active());
+        Event::setActive( m.eventList.first());
 
         // remove from database
         query.exec( QString( "delete from events where id=%1" ).arg( eventPtr->id()));
@@ -214,95 +214,114 @@ void Gui_Event::on_actionRemoveEvent_triggered() {
  */
 void Gui_Event::on_actionImportLogs_triggered() {
     QString path, filePath;
+    QStringList filePaths;
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database or XML (2012)" ), path, this->tr( "Database or 2012 XML (*.db *.xml)" ));
+    filePaths = QFileDialog::getOpenFileNames( this, this->tr( "Select database or XML (2012)" ), path, this->tr( "Database or 2012 XML (*.db *.xml)" ));
 
-    // check for empty filenames
-    if ( filePath.isEmpty())
-        return;
-
-    // check if path is valid
-    if ( !QFileInfo( filePath ).absoluteDir().isReadable())
-        return;
-
-    // importing database
-    if ( filePath.endsWith( ".db" )) {
-
-        // avoid importing the same database
-        if ( !QString::compare( filePath, m.path )) {
-            m.error( StrSoftError, "cannot import current database\n" );
+    // go through all list
+    foreach ( filePath, filePaths ) {
+        // check for empty filenames
+        if ( filePath.isEmpty())
             return;
-        }
 
-        // import database
-        m.attachDatabase( filePath, Main::LogImport );
+        // check if path is valid
+        if ( !QFileInfo( filePath ).absoluteDir().isReadable())
+            return;
 
-        // mark as imported
-        this->setImported();
-    } else if ( filePath.endsWith( ".xml" )) {
-        // FIXME: no updates in GUI
-        QFile xmlList( filePath );
-        xmlList.open( QFile::ReadOnly );
+        // importing database
+        if ( filePath.endsWith( ".db" )) {
 
-        QXmlStreamReader xml( &xmlList );
-
-        if ( xml.readNextStartElement()) {
-            if ( !QString::compare( xml.name().toString(), "team", Qt::CaseInsensitive )) {
-                QString name = xml.attributes().value( "name" ).toString();
-
-                qDebug() << "team" << name;
-
-
-
-                int hour = xml.attributes().value( "hour" ).toInt();
-                int minute = xml.attributes().value( "minute" ).toInt();
-                int members = xml.attributes().value( "members" ).toInt();
-                bool lock = static_cast<bool>( xml.attributes().value( "lock" ).toInt());
-                m.addTeam( name, members, QTime::fromString( QString( "%1:%2" ).arg( hour ).arg( minute ), "HH:mm" ), "imported", lock );
-                int id = m.teamForName( name )->id();
-
-                if ( id < 1 ) {
-                    qDebug() << "bad id";
-                    return;
-                }
-
-                while ( xml.readNextStartElement()) {
-                    if ( !QString::compare( xml.name().toString(), "log", Qt::CaseInsensitive )) {
-                        QString hash = xml.attributes().value( "hash" ).toString();
-                        int value = xml.attributes().value( "value" ).toInt();
-                        // TODO: combos
-                        //int combo = xml.attributes().value( "combo" ).toInt();
-
-                        qDebug() << "found log" << hash;
-
-
-                        bool found = false;
-                        foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
-                            if ( !QString::compare( Main::stringToHash( taskPtr->name()), hash, Qt::CaseInsensitive )) {
-                                qDebug() << taskPtr->id() << id << value;
-                                m.addLog( taskPtr->id(), id, value );
-                                found = true;
-                            }
-                        }
-
-                        if ( !found ) {
-                            m.print( this->tr( "Unknown task with hash %1\n" ).arg( hash ), Main::Database );
-                                qDebug() << this->tr( "Unknown task with hash %1\n" ).arg( hash );
-                        }
-
-                        xml.readNext();
-                    } else {
-                        xml.skipCurrentElement();
-                    }
-                }
-            } else {
-                m.error( StrSoftError, this->tr( "invalid XML file\n" ));
+            // avoid importing the same database
+            if ( !QString::compare( filePath, m.path )) {
+                Common::error( StrSoftError, "cannot import current database\n" );
+                return;
             }
-        }
 
-        xmlList.close();
+            // import database
+            Database::attach( filePath, Database::LogImport );
+
+            // mark as imported
+            //this->setImported();
+        } else if ( filePath.endsWith( ".xml" )) {
+            QFile xmlList( filePath );
+            xmlList.open( QFile::ReadOnly );
+
+            QXmlStreamReader xml( &xmlList );
+
+            Task::add( "[Imported combos]", 1, 999, Task::Multi, Task::Bold, "Sum of imported combo points" );
+            int comboTaskId = Task::forName( "[Imported combos]" )->id();
+
+            if ( comboTaskId < 1 )
+                return;
+
+            if ( xml.readNextStartElement()) {
+                if ( !QString::compare( xml.name().toString(), "team", Qt::CaseInsensitive )) {
+                    QString name = xml.attributes().value( "name" ).toString();
+                    int hour = xml.attributes().value( "hour" ).toInt();
+
+                    int minute = xml.attributes().value( "minute" ).toInt();
+                    QString minuteString = QString( "%1" ).arg( minute );
+                    if ( minuteString.length() == 1 )
+                        minuteString.prepend( "0" );
+
+                    int members = xml.attributes().value( "members" ).toInt();
+                    bool lock = static_cast<bool>( xml.attributes().value( "lock" ).toInt());
+
+                    foreach ( Team *teamPtr, Event::active()->teamList ) {
+                        if ( !QString::compare( teamPtr->name(), name ))
+                            return;
+                    }
+
+                    Team::add( name, members, QTime::fromString( QString( "%1:%2" ).arg( hour ).arg( minuteString ), "HH:mm" ), "imported", lock );
+                    int id = Team::forName( name, true )->id();
+
+                    if ( id < 1 )
+                        return;
+
+                    int combos = 0;
+                    while ( xml.readNextStartElement()) {
+                        if ( !QString::compare( xml.name().toString(), "log", Qt::CaseInsensitive )) {
+                            QString hash = xml.attributes().value( "hash" ).toString();
+                            int value = xml.attributes().value( "value" ).toInt();
+                            int combo = xml.attributes().value( "combo" ).toInt();
+                            combos += combo;
+
+                            bool found = false;
+                            foreach ( Task *taskPtr, Event::active()->taskList ) {
+                                if ( !QString::compare( Database::stringToHash( taskPtr->name()), hash, Qt::CaseInsensitive )) {
+                                    Log::add( taskPtr->id(), id, value );
+                                    found = true;
+                                }
+                            }
+
+                            if ( !found )
+                                Common::print( StrMsg + this->tr( "unknown task with hash %1\n" ).arg( hash ), Common::DatabaseDebug );
+
+                            xml.readNext();
+                        } else {
+                            xml.skipCurrentElement();
+                        }
+                    }
+
+                    Log::add( comboTaskId, id, combos );
+                } else {
+                    Common::error( StrSoftError, this->tr( "invalid XML file\n" ));
+                }
+            }
+
+            // perform refresh
+            Gui_Main *guiPtr;
+            guiPtr = qobject_cast<Gui_Main*>( this->parent());
+
+            if ( guiPtr != NULL ) {
+                guiPtr->fillTeams();
+                guiPtr->fillTasks();
+            }
+
+            xmlList.close();
+        }
     }
 
     // close window
@@ -331,15 +350,12 @@ void Gui_Event::on_actionImportTasks_triggered() {
     if ( filePath.endsWith( ".db" )) {
         // avoid importing the same database
         if ( !QString::compare( filePath, m.path )) {
-            m.error( StrSoftError, "cannot import current database\n" );
+            Common::error( StrSoftError, "cannot import current database\n" );
             return;
         }
 
         // import database
-        m.attachDatabase( filePath, Main::TaskImport );
-
-        // mark as imported
-        this->setImported();
+        Database::attach( filePath, Database::TaskImport );
     }
     // importing csv
     else if ( filePath.endsWith( ".csv" )) {
@@ -363,10 +379,10 @@ void Gui_Event::on_actionImportTasks_triggered() {
             info = task.split( ";" );
 
             if ( info.count() == 6 ) {
-                Task *taskPtr = m.taskForName( info.at( 0 ));
+                Task *taskPtr = Task::forName( info.at( 0 ));
 
                 if ( taskPtr == NULL ) {
-                    m.addTask( info.at( 0 ),                // name
+                    Task::add( info.at( 0 ),                // name
                                info.at( 2 ).toInt(),        // points
                                info.at( 3 ).toInt(),        // multi
                                static_cast<Task::Types>
@@ -376,7 +392,7 @@ void Gui_Event::on_actionImportTasks_triggered() {
                                info.at( 1 ));               // description
                 } else {
 #ifdef APPLET_DEBUG
-                    m.print( this->tr( "Updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Main::System );
+                    Common::print( StrMsg + this->tr( "updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Common::System );
 #endif
                     taskPtr->setPoints( info.at( 2 ).toInt());
                     taskPtr->setMulti( info.at( 3 ).toInt());
@@ -394,7 +410,6 @@ void Gui_Event::on_actionImportTasks_triggered() {
             gui->fillTasks();
     }
     // importing XML (2012 event)
-    // FIXME: no updates in main GUI after task import
     else if ( filePath.endsWith( ".xml" )) {
         QFile xmlList( filePath );
         xmlList.open( QFile::ReadOnly );
@@ -421,14 +436,14 @@ void Gui_Event::on_actionImportTasks_triggered() {
                                 points = 1;
                                 style = Task::Italic;
                             } else
-                                max  = xml.attributes().value( "challenge" ).toInt();
+                                max  = xml.attributes().value( "max" ).toInt();
                         } else
                             taskType = Task::Check;
 
                         if ( challenge )
                             style = Task::Bold;
 
-                        m.addTask( name, points, max, taskType, style );
+                        Task::add( name, points, max, taskType, style );
 
                         xml.readNext();
                     } else {
@@ -436,13 +451,20 @@ void Gui_Event::on_actionImportTasks_triggered() {
                     }
                 }
             } else {
-                m.error( StrSoftError, this->tr( "invalid XML file\n" ));
+                Common::error( StrSoftError, this->tr( "invalid XML file\n" ));
             }
         }
 
+        // perform refresh
+        Gui_Main *guiPtr;
+        guiPtr = qobject_cast<Gui_Main*>( this->parent());
+
+        if ( guiPtr != NULL )
+            guiPtr->fillTasks();
+
         xmlList.close();
     } else {
-        m.error( StrSoftError, this->tr( "unknown task storage format\n" ));
+        Common::error( StrSoftError, this->tr( "unknown task storage format\n" ));
         return;
     }
 
@@ -472,7 +494,7 @@ void Gui_Event::on_actionExportEvent_triggered() {
 
     // forbid overwrite of the current database
     if ( !QString::compare( path, m.path )) {
-        m.error( StrSoftError, this->tr( "cannot overwrite current database\n" ));
+        Common::error( StrSoftError, this->tr( "cannot overwrite current database\n" ));
         return;
     }
 
@@ -482,19 +504,19 @@ void Gui_Event::on_actionExportEvent_triggered() {
 
     // check if exists
     if ( !database.exists()) {
-        m.error( StrSoftError, this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        Common::error( StrSoftError, this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
         return;
     }
 
     // attach the new database
     if ( !query.exec( QString( "attach '%1' as export" ).arg( path ))) {
-        m.error( StrSoftError, this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        Common::error( StrSoftError, this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
         return;
     }
 
-    m.createDatabaseStructure( "export." );
-    query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( m.currentEvent()->id()));
-    query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( m.currentEvent()->id()));
+    Database::createStructure( "export." );
+    query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( Event::active()->id()));
+    query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( Event::active()->id()));
     query.exec( "detach export" );
 }
 
@@ -529,7 +551,7 @@ void Gui_Event::on_actionExportTasks_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Task *taskPtr, m.currentEvent()->taskList ) {
+        foreach ( Task *taskPtr, Event::active()->taskList ) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( taskPtr->name().replace( ';', ',' ))
                    .arg( taskPtr->description().replace( ';', ',' ))

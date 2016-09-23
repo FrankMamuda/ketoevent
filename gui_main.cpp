@@ -61,7 +61,7 @@ void Gui_Main::initialise( bool reload ) {
         this->ui->actionLogTime->setDisabled( true );
     } else {
         // set minimum for time
-        this->ui->timeFinish->setMinimumTime( m.currentEvent()->startTime());
+        this->ui->timeFinish->setMinimumTime( Event::active()->startTime());
 
         // connect team switcher and finish time editor
         if ( !reload ) {
@@ -123,18 +123,18 @@ void Gui_Main::setEventTitle() {
     QString reviewer;
 
     // this really should not happen
-    if ( m.currentEvent() == NULL ) {
+    if ( Event::active() == NULL ) {
         this->setWindowTitle( this->tr( "Ketoevent logger" ));
         return;
     }
 
     // get reviewer name
-    reviewer = m.cvar( "reviewerName" )->string();
+    reviewer = Variable::string( "reviewerName" );
 
     if ( !reviewer.isEmpty())
-        this->setWindowTitle( this->tr( "Ketoevent logger - %1 (%2)" ).arg( m.currentEvent()->name()).arg( reviewer ));
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1 (%2)" ).arg( Event::active()->name()).arg( reviewer ));
     else
-        this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( m.currentEvent()->name()));
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( Event::active()->name()));
 }
 
 /**
@@ -163,13 +163,13 @@ Gui_Main::~Gui_Main() {
  * @param index
  */
 void Gui_Main::teamIndexChanged( int index ) {
-    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( index ).toInt());
+    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( index ).toInt());
     QListWidget *lw = this->ui->taskList;
     int y;
 
     // recalculate last team if required
     if ( this->currentTeamId() != -1 ) {
-        Team *recalcPtr = m.teamForId( this->currentTeamId());
+        Team *recalcPtr = Team::forId( this->currentTeamId());
         if ( recalcPtr != NULL ) {
             if ( !recalcPtr->combosCalculated()) {
                 recalcPtr->calculateCombos();
@@ -281,7 +281,7 @@ void Gui_Main::taskIndexChanged( int row ) {
  * @param time
  */
 void Gui_Main::updateFinishTime( QTime time ) {
-    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
     if ( teamPtr != NULL ) {
         if ( time == teamPtr->finishTime())
             return;
@@ -303,7 +303,7 @@ void Gui_Main::fillTeams( int forcedId ) {
 
     // store last team id
     if ( this->ui->comboTeams->count() && forcedId == -1 ) {
-        Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
         if ( teamPtr != NULL )
             lastId = teamPtr->id();
     }
@@ -312,7 +312,7 @@ void Gui_Main::fillTeams( int forcedId ) {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( Team *teamPtr, m.currentEvent()->teamList ) {
+    foreach ( Team *teamPtr, Event::active()->teamList ) {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
         // resore last id if any
@@ -376,10 +376,10 @@ void Gui_Main::fillTasks() {
     this->clearTasks();
 
     // fill with either sorted or unsorted list
-    if ( m.cvar( "misc/sortTasks" )->isEnabled()/* || m.cvar( "misc/hilightLogged" )->isEnabled()*/)
+    if ( Variable::isEnabled( "misc/sortTasks" )/* || m.cvar( "misc/hilightLogged" )->isEnabled()*/)
         taskList = m.taskListSorted();
     else
-        taskList = m.currentEvent()->taskList;
+        taskList = Event::active()->taskList;
 
     foreach ( Task *taskPtr, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
@@ -484,7 +484,7 @@ void Gui_Main::on_findTaskEdit_returnPressed() {
  */
 void Gui_Main::on_actionEvents_triggered() {
     // store last event id
-    this->setLastEventId( m.cvar( "currentEvent" )->integer());
+    this->setLastEventId( Variable::integer( "currentEvent" ));
 
     // show dialog
     this->eventDialog->show();
@@ -498,13 +498,13 @@ void Gui_Main::eventDialogClosed( int signal ) {
     int newEventId;
 
     // get current id
-    newEventId = m.cvar( "currentEvent" )->integer();
+    newEventId = Variable::integer( "currentEvent" );
 
-    if ( this->eventDialog->importPerformed()) {
+    /*if ( this->eventDialog->importPerformed()) {
         QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
         m.shutdown();
         return;
-    }
+    }*/
 
     if ( signal == Gui_Dialog::Accepted ) {
         // compare these two
@@ -515,7 +515,7 @@ void Gui_Main::eventDialogClosed( int signal ) {
 
         this->setEventTitle();
     } else {
-        m.setCurrentEvent( m.eventForId( this->lastEventId()));
+        Event::setActive( Event::forId( this->lastEventId()));
     }
 }
 
@@ -562,9 +562,9 @@ void Gui_Main::on_actionCombos_triggered() {
 void Gui_Main::on_actionConsole_toggled( bool visible ) {
 #ifdef APPLET_DEBUG
     if ( visible )
-        m.showConsole();
+        Gui_Console::show();
     else
-        m.hideConsole();
+        Gui_Console::hide();
 #else
     Q_UNUSED( visible )
 #endif
@@ -592,10 +592,12 @@ void Gui_Main::on_actionSettings_triggered() {
  * @brief Gui_Main::testSortButton
  */
 void Gui_Main::testSortButton() {
-    if ( m.cvar( "misc/sortLogged" )->isEnabled())
+    /*if ( Variable::isEnabled( "misc/sortLogged" ))
         this->ui->actionSort->setEnabled( true );
     else
-        this->ui->actionSort->setDisabled( true );
+        this->ui->actionSort->setDisabled( true );*/
+
+    this->ui->actionSort->setEnabled( Variable::isEnabled( "misc/sortLogged" ));
 }
 
 //
@@ -665,7 +667,7 @@ void Gui_Main::testTeam( Team *teamPtr ) {
 
     // report
     teamPtr->calculateCombos();
-    m.print( QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Main::System );
+    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Common::System );
 }
 
 /**
@@ -678,19 +680,19 @@ void Gui_Main::stressTest( int numTeams ) {
 
     // clear command has been given
     if ( numTeams == -1 ) {
-        foreach ( Team *teamPtr, m.base.teamList ) {
+        foreach ( Team *teamPtr, m.teamList ) {
             if ( teamPtr->name().startsWith( "Stress test" ))
-                m.removeTeam( teamPtr->name());
+                Team::remove( teamPtr->name());
         }
         this->fillTeams();
         return;
     } else if ( numTeams == -2 ) {
-        if ( !m.currentEvent()->teamList.isEmpty())
-            m.print( this->tr( "Performing stress test for %1 custom teams" ).arg( m.currentEvent()->teamList.count()), Main::System );
+        if ( !Event::active()->teamList.isEmpty())
+            Common::print( StrMsg + this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()), Common::System );
         else
-            m.print( this->tr( "No teams to perform stress test on" ), Main::System );
+            Common::print( StrMsg + this->tr( "no teams to perform stress test on" ), Common::System );
 
-        foreach ( Team *teamPtr, m.currentEvent()->teamList )
+        foreach ( Team *teamPtr, Event::active()->teamList )
             this->testTeam( teamPtr );
         return;
     }
@@ -703,17 +705,17 @@ void Gui_Main::stressTest( int numTeams ) {
 
     // add a few teams with random logs
     for ( k = 0; k < numTeams; k++ ) {
-        int maxSeconds = m.currentEvent()->startTime().secsTo( m.currentEvent()->finalTime());
-        QTime finishTime = m.currentEvent()->startTime().addSecs( irand( 1, maxSeconds ));
+        int maxSeconds = Event::active()->startTime().secsTo( Event::active()->finalTime());
+        QTime finishTime = Event::active()->startTime().addSecs( irand( 1, maxSeconds ));
         QString teamName = QString( "Stress test %1" ).arg( k );
 
         // remove duplicates
-        if ( m.teamForName( teamName ) != NULL )
-            m.removeTeam( teamName );
+        if ( Team::forName( teamName ) != NULL )
+            Team::remove( teamName );
 
         // add a stress test team
-        m.addTeam( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
-        teamPtr = m.teamForName( QString( "Stress test %1" ).arg( k ));
+        Team::add( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
+        teamPtr = Team::forName( QString( "Stress test %1" ).arg( k ));
 
         if ( teamPtr != NULL )
             this->testTeam( teamPtr );
@@ -765,7 +767,7 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
 
         // check if it has a combo assigned, if not get the next free index
         if ( !tw->hasCombo())
-            tw->log()->setComboId( m.getFreeComboHandle());
+            tw->log()->setComboId( Combo::getFreeHandle());
 
         this->setCurrentComboIndex( tw->log()->comboId());
 
@@ -773,7 +775,7 @@ void Gui_Main::on_actionCombine_toggled( bool checked ) {
         tw->combo->setChecked( true );
 
         // check for the total number of logs
-        teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
         if ( teamPtr != NULL ) {
             int count = 0;
 
@@ -911,7 +913,7 @@ void Gui_Main::on_actionSort_triggered() {
  * @brief Gui_Main::on_actionLockTeam_triggered
  */
 void Gui_Main::on_actionLockTeam_triggered() {
-    Team *teamPtr = m.teamForId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
     if ( teamPtr == NULL )
         return;
 
@@ -921,4 +923,14 @@ void Gui_Main::on_actionLockTeam_triggered() {
         teamPtr->lock();
 
     this->teamIndexChanged( this->currentTeamIndex());
+}
+
+/**
+ * @brief Gui_Main::on_actionCombine_changed
+ */
+void Gui_Main::on_actionCombine_changed() {
+    if ( this->ui->actionCombine->isEnabled())
+        this->ui->actionLockTeam->setDisabled( true );
+    else
+        this->ui->actionLockTeam->setEnabled( true );
 }

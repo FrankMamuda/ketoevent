@@ -16,18 +16,24 @@
  *
  */
 
+#ifndef COMBO_H
+#define COMBO_H
+
 //
 // includes
 //
-#include "evententry.h"
+#include <QObject>
 
 /**
- * @brief Event::Event event entry structure (constructor)
- * @param record bound record
- * @param table bound table
+ * @brief The Combo class
  */
-Event::Event( const QSqlRecord &record, const QString &table ) {
-    // bind to sql
-    this->setRecord( record );
-    this->setTable( table );
-}
+class Combo : public QObject {
+    Q_OBJECT
+    Q_CLASSINFO( "description", "Combo subystem" )
+
+public:
+    static int getFreeHandle();
+};
+
+#endif // COMBO_H
+

@@ -64,7 +64,7 @@ public slots:
     void taskIndexChanged( int row );
     void setEventTitle();
     void clearTasks();
-    void print( const QString &msg ) { m.print( StrMsg + msg, Main::GuiMain ); }
+    void print( const QString &msg ) { Common::print( StrMsg + msg, Common::GuiMain ); }
     void lock();
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );
@@ -109,6 +109,7 @@ private slots:
     void on_actionQuickAdd_triggered();
     void on_actionSort_triggered();
     void on_actionLockTeam_triggered();
+    void on_actionCombine_changed();
 
 protected:
     virtual void closeEvent( QCloseEvent *eventPtr ) { m.shutdown(); QWidget::closeEvent( eventPtr ); }

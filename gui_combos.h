@@ -24,7 +24,7 @@
 //
 #include <QDialog>
 #include "gui_combomodel.h"
-#include "logentry.h"
+#include "log.h"
 
 //
 // namespace: Ui

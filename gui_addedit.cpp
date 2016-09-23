@@ -45,7 +45,7 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
         if ( this->mode() == Rename ) {
             this->setWindowTitle( this->tr( "Rename event" ));
             this->ui->acceptButton->setText( this->tr( "Done" ));
-            this->ui->titleEdit->setText( m.currentEvent()->name());
+            this->ui->titleEdit->setText( Event::active()->name());
         } else if ( this->mode() == Add ) {
             this->setWindowTitle( this->tr( "Add an event" ));
             this->ui->acceptButton->setText( this->tr( "Add" ));
@@ -54,7 +54,7 @@ Gui_AddEdit::Gui_AddEdit( Parent parent, Mode mode, int id, QWidget *parentPtr )
 
     case NoParent:
     default:
-        m.error( StrSoftError, this->tr( "Dialog called without parent\n" ));
+        Common::error( StrSoftError, this->tr( "dialog called without parent\n" ));
     }
 }
 
@@ -76,7 +76,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
 
         // must not be in edit mode
         if ( this->mode() == Edit ) {
-            m.error( StrSoftError, this->tr( "Edit mode cannot be used for event dialog\n" ));
+            Common::error( StrSoftError, this->tr( "edit mode cannot be used for event dialog\n" ));
             return;
         }
 
@@ -87,10 +87,10 @@ void Gui_AddEdit::on_acceptButton_clicked() {
         }
 
         if ( this->mode() == Rename )
-            m.currentEvent()->setName( this->ui->titleEdit->text());
+            Event::active()->setName( this->ui->titleEdit->text());
         else if ( this->mode() == Add )
             // just add a new event
-            m.addEvent( this->ui->titleEdit->text());
+            Event::add( this->ui->titleEdit->text());
 
         // alert parent
         evPtr = qobject_cast<Gui_Event*>( this->parent());
@@ -101,7 +101,7 @@ void Gui_AddEdit::on_acceptButton_clicked() {
 
     case NoMode:
     default:
-        m.error( StrSoftError, this->tr( "Dialog called without an edit mode\n" ));
+        Common::error( StrSoftError, this->tr( "dialog called without an edit mode\n" ));
         this->reject();
     }
 

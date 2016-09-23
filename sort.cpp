@@ -164,7 +164,7 @@ static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
     if ( gui->currentTeamId() == -1 )
         return false;
 
-    Team *teamPtr = m.teamForId( gui->currentTeamId());
+    Team *teamPtr = Team::forId( gui->currentTeamId());
     if ( teamPtr == NULL )
         return false;
 
@@ -180,7 +180,7 @@ static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
 
     // something is wrong with QString::localeAwareCompare
     if ( one == false && two == false ) {
-        if ( m.cvar( "misc/sortTasks" )->isEnabled())
+        if ( Variable::isEnabled( "misc/sortTasks" ))
             return /*QString::localeAwareCompare( ePtr0->name(), ePtr1->name()) < 0;*/m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
         else
             return ePtr0->order() < ePtr1->order();
@@ -201,28 +201,28 @@ void Main::sort( ListTypes type ) {
         QList <Task*>boldList;
         QList <Task*>italicList;
 
-        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+        foreach ( Task *taskPtr, Event::active()->taskList ) {
             if ( taskPtr->style() == Task::Regular )
                 regularList << taskPtr;
         }
         qSort( regularList.begin(), regularList.end(), listToAscending<Task> );
 
-        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+        foreach ( Task *taskPtr, Event::active()->taskList ) {
             if ( taskPtr->style() == Task::Bold )
                 boldList << taskPtr;
         }
         qSort( boldList.begin(), boldList.end(), listToAscending<Task> );
 
-        foreach ( Task *taskPtr, this->currentEvent()->taskList ) {
+        foreach ( Task *taskPtr, Event::active()->taskList ) {
             if ( taskPtr->style() == Task::Italic )
                 italicList << taskPtr;
         }
         qSort( italicList.begin(), italicList.end(), listToAscending<Task> );
 
-        this->currentEvent()->taskList.clear();
-        this->currentEvent()->taskList.append( regularList );
-        this->currentEvent()->taskList.append( boldList );
-        this->currentEvent()->taskList.append( italicList );
+        Event::active()->taskList.clear();
+        Event::active()->taskList.append( regularList );
+        Event::active()->taskList.append( boldList );
+        Event::active()->taskList.append( italicList );
 
         // clean up
         regularList.clear();
@@ -232,12 +232,12 @@ void Main::sort( ListTypes type ) {
         break;
 
     case Teams:
-        qSort( this->currentEvent()->teamList.begin(), this->currentEvent()->teamList.end(), listToAscending<Team> );
+        qSort( Event::active()->teamList.begin(), Event::active()->teamList.end(), listToAscending<Team> );
         break;
 
     case NoType:
     default:
-        this->error( StrSoftError, this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
+        Common::error( StrSoftError, this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
         return;
     }
 }
@@ -249,19 +249,19 @@ void Main::sort( ListTypes type ) {
 QList<Task*> Main::taskListSorted() {
     QList <Task*>sortedList;
 
-    if ( this->currentEvent() == NULL )
+    if ( Event::active() == NULL )
         return sortedList;
 
     // make a local copy and sort it alphabetically or by logs (or both)
-    sortedList = this->currentEvent()->taskList;
+    sortedList = Event::active()->taskList;
 
     if ( sortedList.isEmpty())
         return sortedList;
 
-    if ( this->cvar( "misc/sortTasks" )->isEnabled())
+    if ( Variable::isEnabled( "misc/sortTasks" ))
         qSort( sortedList.begin(), sortedList.end(), listToAscending<Task> );
 
-    if ( this->cvar( "misc/hilightLogged" )->isEnabled())
+    if ( Variable::isEnabled( "misc/hilightLogged" ))
         qSort( sortedList.begin(), sortedList.end(), listByLogged );
 
     // return sorted list

@@ -17,55 +17,71 @@
  */
 
 //
-// log.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
+#include "log.h"
 #include "main.h"
 #include <QSqlQuery>
 #include <QSqlError>
 
 /**
- * @brief Main::addLog
+ * @brief Log::Log
+ * @param record
+ * @param table
+ */
+Log::Log( const QSqlRecord &record, const QString &table ) {
+    this->setRecord( record );
+    this->setTable( table );
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+}
+
+/**
+ * @brief Log::points
+ * @return
+ */
+int Log::points() const {
+    Task *taskPtr = Task::forId( this->taskId());
+
+    if ( taskPtr != NULL )
+        return taskPtr->calculate( this->id());
+
+    return 0;
+}
+
+/**
+ * @brief Log::add
  * @param taskId
  * @param teamId
  * @param value
  * @param comboId
- * @return
+ * @return Log entry
  */
-Log *Main::addLog( int taskId, int teamId, int value, int comboId ) {
+Log *Log::add( int taskId, int teamId, int value, int comboId ) {
     Log *logPtr = NULL;
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Main::LogDebug );
+    Common::print( CLMsg + QObject::tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Common::LogDebug );
 
     // avoid duplicates
-    foreach ( logPtr, this->base.logList ) {
+    foreach ( logPtr, m.logList ) {
         if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
             return logPtr;
     }
 
     // add new log
-#ifdef SQL_PREPARE_STATEMENTS
     query.prepare( "insert into logs values ( null, :value, :taskId, :teamId, :comboId )" );
     query.bindValue( ":value", value );
     query.bindValue( ":taskId", taskId );
     query.bindValue( ":teamId", teamId );
     query.bindValue( ":comboId", comboId );
 
-    if ( !query.exec())
-#else
-    if ( !query.exec( QString( "insert into logs values ( null, %1, %2, %3, %4 )" )
-                      .arg( value )
-                      .arg( taskId )
-                      .arg( teamId )
-                      .arg( comboId )
-                      ))
-#endif
-        this->error( StrSoftError, QString( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
+    if ( !query.exec()) {
+        Common::error( CLSoftError, QObject::tr( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
+        return NULL;
+    }
 
     // select the new entry
     query.exec( QString( "select * from logs where id=%1" ).arg( query.lastInsertId().toInt() ));
@@ -73,55 +89,49 @@ Log *Main::addLog( int taskId, int teamId, int value, int comboId ) {
     // get last entry and construct internal entry
     while ( query.next()) {
         logPtr = new Log( query.record(), "logs" );
-        this->base.logList << logPtr;
+        m.logList << logPtr;
+
+        // add to list if none (for imports)
+        Team *teamPtr = Team::forId( teamId );
+        if ( teamPtr != NULL ) {
+            if ( !teamPtr->logList.contains( logPtr ))
+                teamPtr->logList << logPtr;
+        }
     }
     return logPtr;
 }
 
 /**
- * @brief Main::loadLogs
- * @param import
- * @param store
+ * @brief Log::loadLogs
  */
-void Main::loadLogs( bool import, bool store ) {
+void Log::loadLogs() {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading logs form database\n" ), Main::LogDebug );
+    Common::print( CLMsg + QObject::tr( "loading logs form database\n" ), Common::LogDebug );
 
-    // read stuff
-    if ( import )
-        query.exec( "select * from merge.logs" );
-    else
-        query.exec( "select * from logs" );
+    // read all log entries
+    query.exec( "select * from logs" );
 
     // store entries
     while ( query.next()) {
         Log *logPtr = new Log( query.record(), "logs" );
-        Team *teamPtr = this->teamForId( logPtr->teamId(), import );
+        Team *teamPtr = Team::forId( logPtr->teamId());
         if ( teamPtr == NULL )
             return;
 
         teamPtr->logList << logPtr;
-
-        if ( import ) {
-            logPtr->setImported();
-            this->import.logList << logPtr;
-
-            if ( store )
-                logPtr->store();
-        } else
-            this->base.logList << logPtr;
+        m.logList << logPtr;
     }
 }
 
 /**
- * @brief Main::logForId
+ * @brief Log::forId
  * @param id
  * @return
  */
-Log *Main::logForId( int id ) {
-    foreach ( Log *logPtr, this->base.logList ) {
+Log *Log::forId( int id ) {
+    foreach ( Log *logPtr, m.logList ) {
         if ( logPtr->id() == id )
             return logPtr;
     }
@@ -129,13 +139,13 @@ Log *Main::logForId( int id ) {
 }
 
 /**
- * @brief Main::logForIds
+ * @brief Log::forIds
  * @param teamId
  * @param taskId
  * @return
  */
-Log *Main::logForIds( int teamId, int taskId ) {
-    Team *teamPtr = this->teamForId( teamId );
+Log *Log::forIds( int teamId, int taskId ) {
+    Team *teamPtr = Team::forId( teamId );
     if ( teamPtr == NULL )
         return NULL;
 
@@ -144,19 +154,4 @@ Log *Main::logForIds( int teamId, int taskId ) {
             return logPtr;
     }
     return NULL;
-}
-
-/**
- * @brief Main::removeOrphanedLogs
- */
-void Main::removeOrphanedLogs() {
-    // create query
-    QSqlQuery query;
-
-    // announce
-    m.print( StrMsg + this->tr( "removing orphaned logs\n" ), Main::LogDebug );
-
-    // remove orphaned logs (fixes crash with invalid teamId/taskId)
-    if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
-        this->error( StrSoftError, QString( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
 }

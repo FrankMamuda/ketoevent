@@ -43,7 +43,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError, this->tr( "task not set\n" ));
+        Common::error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -118,7 +118,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
         //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
-        m.error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        Common::error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
     }
 
@@ -146,7 +146,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
 void TaskWidget::toggleViewState( ViewState state ) {
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError, this->tr( "task not set\n" ));
+        Common::error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -184,7 +184,7 @@ void TaskWidget::toggleViewState( ViewState state ) {
 
     default:
     case NoState:
-        m.error( StrSoftError, this->tr( "invalid view state\n" ));
+        Common::error( StrSoftError, this->tr( "invalid view state\n" ));
         break;
     }
 }
@@ -200,7 +200,7 @@ void TaskWidget::saveLog() {
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        m.error( StrFatalError, this->tr( "task or team not set\n" ));
+        Common::error( StrFatalError, this->tr( "task or team not set\n" ));
         return;
     }
 
@@ -213,7 +213,7 @@ void TaskWidget::saveLog() {
     } else if ( this->task()->type() == Task::Multi ) {
         value = this->multi->value();
     } else {
-        m.error( StrFatalError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        Common::error( StrFatalError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
         return;
     }
 
@@ -225,12 +225,12 @@ void TaskWidget::saveLog() {
         // remove orphaned combos
         int count = 0;
         int badId = this->log()->comboId();
-        foreach ( Log *logPtr, m.base.logList ) {
+        foreach ( Log *logPtr, m.logList ) {
             if ( logPtr->comboId() == badId )
                 count++;
         }
         if ( count == 2 ) {
-            foreach ( Log *logPtr, m.base.logList ) {
+            foreach ( Log *logPtr, m.logList ) {
                 if ( logPtr->comboId() == badId )
                     logPtr->setComboId( -1 );
             }
@@ -247,12 +247,12 @@ void TaskWidget::saveLog() {
     if ( !this->hasLog()) {
         // check for local logs
         // set log
-        Log *logPtr = m.logForIds( this->team()->id(), this->task()->id());
+        Log *logPtr = Log::forIds( this->team()->id(), this->task()->id());
         if ( logPtr != NULL ) {
             this->setLog( logPtr, false );
         } else {
             // add new log
-            logPtr = m.addLog( this->task()->id(), this->team()->id());
+            logPtr = Log::add( this->task()->id(), this->team()->id());
             this->setLog( logPtr, true );
             this->team()->logList << this->log();
         }
@@ -267,7 +267,7 @@ void TaskWidget::saveLog() {
     // changes made - must recalculate combos
     this->team()->setCombosCalculated( false );
 
-    if ( value > 0 && m.cvar( "misc/hilightLogged" )->isEnabled())
+    if ( value > 0 && Variable::isEnabled( "misc/hilightLogged" ))
         this->taskName->setForegroundRole( QPalette::Highlight );
     else
         this->taskName->setForegroundRole( QPalette::NoRole );
@@ -279,7 +279,7 @@ void TaskWidget::saveLog() {
 TaskWidget::~TaskWidget() {
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError, this->tr( "task not set\n" ));
+        Common::error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -321,23 +321,23 @@ void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        m.error( StrSoftError, this->tr( "task not set\n" ));
+        Common::error( StrSoftError, this->tr( "task not set\n" ));
         return;
     }
 
     // failsafe
     if ( !this->hasLog()) {
-        m.error( StrSoftError, this->tr( "log not set\n" ));
+        Common::error( StrSoftError, this->tr( "log not set\n" ));
         return;
     }
 
     // failsafe
     if ( !this->hasTeam()) {
-        m.error( StrSoftError, this->tr( "team not set\n" ));
+        Common::error( StrSoftError, this->tr( "team not set\n" ));
         return;
     }
 
-    Task *taskPtr = m.taskForId( logPtr->taskId());
+    Task *taskPtr = Task::forId( logPtr->taskId());
     if ( taskPtr == NULL )
         return;
 
@@ -361,7 +361,7 @@ void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
     else if ( this->task()->type() == Task::Multi )
         this->multi->setValue( this->log()->value());
 
-    if ( this->log()->value() > 0 && m.cvar( "misc/hilightLogged" )->isEnabled())
+    if ( this->log()->value() > 0 && Variable::isEnabled( "misc/hilightLogged" ))
         this->taskName->setForegroundRole( QPalette::Highlight );
     else
         this->taskName->setForegroundRole( QPalette::NoRole );
@@ -374,7 +374,7 @@ void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
  * @return
  */
 int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
-    Team *teamPtr = m.teamForId( teamId );
+    Team *teamPtr = Team::forId( teamId );
     if ( teamPtr == NULL )
         return -1;
 
@@ -417,7 +417,7 @@ void TaskWidget::resetLog() {
 
     // failsafe - this really should not happen
     if ( !this->hasTask()) {
-        m.error( StrFatalError, this->tr( "task not set\n" ));
+        Common::error( StrFatalError, this->tr( "task not set\n" ));
         return;
     }
 
@@ -437,13 +437,13 @@ void TaskWidget::setTeam( Team *teamPtr ) {
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        m.error( StrSoftError, this->tr( "task, team or log not set\n" ));
+        Common::error( StrSoftError, this->tr( "task, team or log not set\n" ));
         return;
     }
 
     // find appropriate log
     foreach ( Log *logPtr, teamPtr->logList ) {
-        Task *taskPtr = m.taskForId( logPtr->taskId());
+        Task *taskPtr = Task::forId( logPtr->taskId());
 
         if ( taskPtr == NULL )
             continue;

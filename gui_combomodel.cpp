@@ -81,7 +81,7 @@ QVariant Gui_ComboModel::data( const QModelIndex &index, int role ) const {
         return QVariant();
 
     if ( role == Qt::DisplayRole )
-        return m.taskForId( cPtr->logListSorted.at( index.row())->taskId())->name();
+        return Task::forId( cPtr->logListSorted.at( index.row())->taskId())->name();
     else if ( role == Qt::UserRole )
         return cPtr->logListSorted.at( index.row())->id();
     else if ( role == Qt::BackgroundColorRole ) {

@@ -17,21 +17,17 @@
  */
 
 //
-// combo.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
 #include "main.h"
 
 /**
- * @brief Main::getFreeComboHandle gets a unique combo number
+ * @brief Combo::getFreeHandle gets a unique combo number
  * @return combo id
  */
-int Main::getFreeComboHandle() const {
+int Combo::getFreeHandle() {
     int highest = 0;
-    foreach ( Log *logPtr, this->base.logList ) {
+    foreach ( Log *logPtr, m.logList ) {
         if ( logPtr->comboId() >= highest )
             highest = logPtr->comboId();
     }

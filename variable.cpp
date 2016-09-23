@@ -17,61 +17,32 @@
  */
 
 //
-// variable.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
+#include "variable.h"
 #include "main.h"
 
 /**
- * @brief Main::addCvar
+ * @brief Variable::add
  * @param varPtr
  */
-void Main::addCvar( ConsoleVariable *varPtr ) {
+void Variable::add( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) {
     // avoid duplicates
-    if ( this->cvar( varPtr->key())) {
-        delete varPtr;
+    if ( Variable::find( key ) != NULL )
         return;
-    }
 
-    this->cvarList << varPtr;
+    m.cvarList << new Variable( key, settingsPtr, defaultValue );
 }
 
 /**
- * @brief Main::addSvar
- * @param key
- * @param type
- * @param varClass
- */
-void Main::addSvar( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass ) {
-    this->svarList << new SettingsVariable( key, type, varClass );
-}
-
-/**
- * @brief Main::cvar
+ * @brief find
  * @param key
  * @return
  */
-ConsoleVariable *Main::cvar( const QString &key ) {
-    foreach ( ConsoleVariable *varPtr, this->cvarList ) {
+Variable *Variable::find( const QString &key ) {
+    foreach ( Variable *varPtr, m.cvarList ) {
         if ( !QString::compare( varPtr->key(), key ))
             return varPtr;
     }
-
-    return this->defaultCvar;
-}
-
-/**
- * @brief Main::svar
- * @param key
- * @return
- */
-SettingsVariable *Main::svar( const QString &key ) {
-    foreach ( SettingsVariable *varPtr, this->svarList ) {
-        if ( !QString::compare( varPtr->key(), key ))
-            return varPtr;
-    }
-    return this->defaultSvar;
+    return NULL;
 }

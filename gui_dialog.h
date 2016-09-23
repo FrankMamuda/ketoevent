@@ -54,7 +54,13 @@ protected:
 public slots:
     void lockVariables( bool lock = true ) { this->m_variablesLocked = lock; }
     void unbindVars() { if ( !m.isInitialised()) return; foreach ( SettingsVariable* svar, this->svars ) svar->unbind(); svars.clear(); }
-    void bindVariable( const QString &key, QObject *object ) { this->svars << m.svar( key ); m.svar( key )->bind( object, qobject_cast<QObject*>( this )); }
+    void bindVariable( const QString &key, QObject *object ) {
+        SettingsVariable *svar = SettingsVariable::find( key );
+        if ( svar != NULL ) {
+            this->svars << svar;
+            svar->bind( object, qobject_cast<QObject*>( this ));
+        }
+    }
     void updateVars() { foreach ( SettingsVariable *svar, this->svars ) svar->setState(); }
     void onAccepted() { this->hide(); emit this->closeSignal( Accepted ); }
     void onRejected() { this->hide(); emit this->closeSignal( Rejected ); }

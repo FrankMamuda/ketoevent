@@ -70,6 +70,10 @@ public:
     void unbind();
     void bind( QObject *objPtr, QObject *parentPtr );
 
+    // static functions
+    static void add( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
+    static SettingsVariable *find( const QString &key );
+
 public slots:
     void setKey( const QString &key ) { this->m_key = key; }
     void setType( Types bType ) { this->m_type = bType; }

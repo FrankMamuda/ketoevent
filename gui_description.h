@@ -23,7 +23,7 @@
 // includes
 //
 #include <QDialog>
-#include "taskentry.h"
+#include "task.h"
 
 //
 // namespace: Ui

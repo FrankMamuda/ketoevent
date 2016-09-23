@@ -34,11 +34,11 @@ class Gui_TeamListModel : public QStringListModel {
 
 public:
     Gui_TeamListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return m.currentEvent()->teamList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const { return Event::active()->teamList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
 
-    // this resets whole model based on data in m.base.teamList
+    // this resets whole model based on data in m.teamList
     void beginReset() { this->beginResetModel(); }
     void endReset() { m.sort( Main::Teams ); this->endResetModel(); }
 };

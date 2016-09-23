@@ -17,18 +17,119 @@
  */
 
 //
-// task.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
+#include "task.h"
+#include "log.h"
 #include "main.h"
 #include <QSqlQuery>
 #include <QSqlError>
 
 /**
- * @brief Main::addTask
+ * @brief Task::Task
+ * @param record
+ * @param table
+ */
+Task::Task( const QSqlRecord &record, const QString &table ) {
+    // bind to sql
+    this->setRecord( record );
+    this->setTable( table );
+
+    // points failsafe
+    if ( this->points() < 0 )
+        this->setPoints();
+
+    // maximum multiplier failsafe
+    if ( this->multi() < 0 )
+        this->setMulti();
+
+    // type failsafe
+    switch ( this->type()) {
+    case Check:
+    case Multi:
+        break;
+
+    default:
+        this->setType();
+    }
+
+    // set defaults
+    this->m_reindex = false;
+    this->m_order = this->order( true );
+
+    // perform updates
+    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+}
+
+/**
+ * @brief Task::calculate
+ * @param logId
+ * @return
+ */
+int Task::calculate( int logId ) const {
+    int value = 0;
+
+    // get log parent
+    Log *logPtr = Log::forId( logId );
+    if ( logPtr == NULL )
+        return 0;
+
+    // get initial points
+    switch ( this->type()) {
+    case Check:
+        if ( logPtr->value())
+            value += this->points();
+        break;
+
+    case Multi:
+        if ( logPtr->value() > this->multi())
+            value += this->points() * this->multi();
+        else
+            value += this->points() * logPtr->value();
+        break;
+
+    default:
+        // error
+        return 0;
+    }
+
+    // we're done
+    return value;
+}
+
+/**
+ * @brief Task::setOrder
+ * @param order
+ * @param direct
+ */
+void Task::setOrder( int order, bool direct ) {
+    if ( order < 0 )
+        return;
+
+    if ( direct ) {
+        this->setValue( "parent", order );
+        this->m_reindex = false;
+        this->m_order = order;
+    } else {
+        this->m_order = order;
+        this->m_reindex = true;
+    }
+}
+
+/**
+ * @brief Task::order
+ * @param sql
+ * @return
+ */
+int Task::order( bool sql ) const {
+    if ( sql )
+        return this->record().value( "parent" ).toInt();
+
+    return this->m_order;
+}
+
+/**
+ * @brief Task::add
  * @param taskName
  * @param points
  * @param multi
@@ -36,22 +137,22 @@
  * @param style
  * @param description
  */
-void Main::addTask( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
+void Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
     QSqlQuery query;
     int max = 0;
 
     // announce
-    m.print( StrMsg + this->tr( "adding a new task - name - '%1'; points - %2; multi - %3; type - %4; style - %5; description - '%6'\n" )
+    Common::print( CLMsg + QObject::tr( "adding a new task - name - '%1'; points - %2; multi - %3; type - %4; style - %5; description - '%6'\n" )
              .arg( taskName )
              .arg( points )
              .arg( multi )
              .arg( type )
              .arg( style )
              .arg( description ),
-             Main::TaskDebug );
+             Common::TaskDebug );
 
     // avoid duplicates
-    if ( this->taskForName( taskName ) != NULL )
+    if ( Task::forName( taskName ) != NULL )
         return;
 
     // make sure we insert value at the bottom of the list
@@ -60,7 +161,6 @@ void Main::addTask( const QString &taskName, int points, int multi, Task::Types 
         max = query.value( 0 ).toInt();
 
     // perform database update and select last row
-#ifdef SQL_PREPARE_STATEMENTS
     query.prepare( "insert into tasks values ( null, :name, :points, :multi, :style, :type, :parent, :eventId, :description )" );
     query.bindValue( ":name", taskName );
     query.bindValue( ":points", points );
@@ -68,105 +168,50 @@ void Main::addTask( const QString &taskName, int points, int multi, Task::Types 
     query.bindValue( ":style", static_cast<Task::Styles>( style ));
     query.bindValue( ":type", static_cast<Task::Types>( type ));
     query.bindValue( ":parent", max + 1 );
-    query.bindValue( ":eventId", m.currentEvent()->id());
+    query.bindValue( ":eventId", Event::active()->id());
     query.bindValue( ":description", description );
 
-    if ( !query.exec())
-#else
-    if ( !query.exec( QString( "insert into tasks values ( null, '%1', %2, %3, %4, %5, %6, %7, '%8' )" )
-                      .arg( taskName )
-                      .arg( points )
-                      .arg( multi )
-                      .arg( static_cast<TaskEntry::Styles>( style ))
-                      .arg( static_cast<TaskEntry::Types>( type ))
-                      .arg( max + 1 )
-                      .arg( m.currentEvent()->id())
-                      .arg( description )
-                      ))
-#endif
-        this->error( StrSoftError, QString( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
+    if ( !query.exec()) {
+        Common::error( CLSoftError, QObject::tr( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
+        return;
+    }
 
     // select the new entry
     query.exec( QString( "select * from tasks where id=%1" ).arg( query.lastInsertId().toInt() ));
 
     // get last entry and construct internal entry
     while ( query.next())
-        this->base.taskList << new Task( query.record(), "tasks" );
+        m.taskList << new Task( query.record(), "tasks" );
 
     // add to event
-    this->currentEvent()->taskList << this->base.taskList.last();
+    Event::active()->taskList << m.taskList.last();
 }
 
 /**
- * @brief Main::loadTasks
- * @param import
- * @param store
+ * @brief Task::loadTasks
  */
-void Main::loadTasks( bool import, bool store ) {
+void Task::loadTasks() {
     QSqlQuery query;
 
     // announce
-    m.print( StrMsg + this->tr( "loading tasks from database\n" ), Main::TaskDebug );
+    Common::print( CLMsg + QObject::tr( "loading tasks from database\n" ), Common::TaskDebug );
 
-    // read stuff
-    if ( import )
-        query.exec( "select * from merge.tasks order by parent asc" );
-    else
-        query.exec( "select * from tasks order by parent asc" );
+    // read all task entries
+    query.exec( "select * from tasks order by parent asc" );
 
     // store entries
-    while ( query.next()) {
-        Task *taskPtr = new Task( query.record(), "tasks" );
-
-        // since we're just checking hash and not adding any new tasks on import
-        // there is no need for reindexing
-        if ( import ) {
-            taskPtr->setImported();
-            this->import.taskList << taskPtr;
-        } else
-            this->base.taskList << taskPtr;
-    }
-
-    // handle importing
-    if ( import ) {
-        bool duplicate = false;
-
-        // check for duplicates
-        foreach ( Task *importedTaskPtr, this->import.taskList ) {
-            duplicate = false;
-
-            foreach ( Task *taskPtr, this->base.taskList ) {
-                // there's a match
-                if ( !QString::compare( taskPtr->name(), importedTaskPtr->name())) {
-                    // first time import, just append imported
-                    if ( !importedTaskPtr->name().endsWith( " (imported)")) {
-                        importedTaskPtr->setName( importedTaskPtr->name() + " (imported)" );
-                    }
-                    // second time import is a no-go
-                    else {
-                        duplicate = true;
-                        m.error( StrSoftError, this->tr( "aborting double import of task \"%1\"\n" ).arg( importedTaskPtr->name()));
-                        this->import.taskList.removeOne( taskPtr );
-                        continue;
-                    }
-                }
-            }
-
-            // store the new-found team
-            if ( !duplicate && store )
-                importedTaskPtr->store();
-        }
-    }
+    while ( query.next())
+        m.taskList << new Task( query.record(), "tasks" );
 }
 
 /**
- * @brief Main::taskForId
+ * @brief Task::forId
  * @param id
  * @return
  */
-Task *Main::taskForId( int id ) {
+Task *Task::forId( int id ) {
     // search current event ONLY
-    foreach ( Task *taskPtr, m.currentEvent()->taskList /*this->base.taskList*/ ) {
+    foreach ( Task *taskPtr, Event::active()->taskList /*this->base.taskList*/ ) {
         if ( taskPtr->id() == id )
             return taskPtr;
     }
@@ -174,13 +219,21 @@ Task *Main::taskForId( int id ) {
 }
 
 /**
- * @brief Main::taskForName
+ * @brief Task::forName
  * @param name
+ * @param currentEvent
  * @return
  */
-Task *Main::taskForName( const QString &name ) {
-    // search current event ONLY
-    foreach ( Task *taskPtr, m.currentEvent()->taskList/* this->base.taskList*/ ) {
+Task *Task::forName( const QString &name, bool currentEvent ) {
+    QList <Task*> taskList;
+
+    if ( currentEvent )
+        taskList = Event::active()->taskList;
+    else
+        taskList = m.taskList;
+
+    // search current event ONLY by default
+    foreach ( Task *taskPtr, taskList ) {
         if ( !QString::compare( name, taskPtr->name()))
             return taskPtr;
     }

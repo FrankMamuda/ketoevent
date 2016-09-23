@@ -75,7 +75,7 @@ void Gui_Combos::currentTeamIndexChanged( int index ) {
 
     // get current team
     this->setCurrentTeamIndex( this->ui->comboTeams->itemData( index ).toInt());
-    teamPtr = m.teamForId( this->currentTeamIndex());
+    teamPtr = Team::forId( this->currentTeamIndex());
     if ( teamPtr == NULL )
         return;
 
@@ -107,7 +107,7 @@ void Gui_Combos::fillTeams() {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( Team *teamPtr, m.currentEvent()->teamList )
+    foreach ( Team *teamPtr, Event::active()->teamList )
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
     // set to current team
