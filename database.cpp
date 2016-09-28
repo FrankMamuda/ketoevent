@@ -174,21 +174,17 @@ void Database::attach( const QString &path, Import import ) {
     query.exec( QString( "delete from merge.logs where eventId!=%1" ).arg( eventId ));
     query.exec( QString( "delete from merge.tasks where eventId!=%1" ).arg( eventId ));
 
-    // integrity check
-    query.exec( "select name, points, multi, type from merge.tasks except select name, points, multi, type from tasks;" );
-    while ( query.next())
-        mismatch++;
-
-    /*query.exec( "select name, points, multi, type from tasks except select name, points, multi, type from merge.tasks;" );
-    while ( query.next())
-        mismatch++;*/
-
-    if ( mismatch > 0 ) {
-        Common::error( CLSoftError, QObject::tr( "incompatible task list in \"%1\"\n" ).arg( dbInfo.fileName()));
-        goto removeDB;
-    }
-
     if ( import == LogImport ) {
+        // integrity check
+        query.exec( "select name, points, multi, type from merge.tasks except select name, points, multi, type from tasks;" );
+        while ( query.next())
+            mismatch++;
+
+        if ( mismatch > 0 ) {
+            Common::error( CLSoftError, QObject::tr( "incompatible task list in \"%1\"\n" ).arg( dbInfo.fileName()));
+            goto removeDB;
+        }
+
         // skip duplicate teams
         query.exec( QString( "delete from merge.teams where name in (select name from teams)" ));
 
@@ -326,22 +322,19 @@ bool Database::createStructure( const QString &prefix ) {
             QMessageBox msgBox;
             int state;
 
-            msgBox.setText( /*this->tr*/QObject::tr( "Attempt to import API0 (2013) database?" ));
+            msgBox.setText( QObject::tr( "Attempt to import API0 (2013) database?" ));
             msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
             msgBox.setDefaultButton( QMessageBox::Yes );
             msgBox.setIcon( QMessageBox::Warning );
             state = msgBox.exec();
 
-            //
-            // combos
-            // int combos = 0;
-            // NOTE: this is a little tricky, one way would be to populate comboId with combo
-            //       then sum the values, clear the values and store it in a separate task log
-            //
-
             // check options
             switch ( state ) {
             case QMessageBox::Yes:
+            {
+                int teamId, sum, comboTaskId;
+                QList <int>teamIdList;
+
                 // create initial table structure (temporary)
                 if ( !Database::createEmptyTable( "tmp_" ))
                     return false;
@@ -371,26 +364,61 @@ bool Database::createStructure( const QString &prefix ) {
                             // copy data (tested only for API0)
                             if ( !QString::compare( api.name, "teams", Qt::CaseInsensitive ))
                                 query.exec( QString( "insert into tmp_%1 ( %2, finishTime ) select %2, finish from %1" ).arg( api.name ).arg( fields.join( ", " )));
-                            //else if ( !QString::compare( api9.name, "logs", Qt::CaseInsensitive ))
-                            //    query.exec( QString( "insert into tmp_%1 ( %2, comboId ) select %2, combo from %1" ).arg( api9.name ).arg( fields.join( ", " )));
                             else
                                 query.exec( QString( "insert into tmp_%1 ( %2 ) select %2 from %1" ).arg( api.name ).arg( fields.join( ", " )));
                         }
                     }
+                }
+
+                // add a combo task
+                if ( !query.exec( QObject::tr( "insert into tmp_tasks values ( null, '%1', 1, 999, %2, %3, null, 1, '%4' )" )
+                                 .arg( KetoEvent::comboString )
+                                 .arg( static_cast<int>( Task::Bold ))
+                                 .arg( static_cast<int>( Task::Multi ))
+                                 .arg( KetoEvent::comboDescription )
+                                  )) {
+                    Common::error( CLSoftError, QObject::tr( "could not add combo task\n" ));
+                    return false;
+                }
+
+                // get combo task id
+                comboTaskId = query.lastInsertId().toInt();
+                if ( comboTaskId < 1 ) {
+                    Common::error( CLSoftError, QObject::tr( "bad combo task id\n" ));
+                    return false;
+                }
+
+                // build a teamId list
+                query.exec( "select * from teams" );
+                while ( query.next())
+                    teamIdList << query.record().value( "id" ).toInt();
+
+                // go through all teams and add up combos
+                foreach ( teamId, teamIdList ) {
+                    query.exec( QString( "select sum( combo ) from logs where teamId=%1" ).arg( teamId ));
+                    while ( query.next())
+                        sum = query.value( 0 ).toInt();
+
+                    // insert log
+                    query.exec( QString( "insert into tmp_logs values ( null, %1, %2, %3, -1 )" )
+                                .arg( sum )
+                                .arg( comboTaskId )
+                                .arg( teamId ));
+                }
+
+                // go through all tables and all fields
+                for ( y = 0; y < API::numTables; y++ ) {
+                    table_t api = API::tables[y];
 
                     // drop legacy tables, rename temporary tables to permanent
                     query.exec( QString( "drop table %1" ).arg( api.name ));
                     query.exec( QString( "alter table tmp_%1 rename to %1" ).arg( api.name ));
                 }
 
-                //foreach ( Team)
-                //   query.exec( "select sum( combo ) from logs" );
-
                 // add a single event
                 Event::add( "Imported 2013 event" );
 
                 // fill NULL values with blank data
-                // TODO: also load combos as a sum of all combopoints into a new task "IMPORTED COMBOS" (multi)
                 query.exec( "update teams set lock=0" );
                 query.exec( "update teams set reviewer='imported'" );
                 query.exec( "update teams set eventId=1" );
@@ -398,6 +426,7 @@ bool Database::createStructure( const QString &prefix ) {
                 query.exec( "update tasks set description=''" );
                 query.exec( "update logs set comboId=-1" );
                 return true;
+            }
                 break;
 
             case QMessageBox::No:

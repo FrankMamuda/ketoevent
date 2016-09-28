@@ -101,16 +101,16 @@ bool Gui_Console::completeCommand() {
     }
 
     // print out suggestions
-    Common::print( this->tr( "Available commands and cvars:\n" ), Common::System );
+    Common::print( this->tr( "Available commands and cvars:\n" ), Common::Console );
     foreach ( QString str, matchedStrings ) {
         // check commands
         Command *cmdPtr;
         cmdPtr = cmd.find( str );
         if ( cmdPtr != NULL ) {
             if ( !cmdPtr->description().isEmpty()) {
-                Common::print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Common::System);
+                Common::print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Common::Console);
             } else {
-                Common::print( QString( "  \"%1\n" ).arg( str ), Common::System );
+                Common::print( QString( "  \"%1\n" ).arg( str ), Common::Console );
             }
         }
 
@@ -119,11 +119,11 @@ bool Gui_Console::completeCommand() {
 
         // perform a variable print or set
         if ( cvarPtr != NULL )
-            Common::print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( cvarPtr->key(), cvarPtr->string()), Common::System );
+            Common::print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( cvarPtr->key(), cvarPtr->string()), Common::Console );
     }
 
     // add extra newline
-    Common::print( "\n", Common::System );
+    Common::print( "\n", Common::Console );
 
     // done
     return true;
@@ -258,7 +258,7 @@ void Gui_Console::saveHisotry() {
  */
 void Gui_Console::init() {
     // announce
-    Common::print( CLMsg + QObject::tr( "initilising console\n" ), Common::System );
+    Common::print( CLMsg + QObject::tr( "initilising console\n" ), Common::Console );
 
     if ( m.console != NULL )
         return;

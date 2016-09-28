@@ -312,7 +312,8 @@ void Gui_Main::fillTeams( int forcedId ) {
     this->ui->comboTeams->clear();
 
     // repopulate list
-    foreach ( Team *teamPtr, Event::active()->teamList ) {
+    QList <Team*>teamListSorted = m.teamListSorted();
+    foreach ( Team *teamPtr, teamListSorted ) {
         this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
 
         // resore last id if any
@@ -667,7 +668,7 @@ void Gui_Main::testTeam( Team *teamPtr ) {
 
     // report
     teamPtr->calculateCombos();
-    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Common::System );
+    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Common::GuiMain );
 }
 
 /**
@@ -688,9 +689,9 @@ void Gui_Main::stressTest( int numTeams ) {
         return;
     } else if ( numTeams == -2 ) {
         if ( !Event::active()->teamList.isEmpty())
-            Common::print( StrMsg + this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()), Common::System );
+            Common::print( StrMsg + this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()), Common::GuiMain );
         else
-            Common::print( StrMsg + this->tr( "no teams to perform stress test on" ), Common::System );
+            Common::print( StrMsg + this->tr( "no teams to perform stress test on" ), Common::GuiMain );
 
         foreach ( Team *teamPtr, Event::active()->teamList )
             this->testTeam( teamPtr );

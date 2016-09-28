@@ -30,9 +30,8 @@
 #define ClassLessFunc __FUNCTION__
 #else
 #define ClassFunc QString( "%1::%2: " ).arg( this->metaObject()->className()).arg( __func__ )
-#define ClassLessFunc __func__
+#define ClassLessFunc QString( "%1: " ).arg( __func__ )
 #endif
-
 
 // error message macros
 #define StrMsg ClassFunc
@@ -62,22 +61,23 @@ public:
 
     // debug levels
     enum DebugLevel {
-        NoDebug =    0x0,
-        System =     0x0001,
-        GuiMain =    0x0002,
-        DatabaseDebug =   0x0004,
-        LogDebug =   0x0008,
-        TaskDebug =  0x0010,
-        TeamDebug =  0x0020,
-        EventDebug = 0x0040,
-        Debug =      0x0080
+        NoDebug =           0,
+        System =            1,
+        GuiMain =           2,
+        DatabaseDebug =     4,
+        LogDebug =          8,
+        TaskDebug =         16,
+        TeamDebug =         32,
+        EventDebug =        64,
+        Console =          128,
+        DebugALL = ( System | GuiMain | DatabaseDebug | LogDebug | TaskDebug | TeamDebug | EventDebug | Console )
     };
 
     Q_DECLARE_FLAGS( DebugLevels, DebugLevel )
 
     // console io
     static void error( ErrorTypes type = SoftError, const QString &func = QString::null, const QString &msg = QString::null );
-    static void print( const QString &msg, DebugLevel = NoDebug );
+    static void print( const QString &msg, DebugLevel = System );
 };
 
 #endif // COMMON_H

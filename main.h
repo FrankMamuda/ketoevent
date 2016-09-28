@@ -63,6 +63,8 @@ const static QString defaultStartTime( "10:00" );
 const static QString defaultFinishTime( "15:00" );
 const static QString defaultFinalTime( "15:30" );
 const static QString defaultDatabase( "ketoevent.db" );
+const static QString comboString( QT_TR_NOOP( "[Imported combos]" ));
+const static QString comboDescription( QT_TR_NOOP( "Sum of imported combo points" ));
 }
 
 //
@@ -100,6 +102,7 @@ public:
     QList <Log*>   logList;
     QList <Event*> eventList;
     QList <Task*>  taskListSorted();
+    QList <Team*>  teamListSorted();
     QList <Variable*>  cvarList;
     QList <SettingsVariable*> svarList;
 

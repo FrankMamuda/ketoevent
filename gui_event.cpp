@@ -250,8 +250,8 @@ void Gui_Event::on_actionImportLogs_triggered() {
 
             QXmlStreamReader xml( &xmlList );
 
-            Task::add( "[Imported combos]", 1, 999, Task::Multi, Task::Bold, "Sum of imported combo points" );
-            int comboTaskId = Task::forName( "[Imported combos]" )->id();
+            Task::add( KetoEvent::comboString, 1, 999, Task::Multi, Task::Bold, KetoEvent::comboDescription );
+            int comboTaskId = Task::forName( KetoEvent::comboString )->id();
 
             if ( comboTaskId < 1 )
                 return;
@@ -291,7 +291,8 @@ void Gui_Event::on_actionImportLogs_triggered() {
                             bool found = false;
                             foreach ( Task *taskPtr, Event::active()->taskList ) {
                                 if ( !QString::compare( Database::stringToHash( taskPtr->name()), hash, Qt::CaseInsensitive )) {
-                                    Log::add( taskPtr->id(), id, value );
+                                    if ( value > 0 )
+                                        Log::add( taskPtr->id(), id, value );
                                     found = true;
                                 }
                             }
@@ -392,7 +393,7 @@ void Gui_Event::on_actionImportTasks_triggered() {
                                info.at( 1 ));               // description
                 } else {
 #ifdef APPLET_DEBUG
-                    Common::print( StrMsg + this->tr( "updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Common::System );
+                    Common::print( StrMsg + this->tr( "updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Common::EventDebug );
 #endif
                     taskPtr->setPoints( info.at( 2 ).toInt());
                     taskPtr->setMulti( info.at( 3 ).toInt());
@@ -428,6 +429,9 @@ void Gui_Event::on_actionImportTasks_triggered() {
                         Task::Types taskType;
                         Task::Styles style = Task::Regular;
 
+#ifdef APPLET_DEBUG
+                        Common::print( StrMsg + this->tr( "new task \"%1\" with hash \"%2\"\n" ).arg( name ).arg( Database::stringToHash( name )), Common::EventDebug );
+#endif
                         if ( type > 0 ) {
                             taskType = Task::Multi;
 

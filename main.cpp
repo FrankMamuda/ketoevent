@@ -41,6 +41,7 @@ FUTURE:
 - richText styling? html?
 - unify task and team dialogs (create superclass - less dup code)
 - currently, there is no need for an API change
+- sort teams alphabetically?
 */
 
 /**
@@ -78,6 +79,7 @@ bool Main::initialise( QObject *parent ) {
     Variable::add( "reviewerName", this->settings, "" );
     Variable::add( "system/consoleHistory", this->settings, "" );
     Variable::add( "rankings/current", this->settings, true );
+    //Variable::add( "filesystem/last", this->settings, "" );
 
     // load database entries
     if ( !Database::load())
@@ -230,8 +232,7 @@ int main( int argc, char *argv[] ) {
 
     // set debug level
 #ifdef APPLET_DEBUG
-    m.setDebugLevel( Common::Debug );
-    //m.setDebugLevel( Main::DebugLevel( 0x00FF ));
+    m.setDebugLevel( Common::System );
 #else
     m.setDebugLevel( Common::NoDebug );
 #endif

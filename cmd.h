@@ -119,6 +119,7 @@ public slots:
     void cvarSet( const QStringList & );
     void teamAdd( const QStringList & );
     void teamRemove( const QStringList & );
+    void teamLogs( const QStringList & );
     void stressTest( const QStringList & );
     void memInfo();
     void dbInfo();

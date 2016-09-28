@@ -267,3 +267,25 @@ QList<Task*> Main::taskListSorted() {
     // return sorted list
     return sortedList;
 }
+
+/**
+ * @brief Main::teamListSorted
+ * @return
+ */
+QList<Team*> Main::teamListSorted() {
+    QList <Team*>sortedList;
+
+    if ( Event::active() == NULL )
+        return sortedList;
+
+    // make a local copy and sort it alphabetically or by logs (or both)
+    sortedList = Event::active()->teamList;
+
+    if ( sortedList.isEmpty())
+        return sortedList;
+
+    qSort( sortedList.begin(), sortedList.end(), listToAscending<Team> );
+
+    // return sorted list
+    return sortedList;
+}
