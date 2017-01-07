@@ -152,8 +152,10 @@ void Gui_Rankings::fillData() {
             QStandardItem *itemPtr = new QStandardItem();
             QString text;
 
-            if ( teamPtr == NULL || guiPtr == NULL )
+            if ( teamPtr == NULL || guiPtr == NULL ) {
+                delete itemPtr;
                 return;
+            }
 
             switch ( y ) {
             case TeamName:
@@ -361,9 +363,9 @@ void Gui_Rankings::on_actionExport_triggered() {
             int points;
 
             if ( teamPtr->disqualified())
-                points = -1;
-
-            points = teamPtr->points() - teamPtr->penalty();
+                points = 0;
+            else
+                points = teamPtr->points() - teamPtr->penalty();
 
             if ( points <= 0 )
                 points = 0;
