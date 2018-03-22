@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,23 @@
 // includes
 //
 #include "main.h"
-#include "gui_main.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QTranslator>
-#include "gui_console.h"
+#include "console.h"
 #include "cmd.h"
+#include "xmltools.h"
 
 //
 // classes
 //
-class Main m;
+//class Main m;
 
 /*
 TODO:
+- teamListModel in comboBoxes
+- proper settings variables
+
 FUTURE:
 - use listView instead of listWidget to reduce memory footprint
 - output verbocity levels per subsystem
@@ -40,8 +44,16 @@ FUTURE:
 - combos for stressTest
 - richText styling? html?
 - unify task and team dialogs (create superclass - less dup code)
+
+NOTES:
 - currently, there is no need for an API change
 - sort teams alphabetically?
+
+MODERNIZE:
+- lambdas, overrides, singletons
+- threading (database, rankings)
+- qDebug() string routing
+- database code rewrite (singleton)
 */
 
 /**
@@ -52,38 +64,17 @@ bool Main::initialise( QObject *parent ) {
     // announce
     Common::print( StrMsg + this->tr( "initialising system\n" ), Common::System );
 
-    // set parent
-    this->setParent( parent );
-
-    // init counters
-    this->changesCounter = 0;
-    this->setInitialised( false );
-
-    // initialise settings
-    this->settings = new QSettings( "avoti", "ketoevent" );
-    this->settings->setDefaultFormat( QSettings::NativeFormat );
-
-    // initialise this first
-    Variable::add( "databasePath", this->settings, this->path );
-
-    // TODO: move path to Database class
-    Database::makePath( Variable::string( "databasePath" ));
-    Variable::setValue( "databasePath", this->path );
-
     // init cvars
-    Variable::add( "backup/perform", this->settings, true );
-    Variable::add( "backup/changes", this->settings, 25 );
-    Variable::add( "misc/sortTasks", this->settings, true );
-    Variable::add( "misc/hilightLogged", this->settings, false );
-    Variable::add( "currentEvent", this->settings, -1 );
-    Variable::add( "reviewerName", this->settings, "" );
-    Variable::add( "system/consoleHistory", this->settings, "" );
-    Variable::add( "rankings/current", this->settings, true );
-    //Variable::add( "filesystem/last", this->settings, "" );
-
-    // load database entries
-    if ( !Database::load())
-        return false;
+    Variable::instance()->add( "databasePath", this->path );
+    Variable::instance()->add( "backup/perform", true );
+    Variable::instance()->add( "backup/changes", 25 );
+    Variable::instance()->add( "misc/sortTasks", true );
+    Variable::instance()->add( "misc/hilightLogged", false );
+    Variable::instance()->add( "currentEvent", -1 );
+    Variable::instance()->add( "reviewerName", "" );
+    Variable::instance()->add( "system/consoleHistory", "" );
+    Variable::instance()->add( "rankings/current", true );
+    //Variable::instance()->add( "filesystem/last", "" );
 
     // create settings variables
     SettingsVariable::add( "startTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
@@ -104,9 +95,27 @@ bool Main::initialise( QObject *parent ) {
     SettingsVariable::add( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
     SettingsVariable::add( "rankings/current", SettingsVariable::Action, SettingsVariable::ConsoleVar );
 
+    // load vars
+    XMLTools::instance()->read();
+
+    // set parent
+    this->setParent( parent );
+
+    // init counters
+    this->changesCounter = 0;
+    this->setInitialised( false );
+
+    // TODO: move path to Database class
+    Database::makePath( Variable::instance()->string( "databasePath" ));
+    Variable::instance()->setValue( "databasePath", this->path );
+
+    // load database entries
+    if ( !Database::load())
+        return false;
+
     // init command subsystem
 #ifdef APPLET_DEBUG
-    cmd.init();
+    Cmd::instance()->init();
     this->console->loadHistory();
 #endif
 
@@ -122,29 +131,23 @@ bool Main::initialise( QObject *parent ) {
  * @param ignoreDatabase
  */
 void Main::shutdown( bool ignoreDatabase ) {    
+    // write ot configuration
+    XMLTools::instance()->write();
+
     // announce
     Common::print( StrMsg + this->tr( "performing shutdown\n" ), Common::System );
 
     if ( this->isInitialised()) {
         // clear parent
-        this->setParent( NULL );
+        this->setParent( nullptr );
 
         // save settings
 #ifdef APPLET_DEBUG
         this->console->saveHisotry();
 #endif
-        if ( this->settings != NULL ) {
-            this->settings->sync();
-            delete this->settings;
-        }
 
         // clear entries
         this->clearEvent();
-
-        // clear console vars
-        foreach ( Variable *varPtr, this->cvarList )
-            delete varPtr;
-        this->cvarList.clear();
 
         // ckear settings vars
         foreach ( SettingsVariable *varPtr, this->svarList )
@@ -177,7 +180,7 @@ void Main::shutdown( bool ignoreDatabase ) {
 void Main::update() {
     this->changesCounter++;
 
-    if ( this->changesCounter == Variable::value( "backup/changes" ) && Variable::isEnabled( "backup/perform" )) {
+    if ( this->changesCounter == Variable::instance()->integer( "backup/changes" ) && Variable::instance()->isEnabled( "backup/perform" )) {
         Database::writeBackup();
         this->changesCounter = 0;
     }
@@ -188,33 +191,33 @@ void Main::update() {
  */
 void Main::clearEvent() {
     // get main screen
-    Gui_Main *gui = qobject_cast<Gui_Main*>( this->parent());
-    if ( gui == NULL )
+    MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
+    if ( gui == nullptr )
         return;
 
     // clear task widgets on main screen
     gui->clearTasks();
 
     // clear teams (logs should be cleaned automatically on destruct)
-    foreach ( Team *teamPtr, m.teamList ) {
-        m.teamList.removeOne( teamPtr );
+    foreach ( Team *teamPtr, Main::instance()->teamList ) {
+        Main::instance()->teamList.removeOne( teamPtr );
         delete teamPtr;
     }
-    m.teamList.clear();
+    Main::instance()->teamList.clear();
 
     // clear events
-    foreach ( Event *eventPtr, m.eventList ) {
-        m.eventList.removeOne( eventPtr );
+    foreach ( Event *eventPtr, Main::instance()->eventList ) {
+        Main::instance()->eventList.removeOne( eventPtr );
         delete eventPtr;
     }
-    m.eventList.clear();
+    Main::instance()->eventList.clear();
 
     // clear tasks
-    foreach ( Task *taskPtr, m.taskList ) {
-        m.taskList.removeOne( taskPtr );
+    foreach ( Task *taskPtr, Main::instance()->taskList ) {
+        Main::instance()->taskList.removeOne( taskPtr );
         delete taskPtr;
     }
-    m.taskList.clear();
+    Main::instance()->taskList.clear();
 }
 
 /**
@@ -227,14 +230,14 @@ int main( int argc, char *argv[] ) {
     QApplication app( argc, argv );
 
     // init app
-    QCoreApplication::setOrganizationName( "avoti" );
+    QCoreApplication::setOrganizationName( "factory12" );
     QCoreApplication::setApplicationName( "ketoevent" );
 
     // set debug level
 #ifdef APPLET_DEBUG
-    m.setDebugLevel( Common::System );
+    Main::instance()->setDebugLevel( Common::System );
 #else
-    m.setDebugLevel( Common::NoDebug );
+    Main::instance()->setDebugLevel( Common::NoDebug );
 #endif
 
     // i18n
@@ -250,15 +253,15 @@ int main( int argc, char *argv[] ) {
 
     // init console (for debugging)
 #ifdef APPLET_DEBUG
-    Gui_Console::init();
+    Console::init();
 #endif
 
     // init main window
-    Gui_Main gui;
+    MainWindow gui;
     gui.show();
 
     // initialise application
-    if ( m.initialise( qobject_cast<QObject*>( &gui ))) {
+    if ( Main::instance()->initialise( qobject_cast<QObject*>( &gui ))) {
 
         // add teams
         gui.initialise();

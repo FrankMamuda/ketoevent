@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef SETTINGSVARIABLE_H
-#define SETTINGSVARIABLE_H
+#pragma once
 
 //
 // includes
@@ -93,5 +92,3 @@ private:
     QString m_key;
     QObject *objPtr;
 };
-
-#endif // SETTINGSVARIABLE_H

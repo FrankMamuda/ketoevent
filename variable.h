@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,71 +16,103 @@
  *
  */
 
-#ifndef VARIABLE_H
-#define VARIABLE_H
+#pragma once
 
 //
 // includes
 //
-#include <QObject>
-#include <QSettings>
-#include <QTime>
+#include <QMap>
+#include <QVariant>
+#include <QString>
+#include <QMetaMethod>
+#include "singleton.h"
+
+/**
+ * @brief The VariableEntry class
+ */
+class VariableEntry {
+public:
+    VariableEntry( const QString &key = QString(), const QVariant &defaultValue = QVariant()) : m_key( key ), m_value( defaultValue ), m_defaultValue( defaultValue ) {}
+    QString key() const { return this->m_key; }
+    QVariant value() const { return this->m_value; }
+    QVariant defaultValue() const { return this->m_defaultValue; }
+    void setValue( const QVariant &value ) { m_value = value; }
+
+private:
+    QString m_key;
+    QVariant m_value;
+    QVariant m_defaultValue;
+};
 
 /**
  * @brief The Variable class
  */
 class Variable : public QObject {
     Q_OBJECT
-    Q_PROPERTY( QString key READ key WRITE setKey )
-    Q_PROPERTY( QVariant defaultValue READ defaultValue WRITE setDefaultValue )
-    Q_PROPERTY( QVariant value READ value WRITE setValue )
-    Q_PROPERTY( int integer READ integer )
-    Q_PROPERTY( bool isEnabled READ isEnabled )
-    Q_PROPERTY( float floatValue READ floatValue() )
-    Q_PROPERTY( QString string READ string )
-    Q_PROPERTY( QTime time READ time )
-    Q_PROPERTY( QString timeString READ timeString )
-    Q_CLASSINFO( "description", "Console variable" )
 
 public:
-    explicit Variable( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) { this->setKey( key ); this->s = settingsPtr; this->setDefaultValue( defaultValue ); }
-    QString key() const { return this->m_key; }
-    QVariant defaultValue() const { return this->m_defaultValue; }
-    QVariant value() const { if ( this->s == NULL ) return QVariant(); return this->s->value( this->key(), this->defaultValue()); }
-    int integer() const { return this->value().toInt(); }
-    bool isEnabled() const { return this->value().toBool(); }
-    bool isDisabled() const { return !this->isEnabled(); }
-    float floatValue() const { return this->value().toFloat(); }
-    QString string() const { return this->value().toString(); }
-    QTime time() const { return this->value().toTime(); }
-    QString timeString() const { return this->value().toTime().toString( "hh:mm" ); }
+    ~Variable() {}
+    static Variable *instance() { return Singleton<Variable>::instance( Variable::createInstance ); }
+    bool contains( const QString &key ) const { return this->list.contains( key ); }
 
-    // static functions
-    static Variable *find( const QString &key );
-    static QVariant defaultValue( const QString &key ) { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QVariant(); return cvar->defaultValue(); }
-    static QVariant value( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QVariant(); return cvar->value(); }
-    static int integer( const QString &key )           { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return 0; return cvar->integer(); }
-    static bool isEnabled( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return false; return cvar->isEnabled(); }
-    static bool isDisabled( const QString &key )       { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return true; return cvar->isDisabled(); }
-    static float floatValue( const QString &key )      { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return 0.0f; return cvar->floatValue(); }
-    static QString string( const QString &key )        { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QString::null; return cvar->string(); }
-    static QTime time( const QString &key )            { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QTime(); return cvar->time(); }
-    static QString timeString( const QString &key )    { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return QString::null; return cvar->timeString(); }
-    static void setValue( const QString &key, const QVariant &value ) { Variable *cvar = Variable::find( key ); if ( cvar == NULL ) return; cvar->s->setValue( key, value ); emit cvar->changed(); }
-    static void add( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue = QVariant());
+    template<typename T>
+    T value( const QString &key, bool defaultValue = false ) { if ( defaultValue ) return qvariant_cast<T>( this->list[key].defaultValue()); return qvariant_cast<T>( this->list[key].value()); }
+    int integer( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<int>( key, defaultValue ); }
+    qreal decimalValue( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<qreal>( key, defaultValue ); }
+    bool isEnabled( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<bool>( key, defaultValue ); }
+    bool isDisabled( const QString &key, bool defaultValue = false ) { return !Variable::instance()->isEnabled( key, defaultValue ); }
+    QString string( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<QString>( key, defaultValue ); }
+
+    template<typename T>
+    void updateConnections( const QString &key, const T &value ) {
+        if ( Variable::instance()->slotList.contains( key )) {
+            QPair<QObject*, int> slot;
+
+            slot = Variable::instance()->slotList[key];
+            slot.first->metaObject()->method( slot.second ).invoke( slot.first, Qt::QueuedConnection, Q_ARG( QVariant, value ));
+        }
+    }
+
+    template<typename T>
+    void setValue( const QString &key, const T &value, bool initial = false ) {
+        if ( initial ) {
+            // initial read from configuration file
+            Variable::instance()->list[key].setValue( value );
+        } else {
+            QVariant currentValue;
+
+            if ( !Variable::instance()->contains( key ))
+                return;
+
+            currentValue = Variable::instance()->list[key].value();
+
+            // any subsequent value changes emit a valueChanged signal
+            if ( value != currentValue ) {
+                Variable::instance()->list[key].setValue( value );
+                emit valueChanged( key );
+                Variable::instance()->updateConnections( key, value );
+            }
+        }
+    }
+
+    void setInteger( const QString &key, int value ) { Variable::instance()->setValue<int>( key, value ); }
+    void setDecimalValue( const QString &key, qreal value ) { Variable::instance()->setValue<qreal>( key, value ); }
+    void enable( const QString &key ) { Variable::instance()->setValue<bool>( key, true ); }
+    void disable( const QString &key ) { Variable::instance()->setValue<bool>( key, false ); }
+    void setString( const QString &key, const QString &string ) { Variable::instance()->setValue<QString>( key, string ); }
+
+    template<typename T>
+    void add( const QString &key, const T &value ) { if ( !Variable::instance()->list.contains( key ) && !key.isEmpty()) Variable::instance()->list[key] = VariableEntry( key, QVariant( value )); }
+    void reset( const QString &key ) { if ( Variable::instance()->contains( key )) Variable::instance()->setValue<QVariant>( key, Variable::instance()->value<QVariant>( key, true )); }
+
+    QMap<QString, VariableEntry> list;
+    QMap<QString, QPair<QObject*, int> > slotList;
+    void bind( const QString &key, const QObject *receiver, const char *method );
 
 signals:
-    void changed();
-
-public slots:
-    void setKey( const QString &key ) { this->m_key = key; }
-    void setDefaultValue( const QVariant &value ) { this->m_defaultValue = value; }
-    void setValue( const QVariant &value ) { this->s->setValue( this->key(), value ); emit this->changed(); }
+    void valueChanged( const QString &key );
 
 private:
-    QString m_key;
-    QVariant m_defaultValue;
-    QSettings *s;
+    explicit Variable() {}
+    static Variable *createInstance() { return new Variable(); }
 };
-
-#endif // VARIABLE_H

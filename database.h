@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef DATABASE_H
-#define DATABASE_H
+#pragma once
 
 //
 // includes
@@ -177,17 +176,15 @@ public:
 
     static int highestId( IdTypes type );
     static QString stringToHash( const QString &input );
-    static QStringList generateSchemas( const QString &prefix = QString::null );
+    static QStringList generateSchemas( const QString &prefix = QString() );
     static void attach( const QString &path, Import = LogImport );
-    static void makePath( const QString &path = QString::null );
+    static void makePath( const QString &path = QString() );
     static bool load();
     static void unload();
     static void reload( const QString &path ) { Database::unload(); Database::makePath( path ); Database::load(); }
     static void removeOrphanedLogs();
     static bool createStructure( const QString &prefix = "" );
-    static bool createEmptyTable( const QString &prefix = QString::null );
+    static bool createEmptyTable( const QString &prefix = QString() );
     static void reindexTasks();
     static void writeBackup();
 };
-
-#endif // DATABASE_H

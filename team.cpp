@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ Team::Team( const QSqlRecord &record, const QString &table ) {
         this->setMembers( Event::active()->maxMembers());
 
     // perform updates
-    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+    this->connect( this, SIGNAL( changed()), Main::instance(), SLOT( update()));
 }
 
 /**
@@ -54,7 +54,7 @@ Team::Team( const QSqlRecord &record, const QString &table ) {
  */
 Team::~Team() {
     foreach ( Log *logPtr, this->logList ) {
-        m.logList.removeOne( logPtr );
+        Main::instance()->logList.removeOne( logPtr );
         delete logPtr;
     }
     this->logList.clear();
@@ -167,11 +167,11 @@ bool Team::disqualified() const {
  * @return
  */
 Team *Team::forId( int id ) {
-    foreach ( Team *teamPtr, m.teamList ) {
+    foreach ( Team *teamPtr, Main::instance()->teamList ) {
         if ( teamPtr->id() == id )
             return teamPtr;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -189,7 +189,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
     Common::print( CLMsg + QObject::tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Common::TeamDebug );
 
     // avoid duplicates
-    if ( Team::forName( teamName, true ) != NULL )
+    if ( Team::forName( teamName, true ) != nullptr )
         return;
 
     // perform database update and select last row
@@ -212,10 +212,10 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
 
     // get last entry and construct internal entry
     while ( query.next())
-        m.teamList << new Team( query.record(), "teams" );
+        Main::instance()->teamList << new Team( query.record(), "teams" );
 
     // add to event
-    Event::active()->teamList << m.teamList.last();
+    Event::active()->teamList << Main::instance()->teamList.last();
 }
 
 /**
@@ -223,7 +223,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
  * @param teamName
  */
 void Team::remove( const QString &teamName ) {
-    Team *teamPtr = NULL;
+    Team *teamPtr = nullptr;
     QSqlQuery query;
 
     // announce
@@ -233,7 +233,7 @@ void Team::remove( const QString &teamName ) {
     teamPtr = Team::forName( teamName, true );
 
     // failsafe
-    if ( teamPtr == NULL )
+    if ( teamPtr == nullptr )
         return;
 
     // remove team and logs from db
@@ -241,7 +241,7 @@ void Team::remove( const QString &teamName ) {
     query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
 
     // remove from display
-    m.teamList.removeAll( teamPtr );
+    Main::instance()->teamList.removeAll( teamPtr );
     Event::active()->teamList.removeAll( teamPtr );
 }
 
@@ -261,10 +261,10 @@ void Team::loadTeams() {
 
     // store entries
     while ( query.next())
-        m.teamList << new Team( query.record(), "teams" );
+        Main::instance()->teamList << new Team( query.record(), "teams" );
 
     // sort alphabetically
-    m.sort( Main::Teams );
+    Main::instance()->sort( Main::Teams );
 }
 
 /**
@@ -279,11 +279,11 @@ Team *Team::forName( const QString &name, bool currentEvent ) {
     if ( currentEvent )
         teamList = Event::active()->teamList;
     else
-        teamList = m.teamList;
+        teamList = Main::instance()->teamList;
 
     foreach ( Team *teamPtr, teamList ) {
         if ( !QString::compare( name, teamPtr->name()))
             return teamPtr;
     }
-    return NULL;
+    return nullptr;
 }

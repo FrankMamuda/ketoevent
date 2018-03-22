@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ Log::Log( const QSqlRecord &record, const QString &table ) {
     this->setTable( table );
 
     // perform updates
-    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+    this->connect( this, SIGNAL( changed()), Main::instance(), SLOT( update()));
 }
 
 /**
@@ -44,7 +44,7 @@ Log::Log( const QSqlRecord &record, const QString &table ) {
 int Log::points() const {
     Task *taskPtr = Task::forId( this->taskId());
 
-    if ( taskPtr != NULL )
+    if ( taskPtr != nullptr )
         return taskPtr->calculate( this->id());
 
     return 0;
@@ -59,14 +59,14 @@ int Log::points() const {
  * @return Log entry
  */
 Log *Log::add( int taskId, int teamId, int value, int comboId ) {
-    Log *logPtr = NULL;
+    Log *logPtr = nullptr;
     QSqlQuery query;
 
     // announce
     Common::print( CLMsg + QObject::tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Common::LogDebug );
 
     // avoid duplicates
-    foreach ( logPtr, m.logList ) {
+    foreach ( logPtr, Main::instance()->logList ) {
         if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
             return logPtr;
     }
@@ -80,7 +80,7 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
 
     if ( !query.exec()) {
         Common::error( CLSoftError, QObject::tr( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
-        return NULL;
+        return nullptr;
     }
 
     // select the new entry
@@ -89,11 +89,11 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
     // get last entry and construct internal entry
     while ( query.next()) {
         logPtr = new Log( query.record(), "logs" );
-        m.logList << logPtr;
+        Main::instance()->logList << logPtr;
 
         // add to list if none (for imports)
         Team *teamPtr = Team::forId( teamId );
-        if ( teamPtr != NULL ) {
+        if ( teamPtr != nullptr ) {
             if ( !teamPtr->logList.contains( logPtr ))
                 teamPtr->logList << logPtr;
         }
@@ -117,11 +117,11 @@ void Log::loadLogs() {
     while ( query.next()) {
         Log *logPtr = new Log( query.record(), "logs" );
         Team *teamPtr = Team::forId( logPtr->teamId());
-        if ( teamPtr == NULL )
+        if ( teamPtr == nullptr )
             return;
 
         teamPtr->logList << logPtr;
-        m.logList << logPtr;
+        Main::instance()->logList << logPtr;
     }
 }
 
@@ -131,11 +131,11 @@ void Log::loadLogs() {
  * @return
  */
 Log *Log::forId( int id ) {
-    foreach ( Log *logPtr, m.logList ) {
+    foreach ( Log *logPtr, Main::instance()->logList ) {
         if ( logPtr->id() == id )
             return logPtr;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -146,12 +146,12 @@ Log *Log::forId( int id ) {
  */
 Log *Log::forIds( int teamId, int taskId ) {
     Team *teamPtr = Team::forId( teamId );
-    if ( teamPtr == NULL )
-        return NULL;
+    if ( teamPtr == nullptr )
+        return nullptr;
 
     foreach ( Log *logPtr, teamPtr->logList ) {
         if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
             return logPtr;
     }
-    return NULL;
+    return nullptr;
 }

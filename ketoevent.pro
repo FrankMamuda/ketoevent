@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013-2016 Avotu Briezhaudzetava
+# Copyright (C) 2013-2018 Factory #12
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
+#
 
 QT       += core gui sql xml
 
@@ -26,55 +27,41 @@ win32:RC_FILE = icon.rc
 ICON = icon.icns
 
 SOURCES += main.cpp\
-        gui_main.cpp \
-    gui_teamlistmodel.cpp \
-    gui_tasklistmodel.cpp \
-    gui_rankings.cpp \
-    gui_about.cpp \
-    gui_license.cpp \
     taskwidget.cpp \
     settingsvariable.cpp \
-    gui_settings.cpp \
     variable.cpp \
     sort.cpp \
-    gui_console.cpp \
-    gui_combos.cpp \
-    gui_combomodel.cpp \
     combo.cpp \
-    gui_addedit.cpp \
     cmd.cpp \
-    gui_event.cpp \
-    gui_team.cpp \
-    gui_task.cpp \
-    gui_description.cpp \
     team.cpp \
     task.cpp \
     event.cpp \
     log.cpp \
     database.cpp \
     databaseentry.cpp \
-    common.cpp
+    common.cpp \
+    xmltools.cpp \
+    about.cpp \
+    combomodel.cpp \
+    addedit.cpp \
+    rankings.cpp \
+    settings.cpp \
+    mainwindow.cpp \
+    taskmodel.cpp \
+    teammodel.cpp \
+    teamdialog.cpp \
+    taskdialog.cpp \
+    license.cpp \
+    combodialog.cpp \
+    eventdialog.cpp \
+    description.cpp \
+    console.cpp
 
-HEADERS  += gui_main.h \
+HEADERS  += \
     main.h \
-    gui_teamlistmodel.h \
-    gui_tasklistmodel.h \
-    gui_rankings.h \
-    gui_about.h \
-    gui_license.h \
     taskwidget.h \
     settingsvariable.h \
-    gui_settings.h \
-    gui_console.h \
-    gui_combos.h \
-    gui_combomodel.h \
-    gui_addedit.h \
     cmd.h \
-    gui_event.h \
-    gui_team.h \
-    gui_dialog.h \
-    gui_task.h \
-    gui_description.h \
     team.h \
     task.h \
     event.h \
@@ -83,20 +70,40 @@ HEADERS  += gui_main.h \
     database.h \
     databaseentry.h \
     common.h \
-    variable.h
+    variable.h \
+    callonce.h \
+    singleton.h \
+    xmltools.h \
+    about.h \
+    addedit.h \
+    combomodel.h \
+    combodialog.h \
+    console.h \
+    teamlistmodel.h \
+    teamdialog.h \
+    settings.h \
+    eventdialog.h \
+    description.h \
+    license.h \
+    mainwindow.h \
+    rankings.h \
+    taskdialog.h \
+    dialog.h \
+    tasklistmodel.h
 
-FORMS += gui_main.ui \
-    gui_about.ui \
-    gui_license.ui \
-    gui_console.ui \
-    gui_combos.ui \
-    gui_addedit.ui \
-    gui_event.ui \
-    gui_team.ui \
-    gui_task.ui \
-    gui_rankings.ui \
-    gui_settings.ui \
-    gui_description.ui
+FORMS += \
+    mainwindow.ui \
+    about.ui \
+    addedit.ui \
+    combodialog.ui \
+    console.ui \
+    description.ui \
+    license.ui \
+    eventdialog.ui \
+    rankings.ui \
+    settings.ui \
+    taskdialog.ui \
+    teamdialog.ui
 
 RESOURCES += \
     resources.qrc

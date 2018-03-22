@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,34 +21,29 @@
 //
 #include "main.h"
 #include "cmd.h"
-#include "gui_main.h"
+#include "mainwindow.h"
 #include <QSqlQuery>
 
 // only available in debugging mode
 #ifdef APPLET_DEBUG
 
 //
-// classes
-//
-class Cmd cmd;
-
-//
 // commands
 //
-createCommand( cmd, print )
-createCommand( cmd, list )
-createCommand( cmd, cvarSet )
-createCommand( cmd, teamAdd )
-createCommand( cmd, teamRemove )
-createCommand( cmd, teamLogs )
-createCommand( cmd, stressTest )
-createSimpleCommand( cmd, dbInfo )
-createSimpleCommand( cmd, clearLogs )
-createSimpleCommand( cmd, clearCombos )
-createSimpleCommand( cmd, listCvars )
-createSimpleCommand( m, shutdown )
+createCommandPtr( Cmd::instance(), print )
+createCommandPtr( Cmd::instance(), list )
+createCommandPtr( Cmd::instance(), cvarSet )
+createCommandPtr( Cmd::instance(), teamAdd )
+createCommandPtr( Cmd::instance(), teamRemove )
+createCommandPtr( Cmd::instance(), teamLogs )
+createCommandPtr( Cmd::instance(), stressTest )
+createSimpleCommandPtr( Cmd::instance(), dbInfo )
+createSimpleCommandPtr( Cmd::instance(), clearLogs )
+createSimpleCommandPtr( Cmd::instance(), clearCombos )
+createSimpleCommandPtr( Cmd::instance(), listCvars )
+createSimpleCommandPtr( Main::instance(), shutdown )
 #ifdef APPLET_DEBUG
-createSimpleCommand( cmd, memInfo )
+createSimpleCommandPtr( Cmd::instance(), memInfo )
 #endif
 
 /**
@@ -99,7 +94,7 @@ void Cmd::shutdown() {
  */
 void Cmd::add( const QString &command, cmdCommand_t function, const QString &description ) {
     // failsafe
-    if ( this->find( command ) != NULL ) {
+    if ( this->find( command ) != nullptr ) {
         Common::print( StrWarn + this->tr( "command \"%1\" already exists\n" ).arg( command ), Common::Console );
         return;
     }
@@ -116,7 +111,7 @@ void Cmd::remove( const QString &command ) {
     Command *cmdPtr;
 
     cmdPtr = this->find( command );
-    if ( cmdPtr != NULL ) {
+    if ( cmdPtr != nullptr ) {
         // remove from completer
         cmdList.removeOne( cmdPtr );
         delete cmdPtr;
@@ -174,17 +169,17 @@ void Cmd::list( const QStringList &args ) {
  * @brief Cmd::listCvars lists all available console variables
  */
 void Cmd::listCvars() {
-    if ( !m.cvarList.isEmpty())
-        Common::print( QString( "%1 available console variables:" ).arg( m.cvarList.count()), Common::Console );
+    if ( !Variable::instance()->list.isEmpty())
+        Common::print( QString( "%1 available console variables:" ).arg( Variable::instance()->list.count()), Common::Console );
 
-    foreach ( Variable *cvarPtr, m.cvarList ) {
-        if ( !QString::compare( cvarPtr->key(), "system/consoleHistory" ))
+    foreach ( VariableEntry entry, Variable::instance()->list ) {
+        if ( !QString::compare( entry.key(), "system/consoleHistory" ))
             continue;
 
-        if ( QString::compare( cvarPtr->defaultValue().toString(), cvarPtr->value().toString()), Qt::CaseInsensitive )
-            Common::print( QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( cvarPtr->key()).arg( cvarPtr->value().toString()).arg( cvarPtr->defaultValue().toString()), Common::Console );
+        if ( QString::compare( entry.defaultValue().toString(), entry.value().toString(), Qt::CaseInsensitive ))
+            Common::print( QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( entry.key()).arg( entry.value().toString()).arg( entry.defaultValue().toString()), Common::Console );
         else
-            Common::print( QString( "  \"%1\" is \"%2\"" ).arg( cvarPtr->key()).arg( cvarPtr->value().toString()), Common::Console );
+            Common::print( QString( "  \"%1\" is \"%2\"" ).arg( entry.key()).arg( entry.value().toString()), Common::Console );
     }
 }
 
@@ -194,16 +189,19 @@ void Cmd::listCvars() {
  */
 void Cmd::cvarSet( const QStringList &args ) {
     if ( args.count() < 2 ) {
-        Common::print( this->tr( "usage: cv_print [key] [value] - set console variable value\n" ), Common::Console );
+        Common::print( this->tr( "usage: cv_set [key] [value] - set console variable value\n" ), Common::Console );
         return;
     }
 
-    Variable *cvarPtr = Variable::find( args.first());
-    if ( QString::compare( cvarPtr->key(), args.first(), Qt::CaseInsensitive ))
+    // NOTE: this is case sensitive
+    if ( Variable::instance()->contains( args.first())) {
         Common::print( QString( "no such cvar - \"%1\"" ).arg( args.first()), Common::Console );
-    else {
-        Common::print( QString( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 )).arg( cvarPtr->key()), Common::Console );
-        cvarPtr->setValue( args.at( 1 ));
+    } else {
+        VariableEntry entry;
+
+        entry = Variable::instance()->list[args.first()];
+        Common::print( QString( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 )).arg( entry.key()), Common::Console );
+        Variable::instance()->setValue( entry.key(), args.at( 1 ));
     }
 }
 
@@ -212,12 +210,12 @@ void Cmd::cvarSet( const QStringList &args ) {
  */
 void Cmd::dbInfo() {
     Common::print( QString( "events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
-             .arg( m.eventList.count())
-             .arg( Event::active()->teamList.count())
-             .arg( m.teamList.count())
-             .arg( Event::active()->taskList.count())
-             .arg( m.taskList.count())
-             .arg( m.logList.count()), Common::Console );
+                   .arg( Main::instance()->eventList.count())
+                   .arg( Event::active()->teamList.count())
+                   .arg( Main::instance()->teamList.count())
+                   .arg( Event::active()->taskList.count())
+                   .arg( Main::instance()->taskList.count())
+                   .arg( Main::instance()->logList.count()), Common::Console );
 }
 
 /**
@@ -250,8 +248,8 @@ void Cmd::clearCombos() {
  */
 void Cmd::memInfo() {
     Common::print( QString( "meminfo: %1 allocs, %2 deallocs" )
-             .arg( m.alloc )
-             .arg( m.dealloc ), Common::Console );
+                   .arg( Main::instance()->alloc )
+                   .arg( Main::instance()->dealloc ), Common::Console );
 }
 #endif
 
@@ -264,7 +262,7 @@ void Cmd::teamAdd( const QStringList &args ) {
         Common::print( this->tr( "usage: team_add [name] [members] - add a new team to the current event\n" ), Common::Console );
         return;
     }
-    Team::add( args.at( 0 ), args.at( 1 ).toInt(), Event::active()->startTime(), Variable::string( "reviewerName" ), false );
+    Team::add( args.at( 0 ), args.at( 1 ).toInt(), Event::active()->startTime(), Variable::instance()->string( "reviewerName" ), false );
 }
 
 /**
@@ -294,7 +292,7 @@ void Cmd::teamLogs( const QStringList &args ) {
     Team *teamPtr = Team::forName( args.at( 0 ));
     int count = 0;
     if ( Event::active()->teamList.indexOf( teamPtr ) != -1 ) {
-        foreach ( Log *logPtr, m.logList ) {
+        foreach ( Log *logPtr, Main::instance()->logList ) {
             if ( logPtr->teamId() == teamPtr->id())
                 count++;
         }
@@ -313,7 +311,7 @@ void Cmd::stressTest( const QStringList &args ) {
         return;
     }
 
-    Gui_Main *gui = qobject_cast<Gui_Main *>( m.parent());
+    MainWindow *gui = qobject_cast<MainWindow *>( Main::instance()->parent());
     if ( !QString::compare( args.first(), "clear" )) {
         gui->stressTest( -1 );
         return;
@@ -377,7 +375,7 @@ void Cmd::stressTest( const QStringList &args ) {
         return;
     }
 
-    if ( gui != NULL )
+    if ( gui != nullptr )
         gui->stressTest( args.first().toInt());
 }
 
@@ -389,11 +387,10 @@ void Cmd::stressTest( const QStringList &args ) {
  */
 bool Cmd::executeTokenized( const QString &command, const QStringList &args ) {
     Command *cmdPtr;
-    Variable *cvarPtr;
 
     // find the command
     cmdPtr = this->find( command );
-    if ( cmdPtr != NULL ) {
+    if ( cmdPtr != nullptr ) {
         // execute the function
         if ( cmdPtr->hasFunction()) {
             cmdPtr->execute( args );
@@ -402,15 +399,18 @@ bool Cmd::executeTokenized( const QString &command, const QStringList &args ) {
     }
 
     // find the cvar
-    cvarPtr = Variable::find( command );
-    if ( cvarPtr != NULL ) {
+    // NOTE: this is case sensitive
+    if ( Variable::instance()->contains( command )) {
+        VariableEntry entry;
+
+        entry = Variable::instance()->list[command];
         if ( args.count() >= 1 ) {
             QStringList cvCmd;
             cvCmd.append( command );
             cvCmd << args;
             this->cvarSet( cvCmd );
         } else
-            Common::print( QString( "%1\n" ).arg( cvarPtr->string()), Common::Console );
+            Common::print( QString( "%1\n" ).arg( entry.value().toString()), Common::Console );
 
         return true;
     }
@@ -430,7 +430,7 @@ Command *Cmd::find( const QString &command ) const {
         if ( !QString::compare( command, cmdPtr->name(), Qt::CaseInsensitive ))
             return cmdPtr;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**

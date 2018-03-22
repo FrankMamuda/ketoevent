@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef TEAM_H
-#define TEAM_H
+#pragma once
 
 //
 // includes
@@ -72,7 +71,7 @@ public:
 
     // static functions
     static Team *forId( int id );
-    static void add( const QString &teamName, int members, QTime finishTime, const QString &reviewerName = QString::null, bool lockState = false );
+    static void add( const QString &teamName, int members, QTime finishTime, const QString &reviewerName = QString(), bool lockState = false );
     static Team *forName( const QString &name, bool currentEvent = false );
     static void remove( const QString &teamName );
     static void loadTeams();
@@ -94,5 +93,3 @@ private:
     int m_bonus;
     bool m_calculated;
 };
-
-#endif // TEAMENTRY_H

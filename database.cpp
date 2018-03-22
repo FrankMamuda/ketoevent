@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include <QSqlDatabase>
 #include <QSqlField>
 #include <QMessageBox>
-#include "gui_main.h"
+#include "mainwindow.h"
 
 /**
  * @brief Database::makePath makes a filesystem path if non existant
@@ -61,8 +61,8 @@ void Database::makePath( const QString &path ) {
     }
 
     // store path
-    m.path = fullPath;
-    m.path.replace( "//", "/" );
+    Main::instance()->path = fullPath;
+    Main::instance()->path.replace( "//", "/" );
 }
 
 /**
@@ -75,28 +75,28 @@ int Database::highestId( IdTypes type ) {
 
     switch ( type ) {
     case ComboId:
-        foreach ( Log *logPtr, m.logList ) {
+        foreach ( Log *logPtr, Main::instance()->logList ) {
             if ( logPtr->comboId() > id )
                 id = logPtr->id();
         }
         break;
 
     case TeamId:
-        foreach ( Team *teamPtr, m.teamList ) {
+        foreach ( Team *teamPtr, Main::instance()->teamList ) {
             if ( teamPtr->id() > id )
                 id = teamPtr->id();
         }
         break;
 
     case LogId:
-        foreach ( Log *logPtr, m.logList ) {
+        foreach ( Log *logPtr, Main::instance()->logList ) {
             if ( logPtr->id() > id )
                 id = logPtr->id();
         }
         break;
 
     case TaskId:
-        foreach ( Task *taskPtr, m.taskList ) {
+        foreach ( Task *taskPtr, Main::instance()->taskList ) {
             if ( taskPtr->id() > id )
                 id = taskPtr->id();
         }
@@ -246,10 +246,10 @@ removeDB:
     database.remove();
 
     // refresh gui
-    m.clearEvent();
-    Database::reload( Variable::string( "databasePath" ));
-    Gui_Main *mPtr = qobject_cast<Gui_Main *>( m.parent());
-    if ( mPtr == NULL )
+    Main::instance()->clearEvent();
+    Database::reload( Variable::instance()->string( "databasePath" ));
+    MainWindow *mPtr = qobject_cast<MainWindow *>( Main::instance()->parent());
+    if ( mPtr == nullptr )
         return;
 
     mPtr->fillTasks();
@@ -265,7 +265,7 @@ bool Database::createStructure( const QString &prefix ) {
     QSqlQuery query;
 
     // failafe
-    QFile dbFile( Variable::string( "databasePath" ));
+    QFile dbFile( Variable::instance()->string( "databasePath" ));
     if ( !dbFile.exists()) {
         Common::error( CLFatalError, QObject::tr( "unable to create database file\n" ));
         return false;
@@ -278,7 +278,7 @@ bool Database::createStructure( const QString &prefix ) {
 
     // announce
     if ( !tables.count())
-        Common::print( CLMsg + QObject::tr( "creating an empty database '%1'\n" ).arg( Variable::string( "databasePath" )), Common::DatabaseDebug );
+        Common::print( CLMsg + QObject::tr( "creating an empty database '%1'\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
 
     // TODO: api mismatch should also be handled here (reading a single field from events table)
     //       also schema mismatch could be handled here
@@ -301,7 +301,7 @@ bool Database::createStructure( const QString &prefix ) {
         mismatch = false;
 
         // announce
-        Common::print( CLMsg + QObject::tr( "table field mismatch in '%1'. different API?\n" ).arg( Variable::string( "databasePath" )), Common::DatabaseDebug );
+        Common::print( CLMsg + QObject::tr( "table field mismatch in '%1'. different API?\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
 
         // check if table structure matches API0
         for ( y = 0; y < API0::numTables; y++ ) {
@@ -371,7 +371,7 @@ bool Database::createStructure( const QString &prefix ) {
                 }
 
                 // add a combo task
-                if ( !query.exec( QObject::tr( "insert into tmp_tasks values ( null, '%1', 1, 999, %2, %3, null, 1, '%4' )" )
+                if ( !query.exec( QObject::tr( "insert into tmp_tasks values ( null, '%1', 1, 999, %2, %3, nullptr, 1, '%4' )" )
                                  .arg( KetoEvent::comboString )
                                  .arg( static_cast<int>( Task::Bold ))
                                  .arg( static_cast<int>( Task::Multi ))
@@ -418,7 +418,7 @@ bool Database::createStructure( const QString &prefix ) {
                 // add a single event
                 Event::add( "Imported 2013 event" );
 
-                // fill NULL values with blank data
+                // fill nullptr values with blank data
                 query.exec( "update teams set lock=0" );
                 query.exec( "update teams set reviewer='imported'" );
                 query.exec( "update teams set eventId=1" );
@@ -497,12 +497,12 @@ bool Database::createEmptyTable( const QString &prefix ) {
  */
 bool Database::load() {
     // create database
-    QFile database( m.path );
+    QFile database( Main::instance()->path );
     QFileInfo dbInfo( database );
     QSqlDatabase db = QSqlDatabase::database();
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading database '%1'\n" ).arg( Variable::string( "databasePath" )), Common::DatabaseDebug );
+    Common::print( CLMsg + QObject::tr( "loading database '%1'\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
 
     // failsafe
     if ( !db.isDriverAvailable( "QSQLITE" )) {
@@ -513,7 +513,7 @@ bool Database::load() {
     // set sqlite driver
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setHostName( "localhost" );
-    db.setDatabaseName( m.path );
+    db.setDatabaseName( Main::instance()->path );
 
     // touch file if empty
     if ( !database.exists()) {
@@ -564,7 +564,7 @@ void Database::reindexTasks() {
     bool reindex = false;
 
     // here we perform scheduled writes to disk
-    foreach ( Task *taskPtr, m.taskList ) {
+    foreach ( Task *taskPtr, Main::instance()->taskList ) {
         if ( taskPtr->reindexRequired()) {
             taskPtr->setOrder( taskPtr->order(), true );
             reindex = true;
@@ -626,7 +626,7 @@ void Database::writeBackup() {
     QString backupPath;
 
     // make path if nonexistant
-    QFileInfo db( m.path );
+    QFileInfo db( Main::instance()->path );
     backupPath = db.absolutePath() + "/" + "backups/";
     QDir dir( backupPath );
     if ( !dir.exists()) {
@@ -636,5 +636,5 @@ void Database::writeBackup() {
             return;
         }
     }
-    QFile::copy( m.path, QString( "%1%2_%3.db" ).arg( backupPath ).arg( QFileInfo( m.path ).fileName().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+    QFile::copy( Main::instance()->path, QString( "%1%2_%3.db" ).arg( backupPath ).arg( QFileInfo( Main::instance()->path ).fileName().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }

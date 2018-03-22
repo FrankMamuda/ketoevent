@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,10 @@
  */
 
 //
-// sort.cpp (main.cpp is too crowded)
-//
-
-//
 // includes
 //
 #include "main.h"
-#include "gui_main.h"
+#include "mainwindow.h"
 
 // latin4 chars
 static unsigned int latin4Array[] = {
@@ -145,7 +141,7 @@ QString Main::transliterate( const QString &path ) {
  */
 template <class T>
 static bool listToAscending( T *ePtr0, T *ePtr1 ) {
-    return m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
+    return Main::instance()->transliterate( ePtr0->name().toLower()) < Main::instance()->transliterate( ePtr1->name().toLower());
 }
 
 /**
@@ -157,15 +153,15 @@ static bool listToAscending( T *ePtr0, T *ePtr1 ) {
 static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
     bool one = false, two = false;
 
-    Gui_Main *gui = qobject_cast<Gui_Main*>( m.parent());
-    if ( gui == NULL )
+    MainWindow *gui = qobject_cast<MainWindow*>( Main::instance()->parent());
+    if ( gui == nullptr )
         return false;
 
     if ( gui->currentTeamId() == -1 )
         return false;
 
     Team *teamPtr = Team::forId( gui->currentTeamId());
-    if ( teamPtr == NULL )
+    if ( teamPtr == nullptr )
         return false;
 
     foreach ( Log *logPtr, teamPtr->logList ) {
@@ -180,8 +176,8 @@ static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
 
     // something is wrong with QString::localeAwareCompare
     if ( one == false && two == false ) {
-        if ( Variable::isEnabled( "misc/sortTasks" ))
-            return /*QString::localeAwareCompare( ePtr0->name(), ePtr1->name()) < 0;*/m.transliterate( ePtr0->name().toLower()) < m.transliterate( ePtr1->name().toLower());
+        if ( Variable::instance()->isEnabled( "misc/sortTasks" ))
+            return /*QString::localeAwareCompare( ePtr0->name(), ePtr1->name()) < 0;*/Main::instance()->transliterate( ePtr0->name().toLower()) < Main::instance()->transliterate( ePtr1->name().toLower());
         else
             return ePtr0->order() < ePtr1->order();
     }
@@ -249,7 +245,7 @@ void Main::sort( ListTypes type ) {
 QList<Task*> Main::taskListSorted() {
     QList <Task*>sortedList;
 
-    if ( Event::active() == NULL )
+    if ( Event::active() == nullptr )
         return sortedList;
 
     // make a local copy and sort it alphabetically or by logs (or both)
@@ -258,10 +254,10 @@ QList<Task*> Main::taskListSorted() {
     if ( sortedList.isEmpty())
         return sortedList;
 
-    if ( Variable::isEnabled( "misc/sortTasks" ))
+    if ( Variable::instance()->isEnabled( "misc/sortTasks" ))
         qSort( sortedList.begin(), sortedList.end(), listToAscending<Task> );
 
-    if ( Variable::isEnabled( "misc/hilightLogged" ))
+    if ( Variable::instance()->isEnabled( "misc/hilightLogged" ))
         qSort( sortedList.begin(), sortedList.end(), listByLogged );
 
     // return sorted list
@@ -275,7 +271,7 @@ QList<Task*> Main::taskListSorted() {
 QList<Team*> Main::teamListSorted() {
     QList <Team*>sortedList;
 
-    if ( Event::active() == NULL )
+    if ( Event::active() == nullptr )
         return sortedList;
 
     // make a local copy and sort it alphabetically or by logs (or both)

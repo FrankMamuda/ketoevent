@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef EVENT_H
-#define EVENT_H
+#pragma once
 
 //
 // includes
@@ -68,7 +67,7 @@ public:
     // static functions
     static Event *active();
     static Event *forId( int id );
-    static void add( const QString &title = QString::null );
+    static void add( const QString &title = QString());
     static bool setActive( Event *eventPtr );
     static void buildTTList();
     static bool loadEvents();
@@ -89,5 +88,3 @@ public slots:
 private:
     //static Event *activeEvent;
 };
-
-#endif // EVENT_H

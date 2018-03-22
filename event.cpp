@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ void Event::add( const QString &title ) {
 
     // get last sql entry and construct internal entry
     while ( query.next()) {
-        m.eventList << new Event( query.record(), "events" );
+        Main::instance()->eventList << new Event( query.record(), "events" );
         break;
     }
 }
@@ -100,41 +100,46 @@ bool Event::loadEvents() {
     // store entries
     while ( query.next()) {
         Event *eventPtr = new Event( query.record(), "events" );
-        m.eventList << eventPtr;
+        Main::instance()->eventList << eventPtr;
 
         // failsafe - api check
-        if ( static_cast<unsigned int>( m.eventList.last()->api()) < KetoEvent::MinimumAPI ) {
+        if ( static_cast<unsigned int>( Main::instance()->eventList.last()->api()) < KetoEvent::MinimumAPI ) {
             Common::error( CLSoftError,
                      QObject::tr( "incompatible API - '%1', minimum supported '%2'\n" )
-                     .arg( m.eventList.last()->api())
+                     .arg( Main::instance()->eventList.last()->api())
                      .arg( KetoEvent::MinimumAPI ));
-            m.eventList.removeLast();
+            Main::instance()->eventList.removeLast();
 
             // rename database
             Database::unload();
-            QFile::rename( Variable::string( "databasePath" ), QString( "%1_badAPI_%2.db" ).arg( Variable::string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
-            Database::makePath( Variable::defaultValue( "databasePath" ).toString());
+            QFile::rename( Variable::instance()->string( "databasePath" ), QString( "%1_badAPI_%2.db" ).arg( Variable::instance()->string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+            Database::makePath( Variable::instance()->string( "databasePath", true ));
             Database::load();
             return false;
         }
     }
 
     // no event entry? - create one
-    if ( m.eventList.isEmpty())
+    if ( Main::instance()->eventList.isEmpty())
         Event::add();
 
     // still nothing?
-    if ( m.eventList.isEmpty()) {
+    if ( Main::instance()->eventList.isEmpty()) {
         Common::error( CLFatalError, QObject::tr( "could not create event\n" ));
     }
 
     // fixes crash on empty database
-    Event *eventPtr = Event::forId( Variable::integer( "currentEvent" ));
-    if ( eventPtr == NULL )
-        eventPtr = m.eventList.first();
+    Event *eventPtr = Event::forId( Variable::instance()->integer( "currentEvent" ));
+    if ( eventPtr == nullptr )
+        if ( Main::instance()->eventList.isEmpty()) {
+            Common::error( CLFatalError, QObject::tr( "no valid events and/or corrupted database\n" ));
+            return false;
+        }
+
+        eventPtr = Main::instance()->eventList.first();
 
     if ( !Event::setActive( eventPtr ))
-        Event::setActive( m.eventList.first());
+        Event::setActive( Main::instance()->eventList.first());
 
     return true;
 }
@@ -144,10 +149,10 @@ bool Event::loadEvents() {
  * @return current event entry
  */
 Event *Event::active() {
-    if ( m.activeEvent == NULL )
+    if ( Main::instance()->activeEvent == nullptr )
         Common::error( CLFatalError, QObject::tr( "no valid events\n" ));
 
-    return m.activeEvent;
+    return Main::instance()->activeEvent;
 }
 
 /**
@@ -159,10 +164,10 @@ bool Event::setActive( Event *eventPtr ) {
     // announce
     Common::print( CLMsg + QObject::tr( "setting '%1' as active event\n" ).arg( eventPtr->name()), Common::EventDebug );
 
-    foreach ( Event *entry, m.eventList ) {
+    foreach ( Event *entry, Main::instance()->eventList ) {
         if ( entry == eventPtr ) {
-            m.activeEvent = entry;
-            Variable::setValue( "currentEvent", eventPtr->id());
+            Main::instance()->activeEvent = entry;
+            Variable::instance()->setValue( "currentEvent", eventPtr->id());
             return true;
         }
     }
@@ -175,12 +180,12 @@ bool Event::setActive( Event *eventPtr ) {
  * @return event entry
  */
 Event *Event::forId( int id ) {
-    foreach ( Event *eventPtr, m.eventList ) {
+    foreach ( Event *eventPtr, Main::instance()->eventList ) {
         if ( eventPtr->id() == id )
             return eventPtr;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -190,16 +195,16 @@ void Event::buildTTList() {
     // announce
     Common::print( CLMsg + QObject::tr( "building event TTList\n" ), Common::EventDebug );
 
-    foreach ( Event *eventPtr, m.eventList ) {
+    foreach ( Event *eventPtr, Main::instance()->eventList ) {
         eventPtr->teamList.clear();
         eventPtr->taskList.clear();
 
-        foreach ( Team *teamPtr, m.teamList ) {
+        foreach ( Team *teamPtr, Main::instance()->teamList ) {
             if ( teamPtr->eventId() == eventPtr->id())
                 eventPtr->teamList << teamPtr;
         }
 
-        foreach ( Task *taskPtr, m.taskList ) {
+        foreach ( Task *taskPtr, Main::instance()->taskList ) {
             if ( taskPtr->eventId() == eventPtr->id())
                 eventPtr->taskList << taskPtr;
         }

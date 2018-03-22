@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef TASKWIDGET_H
-#define TASKWIDGET_H
+#pragma once
 
 #include <QLabel>
 #include <QCheckBox>
@@ -51,10 +50,10 @@ public:
     Log *log() const { return this->m_log; }
     Task *task() const { return this->m_task; }
     Team *team() const { return this->m_team; }
-    bool hasLog() const { return this->log() != NULL; }
+    bool hasLog() const { return this->log() != nullptr; }
     bool hasCombo() const { if ( this->hasLog()) { if ( this->log()->comboId() != -1 ) return true; } return false; }
-    bool hasTeam() const { return this->team() != NULL; }
-    bool hasTask() const { return this->task() != NULL; }
+    bool hasTeam() const { return this->team() != nullptr; }
+    bool hasTask() const { return this->task() != nullptr; }
     static int getRelativeComboId( int comboId, int teamId );
     bool isActive() const { return this->m_active; }
     enum ViewState {
@@ -97,5 +96,3 @@ public:
     QPushButton *info;
 #endif
 };
-
-#endif // TASKWIDGET_H

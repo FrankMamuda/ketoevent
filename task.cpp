@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ Task::Task( const QSqlRecord &record, const QString &table ) {
     this->m_order = this->order( true );
 
     // perform updates
-    this->connect( this, SIGNAL( changed()), &m, SLOT( update()));
+    this->connect( this, SIGNAL( changed()), Main::instance(), SLOT( update()));
 }
 
 /**
@@ -71,7 +71,7 @@ int Task::calculate( int logId ) const {
 
     // get log parent
     Log *logPtr = Log::forId( logId );
-    if ( logPtr == NULL )
+    if ( logPtr == nullptr )
         return 0;
 
     // get initial points
@@ -152,7 +152,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
              Common::TaskDebug );
 
     // avoid duplicates
-    if ( Task::forName( taskName ) != NULL )
+    if ( Task::forName( taskName ) != nullptr )
         return;
 
     // make sure we insert value at the bottom of the list
@@ -181,10 +181,10 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
 
     // get last entry and construct internal entry
     while ( query.next())
-        m.taskList << new Task( query.record(), "tasks" );
+        Main::instance()->taskList << new Task( query.record(), "tasks" );
 
     // add to event
-    Event::active()->taskList << m.taskList.last();
+    Event::active()->taskList << Main::instance()->taskList.last();
 }
 
 /**
@@ -201,7 +201,7 @@ void Task::loadTasks() {
 
     // store entries
     while ( query.next())
-        m.taskList << new Task( query.record(), "tasks" );
+        Main::instance()->taskList << new Task( query.record(), "tasks" );
 }
 
 /**
@@ -215,7 +215,7 @@ Task *Task::forId( int id ) {
         if ( taskPtr->id() == id )
             return taskPtr;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -230,12 +230,12 @@ Task *Task::forName( const QString &name, bool currentEvent ) {
     if ( currentEvent )
         taskList = Event::active()->taskList;
     else
-        taskList = m.taskList;
+        taskList = Main::instance()->taskList;
 
     // search current event ONLY by default
     foreach ( Task *taskPtr, taskList ) {
         if ( !QString::compare( name, taskPtr->name()))
             return taskPtr;
     }
-    return NULL;
+    return nullptr;
 }

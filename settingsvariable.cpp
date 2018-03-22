@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 // includes
 //
 #include "settingsvariable.h"
-#include "gui_settings.h"
-#include "gui_rankings.h"
+#include "settings.h"
+#include "rankings.h"
 #include "main.h"
 
 /**
@@ -54,7 +54,7 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     this->setParent( parentPtr );
 
     // failsafe
-    if ( this->parent() == NULL || this->objPtr == NULL ) {
+    if ( this->parent() == nullptr || this->objPtr == nullptr ) {
         Common::error( StrSoftError, this->tr( "unable to bind settings variable \"%1\"\n" ).arg( this->key()));
         return;
     }
@@ -138,8 +138,8 @@ void SettingsVariable::unbind() {
     }
 
     // reset object
-    this->objPtr = NULL;
-    this->setParent( NULL );
+    this->objPtr = nullptr;
+    this->setParent( nullptr );
 }
 
 /**
@@ -159,7 +159,7 @@ void SettingsVariable::setState() {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
-            state = Variable::isEnabled( this->key());
+            state = Variable::instance()->isEnabled( this->key());
         else
             state = Event::active()->record().value( this->key()).toBool();
 
@@ -176,7 +176,7 @@ void SettingsVariable::setState() {
         int value;
 
         if ( this->varClass() == ConsoleVar )
-            value = Variable::integer( this->key());
+            value = Variable::instance()->integer( this->key());
         else
             value = Event::active()->record().value( this->key()).toInt();
 
@@ -190,7 +190,7 @@ void SettingsVariable::setState() {
         QTime time;
 
         if ( this->varClass() == ConsoleVar )
-            time = Variable::time( this->key());
+            time = Variable::instance()->value<QTime>( this->key());
         else
             time = QTime::fromString( Event::active()->record().value( this->key()).toString(), "hh:mm" );
 
@@ -204,7 +204,7 @@ void SettingsVariable::setState() {
         QString text;
 
         if ( this->varClass() == ConsoleVar )
-            text = Variable::string( this->key());
+            text = Variable::instance()->string( this->key());
         else
             text = Event::active()->record().value( this->key()).toString();
 
@@ -219,7 +219,7 @@ void SettingsVariable::setState() {
         bool state;
 
         if ( this->varClass() == ConsoleVar )
-            state = Variable::isEnabled( this->key());
+            state = Variable::instance()->isEnabled( this->key());
         else
             state = Event::active()->record().value( this->key()).toBool();
 
@@ -243,25 +243,19 @@ void SettingsVariable::setState() {
  * @param state
  */
 void SettingsVariable::stateChanged( int state ) {
-    Gui_Settings *sParent = qobject_cast<Gui_Settings*>( this->parent());
+    Settings *sParent = qobject_cast<Settings*>( this->parent());
 
-    if ( sParent == NULL )
+    if ( sParent == nullptr )
         return;
 
     if ( sParent->variablesLocked())
         return;
 
-    if ( this->varClass() == ConsoleVar ) {
-        if ( state == Qt::Checked )
-            Variable::setValue( this->key(), true );
-        else
-            Variable::setValue( this->key(), false );
-    } else {
-        if ( state == Qt::Checked )
-            Event::active()->setValue( this->key(), true );
-        else
-            Event::active()->setValue( this->key(), false );
-    }
+    if ( this->varClass() == ConsoleVar )
+        Variable::instance()->setValue( this->key(), state == Qt::Checked ? true : false );
+    else
+        Event::active()->setValue( this->key(), state == Qt::Checked ? true : false );
+
 }
 
 /**
@@ -269,22 +263,18 @@ void SettingsVariable::stateChanged( int state ) {
  * @param state
  */
 void SettingsVariable::toggled( bool state ) {
-    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
+    Dialog *sParent = qobject_cast<Dialog*>( this->parent());
 
-    if ( sParent == NULL )
+    if ( sParent == nullptr )
         return;
 
     if ( sParent->variablesLocked())
         return;
 
-    if ( this->varClass() == ConsoleVar ) {
-        Variable::setValue( this->key(), state );
-    } else {
-        if ( state == true )
-            Event::active()->setValue( this->key(), true );
-        else
-            Event::active()->setValue( this->key(), false );
-    }
+    if ( this->varClass() == ConsoleVar )
+        Variable::instance()->setValue( this->key(), state );
+    else
+        Event::active()->setValue( this->key(), state );
 }
 
 /**
@@ -292,16 +282,16 @@ void SettingsVariable::toggled( bool state ) {
  * @param integer
  */
 void SettingsVariable::integerValueChanged( int integer ) {
-    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
+    Dialog *sParent = qobject_cast<Dialog*>( this->parent());
 
-    if ( sParent == NULL )
+    if ( sParent == nullptr )
         return;
 
     if ( sParent->variablesLocked())
         return;
 
     if ( this->varClass() == ConsoleVar )
-        Variable::setValue( this->key(), integer );
+        Variable::instance()->setValue( this->key(), integer );
     else
         Event::active()->setValue( this->key(), integer );
 }
@@ -311,16 +301,16 @@ void SettingsVariable::integerValueChanged( int integer ) {
  * @param time
  */
 void SettingsVariable::timeChanged( const QTime &time ) {
-    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
+    Dialog *sParent = qobject_cast<Dialog*>( this->parent());
 
-    if ( sParent == NULL )
+    if ( sParent == nullptr )
         return;
 
     if ( sParent->variablesLocked())
         return;
 
     if ( this->varClass() == ConsoleVar )
-        Variable::setValue( this->key(), time );
+        Variable::instance()->setValue( this->key(), time );
     else
         Event::active()->setValue( this->key(), time.toString( "hh:mm" ));
 }
@@ -330,16 +320,16 @@ void SettingsVariable::timeChanged( const QTime &time ) {
  * @param text
  */
 void SettingsVariable::textChanged( const QString &text ) {
-    Gui_Dialog *sParent = qobject_cast<Gui_Dialog*>( this->parent());
+    Dialog *sParent = qobject_cast<Dialog*>( this->parent());
 
-    if ( sParent == NULL )
+    if ( sParent == nullptr )
         return;
 
     if ( sParent->variablesLocked())
         return;
 
     if ( this->varClass() == ConsoleVar )
-        Variable::setValue( this->key(), text );
+        Variable::instance()->setValue( this->key(), text );
     else
         Event::active()->setValue( this->key(), text );
 }
@@ -350,10 +340,10 @@ void SettingsVariable::textChanged( const QString &text ) {
  */
 void SettingsVariable::add( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass ) {
     // avoid duplicates
-    if ( SettingsVariable::find( key ) != NULL )
+    if ( SettingsVariable::find( key ) != nullptr )
         return;
 
-    m.svarList << new SettingsVariable( key, type, varClass );
+    Main::instance()->svarList << new SettingsVariable( key, type, varClass );
 }
 
 /**
@@ -362,9 +352,9 @@ void SettingsVariable::add( const QString &key, SettingsVariable::Types type, Se
  * @return
  */
 SettingsVariable *SettingsVariable::find( const QString &key ) {
-    foreach ( SettingsVariable *varPtr, m.svarList ) {
+    foreach ( SettingsVariable *varPtr, Main::instance()->svarList ) {
         if ( !QString::compare( varPtr->key(), key ))
             return varPtr;
     }
-    return NULL;
+    return nullptr;
 }

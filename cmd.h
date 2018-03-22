@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef CMD_H
-#define CMD_H
+#pragma once
 
 //
 // includes
@@ -65,7 +64,7 @@ public:
 
     // other funcs
     void execute( const QStringList &args );
-    bool hasFunction() const { if ( this->m_function != NULL ) return true; return false; }
+    bool hasFunction() const { if ( this->m_function != nullptr ) return true; return false; }
 
 public slots:
     // property setters
@@ -90,7 +89,7 @@ class Cmd : public QObject {
     Q_ENUMS( ComboCount )
 
 public:
-    void add( const QString &, cmdCommand_t, const QString & = QString::null );
+    void add( const QString &, cmdCommand_t, const QString & = QString() );
     void remove( const QString & );
     bool execute( const QString & );
     bool hasInitialised() const { return this->m_initialised; }
@@ -104,9 +103,17 @@ public:
         C234
     };
 
+    // constructor/destructor/instance
+    ~Cmd() {}
+    static Cmd *instance() { return Singleton<Cmd>::instance( Cmd::createInstance ); }
+
 private:
     bool executeTokenized( const QString &, const QStringList & );
     bool m_initialised;
+
+    // constructor/destructor/instance
+    Cmd( QObject *parent = nullptr ) : QObject( parent ), m_initialised( false ) {}
+    static Cmd *createInstance() { return new Cmd(); }
 
 public slots:
     void init();
@@ -128,10 +135,4 @@ public slots:
     void listCvars();
 };
 
-//
-// externals
-//
-extern class Cmd cmd;
-
 #endif
-#endif // CMD_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,13 @@
  *
  */
 
-#ifndef MAIN_H
-#define MAIN_H
+#pragma once
 
 //
 // includes
 //
 #include <QObject>
 #include <QList>
-#include <QSettings>
 #include <QTime>
 #include "team.h"
 #include "task.h"
@@ -32,9 +30,10 @@
 #include "event.h"
 #include "variable.h"
 #include "settingsvariable.h"
-#include "gui_console.h"
+#include "console.h"
 #include "database.h"
 #include "common.h"
+#include "singleton.h"
 
 //
 // defines
@@ -71,7 +70,7 @@ const static QString comboDescription( QT_TR_NOOP( "Sum of imported combo points
 // classes
 //
 #ifdef APPLET_DEBUG
-class Gui_Console;
+class Console;
 #endif
 class Database;
 
@@ -103,7 +102,6 @@ public:
     QList <Event*> eventList;
     QList <Task*>  taskListSorted();
     QList <Team*>  teamListSorted();
-    QList <Variable*>  cvarList;
     QList <SettingsVariable*> svarList;
 
     // misc
@@ -116,8 +114,12 @@ public:
 #ifdef APPLET_DEBUG
     int alloc;
     int dealloc;
-    Gui_Console *console;
+    Console *console;
 #endif
+
+    // constructor/destructor/instance
+    ~Main() {}
+    static Main *instance() { return Singleton<Main>::instance( Main::createInstance ); }
 
 public slots:
     // init/shutdown
@@ -134,18 +136,14 @@ public slots:
     void clearEvent();
 
 private:
-    QSettings *settings;
     int changesCounter;
     bool m_init;
     Common::DebugLevels m_debug;
+
+    // constructor/destructor/instance
+    Main( QObject *parent = nullptr ) : QObject( parent ), activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ), console( nullptr ), m_init( false ) {}
+    static Main *createInstance() { return new Main(); }
 };
 
 // flags
 Q_DECLARE_OPERATORS_FOR_FLAGS( Common::DebugLevels )
-
-//
-// externals
-//
-extern class Main m;
-
-#endif // MAIN_H

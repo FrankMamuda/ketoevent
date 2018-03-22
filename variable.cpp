@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,29 +20,32 @@
 // includes
 //
 #include "variable.h"
-#include "main.h"
 
 /**
- * @brief Variable::add
- * @param varPtr
+ * @brief Variable::connect
+ * @param key
+ * @param receiver
+ * @param method
  */
-void Variable::add( const QString &key, QSettings *settingsPtr, const QVariant &defaultValue ) {
-    // avoid duplicates
-    if ( Variable::find( key ) != NULL )
+void Variable::bind( const QString &key, const QObject *receiver, const char *method ) {
+   QPair<QObject*, int> slot;
+   int code;
+
+    if ( key.isEmpty())
         return;
 
-    m.cvarList << new Variable( key, settingsPtr, defaultValue );
-}
+    // check if method is a slot
+    code = (( static_cast<int>( *method ) - '0' ) & 0x3 );
+    if ( code != 1 )
+        return;
 
-/**
- * @brief find
- * @param key
- * @return
- */
-Variable *Variable::find( const QString &key ) {
-    foreach ( Variable *varPtr, m.cvarList ) {
-        if ( !QString::compare( varPtr->key(), key ))
-            return varPtr;
-    }
-    return NULL;
+    // get method name
+    ++method;
+
+    // create an object/method pair
+    slot.first = const_cast<QObject*>( receiver );
+    slot.second = receiver->metaObject()->indexOfSlot( QMetaObject::normalizedSignature( qPrintable( method )));
+
+    // add pair to slotList
+    Variable::instance()->slotList[key] = slot;
 }

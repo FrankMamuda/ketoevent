@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 //
 // includes
@@ -76,8 +75,6 @@ public:
     Q_DECLARE_FLAGS( DebugLevels, DebugLevel )
 
     // console io
-    static void error( ErrorTypes type = SoftError, const QString &func = QString::null, const QString &msg = QString::null );
+    static void error( ErrorTypes type = SoftError, const QString &func = QString(), const QString &msg = QString() );
     static void print( const QString &msg, DebugLevel = System );
 };
-
-#endif // COMMON_H

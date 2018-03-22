@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Avotu Briezhaudzetava
+ * Copyright (C) 2013-2018 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "common.h"
 #include "main.h"
 #include <QMessageBox>
-#include "gui_main.h"
+#include "mainwindow.h"
 
 /**
  * @brief Common::print
@@ -37,14 +37,14 @@ void Common::print( const QString &msg, DebugLevel debug ) {
 
 #ifdef APPLET_DEBUG
     // EVERYTHING is printed to the console
-    if ( m.console != NULL )
-        m.console->print( out );
+    if ( Main::instance()->console != nullptr )
+        Main::instance()->console->print( out );
 
     // subsystem messages may be skipped
     if ( debug == NoDebug )
         return;
     else {
-        if ( !m.debugLevel().testFlag( debug ))
+        if ( !Main::instance()->debugLevel().testFlag( debug ))
             return;
     }
 
@@ -62,8 +62,8 @@ void Common::print( const QString &msg, DebugLevel debug ) {
  * @param msg
  */
 void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
-    Gui_Main *guiPtr;
-    guiPtr = qobject_cast<Gui_Main*>( m.parent());
+    MainWindow *guiPtr;
+    guiPtr = qobject_cast<MainWindow*>( Main::instance()->parent());
     QString dialogMsg;
 
     // failsafe
@@ -77,7 +77,7 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
     if ( type == FatalError ) {
         Common::print( QObject::tr( "FATAL ERROR: %1" ).arg( func + msg ), System );
 
-        if ( guiPtr != NULL ) {
+        if ( guiPtr != nullptr ) {
             guiPtr->lock();
             QMessageBox msgBox;
             msgBox.setWindowTitle( QObject::tr( "Fatal error" ));
@@ -90,7 +90,7 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
             switch ( state ) {
             case QMessageBox::Yes:
                 Database::unload();
-                QFile::rename( Variable::string( "databasePath" ), QString( "%1_badDB_%2.db" ).arg( Variable::string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                QFile::rename( Variable::instance()->string( "databasePath" ), QString( "%1_badDB_%2.db" ).arg( Variable::instance()->string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
                 guiPtr->close();
                 break;
 
@@ -102,7 +102,7 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
             exit( 0 );
         }
     } else {
-        if ( guiPtr != NULL )
+        if ( guiPtr != nullptr )
             QMessageBox::warning( guiPtr, "Error", dialogMsg, QMessageBox::Close );
 
         Common::print( QObject::tr( "ERROR: %1" ).arg( func + msg ), System );
