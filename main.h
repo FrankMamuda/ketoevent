@@ -105,7 +105,7 @@ public:
     QList <SettingsVariable*> svarList;
 
     // misc
-    QString transliterate( const QString &path );
+    QString transliterate( const QString &path ) const;
     bool isInitialised() const { return this->m_init; }
     Common::DebugLevels debugLevel() const { return this->m_debug; }
     Event *activeEvent;

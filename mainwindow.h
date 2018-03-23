@@ -27,7 +27,6 @@
 #include "teamdialog.h"
 #include "taskdialog.h"
 #include "rankings.h"
-#include "about.h"
 #include "settings.h"
 #include "eventdialog.h"
 
@@ -94,7 +93,6 @@ private slots:
     void on_actionTeams_triggered() { this->teamDialog->show(); this->fillTeams(); }
     void on_actionTasks_triggered() { this->taskDialog->show(); }
     void on_actionRankings_triggered() { this->rankingsDialog->show(); }
-    void on_actionAbout_triggered() { About about( this ); about.exec(); }
     void on_actionSettings_triggered();
     void on_actionExit_triggered() { Main::instance()->shutdown(); }
     void on_clearButton_clicked();

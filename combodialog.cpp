@@ -24,16 +24,6 @@
 #include "mainwindow.h"
 
 /**
- * @brief listByCombos
- * @param lPtr0
- * @param lPtr1
- * @return
- */
-static bool listByCombos( Log *lPtr0, Log *lPtr1 ) {
-    return lPtr0->comboId() < lPtr1->comboId();
-}
-
-/**
  * @brief ComboDialog::ComboDialog
  * @param parent
  */
@@ -49,6 +39,9 @@ ComboDialog::ComboDialog( QWidget *parent ) : QDialog( parent ), ui( new Ui::Com
 
     // fill combobox with team names & trigger change
     this->fillTeams();
+
+    // onClose lambda
+    this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ]() { this->accept(); } );
 }
 
 /**
@@ -59,7 +52,7 @@ ComboDialog::~ComboDialog() {
     this->logListSorted.clear();
     this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
     delete this->comboModelPtr;
-    delete ui;
+    delete this->ui;
 }
 
 /**
@@ -84,7 +77,7 @@ void ComboDialog::currentTeamIndexChanged( int index ) {
 
     // make a local copy and sort it by comboId
     this->logListSorted = teamPtr->logList;
-    qSort( this->logListSorted.begin(), this->logListSorted.end(), listByCombos );
+    qSort( this->logListSorted.begin(), this->logListSorted.end(), []( Log *l0, Log *l1 ) { return l0->comboId() < l1->comboId(); } );
 
     foreach ( Log *logPtr, this->logListSorted ) {
         if ( logPtr->comboId() == -1 )
@@ -116,11 +109,4 @@ void ComboDialog::fillTeams() {
         return;
 
     this->ui->comboTeams->setCurrentIndex( mPtr->currentTeamIndex());
-}
-
-/**
- * @brief ComboDialog::on_buttonClose_clicked
- */
-void ComboDialog::on_buttonClose_clicked() {
-    this->accept();
 }

@@ -23,6 +23,7 @@
 //
 #include <QDialog>
 #include "task.h"
+#include "ui_description.h"
 
 //
 // namespace: Ui
@@ -38,8 +39,27 @@ class Description : public QDialog {
     Q_OBJECT
 
 public:
-    explicit Description( Task *taskPtr = 0, QWidget *parent = 0 );
-    ~Description();
+    /**
+     * @brief Description
+     * @param taskPtr
+     * @param parent
+     */
+    explicit Description( Task *taskPtr = 0, QWidget *parent = 0 ) : QDialog( parent ), ui( new Ui::Description ) {
+        this->ui->setupUi( this );
+
+        if ( taskPtr == nullptr || this->parent() == nullptr )
+            return;
+
+        this->ui->taskName->setText( taskPtr->name());
+        this->ui->description->setPlainText( taskPtr->description());
+    }
+
+    /**
+     * @brief Description::~Description
+     */
+    ~Description() {
+        delete this->ui;
+    }
 
 private:
     Ui::Description *ui;

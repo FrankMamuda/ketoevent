@@ -53,7 +53,6 @@ public:
 
 private slots:
     void fillTeams();
-    void on_buttonClose_clicked();
     void currentTeamIndexChanged( int );
     void setCurrentTeamIndex( int index ) { this->m_currentTeamIndex = index; }
 

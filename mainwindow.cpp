@@ -25,6 +25,7 @@
 #include "taskwidget.h"
 #include "eventdialog.h"
 #include "combodialog.h"
+#include "about.h"
 #include <QMessageBox>
 #ifdef Q_OS_UNIX
 #include <sys/types.h>
@@ -41,6 +42,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
     // disable for now
     this->ui->toolBar->removeAction( this->ui->actionSort );
+
+    // about dialog
+    this->connect( this->ui->actionAbout, &QAction::triggered, [ this ]() { About about( this ); about.exec(); } );
 }
 
 /**

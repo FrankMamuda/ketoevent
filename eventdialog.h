@@ -37,7 +37,6 @@ class EventDialog;
 class EventDialog : public Dialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Event handling dialog" )
-    //Q_PROPERTY( bool import READ importPerformed WRITE setImported )
 
 public:
     explicit EventDialog( QWidget *parent = 0 );
@@ -45,14 +44,12 @@ public:
 
 public slots:
     void fillEvents();
-    //bool importPerformed() const { return m_import; }
 
 private slots:
     void bindVars();
     void on_buttonClose_clicked();
     void on_eventCombo_currentIndexChanged( int index );
     void validate();
-    //void setImported( bool import = true ) { this->m_import = import; }
     void on_actionAddEvent_triggered();
     void on_actionRemoveEvent_triggered();
     void on_actionImportLogs_triggered();
@@ -63,6 +60,5 @@ private slots:
 
 private:
     Ui::EventDialog *ui;
-    //bool m_import;
 };
 

@@ -182,7 +182,6 @@ void TaskWidget::toggleViewState( ViewState state ) {
         this->taskLayout->addWidget( this->combo );
         break;
 
-    default:
     case NoState:
         Common::error( StrSoftError, this->tr( "invalid view state\n" ));
         break;
@@ -254,7 +253,10 @@ void TaskWidget::saveLog() {
             // add new log
             logPtr = Log::add( this->task()->id(), this->team()->id());
             this->setLog( logPtr, true );
-            this->team()->logList << this->log();
+
+            // FIXME: why here and in log.cpp?
+            if ( !this->team()->logList.contains( logPtr ))
+                this->team()->logList << this->log();
         }
     }
     // update THIS and only THIS log

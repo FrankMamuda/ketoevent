@@ -22,109 +22,65 @@
 #include "main.h"
 #include "cmd.h"
 #include "mainwindow.h"
+#include "cmd.h"
 #include <QSqlQuery>
 
 // only available in debugging mode
 #ifdef APPLET_DEBUG
 
-//
-// commands
-//
-createCommandPtr( Cmd::instance(), print )
-createCommandPtr( Cmd::instance(), list )
-createCommandPtr( Cmd::instance(), cvarSet )
-createCommandPtr( Cmd::instance(), teamAdd )
-createCommandPtr( Cmd::instance(), teamRemove )
-createCommandPtr( Cmd::instance(), teamLogs )
-createCommandPtr( Cmd::instance(), stressTest )
-createSimpleCommandPtr( Cmd::instance(), dbInfo )
-createSimpleCommandPtr( Cmd::instance(), clearLogs )
-createSimpleCommandPtr( Cmd::instance(), clearCombos )
-createSimpleCommandPtr( Cmd::instance(), listCvars )
-createSimpleCommandPtr( Main::instance(), shutdown )
-#ifdef APPLET_DEBUG
-createSimpleCommandPtr( Cmd::instance(), memInfo )
-#endif
-
 /**
- * @brief Cmd::init initialises command subsystem
+ * @brief Cmd::Cmd
+ * @param parent
  */
-void Cmd::init() {
+Cmd::Cmd( QObject *parent) : QObject( parent ) {
+    auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
+
     // add common commands
-    this->add( "cmd_list", listCmd, this->tr( "list all available commands" ));
-    this->add( "con_print", printCmd, this->tr( "print text to console" ));
-    this->add( "cv_list", listCvarsCmd, this->tr( "list all available console variables" ));
-    this->add( "cv_set", cvarSetCmd, this->tr( "set console variable value" ));
-    this->add( "db_info", dbInfoCmd, this->tr( "display database information" ));
-    this->add( "logs_clear", clearLogsCmd, this->tr( "clear logs for current event" ));
-    this->add( "combos_clear", clearCombosCmd, this->tr( "clear combos for current event" ));
-    this->add( "team_add", teamAddCmd, this->tr( "add a new team to the current event" ));
-    this->add( "team_remove", teamRemoveCmd, this->tr( "remove a team" ));
-    this->add( "team_logs", teamLogsCmd, this->tr( "print number of logs for a team" ));
-    this->add( "shutdown", shutdownCmd, this->tr( "terminate the applet" ));
-    this->add( "sys_stressTest", stressTestCmd, this->tr( "stress test the applet" ));
-    this->add( "mem_info", memInfoCmd, this->tr( "print alloc/dealloc count" ));
+    this->add( "cmd_list", +listCmd, this->tr( "list all available commands" ));
+    this->add( "con_print", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->print( name, args ); }, this->tr( "print text to console" ));
+    this->add( "cv_list", +[]( const QString &, const QStringList & ) { Cmd::instance()->listCvars(); }, this->tr( "list all available console variables" ));
+    this->add( "cv_set", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); }, this->tr( "set console variable value" ));
+    this->add( "db_info", +[]( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); }, this->tr( "display database information" ));
+    this->add( "logs_clear", +[]( const QString &, const QStringList & ) { Cmd::instance()->clearLogs(); }, this->tr( "clear logs for current event" ));
+    this->add( "combos_clear", +[]( const QString &, const QStringList & ) { Cmd::instance()->clearCombos(); }, this->tr( "clear combos for current event" ));
+    this->add( "team_add", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->teamAdd( name, args ); }, this->tr( "add a new team to the current event" ));
+    this->add( "team_remove", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->teamRemove( name, args ); }, this->tr( "remove a team" ));
+    this->add( "team_logs", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->teamLogs( name, args ); }, this->tr( "print number of logs for a team" ));
+    this->add( "shutdown", +[]( const QString &, const QStringList & ) { Main::instance()->shutdown(); }, this->tr( "terminate the applet" ));
+    this->add( "sys_stressTest", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->stressTest( name, args ); }, this->tr( "stress test the applet" ));
     this->add( "help", listCmd, this->tr( "same as cmd_list" ));
-
-    // we are initialised
-    this->setInitialised();
+    this->add( "mem_info", +[]( const QString &, const QStringList & ) {
+        Common::print( QString( "meminfo: %1 allocs, %2 deallocs" )
+                       .arg( Main::instance()->alloc )
+                       .arg( Main::instance()->dealloc ), Common::Console );
+    }, this->tr( "print alloc/dealloc count" ));
 }
 
 /**
- * @brief Cmd::shutdown shuts down command subsystem
+ * @brief Cmd::add
+ * @param name
+ * @param function
+ * @param description
  */
-void Cmd::shutdown() {
+void Cmd::add( const QString &name, function_t function, const QString &description ) {
     // failsafe
-    if ( !this->hasInitialised())
-        return;
-    else
-        this->setInitialised( false );
-
-    // remove all commands
-    foreach ( Command *cmdFunc, this->cmdList )
-        delete cmdFunc;
-    this->cmdList.clear();
-}
-
-/**
- * @brief Cmd::add adds a command
- * @param command command name
- * @param function function callback
- * @param description command description to be printed in console
- */
-void Cmd::add( const QString &command, cmdCommand_t function, const QString &description ) {
-    // failsafe
-    if ( this->find( command ) != nullptr ) {
-        Common::print( StrWarn + this->tr( "command \"%1\" already exists\n" ).arg( command ), Common::Console );
+    if ( this->contains( name )) {
+        Common::print( StrWarn + this->tr( "command \"%1\" already exists\n" ).arg( name ), Common::Console );
         return;
     }
 
-    // alloc new command
-    this->cmdList << new Command( command, function, description );
-}
-
-/**
- * @brief Cmd::remove removes command by name
- * @param command command name
- */
-void Cmd::remove( const QString &command ) {
-    Command *cmdPtr;
-
-    cmdPtr = this->find( command );
-    if ( cmdPtr != nullptr ) {
-        // remove from completer
-        cmdList.removeOne( cmdPtr );
-        delete cmdPtr;
-    }
+    // map a new command
+    this->functionMap.insert( name, function );
+    this->descriptionMap.insert( name, description );
 }
 
 /**
  * @brief Cmd::print prints text to console
  * @param args message
  */
-void Cmd::print( const QStringList &args ) {
+void Cmd::print( const QString &name, const QStringList &args ) {
     if ( args.count() < 1 ) {
-        Common::print( this->tr( "usage: con_print [message] - prints text to console\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [message] - prints text to console\n" ).arg( name ), Common::Console );
         return;
     }
 
@@ -136,32 +92,30 @@ void Cmd::print( const QStringList &args ) {
  * @brief Cmd::list lists all available commands
  * @param args filter
  */
-void Cmd::list( const QStringList &args ) {
+void Cmd::list( const QString &, const QStringList &args ) {
     // announce
     if ( !args.isEmpty()) {
         int numFiltered = 0;
 
         // get total filtered count
-        foreach ( Command *cmdPtr, this->cmdList ) {
-            if ( !args.isEmpty() && !cmdPtr->name().startsWith( args.first()))
+        foreach ( const QString &name, this->functionMap.keys()) {
+            if ( !args.isEmpty() && !name.startsWith( args.first()))
                 continue;
             numFiltered++;
         }
-        if ( !numFiltered )
-            Common::print( StrWarn + this->tr( "could not match any available commands\n" ), Common::Console );
-        else
-            Common::print( this->tr( "matched %1 of %2 available commands:\n" ).arg( numFiltered ).arg( this->cmdList.count()), Common::Console );
-    } else
-        Common::print( this->tr( "%1 available commands:\n" ).arg( this->cmdList.count()), Common::Console );
+        Common::print( !numFiltered ? StrWarn + this->tr( "could not match any available commands\n" ) : this->tr( "matched %1 of %2 available commands:\n" ).arg( numFiltered ).arg( this->functionMap.count()), Common::Console );
+    } else {
+        Common::print( this->tr( "%1 available commands:\n" ).arg( this->functionMap.count()), Common::Console );
+    }
 
-    foreach ( Command *cmdPtr, this->cmdList ) {
-        if ( !args.isEmpty() && !cmdPtr->name().startsWith( args.first()))
+    foreach ( const QString &name, this->functionMap.keys()) {
+        QString description;
+
+        if ( !args.isEmpty() && !name.startsWith( args.first()))
             continue;
 
-        if ( !cmdPtr->description().isEmpty() )
-            Common::print( QString( " %1 - %2\n" ).arg( cmdPtr->name(), cmdPtr->description()), Common::Console );
-        else
-            Common::print( QString( " %1\n" ).arg( cmdPtr->name()), Common::Console );
+        description = this->descriptionMap[name];
+        Common::print( !description.isEmpty() ? QString( " %1 - %2\n" ).arg( name, description ) : QString( " %1\n" ).arg( name ), Common::Console );
     }
 }
 
@@ -187,9 +141,9 @@ void Cmd::listCvars() {
  * @brief Cmd::cvarSet sets a new value to a console variable
  * @param args key, value
  */
-void Cmd::cvarSet( const QStringList &args ) {
+void Cmd::cvarSet( const QString &name, const QStringList &args ) {
     if ( args.count() < 2 ) {
-        Common::print( this->tr( "usage: cv_set [key] [value] - set console variable value\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [key] [value] - set console variable value\n" ).arg( name ), Common::Console );
         return;
     }
 
@@ -209,13 +163,34 @@ void Cmd::cvarSet( const QStringList &args ) {
  * @brief Cmd::dbInfo prints database info to console
  */
 void Cmd::dbInfo() {
-    Common::print( QString( "events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
+    int events = 0, teams = 0, tasks = 0, logs = 0;
+    QSqlQuery query;
+
+    // print out memory contents
+    Common::print( QString( "MEMORY: events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
                    .arg( Main::instance()->eventList.count())
                    .arg( Event::active()->teamList.count())
                    .arg( Main::instance()->teamList.count())
                    .arg( Event::active()->taskList.count())
                    .arg( Main::instance()->taskList.count())
                    .arg( Main::instance()->logList.count()), Common::Console );
+
+    // print out actual databse contents
+    query = QSqlQuery( "select count(*) from events" );
+    if ( query.next())
+        events = query.value( 0 ).toInt();
+    query = QSqlQuery( "select count(*) from teams" );
+    if ( query.next())
+        teams = query.value( 0 ).toInt();
+    query = QSqlQuery( "select count(*) from tasks" );
+    if ( query.next())
+        tasks = query.value( 0 ).toInt();
+    query = QSqlQuery( "select count(*) from logs" );
+    if ( query.next())
+        logs = query.value( 0 ).toInt();
+
+    Common::print( QString( "DATABASE: events - %1, teams - %2, tasks - %3, logs - %4" )
+                   .arg( events ).arg( teams ).arg( tasks ).arg( logs ), Common::Console );
 }
 
 /**
@@ -242,24 +217,13 @@ void Cmd::clearCombos() {
     }
 }
 
-#ifdef APPLET_DEBUG
-/**
- * @brief Cmd::memInfo prints memory information to console (DEBUG)
- */
-void Cmd::memInfo() {
-    Common::print( QString( "meminfo: %1 allocs, %2 deallocs" )
-                   .arg( Main::instance()->alloc )
-                   .arg( Main::instance()->dealloc ), Common::Console );
-}
-#endif
-
 /**
  * @brief Cmd::teamAdd adds a new team to current event
  * @param args name, members
  */
-void Cmd::teamAdd( const QStringList &args ) {
+void Cmd::teamAdd( const QString &name, const QStringList &args ) {
     if ( args.count() < 2 ) {
-        Common::print( this->tr( "usage: team_add [name] [members] - add a new team to the current event\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [name] [members] - add a new team to the current event\n" ).arg( name ), Common::Console );
         return;
     }
     Team::add( args.at( 0 ), args.at( 1 ).toInt(), Event::active()->startTime(), Variable::instance()->string( "reviewerName" ), false );
@@ -269,9 +233,9 @@ void Cmd::teamAdd( const QStringList &args ) {
  * @brief Cmd::teamRemove removes a team from current event
  * @param args name
  */
-void Cmd::teamRemove( const QStringList &args ) {
+void Cmd::teamRemove( const QString &name, const QStringList &args ) {
     if ( args.count() < 1 ) {
-        Common::print( this->tr( "usage: team_remove [name] - remove team\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [name] - remove team\n" ).arg( name ), Common::Console );
         return;
     }
 
@@ -283,9 +247,9 @@ void Cmd::teamRemove( const QStringList &args ) {
  * @brief Cmd::teamLogs removes a team from current event
  * @param args name
  */
-void Cmd::teamLogs( const QStringList &args ) {
+void Cmd::teamLogs( const QString &name, const QStringList &args ) {
     if ( args.count() < 1 ) {
-        Common::print( this->tr( "usage: teamLogs [name] - number of logs for a team\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [name] - number of logs for a team\n" ).arg( name ), Common::Console );
         return;
     }
 
@@ -305,9 +269,16 @@ void Cmd::teamLogs( const QStringList &args ) {
  * @brief Cmd::stressTest log imitation for debugging purposes
  * @param args stress test options (see source code)
  */
-void Cmd::stressTest( const QStringList &args ) {
+void Cmd::stressTest( const QString &name, const QStringList &args ) {
+    enum ComboCount {
+        C0 = 0,
+        C2,
+        C23,
+        C234
+    };
+
     if ( args.count() < 1 ) {
-        Common::print( this->tr( "usage: sys_stressTest [numTeams] - stress test the applet\n" ), Common::Console );
+        Common::print( this->tr( "usage: %1 [numTeams] - stress test the applet\n" ).arg( name ), Common::Console );
         return;
     }
 
@@ -385,30 +356,22 @@ void Cmd::stressTest( const QStringList &args ) {
  * @param args argument string list
  * @return success
  */
-bool Cmd::executeTokenized( const QString &command, const QStringList &args ) {
-    Command *cmdPtr;
-
-    // find the command
-    cmdPtr = this->find( command );
-    if ( cmdPtr != nullptr ) {
-        // execute the function
-        if ( cmdPtr->hasFunction()) {
-            cmdPtr->execute( args );
-            return true;
-        }
+bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
+    if ( this->contains( name )) {
+        this->functionMap[name]( name, args );
+        return true;
     }
 
     // find the cvar
-    // NOTE: this is case sensitive
-    if ( Variable::instance()->contains( command )) {
+    if ( Variable::instance()->contains( name )) {
         VariableEntry entry;
 
-        entry = Variable::instance()->list[command];
+        entry = Variable::instance()->list[name];
         if ( args.count() >= 1 ) {
             QStringList cvCmd;
-            cvCmd.append( command );
+            cvCmd.append( name );
             cvCmd << args;
-            this->cvarSet( cvCmd );
+            this->cvarSet( name, cvCmd );
         } else
             Common::print( QString( "%1\n" ).arg( entry.value().toString()), Common::Console );
 
@@ -416,29 +379,8 @@ bool Cmd::executeTokenized( const QString &command, const QStringList &args ) {
     }
 
     // report unknown command
-    Common::print( StrWarn + this->tr( "unknown command \"%1\", prehaps try \"cmd_list\"\n" ).arg( command ), Common::Console );
+    Common::print( StrWarn + this->tr( "unknown command \"%1\", prehaps try \"cmd_list\"\n" ).arg( name ), Common::Console );
     return false;
-}
-
-/**
- * @brief Cmd::find finds command entry by name
- * @param command command name
- * @return command entry
- */
-Command *Cmd::find( const QString &command ) const {
-    foreach ( Command *cmdPtr, this->cmdList ) {
-        if ( !QString::compare( command, cmdPtr->name(), Qt::CaseInsensitive ))
-            return cmdPtr;
-    }
-    return nullptr;
-}
-
-/**
- * @brief Command::execute executes command function callback
- * @param args arguments
- */
-void Command::execute( const QStringList &args ) {
-    this->m_function( args );
 }
 
 /**
@@ -484,8 +426,8 @@ bool Cmd::tokenize( const QString &string, QString &command, QStringList &args )
 
     if ( command.isEmpty())
         return false;
-    else
-        return true;
+
+    return true;
 }
 
 /**

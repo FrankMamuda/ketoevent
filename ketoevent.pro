@@ -41,9 +41,7 @@ SOURCES += main.cpp\
     databaseentry.cpp \
     common.cpp \
     xmltools.cpp \
-    about.cpp \
     combomodel.cpp \
-    addedit.cpp \
     rankings.cpp \
     settings.cpp \
     mainwindow.cpp \
@@ -51,10 +49,8 @@ SOURCES += main.cpp\
     teammodel.cpp \
     teamdialog.cpp \
     taskdialog.cpp \
-    license.cpp \
     combodialog.cpp \
     eventdialog.cpp \
-    description.cpp \
     console.cpp
 
 HEADERS  += \
@@ -75,7 +71,6 @@ HEADERS  += \
     singleton.h \
     xmltools.h \
     about.h \
-    addedit.h \
     combomodel.h \
     combodialog.h \
     console.h \
@@ -94,7 +89,6 @@ HEADERS  += \
 FORMS += \
     mainwindow.ui \
     about.ui \
-    addedit.ui \
     combodialog.ui \
     console.ui \
     description.ui \

@@ -63,17 +63,17 @@ bool Console::completeCommand() {
     int y;
 
     // find matching commands
-    foreach( Command *cmdPtr, Cmd::instance()->cmdList ) {
-        if ( cmdPtr->name().startsWith( this->ui->input->text(), Qt::CaseInsensitive ))
-            matchedStrings << cmdPtr->name();
+    foreach( const QString &name, Cmd::instance()->keys()) {
+        if ( name.startsWith( this->ui->input->text()))
+            matchedStrings << name;
     }
 
     // find matching cvars
     foreach( VariableEntry entry, Variable::instance()->list ) {
         if ( !QString::compare( entry.key(), "system/consoleHistory" ))
-             continue;
+            continue;
 
-        if ( entry.key().startsWith( this->ui->input->text(), Qt::CaseInsensitive ))
+        if ( entry.key().startsWith( this->ui->input->text()))
             matchedStrings << entry.key();
     }
 
@@ -102,16 +102,13 @@ bool Console::completeCommand() {
 
     // print out suggestions
     Common::print( this->tr( "Available commands and cvars:\n" ), Common::Console );
-    foreach ( QString str, matchedStrings ) {
+    foreach ( const QString &str, matchedStrings ) {
         // check commands
-        Command *cmdPtr;
-        cmdPtr = Cmd::instance()->find( str );
-        if ( cmdPtr != nullptr ) {
-            if ( !cmdPtr->description().isEmpty()) {
-                Common::print( QString( "  \"%1\" - %2\n" ).arg( str, cmdPtr->description()), Common::Console);
-            } else {
-                Common::print( QString( "  \"%1\n" ).arg( str ), Common::Console );
-            }
+        if ( Cmd::instance()->keys().contains( str )) {
+            QString description;
+
+            description = Cmd::instance()->description( str );
+            Common::print( !description.isEmpty() ? QString( "  \"%1\" - %2\n" ).arg( str, description ) : QString( "  \"%1\n" ).arg( str ), Common::Console );
         }
 
         // check variables

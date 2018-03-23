@@ -23,6 +23,7 @@
 //
 #include <QDialog>
 #include <QApplication>
+#include "ui_license.h"
 
 //
 // namespaces
@@ -39,8 +40,25 @@ class License : public QDialog {
     Q_CLASSINFO( "description", "License dialog" )
 
 public:
-    explicit License( QWidget *parent = 0 );
-    ~License();
+    /**
+     * @brief License
+     * @param parent
+     */
+    explicit License( QWidget *parent = 0 ) : QDialog( parent ), ui( new Ui::License ) {
+        this->ui->setupUi( this );
+
+#ifdef Q_OS_MAC
+        // fixes ugly mac font
+        this->ui->licenseContainer->setHtml( ui->licenseContainer->toHtml().replace( "font-size:8pt", "font-size:12pt" ));
+#endif
+    }
+
+    /**
+     * @brief License::~License
+     */
+    ~License() {
+        delete this->ui;
+    }
 
 private slots:
     void on_aboutQtButton_clicked() { QApplication::aboutQt(); }

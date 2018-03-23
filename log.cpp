@@ -94,6 +94,7 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
         // add to list if none (for imports)
         Team *teamPtr = Team::forId( teamId );
         if ( teamPtr != nullptr ) {
+            // FIXME: why here and in taskwidget.cpp?
             if ( !teamPtr->logList.contains( logPtr ))
                 teamPtr->logList << logPtr;
         }

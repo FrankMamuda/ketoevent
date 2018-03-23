@@ -29,106 +29,88 @@
 //
 // defines
 //
-typedef void ( *cmdCommand_t )( const QStringList &args );
-Q_DECLARE_METATYPE( cmdCommand_t )
-
-// command macros (wrappers)
-#define createCommand( c, f ) static void f ## Cmd ( const QStringList &args ) { c.f( args ); }
-#define createCommandPtr( c, f ) static void f ## Cmd ( const QStringList &args ) { c->f( args ); }
-#define createSimpleCommand( c, f ) static void f ## Cmd ( const QStringList &args ) { Q_UNUSED( args ) c.f(); }
-#define createSimpleCommandPtr( c, f ) static void f ## Cmd ( const QStringList &args ) { Q_UNUSED( args ) c->f(); }
-
-/**
- * @brief The Command class
- */
-class Command : public QObject {
-    Q_OBJECT
-    Q_CLASSINFO( "description", "Platform console command" )
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString description READ description WRITE setDescription )
-    Q_PROPERTY( cmdCommand_t function READ function WRITE setFunction )
-    Q_DISABLE_COPY( Command )
-
-public:
-    // constructor
-    Command ( const QString &command, cmdCommand_t &function, const QString &description ) {
-        this->setName( command );
-        this->setFunction( function );
-        this->setDescription( description );
-    }
-
-    // property getters
-    QString name() const { return this->m_name; }
-    QString description() const { return this->m_description; }
-    cmdCommand_t function() const { return this->m_function; }
-
-    // other funcs
-    void execute( const QStringList &args );
-    bool hasFunction() const { if ( this->m_function != nullptr ) return true; return false; }
-
-public slots:
-    // property setters
-    void setName( const QString &command ) { this->m_name = command; }
-    void setDescription( const QString &description ) { this->m_description = description; }
-    void setFunction( const cmdCommand_t &function ) { this->m_function = function; }
-
-private:
-    // properties
-    cmdCommand_t m_function;
-    QString m_name;
-    QString m_description;
-};
+typedef void ( *function_t )( const QString &name, const QStringList &args );
+Q_DECLARE_METATYPE( function_t )
 
 /**
  * @brief The Cmd class
  */
 class Cmd : public QObject {
     Q_OBJECT
-    Q_PROPERTY( bool initialised READ hasInitialised WRITE setInitialised )
     Q_CLASSINFO( "description", "Command subsystem" )
-    Q_ENUMS( ComboCount )
 
 public:
-    void add( const QString &, cmdCommand_t, const QString & = QString() );
-    void remove( const QString & );
-    bool execute( const QString & );
-    bool hasInitialised() const { return this->m_initialised; }
-    QList<Command*> cmdList;
-    Command *find( const QString & ) const;
-    bool tokenize( const QString &string, QString &command, QStringList &arguments );
-    enum ComboCount {
-        C0 = 0,
-        C2,
-        C23,
-        C234
-    };
+    void add( const QString &, function_t, const QString & = QString() );
 
-    // constructor/destructor/instance
-    ~Cmd() {}
+    /**
+     * @brief remove
+     */
+    void remove( const QString &name ) {
+        this->functionMap.remove( name );
+        this->descriptionMap.remove( name );
+    }
+
+    bool execute( const QString & );
+
+    /**
+     * @brief contains
+     * @param name
+     * @return
+     */
+    bool contains( const QString &name ) const { return this->functionMap.contains( name ); }
+
+    /**
+     * @brief keys
+     * @return
+     */
+    QStringList keys() const { return this->functionMap.keys(); }
+
+    /**
+     * @brief function
+     * @param name
+     * @return
+     */
+    function_t function( const QString &name ) const { if ( this->contains( name )) return this->functionMap[name]; return nullptr; }
+
+    /**
+     * @brief description
+     * @param name
+     * @return
+     */
+    QString description( const QString &name ) const { if ( this->contains( name )) return this->descriptionMap[name]; return QString(); }
+
+    bool tokenize( const QString &string, QString &command, QStringList &arguments );
+
+    /**
+     * @brief Cmd::~Cmd
+     */
+    ~Cmd() { this->functionMap.clear(); this->descriptionMap.clear(); }
+
+    /**
+     * @brief instance
+     * @return
+     */
     static Cmd *instance() { return Singleton<Cmd>::instance( Cmd::createInstance ); }
 
 private:
     bool executeTokenized( const QString &, const QStringList & );
-    bool m_initialised;
 
     // constructor/destructor/instance
-    Cmd( QObject *parent = nullptr ) : QObject( parent ), m_initialised( false ) {}
+    Cmd( QObject *parent = nullptr );
     static Cmd *createInstance() { return new Cmd(); }
 
-public slots:
-    void init();
-    void shutdown();
-    void setInitialised( bool intialised = true ) { this->m_initialised = intialised; }
+    QMap<QString, function_t> functionMap;
+    QMap<QString, QString> descriptionMap;
 
+public slots:
     // commands
-    void list( const QStringList & );
-    void print( const QStringList & );
-    void cvarSet( const QStringList & );
-    void teamAdd( const QStringList & );
-    void teamRemove( const QStringList & );
-    void teamLogs( const QStringList & );
-    void stressTest( const QStringList & );
-    void memInfo();
+    void list( const QString &, const QStringList & );
+    void print( const QString &, const QStringList & );
+    void cvarSet( const QString &, const QStringList & );
+    void teamAdd( const QString &, const QStringList & );
+    void teamRemove( const QString &, const QStringList & );
+    void teamLogs( const QString &, const QStringList & );
+    void stressTest( const QString &, const QStringList & );
     void dbInfo();
     void clearLogs();
     void clearCombos();

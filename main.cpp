@@ -36,6 +36,8 @@
 TODO:
 - teamListModel in comboBoxes
 - proper settings variables
+- remove orphaned logs on recalculation
+  also check for duplicates in team->logList
 
 FUTURE:
 - use listView instead of listWidget to reduce memory footprint
@@ -115,7 +117,6 @@ bool Main::initialise( QObject *parent ) {
 
     // init command subsystem
 #ifdef APPLET_DEBUG
-    Cmd::instance()->init();
     this->console->loadHistory();
 #endif
 
@@ -131,9 +132,6 @@ bool Main::initialise( QObject *parent ) {
  * @param ignoreDatabase
  */
 void Main::shutdown( bool ignoreDatabase ) {    
-    // write ot configuration
-    XMLTools::instance()->write();
-
     // announce
     Common::print( StrMsg + this->tr( "performing shutdown\n" ), Common::System );
 
@@ -145,6 +143,8 @@ void Main::shutdown( bool ignoreDatabase ) {
 #ifdef APPLET_DEBUG
         this->console->saveHisotry();
 #endif
+        // write ot configuration
+        XMLTools::instance()->write();
 
         // clear entries
         this->clearEvent();

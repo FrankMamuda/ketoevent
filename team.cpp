@@ -236,9 +236,18 @@ void Team::remove( const QString &teamName ) {
     if ( teamPtr == nullptr )
         return;
 
+    // remove logs from memory
+    foreach ( Log *log, Main::instance()->logList ) {
+        if ( log->teamId() == teamPtr->id())
+            Main::instance()->logList.removeAll( log );
+    }
+
     // remove team and logs from db
-    query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id()));
-    query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id()));
+    if ( !query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id())))
+        Common::error( CLSoftError, QObject::tr( "could not remove team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+
+    if ( !query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id())))
+        Common::error( CLSoftError, QObject::tr( "could not remove team log, reason: \"%1\"\n" ).arg( query.lastError().text()));
 
     // remove from display
     Main::instance()->teamList.removeAll( teamPtr );

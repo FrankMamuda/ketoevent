@@ -22,11 +22,11 @@
 #include "eventdialog.h"
 #include "mainwindow.h"
 #include "event.h"
-#include "addedit.h"
 #include <QMessageBox>
 #include <QSqlQuery>
 #include <QFileDialog>
 #include "QSqlError"
+#include <QInputDialog>
 #include <QStringList>
 #include <QTextStream>
 #include <QXmlStreamReader>
@@ -44,7 +44,6 @@ EventDialog::EventDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::Even
         this->bindVars();
 
     this->fillEvents();
-    //this->setImported( false );
 }
 
 /**
@@ -78,7 +77,6 @@ void EventDialog::fillEvents() {
  * @brief EventDialog::~EventDialog
  */
 EventDialog::~EventDialog() {
-    //this->disconnect( this->ui->titleEdit, SIGNAL( textChanged( QString )));
     this->unbindVars();
     delete ui;
 }
@@ -87,8 +85,6 @@ EventDialog::~EventDialog() {
  * @brief EventDialog::bindVars
  */
 void EventDialog::bindVars() {
-    //MainWindow *gui;
-
     // lock vars
     this->lockVariables();
 
@@ -160,8 +156,16 @@ void EventDialog::validate() {
  * @brief EventDialog::on_actionAddEvent_triggered
  */
 void EventDialog::on_actionAddEvent_triggered() {
-    AddEdit evAdd( AddEdit::EventDlg, AddEdit::Add, -1, this );
-    evAdd.exec();
+    bool ok;
+    QString title;
+
+    title = QInputDialog::getText( this, this->tr( "Add an event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok );
+    if ( ok && !title.isEmpty()) {
+        Event::add( title );
+        this->fillEvents();
+    } else {
+        QMessageBox::warning( this, this->tr( "Set event title" ), this->tr( "Event title not specified" ));
+    }
 }
 
 /**
@@ -217,7 +221,7 @@ void EventDialog::on_actionImportLogs_triggered() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePaths = QFileDialog::getOpenFileNames( this, this->tr( "Select database or XML (2012)" ), path, this->tr( "Database or 2012 XML (*.db *.xml)" ));
+    filePaths = QFileDialog::getOpenFileNames( this, this->tr( "Select database" ), path, this->tr( "Database (*.db)" ));
 
     // go through all list
     foreach ( filePath, filePaths ) {
@@ -240,87 +244,6 @@ void EventDialog::on_actionImportLogs_triggered() {
 
             // import database
             Database::attach( filePath, Database::LogImport );
-
-            // mark as imported
-            //this->setImported();
-        } else if ( filePath.endsWith( ".xml" )) {
-            QFile xmlList( filePath );
-            xmlList.open( QFile::ReadOnly );
-
-            QXmlStreamReader xml( &xmlList );
-
-            Task::add( KetoEvent::comboString, 1, 999, Task::Multi, Task::Bold, KetoEvent::comboDescription );
-            int comboTaskId = Task::forName( KetoEvent::comboString )->id();
-
-            if ( comboTaskId < 1 )
-                return;
-
-            if ( xml.readNextStartElement()) {
-                if ( !QString::compare( xml.name().toString(), "team", Qt::CaseInsensitive )) {
-                    QString name = xml.attributes().value( "name" ).toString();
-                    int hour = xml.attributes().value( "hour" ).toInt();
-
-                    int minute = xml.attributes().value( "minute" ).toInt();
-                    QString minuteString = QString( "%1" ).arg( minute );
-                    if ( minuteString.length() == 1 )
-                        minuteString.prepend( "0" );
-
-                    int members = xml.attributes().value( "members" ).toInt();
-                    bool lock = static_cast<bool>( xml.attributes().value( "lock" ).toInt());
-
-                    foreach ( Team *teamPtr, Event::active()->teamList ) {
-                        if ( !QString::compare( teamPtr->name(), name ))
-                            return;
-                    }
-
-                    Team::add( name, members, QTime::fromString( QString( "%1:%2" ).arg( hour ).arg( minuteString ), "HH:mm" ), "imported", lock );
-                    int id = Team::forName( name, true )->id();
-
-                    if ( id < 1 )
-                        return;
-
-                    int combos = 0;
-                    while ( xml.readNextStartElement()) {
-                        if ( !QString::compare( xml.name().toString(), "log", Qt::CaseInsensitive )) {
-                            QString hash = xml.attributes().value( "hash" ).toString();
-                            int value = xml.attributes().value( "value" ).toInt();
-                            int combo = xml.attributes().value( "combo" ).toInt();
-                            combos += combo;
-
-                            bool found = false;
-                            foreach ( Task *taskPtr, Event::active()->taskList ) {
-                                if ( !QString::compare( Database::stringToHash( taskPtr->name()), hash, Qt::CaseInsensitive )) {
-                                    if ( value > 0 )
-                                        Log::add( taskPtr->id(), id, value );
-                                    found = true;
-                                }
-                            }
-
-                            if ( !found )
-                                Common::print( StrMsg + this->tr( "unknown task with hash %1\n" ).arg( hash ), Common::DatabaseDebug );
-
-                            xml.readNext();
-                        } else {
-                            xml.skipCurrentElement();
-                        }
-                    }
-
-                    Log::add( comboTaskId, id, combos );
-                } else {
-                    Common::error( StrSoftError, this->tr( "invalid XML file\n" ));
-                }
-            }
-
-            // perform refresh
-            MainWindow *guiPtr;
-            guiPtr = qobject_cast<MainWindow*>( this->parent());
-
-            if ( guiPtr != nullptr ) {
-                guiPtr->fillTeams();
-                guiPtr->fillTasks();
-            }
-
-            xmlList.close();
         }
     }
 
@@ -336,7 +259,7 @@ void EventDialog::on_actionImportTasks_triggered() {
 
     // get filename from dialog
     path = QString( QDir::currentPath() + "/" );
-    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database, csv list or XML (2012)" ), path, this->tr( "Database, CSV list or 2012 XML (*.db *.csv *.xml)" ));
+    filePath = QFileDialog::getOpenFileName( this, this->tr( "Select database or csv list" ), path, this->tr( "Database, CSV list or 2012 XML (*.db *.csv)" ));
 
     // check for empty filenames
     if ( filePath.isEmpty())
@@ -408,64 +331,6 @@ void EventDialog::on_actionImportTasks_triggered() {
         MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
         if ( gui != nullptr )
             gui->fillTasks();
-    }
-    // importing XML (2012 event)
-    else if ( filePath.endsWith( ".xml" )) {
-        QFile xmlList( filePath );
-        xmlList.open( QFile::ReadOnly );
-
-        QXmlStreamReader xml( &xmlList );
-
-        if ( xml.readNextStartElement()) {
-            if ( !QString::compare( xml.name().toString(), "tasks", Qt::CaseInsensitive )) {
-                while ( xml.readNextStartElement()) {
-                    if ( !QString::compare( xml.name().toString(), "task", Qt::CaseInsensitive )) {
-                        QString name = xml.attributes().value( "name" ).toString();
-                        int type = xml.attributes().value( "type" ).toInt();
-                        int points = xml.attributes().value( "points" ).toInt();
-                        bool challenge = static_cast<bool>( xml.attributes().value( "challenge" ).toInt());
-                        int max;
-                        Task::Types taskType;
-                        Task::Styles style = Task::Regular;
-
-#ifdef APPLET_DEBUG
-                        Common::print( StrMsg + this->tr( "new task \"%1\" with hash \"%2\"\n" ).arg( name ).arg( Database::stringToHash( name )), Common::EventDebug );
-#endif
-                        if ( type > 0 ) {
-                            taskType = Task::Multi;
-
-                            if ( type == 2 ) {
-                                max = 10;
-                                points = 1;
-                                style = Task::Italic;
-                            } else
-                                max  = xml.attributes().value( "max" ).toInt();
-                        } else
-                            taskType = Task::Check;
-
-                        if ( challenge )
-                            style = Task::Bold;
-
-                        Task::add( name, points, max, taskType, style );
-
-                        xml.readNext();
-                    } else {
-                        xml.skipCurrentElement();
-                    }
-                }
-            } else {
-                Common::error( StrSoftError, this->tr( "invalid XML file\n" ));
-            }
-        }
-
-        // perform refresh
-        MainWindow *guiPtr;
-        guiPtr = qobject_cast<MainWindow*>( this->parent());
-
-        if ( guiPtr != nullptr )
-            guiPtr->fillTasks();
-
-        xmlList.close();
     } else {
         Common::error( StrSoftError, this->tr( "unknown task storage format\n" ));
         return;
@@ -576,6 +441,15 @@ void EventDialog::on_actionExportTasks_triggered() {
  * @brief EventDialog::on_actionRename_triggered
  */
 void EventDialog::on_actionRename_triggered() {
-    AddEdit evAdd( AddEdit::EventDlg, AddEdit::Rename, -1, this );
-    evAdd.exec();
+    bool ok;
+    QString title;
+
+    title = QInputDialog::getText( this, this->tr( "Add an event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok );
+    if ( ok && !title.isEmpty()) {
+        // FIXME: check for duplicates
+        Event::active()->setName( title );
+        this->fillEvents();
+    } else {
+        QMessageBox::warning( this, this->tr( "Set event title" ), this->tr( "Event title not specified" ));
+    }
 }

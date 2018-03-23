@@ -119,7 +119,7 @@ static char latin1Array[] = {
  * @param path
  * @return
  */
-QString Main::transliterate( const QString &path ) {
+QString Main::transliterate( const QString &path ) const {
     int y;
     QString out;
 
