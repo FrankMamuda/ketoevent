@@ -103,7 +103,7 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
         }
     } else {
         if ( guiPtr != nullptr )
-            QMessageBox::warning( guiPtr, "Error", dialogMsg, QMessageBox::Close );
+            QMessageBox::warning( guiPtr, QObject::tr( "Error" ), dialogMsg, QMessageBox::Close );
 
         Common::print( QObject::tr( "ERROR: %1" ).arg( func + msg ), System );
     }

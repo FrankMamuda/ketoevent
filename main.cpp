@@ -46,6 +46,7 @@ FUTURE:
 - combos for stressTest
 - richText styling? html?
 - unify task and team dialogs (create superclass - less dup code)
+- completers everywhere (find, etc.)
 
 NOTES:
 - currently, there is no need for an API change

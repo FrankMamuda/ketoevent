@@ -159,7 +159,7 @@ MainWindow::~MainWindow() {
     delete this->taskDialog;
     delete this->rankingsDialog;
     delete this->settingsDialog;
-    delete ui;
+    delete this->ui;
 }
 
 /**

@@ -24,6 +24,7 @@
 #include "ui_taskdialog.h"
 #include <QMessageBox>
 #include <QSqlQuery>
+#include <QTimer>
 
 /**
  * @brief TaskDialog::TaskDialog
@@ -54,6 +55,23 @@ TaskDialog::TaskDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::TaskDi
 
     // set focus
     this->ui->closeButton->setFocus();
+
+    // jump to points on enter
+    this->connect( this->ui->taskName, &QLineEdit::returnPressed, [ this ] {
+        QTimer::singleShot( 0, this->ui->taskPoints, SLOT( setFocus()));
+        this->ui->taskPoints->selectAll();
+    } );
+
+    // jump to close on next enter
+    this->ui->taskPoints->setKeyboardTracking( false );
+    this->connect( this->ui->taskPoints, &QSpinBox::editingFinished, [ this ] {
+        QTimer::singleShot( 0, this->ui->doneButton, SLOT( setFocus()));
+    } );
+
+    // jump from desc
+    this->connect( this->ui->taskDescription, &QLineEdit::returnPressed, [ this ] {
+        QTimer::singleShot( 0, this->ui->doneButton, SLOT( setFocus()));
+    } );
 }
 
 /**
@@ -86,6 +104,11 @@ void TaskDialog::toggleView( ViewState viewState ) {
     this->ui->findTask->setEnabled( state );
     this->ui->clearText->setEnabled( state );
     this->ui->taskDescription->setDisabled( state );
+
+    if ( !state )
+        QTimer::singleShot( 0, this->ui->taskName, SLOT( setFocus()));
+
+    this->ui->taskList->scrollToBottom();
 }
 
 /**

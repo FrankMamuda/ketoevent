@@ -249,6 +249,9 @@
              <iconset resource="resources.qrc">
               <normaloff>:/icons/accept.png</normaloff>:/icons/accept.png</iconset>
             </property>
+            <property name="autoDefault">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
