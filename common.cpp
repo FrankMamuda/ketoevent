@@ -62,8 +62,7 @@ void Common::print( const QString &msg, DebugLevel debug ) {
  * @param msg
  */
 void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
-    MainWindow *guiPtr;
-    guiPtr = qobject_cast<MainWindow*>( Main::instance()->parent());
+    MainWindow *mainWindow;
     QString dialogMsg;
 
     // failsafe
@@ -74,11 +73,12 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
     dialogMsg = msg;
     dialogMsg.replace( 0, 1, dialogMsg.at( 0 ).toUpper());
 
+    mainWindow = qobject_cast<MainWindow*>( Main::instance()->parent());
     if ( type == FatalError ) {
         Common::print( QObject::tr( "FATAL ERROR: %1" ).arg( func + msg ), System );
 
-        if ( guiPtr != nullptr ) {
-            guiPtr->lock();
+        if ( mainWindow != nullptr ) {
+            mainWindow->lock();
             QMessageBox msgBox;
             msgBox.setWindowTitle( QObject::tr( "Fatal error" ));
             msgBox.setText( dialogMsg + "\n" + QObject::tr( "Do you want to reset the database (requires restart)?" ));
@@ -91,7 +91,7 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
             case QMessageBox::Yes:
                 Database::unload();
                 QFile::rename( Variable::instance()->string( "databasePath" ), QString( "%1_badDB_%2.db" ).arg( Variable::instance()->string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
-                guiPtr->close();
+                mainWindow->close();
                 break;
 
             case QMessageBox::No:
@@ -102,8 +102,8 @@ void Common::error( ErrorTypes type, const QString &func, const QString &msg ) {
             exit( 0 );
         }
     } else {
-        if ( guiPtr != nullptr )
-            QMessageBox::warning( guiPtr, QObject::tr( "Error" ), dialogMsg, QMessageBox::Close );
+        if ( mainWindow != nullptr )
+            QMessageBox::warning( mainWindow, QObject::tr( "Error" ), dialogMsg, QMessageBox::Close );
 
         Common::print( QObject::tr( "ERROR: %1" ).arg( func + msg ), System );
     }

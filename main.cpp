@@ -63,6 +63,8 @@ MODERNIZE:
  * @brief Main::initialise
  * @param parent
  */
+Main::~Main() { delete this->teamModel; }
+
 bool Main::initialise( QObject *parent ) {
     // announce
     Common::print( StrMsg + this->tr( "initialising system\n" ), Common::System );
@@ -191,35 +193,43 @@ void Main::update() {
  * @brief Main::clearEvent perform garbage collection
  */
 void Main::clearEvent() {
+    MainWindow *mainWindow;
+
     // get main screen
-    MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
-    if ( gui == nullptr )
+    mainWindow = qobject_cast<MainWindow*>( this->parent());
+    if ( mainWindow == nullptr )
         return;
 
     // clear task widgets on main screen
-    gui->clearTasks();
+    mainWindow->clearTasks();
 
     // clear teams (logs should be cleaned automatically on destruct)
-    foreach ( Team *teamPtr, Main::instance()->teamList ) {
-        Main::instance()->teamList.removeOne( teamPtr );
-        delete teamPtr;
+    foreach ( Team *team, Main::instance()->teamList ) {
+        Main::instance()->teamList.removeOne( team );
+        delete team;
     }
     Main::instance()->teamList.clear();
 
     // clear events
-    foreach ( Event *eventPtr, Main::instance()->eventList ) {
-        Main::instance()->eventList.removeOne( eventPtr );
-        delete eventPtr;
+    foreach ( Event *event, Main::instance()->eventList ) {
+        Main::instance()->eventList.removeOne( event );
+        delete event;
     }
     Main::instance()->eventList.clear();
 
     // clear tasks
-    foreach ( Task *taskPtr, Main::instance()->taskList ) {
-        Main::instance()->taskList.removeOne( taskPtr );
-        delete taskPtr;
+    foreach ( Task *task, Main::instance()->taskList ) {
+        Main::instance()->taskList.removeOne( task );
+        delete task;
     }
     Main::instance()->taskList.clear();
 }
+
+/**
+ * @brief Main::Main
+ * @param parent
+ */
+Main::Main(QObject *parent) : QObject( parent ), activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ), console( nullptr ), teamModel( new TeamListModel()), m_init( false ) {}
 
 /**
  * @brief main

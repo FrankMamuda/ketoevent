@@ -224,14 +224,14 @@ void TaskWidget::saveLog() {
         // remove orphaned combos
         int count = 0;
         int badId = this->log()->comboId();
-        foreach ( Log *logPtr, Main::instance()->logList ) {
-            if ( logPtr->comboId() == badId )
+        foreach ( Log *log, Main::instance()->logList ) {
+            if ( log->comboId() == badId )
                 count++;
         }
         if ( count == 2 ) {
-            foreach ( Log *logPtr, Main::instance()->logList ) {
-                if ( logPtr->comboId() == badId )
-                    logPtr->setComboId( -1 );
+            foreach ( Log *log, Main::instance()->logList ) {
+                if ( log->comboId() == badId )
+                    log->setComboId( -1 );
             }
         }
 
@@ -246,25 +246,25 @@ void TaskWidget::saveLog() {
     if ( !this->hasLog()) {
         // check for local logs
         // set log
-        Log *logPtr = Log::forIds( this->team()->id(), this->task()->id());
-        if ( logPtr != nullptr ) {
-            this->setLog( logPtr, false );
+        Log *log = Log::forIds( this->team()->id(), this->task()->id());
+        if ( log != nullptr ) {
+            this->setLog( log, false );
         } else {
             // add new log
-            logPtr = Log::add( this->task()->id(), this->team()->id());
-            this->setLog( logPtr, true );
+            log = Log::add( this->task()->id(), this->team()->id());
+            this->setLog( log, true );
 
             // FIXME: why here and in log.cpp?
-            if ( !this->team()->logList.contains( logPtr ))
+            if ( !this->team()->logList.contains( log ))
                 this->team()->logList << this->log();
         }
     }
     // update THIS and only THIS log
     this->log()->setValue( value );
 
-    MainWindow *gui = qobject_cast<MainWindow *>( Main::instance()->parent());
-    if ( gui != nullptr )
-        gui->taskIndexChanged( -1 );
+    MainWindow *mainWindow = qobject_cast<MainWindow *>( Main::instance()->parent());
+    if ( mainWindow != nullptr )
+        mainWindow->taskIndexChanged( -1 );
 
     // changes made - must recalculate combos
     this->team()->setCombosCalculated( false );
@@ -315,11 +315,11 @@ TaskWidget::~TaskWidget() {
 
 /**
  * @brief TaskWidget::setLog
- * @param logPtr
+ * @param log
  * @param fromDatabase
  */
-void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
-    this->m_log = logPtr;
+void TaskWidget::setLog( Log *log, bool fromDatabase ) {
+    this->m_log = log;
 
     // failsafe
     if ( !this->hasTask()) {
@@ -339,12 +339,12 @@ void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
         return;
     }
 
-    Task *taskPtr = Task::forId( logPtr->taskId());
-    if ( taskPtr == nullptr )
+    Task *task = Task::forId( log->taskId());
+    if ( task == nullptr )
         return;
 
     // make sure log's task is the same task
-    if ( taskPtr != this->task())
+    if ( task != this->task())
         return;
 
     // connect for id updates
@@ -376,13 +376,13 @@ void TaskWidget::setLog( Log *logPtr, bool fromDatabase ) {
  * @return
  */
 int TaskWidget::getRelativeComboId( int comboId, int teamId ) {
-    Team *teamPtr = Team::forId( teamId );
-    if ( teamPtr == nullptr )
+    Team *team = Team::forId( teamId );
+    if ( team == nullptr )
         return -1;
 
     QList <int>combos;
-    foreach ( Log *logPtr, teamPtr->logList ) {
-        int id = logPtr->comboId();
+    foreach ( Log *log, team->logList ) {
+        int id = log->comboId();
 
         if ( id == -1 )
             continue;
@@ -432,10 +432,10 @@ void TaskWidget::resetLog() {
 
 /**
  * @brief TaskWidget::setTeam
- * @param teamPtr
+ * @param team
  */
-void TaskWidget::setTeam( Team *teamPtr ) {
-    this->m_team = teamPtr;
+void TaskWidget::setTeam( Team *team ) {
+    this->m_team = team;
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
@@ -444,14 +444,14 @@ void TaskWidget::setTeam( Team *teamPtr ) {
     }
 
     // find appropriate log
-    foreach ( Log *logPtr, teamPtr->logList ) {
-        Task *taskPtr = Task::forId( logPtr->taskId());
+    foreach ( Log *log, team->logList ) {
+        Task *task = Task::forId( log->taskId());
 
-        if ( taskPtr == nullptr )
+        if ( task == nullptr )
             continue;
 
-        if ( taskPtr == this->task()) {
-            this->setLog( logPtr );
+        if ( task == this->task()) {
+            this->setLog( log );
             break;
         }
     }
@@ -477,8 +477,10 @@ void TaskWidget::resetTeam() {
  * @param checked
  */
 void TaskWidget::toggleCombo( bool checked ) {    
-    MainWindow *gui = qobject_cast<MainWindow *>( Main::instance()->parent());
-    if ( gui == nullptr )
+    MainWindow *mainWindow;
+
+    mainWindow = qobject_cast<MainWindow *>( Main::instance()->parent());
+    if ( mainWindow == nullptr )
         return;
 
     if ( checked ) {
@@ -489,7 +491,7 @@ void TaskWidget::toggleCombo( bool checked ) {
         if ( !this->hasLog() || this->hasCombo() || !this->hasTeam())
             return;
 
-        this->log()->setComboId( gui->currentComboIndex());
+        this->log()->setComboId( mainWindow->currentComboIndex());
 
         // changes made - must recalculate combos
         this->team()->setCombosCalculated( false );
@@ -498,7 +500,7 @@ void TaskWidget::toggleCombo( bool checked ) {
         this->taskName->setStyleSheet( "padding: 6px;" );
         this->combo->setIcon( QIcon( ":/icons/add.png" ));
 
-        if ( !this->hasLog() && gui->currentComboIndex() != -1 )
+        if ( !this->hasLog() && mainWindow->currentComboIndex() != -1 )
             return;
 
         if ( !this->hasTeam())

@@ -68,7 +68,7 @@ public:
     static Event *active();
     static Event *forId( int id );
     static void add( const QString &title = QString());
-    static bool setActive( Event *eventPtr );
+    static bool setActive( Event *event );
     static void buildTTList();
     static bool loadEvents();
 

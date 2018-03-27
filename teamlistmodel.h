@@ -36,8 +36,9 @@ public:
     int rowCount( const QModelIndex & = QModelIndex()) const { return Event::active()->teamList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
+    //void update() { emit this->dataChanged(); }
 
     // this resets whole model based on data in Main::instance()->teamList
     void beginReset() { this->beginResetModel(); }
-    void endReset() { Main::instance()->sort( Main::Teams ); this->endResetModel(); }
+    void endReset() { this->endResetModel(); }
 };

@@ -68,25 +68,33 @@ static comboColour_t colourForId( int id ) {
  * @return
  */
 QVariant ComboModel::data( const QModelIndex &index, int role ) const {
+    ComboDialog *comboDialog;
+
     if ( !index.isValid())
         return QVariant();
 
     // get dialog parent
-    ComboDialog *cPtr = qobject_cast<ComboDialog *>( this->listParent );
-    if ( cPtr == nullptr )
+    comboDialog = qobject_cast<ComboDialog *>( this->listParent );
+    if ( comboDialog == nullptr )
         return 0;
 
     // get row count from parent
-    if ( index.row() >= cPtr->logListSorted.count())
+    if ( index.row() >= comboDialog->logListSorted.count())
         return QVariant();
 
     if ( role == Qt::DisplayRole )
-        return Task::forId( cPtr->logListSorted.at( index.row())->taskId())->name();
+        return Task::forId( comboDialog->logListSorted.at( index.row())->taskId())->name();
     else if ( role == Qt::UserRole )
-        return cPtr->logListSorted.at( index.row())->id();
+        return comboDialog->logListSorted.at( index.row())->id();
     else if ( role == Qt::BackgroundColorRole ) {
         // make sets of combos **colourful**
-        comboColour_t colour = colourForId( TaskWidget::getRelativeComboId( cPtr->logListSorted.at( index.row())->comboId(), cPtr->currentTeamIndex()));
+        // EGH WHAT? FIXME?
+        comboColour_t colour = { 1, 1, 1 };
+
+        if ( !comboDialog->logListSorted.isEmpty())
+            colour = colourForId( TaskWidget::getRelativeComboId( comboDialog->logListSorted.at( index.row())->comboId(), comboDialog->logListSorted.first()->teamId() ));
+
+        //comboColour_t colour = colourForId( TaskWidget::getRelativeComboId( cPtr->logListSorted.at( index.row())->comboId(), cPtr->logListSorted.first()->teamId()));
         return QColor( colour.r, colour.g, colour.b, 64 );
     } else
         return QVariant();
@@ -109,11 +117,13 @@ Qt::ItemFlags ComboModel::flags( const QModelIndex &index ) const {
  * @return
  */
 int ComboModel::rowCount( const QModelIndex & ) const {
-    // get dialog parent
-    ComboDialog *cPtr = qobject_cast<ComboDialog *>( this->listParent );
-    if ( cPtr == nullptr )
+    ComboDialog *comboDialog;
+
+    // get dialog parent            
+    comboDialog  = qobject_cast<ComboDialog *>( this->listParent );
+    if ( comboDialog == nullptr )
         return 0;
 
     // get row count from parent
-    return cPtr->logListSorted.count();
+    return comboDialog->logListSorted.count();
 }

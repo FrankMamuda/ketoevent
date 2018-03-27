@@ -42,10 +42,11 @@ Log::Log( const QSqlRecord &record, const QString &table ) {
  * @return
  */
 int Log::points() const {
-    Task *taskPtr = Task::forId( this->taskId());
+    Task *task;
 
-    if ( taskPtr != nullptr )
-        return taskPtr->calculate( this->id());
+    task = Task::forId( this->taskId());
+    if ( task != nullptr )
+        return task->calculate( this->id());
 
     return 0;
 }
@@ -59,16 +60,16 @@ int Log::points() const {
  * @return Log entry
  */
 Log *Log::add( int taskId, int teamId, int value, int comboId ) {
-    Log *logPtr = nullptr;
+    Log *log = nullptr;
     QSqlQuery query;
 
     // announce
     Common::print( CLMsg + QObject::tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Common::LogDebug );
 
     // avoid duplicates
-    foreach ( logPtr, Main::instance()->logList ) {
-        if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
-            return logPtr;
+    foreach ( log, Main::instance()->logList ) {
+        if ( log->taskId() == taskId && log->teamId() == teamId )
+            return log;
     }
 
     // add new log
@@ -88,18 +89,18 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
 
     // get last entry and construct internal entry
     while ( query.next()) {
-        logPtr = new Log( query.record(), "logs" );
-        Main::instance()->logList << logPtr;
+        log = new Log( query.record(), "logs" );
+        Main::instance()->logList << log;
 
         // add to list if none (for imports)
-        Team *teamPtr = Team::forId( teamId );
-        if ( teamPtr != nullptr ) {
+        Team *team = Team::forId( teamId );
+        if ( team != nullptr ) {
             // FIXME: why here and in taskwidget.cpp?
-            if ( !teamPtr->logList.contains( logPtr ))
-                teamPtr->logList << logPtr;
+            if ( !team->logList.contains( log ))
+                team->logList << log;
         }
     }
-    return logPtr;
+    return log;
 }
 
 /**
@@ -116,13 +117,13 @@ void Log::loadLogs() {
 
     // store entries
     while ( query.next()) {
-        Log *logPtr = new Log( query.record(), "logs" );
-        Team *teamPtr = Team::forId( logPtr->teamId());
-        if ( teamPtr == nullptr )
+        Log *log = new Log( query.record(), "logs" );
+        Team *team = Team::forId( log->teamId());
+        if ( team == nullptr )
             return;
 
-        teamPtr->logList << logPtr;
-        Main::instance()->logList << logPtr;
+        team->logList << log;
+        Main::instance()->logList << log;
     }
 }
 
@@ -132,9 +133,9 @@ void Log::loadLogs() {
  * @return
  */
 Log *Log::forId( int id ) {
-    foreach ( Log *logPtr, Main::instance()->logList ) {
-        if ( logPtr->id() == id )
-            return logPtr;
+    foreach ( Log *log, Main::instance()->logList ) {
+        if ( log->id() == id )
+            return log;
     }
     return nullptr;
 }
@@ -146,13 +147,13 @@ Log *Log::forId( int id ) {
  * @return
  */
 Log *Log::forIds( int teamId, int taskId ) {
-    Team *teamPtr = Team::forId( teamId );
-    if ( teamPtr == nullptr )
+    Team *team = Team::forId( teamId );
+    if ( team == nullptr )
         return nullptr;
 
-    foreach ( Log *logPtr, teamPtr->logList ) {
-        if ( logPtr->taskId() == taskId && logPtr->teamId() == teamId )
-            return logPtr;
+    foreach ( Log *log, team->logList ) {
+        if ( log->taskId() == taskId && log->teamId() == teamId )
+            return log;
     }
     return nullptr;
 }

@@ -147,57 +147,58 @@ void Rankings::fillData() {
     // fill data
     for ( y = 0; y < NumRankingColumns; y++ ) {
         for ( k = 0; k < Event::active()->teamList.count(); k++ ) {
-            Team *teamPtr = Event::active()->teamList.at( k );
-            MainWindow *guiPtr = qobject_cast<MainWindow*>( this->parent());
+            Team *team = Event::active()->teamList.at( k );
+            MainWindow *mainWindow;
             QStandardItem *itemPtr = new QStandardItem();
             QString text;
 
-            if ( teamPtr == nullptr || guiPtr == nullptr ) {
+            mainWindow = qobject_cast<MainWindow*>( this->parent());
+            if ( team == nullptr || mainWindow == nullptr ) {
                 delete itemPtr;
                 return;
             }
 
             switch ( y ) {
             case TeamName:
-                text = teamPtr->name();
+                text = team->name();
 
                 if ( Variable::instance()->isEnabled( "rankings/current" )) {
-                    if ( teamPtr != Team::forId( guiPtr->currentTeamId()))
+                    if ( team != Team::forId( mainWindow->currentTeamId()))
                         text = "";
                 }
                 break;
 
             case Tasks:
-                text = QString( "%1" ).arg( teamPtr->logList.count());
+                text = QString( "%1" ).arg( team->logList.count());
                 break;
 
             case Combos:
-                text = QString( "%1" ).arg( teamPtr->combos());
+                text = QString( "%1" ).arg( team->combos());
                 break;
 
             case Total:
-                text = QString( "%1" ).arg( teamPtr->total());
+                text = QString( "%1" ).arg( team->total());
                 break;
 
             case Time:
-                text = QString( "%1" ).arg( teamPtr->timeOnTrack());
+                text = QString( "%1" ).arg( team->timeOnTrack());
                 break;
 
             case Reviewer:
-                text = teamPtr->reviewer();
+                text = team->reviewer();
                 break;
 
             case Penalty:
-                if ( teamPtr->penalty() > 0 )
+                if ( team->penalty() > 0 )
                     itemPtr->setForeground( QColor( Qt::red ));
-                text = QString( "%1" ).arg( teamPtr->penalty());
+                text = QString( "%1" ).arg( team->penalty());
                 break;
 
             case Points:
-                if ( teamPtr->disqualified())
+                if ( team->disqualified())
                     text = QString( "-1" );
 
-                points = teamPtr->points() - teamPtr->penalty();
+                points = team->points() - team->penalty();
 
                 if ( points <= 0 )
                     points = 0;
@@ -214,7 +215,7 @@ void Rankings::fillData() {
             }
 
             // disqualified
-            if ( teamPtr->disqualified())
+            if ( team->disqualified())
                 itemPtr->setForeground( QColor( Qt::red ));
 
             // make it centred
@@ -242,20 +243,20 @@ void Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0, pointsLogged = 0, maxPoints = 0;
 
     // get team stats
-    foreach ( Team *teamPtr, Event::active()->teamList ) {
-        numParcipiants += teamPtr->members();
-        numTasks += teamPtr->logList.count();
-        teamPtr->setCombosCalculated( false );
-        teamPtr->calculateCombos();
-        pointsLogged += teamPtr->points();
+    foreach ( Team *team, Event::active()->teamList ) {
+        numParcipiants += team->members();
+        numTasks += team->logList.count();
+        team->setCombosCalculated( false );
+        team->calculateCombos();
+        pointsLogged += team->points();
     }
 
     // get max points
-    foreach ( Task *taskPtr, Event::active()->taskList ) {
-        if ( taskPtr->type() == Task::Check )
-            maxPoints += taskPtr->points();
-        else if ( taskPtr->type() == Task::Multi )
-            maxPoints += taskPtr->points() * taskPtr->multi();
+    foreach ( Task *task, Event::active()->taskList ) {
+        if ( task->type() == Task::Check )
+            maxPoints += task->points();
+        else if ( task->type() == Task::Multi )
+            maxPoints += task->points() * task->multi();
     }
 
     // display data
@@ -359,23 +360,23 @@ void Rankings::on_actionExport_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Team *teamPtr, Event::active()->teamList ) {
+        foreach ( Team *team, Event::active()->teamList ) {
             int points;
 
-            if ( teamPtr->disqualified())
+            if ( team->disqualified())
                 points = 0;
             else
-                points = teamPtr->points() - teamPtr->penalty();
+                points = team->points() - team->penalty();
 
             if ( points <= 0 )
                 points = 0;
 
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
-                   .arg( teamPtr->name())
-                   .arg( teamPtr->logList.count())
-                   .arg( teamPtr->combos())
-                   .arg( teamPtr->timeOnTrack())
-                   .arg( teamPtr->penalty())
+                   .arg( team->name())
+                   .arg( team->logList.count())
+                   .arg( team->combos())
+                   .arg( team->timeOnTrack())
+                   .arg( team->penalty())
                    .arg( points )
        #ifdef Q_OS_WIN
                    .arg( "\r\n" );

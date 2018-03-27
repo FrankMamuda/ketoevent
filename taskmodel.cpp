@@ -37,19 +37,19 @@ QVariant TaskListModel::data( const QModelIndex &index, int role ) const {
 
     // just supply view with team names from global list
     if ( role == Qt::DisplayRole ) {
-        Task *taskPtr = Event::active()->taskList.at( index.row());
+        Task *task = Event::active()->taskList.at( index.row());
 
-        if ( taskPtr->type() == Task::Multi )
-            return QString( "%1 (%2x%3)" ).arg( taskPtr->name()).arg( taskPtr->points()).arg( taskPtr->multi());
+        if ( task->type() == Task::Multi )
+            return QString( "%1 (%2x%3)" ).arg( task->name()).arg( task->points()).arg( task->multi());
         else
-            return QString( "%1 (%2)" ).arg( taskPtr->name()).arg( taskPtr->points());
+            return QString( "%1 (%2)" ).arg( task->name()).arg( task->points());
     } else if ( role == Qt::FontRole ) {
-        Task *taskPtr = Event::active()->taskList.at( index.row());
+        Task *task = Event::active()->taskList.at( index.row());
         QFont font;
 
-        if ( taskPtr->style() == Task::Bold )
+        if ( task->style() == Task::Bold )
             font.setBold( true );
-        else if ( taskPtr->style() == Task::Italic )
+        else if ( task->style() == Task::Italic )
             font.setItalic( true );
 
         return font;

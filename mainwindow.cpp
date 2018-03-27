@@ -21,7 +21,7 @@
 //
 #include "main.h"
 #include "mainwindow.h"
-#include "ui_mainWindow.h"
+#include "ui_mainwindow.h"
 #include "taskwidget.h"
 #include "eventdialog.h"
 #include "combodialog.h"
@@ -31,6 +31,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #endif
+
+// TODO: SWITCH to new event after addition
 
 /**
  * @brief MainWindow::MainWindow
@@ -67,6 +69,9 @@ void MainWindow::initialise( bool reload ) {
         // set minimum for time
         this->ui->timeFinish->setMinimumTime( Event::active()->startTime());
 
+        //
+        this->ui->comboTeams->setModel( Main::instance()->teamModel );
+
         // connect team switcher and finish time editor
         if ( !reload ) {
             this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( teamIndexChanged( int )));
@@ -75,7 +80,7 @@ void MainWindow::initialise( bool reload ) {
         }
 
         // fill in tasks and teams
-        this->fillTeams();
+        this->selectTeam();
         this->fillTasks();
     }
 
@@ -167,9 +172,11 @@ MainWindow::~MainWindow() {
  * @param index
  */
 void MainWindow::teamIndexChanged( int index ) {
-    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( index ).toInt());
+    Team *team = Team::forId( this->ui->comboTeams->itemData( index ).toInt());
     QListWidget *lw = this->ui->taskList;
     int y;
+
+    this->ui->comboTeams->update();
 
     // recalculate last team if required
     if ( this->currentTeamId() != -1 ) {
@@ -185,35 +192,35 @@ void MainWindow::teamIndexChanged( int index ) {
     // disable combine button
     this->ui->actionCombine->setDisabled( true );
 
-    if ( teamPtr != nullptr ) {
+    if ( team != nullptr ) {
         this->ui->comboTeams->setEnabled( true );
         this->ui->actionLockTeam->setEnabled( true );
 
         // set time
-        this->ui->timeFinish->setTime( teamPtr->finishTime());
+        this->ui->timeFinish->setTime( team->finishTime());
 
         // clean up values
         for ( y = 0; y < lw->count(); y++ ) {
-            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-            if ( taskPtr == nullptr )
+            TaskWidget *task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+            if ( task == nullptr )
                 continue;
 
-            taskPtr->resetTeam();
+            task->resetTeam();
         }
 
         // display new values
         for ( y = 0; y < lw->count(); y++ ) {
-            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-            if ( taskPtr == nullptr )
+            TaskWidget *task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+            if ( task == nullptr )
                 continue;
 
-            taskPtr->setTeam( teamPtr );
+            task->setTeam( team );
 
             // trigger id change
-            taskPtr->comboIdChanged();
+            task->comboIdChanged();
         }
 
-        if ( teamPtr->isLocked()) {
+        if ( team->isLocked()) {
             this->ui->actionLockTeam->setIcon( QIcon( ":/icons/unlock.png" ));
             this->ui->actionLockTeam->setText( this->tr( "Unlock" ));
             this->ui->taskList->setDisabled( true );
@@ -252,23 +259,23 @@ void MainWindow::taskIndexChanged( int row ) {
         row = this->ui->taskList->currentRow();
 
     // get task widget
-    TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( row )));
-    if ( taskPtr == nullptr )
+    TaskWidget *task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( row )));
+    if ( task == nullptr )
         return;
 
     // should get things going faster
-    if ( taskPtr->task()->type() == Task::Check )
-        taskPtr->check->setFocus();
-    else if ( taskPtr->task()->type() == Task::Multi ) {
-        taskPtr->multi->setFocus();
-        taskPtr->multi->selectAll();
+    if ( task->task()->type() == Task::Check )
+        task->check->setFocus();
+    else if ( task->task()->type() == Task::Multi ) {
+        task->multi->setFocus();
+        task->multi->selectAll();
     }
 
     // get log
-    Log *lPtr = taskPtr->log();
+    Log *lPtr = task->log();
 
     // check for value
-    if ( taskPtr->hasLog()) {
+    if ( task->hasLog()) {
         if ( lPtr->value()) {
             // is logged - can be combined
             this->ui->actionCombine->setEnabled( true );
@@ -285,44 +292,36 @@ void MainWindow::taskIndexChanged( int row ) {
  * @param time
  */
 void MainWindow::updateFinishTime( QTime time ) {
-    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr != nullptr ) {
-        if ( time == teamPtr->finishTime())
+    Team *team = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( team != nullptr ) {
+        if ( time == team->finishTime())
             return;
 
-        teamPtr->setFinishTime( time );
+        team->setFinishTime( time );
     }
 }
 
 /**
- * @brief MainWindow::fillTeams
- * @param forcedId
+ * @brief MainWindow::selectTeam
+ * @param id
  */
-void MainWindow::fillTeams( int forcedId ) {
-    int lastId = forcedId;
+void MainWindow::selectTeam( int id ) {
+    int y;
 
     // abort if partially initialised
     if ( !Main::instance()->isInitialised())
         return;
 
-    // store last team id
-    if ( this->ui->comboTeams->count() && forcedId == -1 ) {
-        Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-        if ( teamPtr != nullptr )
-            lastId = teamPtr->id();
+    // select something
+    if ( id == -1 ) {
+        this->ui->comboTeams->setCurrentIndex( this->ui->comboTeams->count() - 1 );
+        return;
     }
 
-    // clear list
-    this->ui->comboTeams->clear();
-
-    // repopulate list
-    QList <Team*>teamListSorted = Main::instance()->teamListSorted();
-    foreach ( Team *teamPtr, teamListSorted ) {
-        this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
-
-        // resore last id if any
-        if ( lastId != -1 && lastId == teamPtr->id())
-            this->ui->comboTeams->setCurrentIndex( this->ui->comboTeams->count()-1 );
+    // select id
+    for ( y = 0; y < this->ui->comboTeams->count(); y++ )
+        if ( id == this->ui->comboTeams->itemData( y, Qt::UserRole ).toInt()) {
+            this->ui->comboTeams->setCurrentIndex( y );
     }
 }
 
@@ -334,12 +333,12 @@ void MainWindow::clearTasks() {
 
     // cannot use for loop, since items are removed from list
     while ( lw->count()) {
-        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
-        if ( taskPtr == nullptr )
+        TaskWidget *task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
+        if ( task == nullptr )
             continue;
 
-        this->disconnect( taskPtr->combo, SIGNAL( toggled( bool )));
-        delete taskPtr;
+        this->disconnect( task->combo, SIGNAL( toggled( bool )));
+        delete task;
         delete lw->item( 0 );
 #ifdef APPLET_DEBUG
         Main::instance()->dealloc +=2;
@@ -386,11 +385,11 @@ void MainWindow::fillTasks() {
     else
         taskList = Event::active()->taskList;
 
-    foreach ( Task *taskPtr, taskList ) {
+    foreach ( Task *task, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
         itemPtr->setSizeHint( QSize( 0 , 34 ));
         lw->addItem( itemPtr );
-        TaskWidget *widgetPtr = new TaskWidget( taskPtr );
+        TaskWidget *widgetPtr = new TaskWidget( task );
         lw->setItemWidget( itemPtr, widgetPtr );
 
 #ifdef APPLET_DEBUG
@@ -442,11 +441,11 @@ void MainWindow::on_findTaskEdit_returnPressed() {
 
     // find item from current position
     for ( y = this->currentMatch(); y < this->ui->taskList->count(); y++ ) {
-        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
-        if ( taskPtr == nullptr )
+        TaskWidget *task = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
+        if ( task == nullptr )
             continue;
 
-        QString taskName = taskPtr->taskName->text();
+        QString taskName = task->taskName->text();
 
         if ( taskName.contains( matchString, Qt::CaseInsensitive )) {
             match = true;
@@ -458,11 +457,11 @@ void MainWindow::on_findTaskEdit_returnPressed() {
     // no match, try again from beginning
     if ( !match ) {
         for ( y = 0; y < this->ui->taskList->count(); y++ ) {
-            TaskWidget *taskPtr = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
-            if ( taskPtr == nullptr )
+            TaskWidget *task = qobject_cast<TaskWidget *>( this->ui->taskList->itemWidget( this->ui->taskList->item( y )));
+            if ( task == nullptr )
                 continue;
 
-            QString taskName = taskPtr->taskName->text();
+            QString taskName = task->taskName->text();
 
             if ( taskName.contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
@@ -515,7 +514,7 @@ void MainWindow::eventDialogClosed( int signal ) {
         // compare these two
         if ( newEventId != this->lastEventId()) {
             this->fillTasks();
-            this->fillTeams();
+            this->selectTeam();
         }
 
         this->setEventTitle();
@@ -529,9 +528,9 @@ void MainWindow::eventDialogClosed( int signal ) {
  */
 void MainWindow::teamDialogClosed( int ) {
     if ( this->teamDialog->state() == TeamDialog::AddQuick )
-        this->fillTeams( this->teamDialog->lastId());
+        this->selectTeam( this->teamDialog->lastId());
     else
-        this->fillTeams();
+        this->selectTeam();
 }
 
 /**
@@ -545,7 +544,7 @@ void MainWindow::taskDialogClosed( int ) {
  * @brief MainWindow::settingsDialogClosed
  */
 void MainWindow::settingsDialogClosed( int ) {
-    this->fillTeams();
+    this->selectTeam();
     this->fillTasks();
     this->setEventTitle();
     this->testSortButton();
@@ -617,7 +616,7 @@ void MainWindow::testSortButton() {
  * @return
  */
 static int irand( int min, int max ) {
-    qsrand( QTime::currentTime().msec()
+    qsrand( static_cast<unsigned int>( QTime::currentTime().msec())
 #ifdef Q_OS_UNIX
             * getpid()
 #endif
@@ -633,46 +632,46 @@ static int irand( int min, int max ) {
 
 /**
  * @brief MainWindow::testTeam
- * @param teamPtr
+ * @param team
  */
-void MainWindow::testTeam( Team *teamPtr ) {
+void MainWindow::testTeam( Team *team ) {
     int shouldBe = 0;
     int rand = 0;
     QListWidget *lw = this->ui->taskList;
     int y;
 
     // select the team
-    this->fillTeams( teamPtr->id());
+    this->selectTeam( team->id());
 
     // log random values
     for ( y = 0; y < lw->count(); y++ ) {
-        TaskWidget *taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-        if ( taskPtr == nullptr )
+        TaskWidget *task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        if ( task == nullptr )
             continue;
 
-        if ( taskPtr->task()->type() == Task::Check ) {
+        if ( task->task()->type() == Task::Check ) {
             rand = irand( 0, 1 );
 
             if ( rand ) {
-                taskPtr->check->setChecked( static_cast<bool>( rand ));
-                shouldBe += taskPtr->task()->points();
+                task->check->setChecked( static_cast<bool>( rand ));
+                shouldBe += task->task()->points();
             }
-        } else if ( taskPtr->task()->type() == Task::Multi ) {
-            rand = irand( 0, taskPtr->task()->multi());
+        } else if ( task->task()->type() == Task::Multi ) {
+            rand = irand( 0, task->task()->multi());
 
             if ( rand ) {
-                taskPtr->multi->setValue( rand );
-                shouldBe += taskPtr->task()->points() * rand;
+                task->multi->setValue( rand );
+                shouldBe += task->task()->points() * rand;
             }
         }
     }
 
     // subtract penalty
-    shouldBe -= teamPtr->penalty();
+    shouldBe -= team->penalty();
 
     // report
-    teamPtr->calculateCombos();
-    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( teamPtr->name()).arg( teamPtr->points() - teamPtr->penalty()).arg( shouldBe ), Common::GuiMain );
+    team->calculateCombos();
+    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( team->name()).arg( team->points() - team->penalty()).arg( shouldBe ), Common::GuiMain );
 }
 
 /**
@@ -680,16 +679,16 @@ void MainWindow::testTeam( Team *teamPtr ) {
  * @param numTeams
  */
 void MainWindow::stressTest( int numTeams ) {
-    Team *teamPtr;
+    Team *team;
     int k;
 
     // clear command has been given
     if ( numTeams == -1 ) {
-        foreach ( Team *teamPtr, Main::instance()->teamList ) {
-            if ( teamPtr->name().startsWith( "Stress test" ))
-                Team::remove( teamPtr->name());
+        foreach ( Team *team, Main::instance()->teamList ) {
+            if ( team->name().startsWith( "Stress test" ))
+                Team::remove( team->name());
         }
-        this->fillTeams();
+        this->selectTeam();
         return;
     } else if ( numTeams == -2 ) {
         if ( !Event::active()->teamList.isEmpty())
@@ -697,8 +696,8 @@ void MainWindow::stressTest( int numTeams ) {
         else
             Common::print( StrMsg + this->tr( "no teams to perform stress test on" ), Common::GuiMain );
 
-        foreach ( Team *teamPtr, Event::active()->teamList )
-            this->testTeam( teamPtr );
+        foreach ( Team *team, Event::active()->teamList )
+            this->testTeam( team );
         return;
     }
 
@@ -720,10 +719,10 @@ void MainWindow::stressTest( int numTeams ) {
 
         // add a stress test team
         Team::add( teamName, irand( 1, 2 ), finishTime, "Stress Test", false );
-        teamPtr = Team::forName( QString( "Stress test %1" ).arg( k ));
+        team = Team::forName( QString( "Stress test %1" ).arg( k ));
 
-        if ( teamPtr != nullptr )
-            this->testTeam( teamPtr );
+        if ( team != nullptr )
+            this->testTeam( team );
     }
 }
 #endif
@@ -741,7 +740,7 @@ void MainWindow::on_actionLogTime_triggered() {
  */
 void MainWindow::on_actionCombine_toggled( bool checked ) {
     QListWidget *lw;
-    Team *teamPtr;
+    Team *team;
     TaskWidget *tw;
     QList<int> indexList;
     bool valueSet;
@@ -761,7 +760,7 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
 
     // check if any reason to combine (>= logged tasks & active task is logged)
     if ( checked ) {
-        Log *logPtr = nullptr;
+        Log *log = nullptr;
 
         // check if the active task is logged
         if ( !tw->hasLog()) {
@@ -780,13 +779,13 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
         tw->combo->setChecked( true );
 
         // check for the total number of logs
-        teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-        if ( teamPtr != nullptr ) {
+        team = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+        if ( team != nullptr ) {
             int count = 0;
 
             // cannot use list->count(), since team might have orphaned logs
-            foreach ( logPtr, teamPtr->logList ) {
-                if ( logPtr->value())
+            foreach ( log, team->logList ) {
+                if ( log->value())
                     count++;
             }
 
@@ -803,18 +802,18 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
 
     // go through items one by one
     for ( y = 0; y < lw->count(); y++ ) {
-        TaskWidget *taskPtr;
+        TaskWidget *task;
 
         // get task widget
-        taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-        if ( taskPtr == nullptr )
+        task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+        if ( task == nullptr )
             continue;
 
         // reset value check
         valueSet = true;
 
         // get log
-        Log *lPtr = taskPtr->log();
+        Log *lPtr = task->log();
         // check for value
         if ( lPtr == nullptr )
             valueSet = false;
@@ -836,12 +835,12 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
             indexList << y;
         else {
             // switch view state and swap widgets
-            taskPtr->toggleViewState( TaskWidget::Combine );
+            task->toggleViewState( TaskWidget::Combine );
 
             // hilight combined entries
-            if ( taskPtr->hasCombo()) {
-                if ( taskPtr->log()->comboId() == this->currentComboIndex())
-                    taskPtr->combo->setChecked( true );
+            if ( task->hasCombo()) {
+                if ( task->log()->comboId() == this->currentComboIndex())
+                    task->combo->setChecked( true );
                 else
                     indexList << y;
             }
@@ -851,15 +850,15 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
     if ( !checked ) {
         if ( count < 2 ) {
             for ( y = 0; y < lw->count(); y++ ) {
-                TaskWidget *taskPtr;
+                TaskWidget *task;
 
                 // get task widget
-                taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
-                if ( taskPtr == nullptr )
+                task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( y )));
+                if ( task == nullptr )
                     continue;
 
                 // get log
-                Log *lPtr = taskPtr->log();
+                Log *lPtr = task->log();
                 // check for value
                 if ( lPtr == nullptr )
                     continue;
@@ -890,12 +889,12 @@ void MainWindow::on_actionCombine_toggled( bool checked ) {
 
     // one task cannot be combined, so disable the button
     if ( lw->count() == 1 ) {
-        TaskWidget *taskPtr;
+        TaskWidget *task;
 
         // get the first item
-        taskPtr = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
-        if ( taskPtr != nullptr )
-            taskPtr->combo->setDisabled( true );
+        task = qobject_cast<TaskWidget *>( lw->itemWidget( lw->item( 0 )));
+        if ( task != nullptr )
+            task->combo->setDisabled( true );
     }
 }
 
@@ -918,14 +917,14 @@ void MainWindow::on_actionSort_triggered() {
  * @brief MainWindow::on_actionLockTeam_triggered
  */
 void MainWindow::on_actionLockTeam_triggered() {
-    Team *teamPtr = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
-    if ( teamPtr == nullptr )
+    Team *team = Team::forId( this->ui->comboTeams->itemData( this->ui->comboTeams->currentIndex()).toInt());
+    if ( team == nullptr )
         return;
 
-    if ( teamPtr->isLocked())
-        teamPtr->unlock();
+    if ( team->isLocked())
+        team->unlock();
     else
-        teamPtr->lock();
+        team->lock();
 
     this->teamIndexChanged( this->currentTeamIndex());
 }

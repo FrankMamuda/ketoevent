@@ -51,7 +51,7 @@ EventDialog::EventDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::Even
  */
 void EventDialog::fillEvents() {
     int y = 0, id = -1;
-    Event *eventPtr;
+    Event *event;
 
     if ( this->variablesLocked())
         return;
@@ -60,9 +60,9 @@ void EventDialog::fillEvents() {
     this->ui->eventCombo->clear();
 
     // set last event
-    eventPtr = Event::forId( Variable::instance()->integer( "currentEvent" ));
-    if ( eventPtr != nullptr )
-        id = eventPtr->id();
+    event = Event::forId( Variable::instance()->integer( "currentEvent" ));
+    if ( event != nullptr )
+        id = event->id();
 
     // fill the combobox with events
     foreach ( Event *ePtr, Main::instance()->eventList ) {
@@ -126,9 +126,9 @@ void EventDialog::on_eventCombo_currentIndexChanged( int index ) {
     this->validate();
 
     // set current event
-    Event *eventPtr = Event::forId( this->ui->eventCombo->itemData( index ).toInt());
-    if ( eventPtr != nullptr && eventPtr != Event::active()) {
-        Event::setActive( eventPtr );
+    Event *event = Event::forId( this->ui->eventCombo->itemData( index ).toInt());
+    if ( event != nullptr && event != Event::active()) {
+        Event::setActive( event );
         this->lockVariables();
         this->updateVars();
         this->lockVariables( false );
@@ -174,7 +174,7 @@ void EventDialog::on_actionAddEvent_triggered() {
 void EventDialog::on_actionRemoveEvent_triggered() {
     QMessageBox msgBox;
     int state;
-    Event *eventPtr = Event::active();
+    Event *event = Event::active();
     QSqlQuery query;
 
     // make sure we cannot delete all events
@@ -199,8 +199,8 @@ void EventDialog::on_actionRemoveEvent_triggered() {
         Event::setActive( Main::instance()->eventList.first());
 
         // remove from database
-        query.exec( QString( "delete from events where id=%1" ).arg( eventPtr->id()));
-        delete eventPtr;
+        query.exec( QString( "delete from events where id=%1" ).arg( event->id()));
+        delete event;
 
         // reset
         this->fillEvents();
@@ -302,9 +302,9 @@ void EventDialog::on_actionImportTasks_triggered() {
             info = task.split( ";" );
 
             if ( info.count() == 6 ) {
-                Task *taskPtr = Task::forName( info.at( 0 ));
+                Task *task = Task::forName( info.at( 0 ));
 
-                if ( taskPtr == nullptr ) {
+                if ( task == nullptr ) {
                     Task::add( info.at( 0 ),                // name
                                info.at( 2 ).toInt(),        // points
                                info.at( 3 ).toInt(),        // multi
@@ -317,20 +317,20 @@ void EventDialog::on_actionImportTasks_triggered() {
 #ifdef APPLET_DEBUG
                     Common::print( StrMsg + this->tr( "updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Common::EventDebug );
 #endif
-                    taskPtr->setPoints( info.at( 2 ).toInt());
-                    taskPtr->setMulti( info.at( 3 ).toInt());
-                    taskPtr->setType( static_cast<Task::Types>( info.at( 5 ).toInt()));
-                    taskPtr->setStyle( static_cast<Task::Styles>( info.at( 4 ).toInt()));
-                    taskPtr->setDescription( info.at( 1 ));
+                    task->setPoints( info.at( 2 ).toInt());
+                    task->setMulti( info.at( 3 ).toInt());
+                    task->setType( static_cast<Task::Types>( info.at( 5 ).toInt()));
+                    task->setStyle( static_cast<Task::Styles>( info.at( 4 ).toInt()));
+                    task->setDescription( info.at( 1 ));
                 }
             }
         }
 
         csvList.close();
 
-        MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
-        if ( gui != nullptr )
-            gui->fillTasks();
+        MainWindow *mainWindow = qobject_cast<MainWindow*>( this->parent());
+        if ( mainWindow != nullptr )
+            mainWindow->fillTasks();
     } else {
         Common::error( StrSoftError, this->tr( "unknown task storage format\n" ));
         return;
@@ -419,14 +419,14 @@ void EventDialog::on_actionExportTasks_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Task *taskPtr, Event::active()->taskList ) {
+        foreach ( Task *task, Event::active()->taskList ) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
-                   .arg( taskPtr->name().replace( ';', ',' ))
-                   .arg( taskPtr->description().replace( ';', ',' ))
-                   .arg( taskPtr->points())
-                   .arg( taskPtr->multi())
-                   .arg( taskPtr->style())
-                   .arg( taskPtr->type())
+                   .arg( task->name().replace( ';', ',' ))
+                   .arg( task->description().replace( ';', ',' ))
+                   .arg( task->points())
+                   .arg( task->multi())
+                   .arg( task->style())
+                   .arg( task->type())
        #ifdef Q_OS_WIN
                    .arg( "\r\n" );
 #else

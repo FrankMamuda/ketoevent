@@ -81,7 +81,7 @@ void Settings::on_backupPerform_stateChanged( int state ) {
  * @brief Settings::on_pathButton_clicked
  */
 void Settings::on_pathButton_clicked() {
-    MainWindow *gui;
+    MainWindow *mainWindow;
     QString path, filePath;
 
     // get filename from dialog
@@ -114,9 +114,9 @@ void Settings::on_pathButton_clicked() {
     Database::reload( Variable::instance()->string( "databasePath" ));
 
     // reinitialise gui
-    gui = qobject_cast<MainWindow*>( this->parent());
-    if ( gui != nullptr )
-        gui->initialise( true );
+    mainWindow = qobject_cast<MainWindow*>( this->parent());
+    if ( mainWindow != nullptr )
+        mainWindow->initialise( true );
 }
 
 /**

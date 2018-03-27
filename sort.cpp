@@ -150,25 +150,26 @@ static bool listToAscending( T *ePtr0, T *ePtr1 ) {
  * @param ePtr1
  * @return
  */
-static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
+static bool listByLogged( Task *task0, Task *task1 ) {
+    MainWindow *mainWindow;
     bool one = false, two = false;
 
-    MainWindow *gui = qobject_cast<MainWindow*>( Main::instance()->parent());
-    if ( gui == nullptr )
+    mainWindow = qobject_cast<MainWindow*>( Main::instance()->parent());
+    if ( mainWindow == nullptr )
         return false;
 
-    if ( gui->currentTeamId() == -1 )
+    if ( mainWindow->currentTeamId() == -1 )
         return false;
 
-    Team *teamPtr = Team::forId( gui->currentTeamId());
-    if ( teamPtr == nullptr )
+    Team *team = Team::forId( mainWindow->currentTeamId());
+    if ( team == nullptr )
         return false;
 
-    foreach ( Log *logPtr, teamPtr->logList ) {
-        if ( logPtr->value()) {
-            if ( logPtr->taskId() == ePtr0->id())
+    foreach ( Log *log, team->logList ) {
+        if ( log->value()) {
+            if ( log->taskId() == task0->id())
                 one = true;
-            if ( logPtr->taskId() == ePtr1->id())
+            if ( log->taskId() == task1->id())
                 two = true;
 
         }
@@ -177,9 +178,9 @@ static bool listByLogged( Task *ePtr0, Task *ePtr1 ) {
     // something is wrong with QString::localeAwareCompare
     if ( one == false && two == false ) {
         if ( Variable::instance()->isEnabled( "misc/sortTasks" ))
-            return /*QString::localeAwareCompare( ePtr0->name(), ePtr1->name()) < 0;*/Main::instance()->transliterate( ePtr0->name().toLower()) < Main::instance()->transliterate( ePtr1->name().toLower());
+            return Main::instance()->transliterate( task0->name().toLower()) < Main::instance()->transliterate( task1->name().toLower());
         else
-            return ePtr0->order() < ePtr1->order();
+            return task0->order() < task1->order();
     }
 
     return one < two;
@@ -197,21 +198,21 @@ void Main::sort( ListTypes type ) {
         QList <Task*>boldList;
         QList <Task*>italicList;
 
-        foreach ( Task *taskPtr, Event::active()->taskList ) {
-            if ( taskPtr->style() == Task::Regular )
-                regularList << taskPtr;
+        foreach ( Task *task, Event::active()->taskList ) {
+            if ( task->style() == Task::Regular )
+                regularList << task;
         }
         qSort( regularList.begin(), regularList.end(), listToAscending<Task> );
 
-        foreach ( Task *taskPtr, Event::active()->taskList ) {
-            if ( taskPtr->style() == Task::Bold )
-                boldList << taskPtr;
+        foreach ( Task *task, Event::active()->taskList ) {
+            if ( task->style() == Task::Bold )
+                boldList << task;
         }
         qSort( boldList.begin(), boldList.end(), listToAscending<Task> );
 
-        foreach ( Task *taskPtr, Event::active()->taskList ) {
-            if ( taskPtr->style() == Task::Italic )
-                italicList << taskPtr;
+        foreach ( Task *task, Event::active()->taskList ) {
+            if ( task->style() == Task::Italic )
+                italicList << task;
         }
         qSort( italicList.begin(), italicList.end(), listToAscending<Task> );
 

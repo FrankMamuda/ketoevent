@@ -35,8 +35,7 @@ TeamDialog::TeamDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::TeamDi
     this->ui->setupUi( this );
 
     // set up view
-    this->listModelPtr = new TeamListModel( this );
-    this->ui->teamList->setModel( listModelPtr );
+    this->ui->teamList->setModel( Main::instance()->teamModel );
     this->ui->teamList->setAlternatingRowColors( true );
     this->ui->finishTimeEdit->setMinimumTime( Event::active()->startTime());
     this->ui->teamMembersEdit->setMinimum( Event::active()->minMembers());
@@ -73,8 +72,7 @@ void TeamDialog::enableView() {
  */
 TeamDialog::~TeamDialog() {
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
-    delete ui;
-    delete this->listModelPtr;
+    delete this->ui;
 }
 
 /**
@@ -89,7 +87,7 @@ void TeamDialog::toggleAddEditWidget( AddEditState state ) {
         this->ui->teamList->setEnabled( true );
         this->enableView();
     } else {
-        Team *teamPtr = nullptr;
+        Team *team = nullptr;
 
         // disable everything
         this->ui->addEditWidget->show();
@@ -120,17 +118,17 @@ void TeamDialog::toggleAddEditWidget( AddEditState state ) {
 
         case Edit:
             // match by id
-            teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+            team = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
-            if ( teamPtr == nullptr ) {
+            if ( team == nullptr ) {
                 this->toggleAddEditWidget( NoState );
                 return;
             }
 
-            this->ui->teamNameEdit->setText( teamPtr->name());
-            this->ui->finishTimeEdit->setTime( teamPtr->finishTime());
-            this->ui->teamMembersEdit->setValue( teamPtr->members());
-            this->ui->reviewerEdit->setText( teamPtr->reviewer());
+            this->ui->teamNameEdit->setText( team->name());
+            this->ui->finishTimeEdit->setTime( team->finishTime());
+            this->ui->teamMembersEdit->setValue( team->members());
+            this->ui->reviewerEdit->setText( team->reviewer());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit team" ));
 
             break;
@@ -149,7 +147,7 @@ void TeamDialog::toggleAddEditWidget( AddEditState state ) {
  * @brief TeamDialog::on_doneButton_clicked
  */
 void TeamDialog::on_doneButton_clicked() {
-    Team *teamPtr;
+    Team *team;
     QModelIndex lastIndex;
 
     // failsafe
@@ -161,27 +159,24 @@ void TeamDialog::on_doneButton_clicked() {
         return;
     }
 
-    // begin reset
-    this->listModelPtr->beginReset();
-
     // alternate between Add/Edit states
     if ( this->state() == Add || this->state() == AddQuick ) {
         Team::add( this->ui->teamNameEdit->text(), this->ui->teamMembersEdit->value(), this->ui->finishTimeEdit->time(), this->ui->reviewerEdit->text());
-        lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
+        lastIndex = Main::instance()->teamModel->index( Main::instance()->teamModel->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match name to be sure
-        teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+        team = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
 
-        if ( teamPtr == nullptr ) {
+        if ( team == nullptr ) {
             this->toggleAddEditWidget( NoState );
             return;
         }
 
         // set edited data
-        teamPtr->setName( this->ui->teamNameEdit->text());
-        teamPtr->setFinishTime( this->ui->finishTimeEdit->time());
-        teamPtr->setMembers( this->ui->teamMembersEdit->value());
-        teamPtr->setReviewer( this->ui->reviewerEdit->text());
+        team->setName( this->ui->teamNameEdit->text());
+        team->setFinishTime( this->ui->finishTimeEdit->time());
+        team->setMembers( this->ui->teamMembersEdit->value());
+        team->setReviewer( this->ui->reviewerEdit->text());
 
         // get last index
         lastIndex = this->ui->teamList->currentIndex();
@@ -195,7 +190,6 @@ void TeamDialog::on_doneButton_clicked() {
 
     // reset view
     this->toggleAddEditWidget( NoState );
-    this->listModelPtr->endReset();
 
     // select last added/edited value
     this->ui->teamList->setCurrentIndex( lastIndex );
@@ -213,12 +207,12 @@ void TeamDialog::on_reviewerButton_clicked() {
  */
 void TeamDialog::on_actionRemove_triggered() {
     int state;
-    Team *teamPtr = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
+    Team *team = Team::forId( this->ui->teamList->model()->data( this->ui->teamList->currentIndex(), Qt::UserRole ).toInt());
     QSqlQuery query;
 
-    if ( teamPtr != nullptr ) {
+    if ( team != nullptr ) {
         QMessageBox msgBox;
-        msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( teamPtr->name()));
+        msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( team->name()));
         msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
         msgBox.setDefaultButton( QMessageBox::Yes );
         msgBox.setIcon( QMessageBox::Warning );
@@ -228,19 +222,7 @@ void TeamDialog::on_actionRemove_triggered() {
         // check options
         switch ( state ) {
         case QMessageBox::Yes:
-            // begin reset
-            this->listModelPtr->beginReset();
-
-            // remove from memory
-            Main::instance()->teamList.removeOne( teamPtr );
-            Event::active()->teamList.removeOne( teamPtr );
-
-            // remove from database
-            // fortunately teams are listed alphabetically, so there is no need to update order
-            query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id()));
-
-            // end reset
-            this->listModelPtr->endReset();
+            Team::remove( team->name());
             break;
 
         case QMessageBox::No:
@@ -254,20 +236,21 @@ void TeamDialog::on_actionRemove_triggered() {
  * @brief TeamDialog::closeEvent
  * @param ePtr
  */
-void TeamDialog::closeEvent( QCloseEvent *ePtr ) {
+void TeamDialog::closeEvent( QCloseEvent *closeEvent ) {
+    MainWindow *mainWindow;
     bool quick = false;
 
     if ( this->state() == AddQuick )
         quick = true;
 
     this->toggleAddEditWidget( NoState );
-    ePtr->accept();
+    closeEvent->accept();
 
-    MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
-    if ( gui != nullptr ) {
+    mainWindow = qobject_cast<MainWindow*>( this->parent());
+    if ( mainWindow != nullptr ) {
         if ( quick && !Event::active()->teamList.isEmpty())
-            gui->fillTeams( Event::active()->teamList.last()->id());
+            mainWindow->selectTeam( Event::active()->teamList.last()->id());
         else
-            gui->fillTeams();
+            mainWindow->selectTeam();
     }
 }

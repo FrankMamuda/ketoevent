@@ -43,21 +43,18 @@ class ComboModel;
 class ComboDialog : public QDialog {
     Q_OBJECT
     Q_CLASSINFO( "description", "Combination dialog" )
-    Q_PROPERTY( int currentTeamIndex READ currentTeamIndex WRITE setCurrentTeamIndex )
 
 public:
     explicit ComboDialog( QWidget *parent = 0 );
     ~ComboDialog();
     QList <Log *>logListSorted;
-    int currentTeamIndex() const { return this->m_currentTeamIndex; }
 
 private slots:
-    void fillTeams();
+    //void fillTeams();
     void currentTeamIndexChanged( int );
-    void setCurrentTeamIndex( int index ) { this->m_currentTeamIndex = index; }
 
 private:
     Ui::ComboDialog *ui;
-    ComboModel *comboModelPtr;
+    ComboModel *comboModel;
     int m_currentTeamIndex;
 };

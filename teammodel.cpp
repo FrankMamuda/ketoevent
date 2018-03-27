@@ -38,8 +38,9 @@ QVariant TeamListModel::data( const QModelIndex &index, int role ) const {
         return Event::active()->teamList.at( index.row())->name();
     else if ( role == Qt::UserRole )
         return Event::active()->teamList.at( index.row())->id();
-    else
-        return QVariant();
+
+
+    return QVariant();
 }
 
 /**

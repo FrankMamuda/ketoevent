@@ -75,30 +75,30 @@ int Database::highestId( IdTypes type ) {
 
     switch ( type ) {
     case ComboId:
-        foreach ( Log *logPtr, Main::instance()->logList ) {
-            if ( logPtr->comboId() > id )
-                id = logPtr->id();
+        foreach ( Log *log, Main::instance()->logList ) {
+            if ( log->comboId() > id )
+                id = log->id();
         }
         break;
 
     case TeamId:
-        foreach ( Team *teamPtr, Main::instance()->teamList ) {
-            if ( teamPtr->id() > id )
-                id = teamPtr->id();
+        foreach ( Team *team, Main::instance()->teamList ) {
+            if ( team->id() > id )
+                id = team->id();
         }
         break;
 
     case LogId:
-        foreach ( Log *logPtr, Main::instance()->logList ) {
-            if ( logPtr->id() > id )
-                id = logPtr->id();
+        foreach ( Log *log, Main::instance()->logList ) {
+            if ( log->id() > id )
+                id = log->id();
         }
         break;
 
     case TaskId:
-        foreach ( Task *taskPtr, Main::instance()->taskList ) {
-            if ( taskPtr->id() > id )
-                id = taskPtr->id();
+        foreach ( Task *task, Main::instance()->taskList ) {
+            if ( task->id() > id )
+                id = task->id();
         }
         break;
 
@@ -248,12 +248,12 @@ removeDB:
     // refresh gui
     Main::instance()->clearEvent();
     Database::reload( Variable::instance()->string( "databasePath" ));
-    MainWindow *mPtr = qobject_cast<MainWindow *>( Main::instance()->parent());
-    if ( mPtr == nullptr )
+    MainWindow *mainWindow = qobject_cast<MainWindow *>( Main::instance()->parent());
+    if ( mainWindow == nullptr )
         return;
 
-    mPtr->fillTasks();
-    mPtr->fillTeams();
+    mainWindow->fillTasks();
+    mainWindow->selectTeam();
 }
 
 /**
@@ -564,9 +564,9 @@ void Database::reindexTasks() {
     bool reindex = false;
 
     // here we perform scheduled writes to disk
-    foreach ( Task *taskPtr, Main::instance()->taskList ) {
-        if ( taskPtr->reindexRequired()) {
-            taskPtr->setOrder( taskPtr->order(), true );
+    foreach ( Task *task, Main::instance()->taskList ) {
+        if ( task->reindexRequired()) {
+            task->setOrder( task->order(), true );
             reindex = true;
         }
     }

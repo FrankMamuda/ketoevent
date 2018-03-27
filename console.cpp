@@ -130,83 +130,83 @@ bool Console::completeCommand() {
 
 /**
  * @brief Console::mousePressEvent
- * @param eventPtr
+ * @param event
  */
-void Console::mousePressEvent( QMouseEvent *eventPtr ){
-    this->m_windowPos = eventPtr->pos();
+void Console::mousePressEvent( QMouseEvent *event ){
+    this->m_windowPos = event->pos();
 }
 
 /**
  * @brief Console::mouseMoveEvent
- * @param eventPtr
+ * @param event
  */
-void Console::mouseMoveEvent( QMouseEvent *eventPtr ) {
+void Console::mouseMoveEvent( QMouseEvent *event ) {
     QPoint out;
 
-    if ( eventPtr->buttons() && Qt::LeftButton )
-        this->move( this->pos() + eventPtr->pos() - this->m_windowPos );
+    if ( event->buttons() && Qt::LeftButton )
+        this->move( this->pos() + event->pos() - this->m_windowPos );
 }
 
 /**
  * @brief ConsoleEventFilter::eventFilter
- * @param objectPtr
- * @param eventPtr
+ * @param object
+ * @param event
  * @return
  */
-bool ConsoleEventFilter::eventFilter( QObject *objectPtr, QEvent *eventPtr ) {
-    QConsoleEdit *lePtr = qobject_cast<QConsoleEdit *>( objectPtr );
-    Console *cPtr = qobject_cast<Console *>( objectPtr->parent());
-    if ( cPtr == nullptr || lePtr == nullptr )
+bool ConsoleEventFilter::eventFilter( QObject *object, QEvent *event ) {
+    QConsoleEdit *consoleEdit = qobject_cast<QConsoleEdit *>( object );
+    Console *consoleDialog = qobject_cast<Console *>( object->parent());
+    if ( consoleDialog == nullptr || consoleEdit == nullptr )
         return false;
 
-    if ( lePtr->hasFocus()) {
-        if ( eventPtr->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>( eventPtr );
+    if ( consoleEdit->hasFocus()) {
+        if ( event->type() == QEvent::KeyPress ) {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>( event );
 
             // history list -> up
             if ( keyEvent->key() == Qt::Key_Up ) {
-                if ( !lePtr->history.isEmpty()) {
-                    if ( lePtr->historyOffset() < lePtr->history.count() )
-                        lePtr->pushHistoryOffset();
+                if ( !consoleEdit->history.isEmpty()) {
+                    if ( consoleEdit->historyOffset() < consoleEdit->history.count() )
+                        consoleEdit->pushHistoryOffset();
 
-                    int offset = lePtr->history.count() - lePtr->historyOffset();
+                    int offset = consoleEdit->history.count() - consoleEdit->historyOffset();
 
                     if ( offset > 0 )
-                        lePtr->setText( lePtr->history.at( offset ));
+                        consoleEdit->setText( consoleEdit->history.at( offset ));
                     else
-                        lePtr->setText( lePtr->history.first());
+                        consoleEdit->setText( consoleEdit->history.first());
                 }
                 return true;
 
                 // history list -> down
             } else if ( keyEvent->key() == Qt::Key_Down ) {
-                if ( !lePtr->history.isEmpty()) {
+                if ( !consoleEdit->history.isEmpty()) {
                     int offset;
 
-                    if ( lePtr->historyOffset() > 0 )
-                        lePtr->popHistoryOffset();
+                    if ( consoleEdit->historyOffset() > 0 )
+                        consoleEdit->popHistoryOffset();
 
-                    if ( lePtr->historyOffset() == 0 ) {
-                        lePtr->clear();
+                    if ( consoleEdit->historyOffset() == 0 ) {
+                        consoleEdit->clear();
                         return true;
                     }
 
-                    offset = lePtr->history.count() - lePtr->historyOffset();
+                    offset = consoleEdit->history.count() - consoleEdit->historyOffset();
 
-                    if ( offset < lePtr->history.count())
-                        lePtr->setText( lePtr->history.at( offset ));
+                    if ( offset < consoleEdit->history.count())
+                        consoleEdit->setText( consoleEdit->history.at( offset ));
                     else
-                        lePtr->setText( lePtr->history.last());
+                        consoleEdit->setText( consoleEdit->history.last());
                 }
                 return true;
 
                 // complete command
             } else if ( keyEvent->key() == Qt::Key_Tab ) {
                 // abort if no text at all
-                if ( lePtr->text().isEmpty())
+                if ( consoleEdit->text().isEmpty())
                     return true;
 
-                return cPtr->completeCommand();
+                return consoleDialog->completeCommand();
             }
         }
     }

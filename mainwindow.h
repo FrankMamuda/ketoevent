@@ -66,10 +66,10 @@ public slots:
     void lock();
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );
-    void testTeam( Team *teamPtr );
+    void testTeam( Team *team );
 #endif
     // team/task fill
-    void fillTeams( int focedId = -1 );
+    void selectTeam( int id = -1 );
     void fillTasks();
 
 private slots:
@@ -90,7 +90,7 @@ private slots:
     void setCurrentMatch( int match = 0 ) { this->m_currentMatch = match; }
 
     // ui elements
-    void on_actionTeams_triggered() { this->teamDialog->show(); this->fillTeams(); }
+    void on_actionTeams_triggered() { this->teamDialog->show(); this->selectTeam(); }
     void on_actionTasks_triggered() { this->taskDialog->show(); }
     void on_actionRankings_triggered() { this->rankingsDialog->show(); }
     void on_actionSettings_triggered();
@@ -109,7 +109,7 @@ private slots:
     void on_actionCombine_changed();
 
 protected:
-    virtual void closeEvent( QCloseEvent *eventPtr ) { Main::instance()->shutdown(); QWidget::closeEvent( eventPtr ); }
+    virtual void closeEvent( QCloseEvent *event ) { Main::instance()->shutdown(); QWidget::closeEvent( event ); }
 
 private:
     Ui::MainWindow *ui;

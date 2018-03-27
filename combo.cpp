@@ -27,9 +27,9 @@
  */
 int Combo::getFreeHandle() {
     int highest = 0;
-    foreach ( Log *logPtr, Main::instance()->logList ) {
-        if ( logPtr->comboId() >= highest )
-            highest = logPtr->comboId();
+    foreach ( Log *log, Main::instance()->logList ) {
+        if ( log->comboId() >= highest )
+            highest = log->comboId();
     }
     return highest + 1;
 }

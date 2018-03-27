@@ -63,7 +63,7 @@ public:
     };
 
 private slots:
-    void setTask( Task *taskPtr ) { this->m_task = taskPtr; }
+    void setTask( Task *task ) { this->m_task = task; }
     void resetLog();
     void setActive( bool active = true ) { this->m_active = active; }
 #ifdef UI_INFO_BUTTON_ENABLED
@@ -71,10 +71,10 @@ private slots:
 #endif
 
 public slots:
-    void setTeam( Team *teamPtr );
+    void setTeam( Team *team );
     void resetTeam();
     void saveLog();
-    void setLog( Log *logPtr, bool fromDatabase = false );
+    void setLog( Log *log, bool fromDatabase = false );
     void toggleCombo( bool );
     void comboIdChanged();
     void toggleViewState( ViewState );

@@ -43,18 +43,18 @@ SettingsVariable::SettingsVariable( const QString &key, SettingsVariable::Types 
  * @param parentPtr
  */
 void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
-    QSpinBox *sPtr;
-    QCheckBox *cPtr;
-    QTimeEdit *tPtr;
-    QLineEdit *lPtr;
-    QAction *aPtr;
+    QSpinBox *spinBox;
+    QCheckBox *checkBox;
+    QTimeEdit *timeEdit;
+    QLineEdit *lineEdit;
+    QAction *action;
 
     // set object and parent
-    this->objPtr = objPtr;
+    this->object = objPtr;
     this->setParent( parentPtr );
 
     // failsafe
-    if ( this->parent() == nullptr || this->objPtr == nullptr ) {
+    if ( this->parent() == nullptr || this->object == nullptr ) {
         Common::error( StrSoftError, this->tr( "unable to bind settings variable \"%1\"\n" ).arg( this->key()));
         return;
     }
@@ -62,31 +62,31 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
     // connect slots
     switch ( this->type()) {
     case CheckBox:
-        cPtr = qobject_cast<QCheckBox*>( this->objPtr );
-        cPtr->connect( cPtr, SIGNAL( stateChanged( int )), this, SLOT( stateChanged( int )));
+        checkBox = qobject_cast<QCheckBox*>( this->object );
+        checkBox->connect( checkBox, SIGNAL( stateChanged( int )), this, SLOT( stateChanged( int )));
         break;
 
     case SpinBox:
-        sPtr = qobject_cast<QSpinBox*>( this->objPtr );
-        sPtr->connect( sPtr, SIGNAL( valueChanged( int )), this, SLOT( integerValueChanged( int )));
+        spinBox = qobject_cast<QSpinBox*>( this->object );
+        spinBox->connect( spinBox, SIGNAL( valueChanged( int )), this, SLOT( integerValueChanged( int )));
         break;
 
     case TimeEdit:
-        tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
-        tPtr->connect( tPtr, SIGNAL( timeChanged( QTime )), this, SLOT( timeChanged( QTime )));
+        timeEdit = qobject_cast<QTimeEdit*>( this->object );
+        timeEdit->connect( timeEdit, SIGNAL( timeChanged( QTime )), this, SLOT( timeChanged( QTime )));
         break;
 
     case LineEdit:
-        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
-        lPtr->connect( lPtr, SIGNAL( textChanged( QString )), this, SLOT( textChanged( QString )));
+        lineEdit = qobject_cast<QLineEdit*>( this->object );
+        lineEdit->connect( lineEdit, SIGNAL( textChanged( QString )), this, SLOT( textChanged( QString )));
         break;
 
     case Action:
-        aPtr = qobject_cast<QAction*>( this->objPtr );
-        aPtr->connect( aPtr, SIGNAL( toggled( bool)), this, SLOT( toggled( bool )));
+        action = qobject_cast<QAction*>( this->object );
+        action->connect( action, SIGNAL( toggled( bool)), this, SLOT( toggled( bool )));
         break;
 
-    default:
+    case NoType:
         Common::error( StrSoftError, this->tr( "unknown type\n" ));
         return;
     }
@@ -99,46 +99,45 @@ void SettingsVariable::bind( QObject *objPtr, QObject *parentPtr ) {
  * @brief SettingsVariable::unbind
  */
 void SettingsVariable::unbind() {
-    QSpinBox *sPtr;
-    QCheckBox *cPtr;
-    QTimeEdit *tPtr;
-    QLineEdit *lPtr;
-    QAction *aPtr;
+    QSpinBox *spinBox;
+    QCheckBox *checkBox;
+    QTimeEdit *timeEdit;
+    QLineEdit *lineEdit;
+    QAction *action;
 
     // connect slots
     switch ( this->type()) {
     case CheckBox:
-        cPtr = qobject_cast<QCheckBox*>( this->objPtr );
-        cPtr->disconnect( cPtr, SIGNAL( stateChanged( int )));
+        checkBox = qobject_cast<QCheckBox*>( this->object );
+        checkBox->disconnect( checkBox, SIGNAL( stateChanged( int )));
         break;
 
     case SpinBox:
-        sPtr = qobject_cast<QSpinBox*>( this->objPtr );
-        sPtr->disconnect( sPtr, SIGNAL( valueChanged( int )));
+        spinBox = qobject_cast<QSpinBox*>( this->object );
+        spinBox->disconnect( spinBox, SIGNAL( valueChanged( int )));
         break;
 
     case TimeEdit:
-        tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
-        tPtr->disconnect( tPtr, SIGNAL( timeChanged( QTime )));
+        timeEdit = qobject_cast<QTimeEdit*>( this->object );
+        timeEdit->disconnect( timeEdit, SIGNAL( timeChanged( QTime )));
         break;
 
     case LineEdit:
-        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
-        lPtr->disconnect( lPtr, SIGNAL( textChanged( QString )));
+        lineEdit = qobject_cast<QLineEdit*>( this->object );
+        lineEdit->disconnect( lineEdit, SIGNAL( textChanged( QString )));
         break;
 
     case Action:
-        aPtr = qobject_cast<QAction*>( this->objPtr );
-        aPtr->disconnect( aPtr, SIGNAL( toggled( bool )));
+        action = qobject_cast<QAction*>( this->object );
+        action->disconnect( action, SIGNAL( toggled( bool )));
         break;
 
     case NoType:
-    default:
         break;
     }
 
     // reset object
-    this->objPtr = nullptr;
+    this->object = nullptr;
     this->setParent( nullptr );
 }
 
@@ -146,11 +145,11 @@ void SettingsVariable::unbind() {
  * @brief SettingsVariable::setState
  */
 void SettingsVariable::setState() {
-    QSpinBox *sPtr;
-    QCheckBox *cPtr;
-    QTimeEdit *tPtr;
-    QLineEdit *lPtr;
-    QAction *aPtr;
+    QSpinBox *spinBox;
+    QCheckBox *checkBox;
+    QTimeEdit *timeEdit;
+    QLineEdit *lineEdit;
+    QAction *action;
 
     // set values to GUI
     switch ( this->type()) {
@@ -163,11 +162,11 @@ void SettingsVariable::setState() {
         else
             state = Event::active()->record().value( this->key()).toBool();
 
-        cPtr = qobject_cast<QCheckBox*>( this->objPtr );
+        checkBox = qobject_cast<QCheckBox*>( this->object );
         if ( state )
-            cPtr->setCheckState( Qt::Checked );
+            checkBox->setCheckState( Qt::Checked );
         else
-            cPtr->setCheckState( Qt::Unchecked );
+            checkBox->setCheckState( Qt::Unchecked );
     }
         break;
 
@@ -180,8 +179,8 @@ void SettingsVariable::setState() {
         else
             value = Event::active()->record().value( this->key()).toInt();
 
-        sPtr = qobject_cast<QSpinBox*>( this->objPtr );
-        sPtr->setValue( value );
+        spinBox = qobject_cast<QSpinBox*>( this->object );
+        spinBox->setValue( value );
     }
         break;
 
@@ -194,8 +193,8 @@ void SettingsVariable::setState() {
         else
             time = QTime::fromString( Event::active()->record().value( this->key()).toString(), "hh:mm" );
 
-        tPtr = qobject_cast<QTimeEdit*>( this->objPtr );
-        tPtr->setTime( time );
+        timeEdit = qobject_cast<QTimeEdit*>( this->object );
+        timeEdit->setTime( time );
     }
         break;
 
@@ -208,8 +207,8 @@ void SettingsVariable::setState() {
         else
             text = Event::active()->record().value( this->key()).toString();
 
-        lPtr = qobject_cast<QLineEdit*>( this->objPtr );
-        lPtr->setText( text );
+        lineEdit = qobject_cast<QLineEdit*>( this->object );
+        lineEdit->setText( text );
     }
         break;
 
@@ -223,16 +222,15 @@ void SettingsVariable::setState() {
         else
             state = Event::active()->record().value( this->key()).toBool();
 
-        aPtr = qobject_cast<QAction*>( this->objPtr );
+        action = qobject_cast<QAction*>( this->object );
         if ( state )
-            aPtr->setChecked( true );
+            action->setChecked( true );
         else
-            aPtr->setChecked( false );
+            action->setChecked( false );
     }
         break;
 
     case NoType:
-    default:
         Common::error( StrSoftError, this->tr( "unknown settings variable type" ));
         return;
     }

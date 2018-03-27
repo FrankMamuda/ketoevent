@@ -21,6 +21,7 @@
 //
 #include "team.h"
 #include "main.h"
+#include "teamlistmodel.h"
 #include <QSqlQuery>
 #include <QSqlError>
 
@@ -53,9 +54,9 @@ Team::Team( const QSqlRecord &record, const QString &table ) {
  * @brief Team::~Team
  */
 Team::~Team() {
-    foreach ( Log *logPtr, this->logList ) {
-        Main::instance()->logList.removeOne( logPtr );
-        delete logPtr;
+    foreach ( Log *log, this->logList ) {
+        Main::instance()->logList.removeOne( log );
+        delete log;
     }
     this->logList.clear();
 }
@@ -70,8 +71,8 @@ int Team::points() const {
     if ( this->disqualified())
         return 0;
 
-    foreach ( Log *logPtr, this->logList )
-        points += logPtr->points();
+    foreach ( Log *log, this->logList )
+        points += log->points();
 
     return points + this->bonus();
 }
@@ -167,9 +168,9 @@ bool Team::disqualified() const {
  * @return
  */
 Team *Team::forId( int id ) {
-    foreach ( Team *teamPtr, Main::instance()->teamList ) {
-        if ( teamPtr->id() == id )
-            return teamPtr;
+    foreach ( Team *team, Main::instance()->teamList ) {
+        if ( team->id() == id )
+            return team;
     }
     return nullptr;
 }
@@ -184,6 +185,9 @@ Team *Team::forId( int id ) {
  */
 void Team::add( const QString &teamName, int members, QTime finishTime, const QString &reviewerName, bool lockState ) {
     QSqlQuery query;
+
+    // reset model
+    Main::instance()->teamModel->beginReset();
 
     // announce
     Common::print( CLMsg + QObject::tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Common::TeamDebug );
@@ -216,6 +220,9 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
 
     // add to event
     Event::active()->teamList << Main::instance()->teamList.last();
+
+    // reset model
+    Main::instance()->teamModel->endReset();
 }
 
 /**
@@ -223,35 +230,41 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
  * @param teamName
  */
 void Team::remove( const QString &teamName ) {
-    Team *teamPtr = nullptr;
+    Team *team = nullptr;
     QSqlQuery query;
+
+    // reset model
+    Main::instance()->teamModel->beginReset();
 
     // announce
     Common::print( CLMsg + QObject::tr( "removing team '%1'\n" ).arg( teamName ), Common::TeamDebug );
 
     // find team
-    teamPtr = Team::forName( teamName, true );
+    team = Team::forName( teamName, true );
 
     // failsafe
-    if ( teamPtr == nullptr )
+    if ( team == nullptr )
         return;
 
     // remove logs from memory
     foreach ( Log *log, Main::instance()->logList ) {
-        if ( log->teamId() == teamPtr->id())
+        if ( log->teamId() == team->id())
             Main::instance()->logList.removeAll( log );
     }
 
     // remove team and logs from db
-    if ( !query.exec( QString( "delete from teams where id=%1" ).arg( teamPtr->id())))
+    if ( !query.exec( QString( "delete from teams where id=%1" ).arg( team->id())))
         Common::error( CLSoftError, QObject::tr( "could not remove team, reason: \"%1\"\n" ).arg( query.lastError().text()));
 
-    if ( !query.exec( QString( "delete from logs where teamId=%1" ).arg( teamPtr->id())))
+    if ( !query.exec( QString( "delete from logs where teamId=%1" ).arg( team->id())))
         Common::error( CLSoftError, QObject::tr( "could not remove team log, reason: \"%1\"\n" ).arg( query.lastError().text()));
 
     // remove from display
-    Main::instance()->teamList.removeAll( teamPtr );
-    Event::active()->teamList.removeAll( teamPtr );
+    Main::instance()->teamList.removeAll( team );
+    Event::active()->teamList.removeAll( team );
+
+    // reset model
+    Main::instance()->teamModel->endReset();
 }
 
 /**
@@ -285,14 +298,10 @@ void Team::loadTeams() {
 Team *Team::forName( const QString &name, bool currentEvent ) {
     QList <Team*> teamList;
 
-    if ( currentEvent )
-        teamList = Event::active()->teamList;
-    else
-        teamList = Main::instance()->teamList;
-
-    foreach ( Team *teamPtr, teamList ) {
-        if ( !QString::compare( name, teamPtr->name()))
-            return teamPtr;
+    teamList = currentEvent ? Event::active()->teamList : Main::instance()->teamList;
+    foreach ( Team *team, teamList ) {
+        if ( !QString::compare( name, team->name()))
+            return team;
     }
     return nullptr;
 }

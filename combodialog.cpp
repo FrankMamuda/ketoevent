@@ -28,17 +28,24 @@
  * @param parent
  */
 ComboDialog::ComboDialog( QWidget *parent ) : QDialog( parent ), ui( new Ui::ComboDialog ) {
+    int y;
+
     this->ui->setupUi( this );
 
     // connect for updates
-    this->connect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )), this, SLOT( currentTeamIndexChanged( int )));
+    this->ui->comboTeams->setModel( Main::instance()->teamModel );
+    this->connect<void( QComboBox::* )( int )>( this->ui->comboTeams, &QComboBox::currentIndexChanged, [ this ]( int index ) { this->currentTeamIndexChanged( this->ui->comboTeams->itemData( index, Qt::UserRole ).toInt()); } );
 
     // set up view
-    this->comboModelPtr = new ComboModel( this );
-    this->ui->listCombined->setModel( this->comboModelPtr );
+    this->comboModel = new ComboModel( this );
+    this->ui->listCombined->setModel( this->comboModel );
 
-    // fill combobox with team names & trigger change
-    this->fillTeams();
+    // trigger change
+    this->ui->comboTeams->setCurrentIndex( -1 );
+    for ( y = 0; y < this->ui->comboTeams->count(); y++ ) {
+        if ( this->ui->comboTeams->itemData( y, Qt::UserRole ).toInt() == qobject_cast<MainWindow*>( parent )->currentTeamId())
+            this->ui->comboTeams->setCurrentIndex( y );
+    }
 
     // onClose lambda
     this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ]() { this->accept(); } );
@@ -51,7 +58,7 @@ ComboDialog::~ComboDialog() {
     // clean up
     this->logListSorted.clear();
     this->disconnect( this->ui->comboTeams, SIGNAL( currentIndexChanged( int )));
-    delete this->comboModelPtr;
+    delete this->comboModel;
     delete this->ui;
 }
 
@@ -60,53 +67,33 @@ ComboDialog::~ComboDialog() {
  * @param index
  */
 void ComboDialog::currentTeamIndexChanged( int index ) {
-    Team *teamPtr;
+    Team *team;
 
     // abort on invalid indexes
     if ( index == -1 )
         return;
 
     // get current team
-    this->setCurrentTeamIndex( this->ui->comboTeams->itemData( index ).toInt());
-    teamPtr = Team::forId( this->currentTeamIndex());
-    if ( teamPtr == nullptr )
+    team = Team::forId( index );
+    if ( team == nullptr )
         return;
 
     // begin reset
-    this->comboModelPtr->beginReset();
+    this->comboModel->beginReset();
 
     // make a local copy and sort it by comboId
-    this->logListSorted = teamPtr->logList;
+    this->logListSorted = team->logList;
     qSort( this->logListSorted.begin(), this->logListSorted.end(), []( Log *l0, Log *l1 ) { return l0->comboId() < l1->comboId(); } );
 
-    foreach ( Log *logPtr, this->logListSorted ) {
-        if ( logPtr->comboId() == -1 )
-            this->logListSorted.removeOne( logPtr );
+    foreach ( Log *log, this->logListSorted ) {
+        if ( log->comboId() == -1 )
+            this->logListSorted.removeOne( log );
     }
 
-    teamPtr->calculateCombos();
-    this->ui->combos->setText( this->tr( "%1 (%2 tasks)" ).arg( teamPtr->combos()).arg( teamPtr->total()));
-    this->ui->points->setText( QString( "%1" ).arg( teamPtr->bonus()));
+    team->calculateCombos();
+    this->ui->combos->setText( this->tr( "%1 (%2 tasks)" ).arg( team->combos()).arg( team->total()));
+    this->ui->points->setText( QString( "%1" ).arg( team->bonus()));
 
     // end reset
-    this->comboModelPtr->endReset();
-}
-
-/**
- * @brief ComboDialog::fillTeams
- */
-void ComboDialog::fillTeams() {
-    // clear list
-    this->ui->comboTeams->clear();
-
-    // repopulate list
-    foreach ( Team *teamPtr, Event::active()->teamList )
-        this->ui->comboTeams->addItem( teamPtr->name(), teamPtr->id());
-
-    // set to current team
-    MainWindow *mPtr = qobject_cast<MainWindow *>( this->parent());
-    if ( mPtr == nullptr )
-        return;
-
-    this->ui->comboTeams->setCurrentIndex( mPtr->currentTeamIndex());
+    this->comboModel->endReset();
 }

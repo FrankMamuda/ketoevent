@@ -67,7 +67,7 @@ public:
 
     // bind/unbind
     void unbind();
-    void bind( QObject *objPtr, QObject *parentPtr );
+    void bind( QObject *object, QObject *parentPtr );
 
     // static functions
     static void add( const QString &key, SettingsVariable::Types type, SettingsVariable::Class varClass );
@@ -90,5 +90,5 @@ private:
     Types m_type;
     Class m_class;
     QString m_key;
-    QObject *objPtr;
+    QObject *object;
 };

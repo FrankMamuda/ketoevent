@@ -21,6 +21,7 @@
 //
 #include "main.h"
 #include "event.h"
+#include "teamlistmodel.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QFile>
@@ -99,8 +100,8 @@ bool Event::loadEvents() {
 
     // store entries
     while ( query.next()) {
-        Event *eventPtr = new Event( query.record(), "events" );
-        Main::instance()->eventList << eventPtr;
+        Event *event = new Event( query.record(), "events" );
+        Main::instance()->eventList << event;
 
         // failsafe - api check
         if ( static_cast<unsigned int>( Main::instance()->eventList.last()->api()) < KetoEvent::MinimumAPI ) {
@@ -129,16 +130,16 @@ bool Event::loadEvents() {
     }
 
     // fixes crash on empty database
-    Event *eventPtr = Event::forId( Variable::instance()->integer( "currentEvent" ));
-    if ( eventPtr == nullptr )
+    Event *event = Event::forId( Variable::instance()->integer( "currentEvent" ));
+    if ( event == nullptr )
         if ( Main::instance()->eventList.isEmpty()) {
             Common::error( CLFatalError, QObject::tr( "no valid events and/or corrupted database\n" ));
             return false;
         }
 
-        eventPtr = Main::instance()->eventList.first();
+        event = Main::instance()->eventList.first();
 
-    if ( !Event::setActive( eventPtr ))
+    if ( !Event::setActive( event ))
         Event::setActive( Main::instance()->eventList.first());
 
     return true;
@@ -157,17 +158,17 @@ Event *Event::active() {
 
 /**
  * @brief Event::setActive sets active event
- * @param eventPtr event entry
+ * @param event event entry
  * @return success
  */
-bool Event::setActive( Event *eventPtr ) {
+bool Event::setActive( Event *event ) {
     // announce
-    Common::print( CLMsg + QObject::tr( "setting '%1' as active event\n" ).arg( eventPtr->name()), Common::EventDebug );
+    Common::print( CLMsg + QObject::tr( "setting '%1' as active event\n" ).arg( event->name()), Common::EventDebug );
 
     foreach ( Event *entry, Main::instance()->eventList ) {
-        if ( entry == eventPtr ) {
+        if ( entry == event ) {
             Main::instance()->activeEvent = entry;
-            Variable::instance()->setValue( "currentEvent", eventPtr->id());
+            Variable::instance()->setValue( "currentEvent", event->id());
             return true;
         }
     }
@@ -180,9 +181,9 @@ bool Event::setActive( Event *eventPtr ) {
  * @return event entry
  */
 Event *Event::forId( int id ) {
-    foreach ( Event *eventPtr, Main::instance()->eventList ) {
-        if ( eventPtr->id() == id )
-            return eventPtr;
+    foreach ( Event *event, Main::instance()->eventList ) {
+        if ( event->id() == id )
+            return event;
     }
 
     return nullptr;
@@ -195,18 +196,25 @@ void Event::buildTTList() {
     // announce
     Common::print( CLMsg + QObject::tr( "building event TTList\n" ), Common::EventDebug );
 
-    foreach ( Event *eventPtr, Main::instance()->eventList ) {
-        eventPtr->teamList.clear();
-        eventPtr->taskList.clear();
+    // reset model
+    Main::instance()->teamModel->beginReset();
 
-        foreach ( Team *teamPtr, Main::instance()->teamList ) {
-            if ( teamPtr->eventId() == eventPtr->id())
-                eventPtr->teamList << teamPtr;
+    // build task and team list for the event
+    foreach ( Event *event, Main::instance()->eventList ) {
+        event->teamList.clear();
+        event->taskList.clear();
+
+        foreach ( Team *team, Main::instance()->teamList ) {
+            if ( team->eventId() == event->id())
+                event->teamList << team;
         }
 
-        foreach ( Task *taskPtr, Main::instance()->taskList ) {
-            if ( taskPtr->eventId() == eventPtr->id())
-                eventPtr->taskList << taskPtr;
+        foreach ( Task *task, Main::instance()->taskList ) {
+            if ( task->eventId() == event->id())
+                event->taskList << task;
         }
     }
+
+    // reset model
+    Main::instance()->teamModel->endReset();
 }

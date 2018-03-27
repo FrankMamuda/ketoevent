@@ -32,7 +32,7 @@ class ComboModel : public QStringListModel {
     Q_CLASSINFO( "description", "Combination view engine" )
 
 public:
-    ComboModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) { this->listParent = parentPtr; }
+    ComboModel( QObject *parent = 0 ) : QStringListModel( parent ) { this->listParent = parent; }
     int rowCount( const QModelIndex & = QModelIndex()) const;
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;

@@ -73,6 +73,7 @@ const static QString comboDescription( QT_TR_NOOP( "Sum of imported combo points
 class Console;
 #endif
 class Database;
+class TeamListModel;
 
 /**
  * @brief The Main class
@@ -118,8 +119,10 @@ public:
 #endif
 
     // constructor/destructor/instance
-    ~Main() {}
+    ~Main();
     static Main *instance() { return Singleton<Main>::instance( Main::createInstance ); }
+
+    TeamListModel *teamModel;
 
 public slots:
     // init/shutdown
@@ -141,7 +144,7 @@ private:
     Common::DebugLevels m_debug;
 
     // constructor/destructor/instance
-    Main( QObject *parent = nullptr ) : QObject( parent ), activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ), console( nullptr ), m_init( false ) {}
+    Main( QObject *parent = nullptr );
     static Main *createInstance() { return new Main(); }
 };
 

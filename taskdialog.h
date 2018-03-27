@@ -97,7 +97,7 @@ private slots:
 private:
     Ui::TaskDialog *ui;
     AddEditState m_state;
-    TaskListModel *listModelPtr;
+    TaskListModel *taskModel;
     int m_currentMatch;
     void move( MoveDirection direction );
 

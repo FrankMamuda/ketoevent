@@ -34,8 +34,8 @@ TaskDialog::TaskDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::TaskDi
     this->ui->setupUi( this );
 
     // set up view
-    this->listModelPtr = new TaskListModel( this );
-    this->ui->taskList->setModel( this->listModelPtr );
+    this->taskModel = new TaskListModel( this );
+    this->ui->taskList->setModel( this->taskModel );
     this->ui->taskList->setAlternatingRowColors( true );
     this->ui->taskList->setSelectionMode( QAbstractItemView::SingleSelection );
     this->ui->taskMaxMulti->setMinimum( 2 );
@@ -79,7 +79,7 @@ TaskDialog::TaskDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::TaskDi
  */
 TaskDialog::~TaskDialog() {
     delete ui;
-    delete this->listModelPtr;
+    delete this->taskModel;
 }
 
 /**
@@ -123,7 +123,7 @@ void TaskDialog::toggleAddEditWidget( AddEditState state ) {
         this->ui->taskList->setEnabled( true );
         this->toggleView();
     } else {
-        Task *taskPtr = nullptr;
+        Task *task = nullptr;
 
         // disable everything
         this->ui->addEditWidget->show();
@@ -148,21 +148,21 @@ void TaskDialog::toggleAddEditWidget( AddEditState state ) {
 
         case Edit:
             // match by id
-            taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
-            if ( taskPtr == nullptr ) {
+            task = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+            if ( task == nullptr ) {
                 this->toggleAddEditWidget( NoState );
                 return;
             }
 
-            this->ui->taskName->setText( taskPtr->name());
-            this->ui->taskDescription->setText( taskPtr->description());
-            this->ui->taskPoints->setValue( taskPtr->points());
-            this->ui->taskType->setCurrentIndex( static_cast<int>( taskPtr->type()));
-            this->ui->taskStyle->setCurrentIndex( static_cast<int>( taskPtr->style()));
-            this->ui->taskMaxMulti->setValue( taskPtr->multi());
+            this->ui->taskName->setText( task->name());
+            this->ui->taskDescription->setText( task->description());
+            this->ui->taskPoints->setValue( task->points());
+            this->ui->taskType->setCurrentIndex( static_cast<int>( task->type()));
+            this->ui->taskStyle->setCurrentIndex( static_cast<int>( task->style()));
+            this->ui->taskMaxMulti->setValue( task->multi());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Edit task" ));
 
-            if ( taskPtr->type() == Task::Check ) {
+            if ( task->type() == Task::Check ) {
                 this->ui->taskMaxMulti->setValue( 2 );
                 this->ui->taskMaxMulti->setDisabled( true );
             }
@@ -184,7 +184,7 @@ void TaskDialog::toggleAddEditWidget( AddEditState state ) {
  * @brief TaskDialog::on_doneButton_clicked
  */
 void TaskDialog::on_doneButton_clicked() {
-    Task *taskPtr = nullptr;
+    Task *task = nullptr;
     QModelIndex lastIndex;
 
     // failsafe
@@ -197,28 +197,28 @@ void TaskDialog::on_doneButton_clicked() {
     }
 
     // begin reset
-    this->listModelPtr->beginReset();
+    this->taskModel->beginReset();
 
     // alternate between Add/Edit states
     if ( this->state() == Add ) {
         Task::add( this->ui->taskName->text(), this->ui->taskPoints->value(), this->ui->taskMaxMulti->value(), static_cast<Task::Types>( this->ui->taskType->currentIndex()), static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()), this->ui->taskDescription->text());
-        lastIndex = this->listModelPtr->index( this->listModelPtr->rowCount()-1);
+        lastIndex = this->taskModel->index( this->taskModel->rowCount()-1);
     } else if ( this->state() == Edit ) {
         // match by id
-        taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
+        task = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());;
 
-        if ( taskPtr == nullptr ) {
+        if ( task == nullptr ) {
             this->toggleAddEditWidget( NoState );
             return;
         }
 
         // set edited data
-        taskPtr->setName( this->ui->taskName->text());
-        taskPtr->setPoints( this->ui->taskPoints->value());
-        taskPtr->setMulti( this->ui->taskMaxMulti->value());
-        taskPtr->setType( static_cast<Task::Types>( this->ui->taskType->currentIndex()));;
-        taskPtr->setStyle( static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()));;
-        taskPtr->setDescription( this->ui->taskDescription->text());
+        task->setName( this->ui->taskName->text());
+        task->setPoints( this->ui->taskPoints->value());
+        task->setMulti( this->ui->taskMaxMulti->value());
+        task->setType( static_cast<Task::Types>( this->ui->taskType->currentIndex()));;
+        task->setStyle( static_cast<Task::Styles>( this->ui->taskStyle->currentIndex()));;
+        task->setDescription( this->ui->taskDescription->text());
 
         // get last index
         lastIndex = this->ui->taskList->currentIndex();
@@ -227,7 +227,7 @@ void TaskDialog::on_doneButton_clicked() {
     // reset view
     this->toggleAddEditWidget( NoState );
     this->setCurrentMatch();
-    this->listModelPtr->endReset();
+    this->taskModel->endReset();
 
     // select last added/edited value
     this->ui->taskList->setCurrentIndex( lastIndex );
@@ -267,14 +267,14 @@ void TaskDialog::findTask() {
         return;
 
     // advance
-    if ( this->currentMatch() >= this->listModelPtr->rowCount() - 1 || this->currentMatch() <= 0 )
+    if ( this->currentMatch() >= this->taskModel->rowCount() - 1 || this->currentMatch() <= 0 )
         this->setCurrentMatch();
     else
         this->setCurrentMatch( this->currentMatch() + 1 );
 
     // find item from current position
-    for ( y = this->currentMatch(); y < this->listModelPtr->rowCount(); y++ ) {
-        index = this->listModelPtr->index( y, 0 );
+    for ( y = this->currentMatch(); y < this->taskModel->rowCount(); y++ ) {
+        index = this->taskModel->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
             if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
@@ -287,8 +287,8 @@ void TaskDialog::findTask() {
 
     // no match, try again from beginning
     if ( !match ) {
-        for ( y = 0; y < this->listModelPtr->rowCount(); y++ ) {
-            index = this->listModelPtr->index( y, 0 );
+        for ( y = 0; y < this->taskModel->rowCount(); y++ ) {
+            index = this->taskModel->index( y, 0 );
             if ( index.isValid()) {
                 // list must be the same as in App_Main, don't match by display role
                 if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
@@ -367,19 +367,19 @@ void TaskDialog::on_taskType_currentIndexChanged( int index ) {
  * @param direction
  */
 void TaskDialog::move( MoveDirection direction ) {
-    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *task = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     QModelIndex index;
     int y, t0, t1;
     int k = 0;
 
     // begin reset
-    this->listModelPtr->beginReset();
+    this->taskModel->beginReset();
 
     // match name to be sure
-    if ( taskPtr == nullptr )
+    if ( task == nullptr )
         return;
 
-    y = Event::active()->taskList.indexOf( taskPtr );
+    y = Event::active()->taskList.indexOf( task );
 
     if ( direction == Up && y != 0 ) {
         k = y - 1;
@@ -406,10 +406,10 @@ void TaskDialog::move( MoveDirection direction ) {
     }
 
     // end reset
-    this->listModelPtr->endReset();
+    this->taskModel->endReset();
 
     // reselect value
-    index = this->listModelPtr->index( k, 0 );
+    index = this->taskModel->index( k, 0 );
     this->ui->taskList->setCurrentIndex( index );
     this->setCurrentMatch( k );
 
@@ -422,24 +422,24 @@ void TaskDialog::move( MoveDirection direction ) {
  */
 void TaskDialog::on_actionRemove_triggered() {
     QSqlQuery query;
-    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    Task *task = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
     int y = 1;
 
-    if ( taskPtr == nullptr ) {
+    if ( task == nullptr ) {
         this->toggleAddEditWidget( NoState );
         return;
     }
 
     // begin reset
-    this->listModelPtr->beginReset();
+    this->taskModel->beginReset();
 
     // remove from internal list (both base and current event - there should be
     //   no mismatches, since eventId differs for tasks)
-    Event::active()->taskList.removeOne( taskPtr );
-    Main::instance()->taskList.removeOne( taskPtr );
+    Event::active()->taskList.removeOne( task );
+    Main::instance()->taskList.removeOne( task );
 
     // remove from database
-    query.exec( QString( "delete from tasks where id=%1" ).arg( taskPtr->id()));
+    query.exec( QString( "delete from tasks where id=%1" ).arg( task->id()));
 
     // database reindexing must be performed, however this is done in-memory,
     // actual changes are written to disk only when requested
@@ -449,7 +449,7 @@ void TaskDialog::on_actionRemove_triggered() {
     }
 
     // end reset
-    this->listModelPtr->endReset();
+    this->taskModel->endReset();
 
     // reset this
     this->changeUpDownState( this->ui->taskList->currentIndex());
@@ -462,19 +462,19 @@ void TaskDialog::on_actionSort_triggered() {
     int y = 0;
 
     // begin reset
-    this->listModelPtr->beginReset();
+    this->taskModel->beginReset();
 
     // sort by name
     Main::instance()->sort( Main::Tasks );
 
     // reindex whole list
-    foreach ( Task *taskPtr, Event::active()->taskList ) {
-        taskPtr->setOrder( y );
+    foreach ( Task *task, Event::active()->taskList ) {
+        task->setOrder( y );
         y++;
     }
 
     // end reset
-    this->listModelPtr->endReset();
+    this->taskModel->endReset();
 }
 
 /**
@@ -482,6 +482,8 @@ void TaskDialog::on_actionSort_triggered() {
  * @param ePtr
  */
 void TaskDialog::closeEvent( QCloseEvent *ePtr ) {
+    MainWindow *mainWindow;
+
     this->toggleAddEditWidget( NoState );
     ePtr->accept();
 
@@ -489,9 +491,9 @@ void TaskDialog::closeEvent( QCloseEvent *ePtr ) {
     Database::reindexTasks();
 
     // refill tasks in gui
-    MainWindow *gui = qobject_cast<MainWindow*>( this->parent());
-    if ( gui != nullptr )
-        gui->fillTasks();
+    mainWindow = qobject_cast<MainWindow*>( this->parent());
+    if ( mainWindow != nullptr )
+        mainWindow->fillTasks();
 }
 
 /**
@@ -499,8 +501,8 @@ void TaskDialog::closeEvent( QCloseEvent *ePtr ) {
  * @param index
  */
 void TaskDialog::changeUpDownState( const QModelIndex &index ) {
-    Task *taskPtr = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
-    if ( taskPtr == nullptr ) {
+    Task *task = Task::forId( this->ui->taskList->model()->data( this->ui->taskList->currentIndex(), Qt::UserRole ).toInt());
+    if ( task == nullptr ) {
         this->ui->actionMoveUp->setDisabled( true );
         this->ui->actionMoveDown->setDisabled( true );
         return;

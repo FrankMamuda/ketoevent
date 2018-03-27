@@ -41,17 +41,17 @@ class Description : public QDialog {
 public:
     /**
      * @brief Description
-     * @param taskPtr
+     * @param task
      * @param parent
      */
-    explicit Description( Task *taskPtr = 0, QWidget *parent = 0 ) : QDialog( parent ), ui( new Ui::Description ) {
+    explicit Description( Task *task = 0, QWidget *parent = 0 ) : QDialog( parent ), ui( new Ui::Description ) {
         this->ui->setupUi( this );
 
-        if ( taskPtr == nullptr || this->parent() == nullptr )
+        if ( task == nullptr || this->parent() == nullptr )
             return;
 
-        this->ui->taskName->setText( taskPtr->name());
-        this->ui->description->setPlainText( taskPtr->description());
+        this->ui->taskName->setText( task->name());
+        this->ui->description->setPlainText( task->description());
     }
 
     /**

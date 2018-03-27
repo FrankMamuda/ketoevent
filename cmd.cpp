@@ -199,10 +199,10 @@ void Cmd::dbInfo() {
 void Cmd::clearLogs() {
     QSqlQuery query;
 
-    foreach ( Team *teamPtr, Event::active()->teamList ) {
-        foreach ( Log *logPtr, teamPtr->logList ) {
-            logPtr->setValue( 0 );
-            query.exec( QString( "delete from logs where value=%1" ).arg( logPtr->id()));
+    foreach ( Team *team, Event::active()->teamList ) {
+        foreach ( Log *log, team->logList ) {
+            log->setValue( 0 );
+            query.exec( QString( "delete from logs where value=%1" ).arg( log->id()));
         }
     }
 }
@@ -211,9 +211,9 @@ void Cmd::clearLogs() {
  * @brief Cmd::clearCombos clears ALL combos
  */
 void Cmd::clearCombos() {
-    foreach ( Team *teamPtr, Event::active()->teamList ) {
-        foreach ( Log *logPtr, teamPtr->logList )
-            logPtr->setComboId( -1 );
+    foreach ( Team *team, Event::active()->teamList ) {
+        foreach ( Log *log, team->logList )
+            log->setComboId( -1 );
     }
 }
 
@@ -253,11 +253,11 @@ void Cmd::teamLogs( const QString &name, const QStringList &args ) {
         return;
     }
 
-    Team *teamPtr = Team::forName( args.at( 0 ));
+    Team *team = Team::forName( args.at( 0 ));
     int count = 0;
-    if ( Event::active()->teamList.indexOf( teamPtr ) != -1 ) {
-        foreach ( Log *logPtr, Main::instance()->logList ) {
-            if ( logPtr->teamId() == teamPtr->id())
+    if ( Event::active()->teamList.indexOf( team ) != -1 ) {
+        foreach ( Log *log, Main::instance()->logList ) {
+            if ( log->teamId() == team->id())
                 count++;
         }
         Common::print( this->tr( "  %1 logs\n" ).arg( count ), Common::Console );
@@ -270,6 +270,8 @@ void Cmd::teamLogs( const QString &name, const QStringList &args ) {
  * @param args stress test options (see source code)
  */
 void Cmd::stressTest( const QString &name, const QStringList &args ) {
+    MainWindow *mainWindow;
+
     enum ComboCount {
         C0 = 0,
         C2,
@@ -282,23 +284,23 @@ void Cmd::stressTest( const QString &name, const QStringList &args ) {
         return;
     }
 
-    MainWindow *gui = qobject_cast<MainWindow *>( Main::instance()->parent());
+    mainWindow = qobject_cast<MainWindow *>( Main::instance()->parent());
     if ( !QString::compare( args.first(), "clear" )) {
-        gui->stressTest( -1 );
+        mainWindow->stressTest( -1 );
         return;
     }
 
     if ( !QString::compare( args.first(), "custom" )) {
-        gui->stressTest( -2 );
+        mainWindow->stressTest( -2 );
         return;
     }
 
     if ( !QString::compare( args.first(), "combos" )) {
-        foreach ( Team *teamPtr, Event::active()->teamList ) {
+        foreach ( Team *team, Event::active()->teamList ) {
             int numLogs = 0;
 
-            foreach ( Log *logPtr, teamPtr->logList ) {
-                if ( logPtr->value() == 0 )
+            foreach ( Log *log, team->logList ) {
+                if ( log->value() == 0 )
                     continue;
 
                 // do something
@@ -317,15 +319,15 @@ void Cmd::stressTest( const QString &name, const QStringList &args ) {
 
             QList <Log*> logList;
 
-            foreach ( Log *logPtr, teamPtr->logList ) {
-                if ( logPtr->value() == 0 )
+            foreach ( Log *log, team->logList ) {
+                if ( log->value() == 0 )
                     continue;
 
                 if ( comboCount == C0 )
                     break;
 
                 // first fill the largest pool
-                logList << logPtr;
+                logList << log;
 
                 if ( comboCount == C234 && logList.count() == 4 )
                     comboCount = C23;
@@ -337,8 +339,8 @@ void Cmd::stressTest( const QString &name, const QStringList &args ) {
                     continue;
 
                 int freeHandle = Combo::getFreeHandle();
-                foreach ( Log *logPtr, logList )
-                    logPtr->setComboId( freeHandle );
+                foreach ( Log *log, logList )
+                    log->setComboId( freeHandle );
 
                 logList.clear();
             }
@@ -346,8 +348,8 @@ void Cmd::stressTest( const QString &name, const QStringList &args ) {
         return;
     }
 
-    if ( gui != nullptr )
-        gui->stressTest( args.first().toInt());
+    if ( mainWindow != nullptr )
+        mainWindow->stressTest( args.first().toInt());
 }
 
 /**

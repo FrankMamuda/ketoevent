@@ -70,22 +70,22 @@ int Task::calculate( int logId ) const {
     int value = 0;
 
     // get log parent
-    Log *logPtr = Log::forId( logId );
-    if ( logPtr == nullptr )
+    Log *log = Log::forId( logId );
+    if ( log == nullptr )
         return 0;
 
     // get initial points
     switch ( this->type()) {
     case Check:
-        if ( logPtr->value())
+        if ( log->value())
             value += this->points();
         break;
 
     case Multi:
-        if ( logPtr->value() > this->multi())
+        if ( log->value() > this->multi())
             value += this->points() * this->multi();
         else
-            value += this->points() * logPtr->value();
+            value += this->points() * log->value();
         break;
 
     default:
@@ -211,9 +211,9 @@ void Task::loadTasks() {
  */
 Task *Task::forId( int id ) {
     // search current event ONLY
-    foreach ( Task *taskPtr, Event::active()->taskList /*this->base.taskList*/ ) {
-        if ( taskPtr->id() == id )
-            return taskPtr;
+    foreach ( Task *task, Event::active()->taskList /*this->base.taskList*/ ) {
+        if ( task->id() == id )
+            return task;
     }
     return nullptr;
 }
@@ -233,9 +233,9 @@ Task *Task::forName( const QString &name, bool currentEvent ) {
         taskList = Main::instance()->taskList;
 
     // search current event ONLY by default
-    foreach ( Task *taskPtr, taskList ) {
-        if ( !QString::compare( name, taskPtr->name()))
-            return taskPtr;
+    foreach ( Task *task, taskList ) {
+        if ( !QString::compare( name, task->name()))
+            return task;
     }
     return nullptr;
 }
