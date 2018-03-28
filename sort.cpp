@@ -234,7 +234,7 @@ void Main::sort( ListTypes type ) {
 
     case NoType:
     default:
-        Common::error( StrSoftError, this->tr( "unknown list type \"%1\"\n" ).arg( static_cast<int>( type )));
+        qCritical() << this->tr( "unknown list type \"%1\"" ).arg( static_cast<int>( type ));
         return;
     }
 }

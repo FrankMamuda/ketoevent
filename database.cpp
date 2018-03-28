@@ -57,7 +57,7 @@ void Database::makePath( const QString &path ) {
     if ( !dir.exists()) {
         dir.mkpath( db.absolutePath());
         if ( !dir.exists())
-            Common::error( CLFatalError, QObject::tr( "could not create database path - \"%1\"\n" ).arg( fullPath ));
+            qFatal( QObject::tr( "could not create database path - \"%1\"" ).arg( fullPath ).toUtf8().constData());
     }
 
     // store path
@@ -134,7 +134,7 @@ void Database::attach( const QString &path, Import import ) {
     int mismatch = 0;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "attaching database %1\n" ).arg( path ), Common::DatabaseDebug );
+    qDebug() << QObject::tr( "attaching database %1" ).arg( path );
 
     // write backup just in case
     Database::writeBackup();
@@ -144,13 +144,13 @@ void Database::attach( const QString &path, Import import ) {
     QFile database( dbPath );
     QFileInfo dbInfo( database );
     if ( !database.exists()) {
-        Common::error( CLSoftError, QObject::tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        qCritical() << QObject::tr( "database \"%1\" does not exist" ).arg( dbInfo.fileName());
         goto removeDB;
     }
 
     // attach the new database
     if ( !query.exec( QString( "attach '%1' as merge" ).arg( dbPath ))) {
-        Common::error( CLSoftError, QObject::tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not attach database, reason - \"%1\"" ).arg( query.lastError().text());
         return;
     }
 
@@ -158,13 +158,13 @@ void Database::attach( const QString &path, Import import ) {
         while ( query.next())
             eventId = query.record().value( "id" ).toInt();
     } else {
-        Common::error( CLSoftError, QObject::tr( "database \"%1\" does not contain events\n" ).arg( dbInfo.fileName()));
+        qCritical() << QObject::tr( "database \"%1\" does not contain events" ).arg( dbInfo.fileName());
         goto removeDB;
     }
 
     // failsafe
     if ( eventId < 1 ) {
-        Common::error( CLSoftError, QObject::tr( "database \"%1\" does not contain event \"%2\"\n" ).arg( dbInfo.fileName()).arg( Event::active()->name()));
+        qCritical() << QObject::tr( "database \"%1\" does not contain event \"%2\"" ).arg( dbInfo.fileName()).arg( Event::active()->name());
         goto removeDB;
     }
 
@@ -181,7 +181,7 @@ void Database::attach( const QString &path, Import import ) {
             mismatch++;
 
         if ( mismatch > 0 ) {
-            Common::error( CLSoftError, QObject::tr( "incompatible task list in \"%1\"\n" ).arg( dbInfo.fileName()));
+            qCritical() << QObject::tr( "incompatible task list in \"%1\"" ).arg( dbInfo.fileName());
             goto removeDB;
         }
 
@@ -234,7 +234,7 @@ void Database::attach( const QString &path, Import import ) {
             }
 
             if ( !query.exec( QString( "insert into %1 ( %2 ) select %2 from merge.%1" ).arg( api.name ).arg( fields.join( ", " )))) {
-                Common::error( CLSoftError, QObject::tr( "could not perform import, reason \"%1\"\n" ).arg( query.lastError().text()));
+                qCritical() << QObject::tr( "could not perform import, reason - \"%1\"" ).arg( query.lastError().text());
                 break;
             }
         }
@@ -266,10 +266,8 @@ bool Database::createStructure( const QString &prefix ) {
 
     // failafe
     QFile dbFile( Variable::instance()->string( "databasePath" ));
-    if ( !dbFile.exists()) {
-        Common::error( CLFatalError, QObject::tr( "unable to create database file\n" ));
-        return false;
-    }
+    if ( !dbFile.exists())
+        qFatal( QObject::tr( "unable to create database file" ).toUtf8().constData());
 
     // additional structure check (API9)
     QSqlDatabase db = QSqlDatabase::database();
@@ -278,7 +276,7 @@ bool Database::createStructure( const QString &prefix ) {
 
     // announce
     if ( !tables.count())
-        Common::print( CLMsg + QObject::tr( "creating an empty database '%1'\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
+        qDebug() << QObject::tr( "creating an empty database '%1'" ).arg( Variable::instance()->string( "databasePath" ));
 
     // TODO: api mismatch should also be handled here (reading a single field from events table)
     //       also schema mismatch could be handled here
@@ -301,7 +299,7 @@ bool Database::createStructure( const QString &prefix ) {
         mismatch = false;
 
         // announce
-        Common::print( CLMsg + QObject::tr( "table field mismatch in '%1'. different API?\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
+        qDebug() << QObject::tr( "table field mismatch in '%1'. different API?" ).arg( Variable::instance()->string( "databasePath" ));
 
         // check if table structure matches API0
         for ( y = 0; y < API0::numTables; y++ ) {
@@ -377,14 +375,14 @@ bool Database::createStructure( const QString &prefix ) {
                                  .arg( static_cast<int>( Task::Multi ))
                                  .arg( KetoEvent::comboDescription )
                                   )) {
-                    Common::error( CLSoftError, QObject::tr( "could not add combo task\n" ));
+                    qCritical() << QObject::tr( "could not add combo task" );
                     return false;
                 }
 
                 // get combo task id
                 comboTaskId = query.lastInsertId().toInt();
                 if ( comboTaskId < 1 ) {
-                    Common::error( CLSoftError, QObject::tr( "bad combo task id\n" ));
+                    qCritical() << QObject::tr( "bad combo task id" );
                     return false;
                 }
 
@@ -434,7 +432,7 @@ bool Database::createStructure( const QString &prefix ) {
                 ;
             }
         } else
-            Common::error( CLFatalError, QObject::tr( "Could not import database\n" ));
+            qFatal( QObject::tr( "Could not import database" ).toUtf8().constData());
 
         return false;
     }
@@ -484,10 +482,8 @@ bool Database::createEmptyTable( const QString &prefix ) {
     // get schemas
     schemas = Database::generateSchemas( prefix );
     foreach ( QString schema, schemas ) {
-        if ( !query.exec( schema )) {
-            Common::error( CLFatalError, QObject::tr( "could not create internal database structure, reason - \"%1\"\n" ).arg( query.lastError().text()));
-            return false;
-        }
+        if ( !query.exec( schema ))
+            qFatal( QObject::tr( "could not create internal database structure, reason - \"%1\"" ).arg( query.lastError().text()).toUtf8().constData());
     }
     return true;
 }
@@ -502,13 +498,11 @@ bool Database::load() {
     QSqlDatabase db = QSqlDatabase::database();
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading database '%1'\n" ).arg( Variable::instance()->string( "databasePath" )), Common::DatabaseDebug );
+    qDebug() << QObject::tr( "loading database '%1'" ).arg( Variable::instance()->string( "databasePath" ));
 
     // failsafe
-    if ( !db.isDriverAvailable( "QSQLITE" )) {
-        Common::error( CLFatalError, QObject::tr( "sqlite not present on the system\n" ));
-        return false;
-    }
+    if ( !db.isDriverAvailable( "QSQLITE" ))
+        qFatal( QObject::tr( "sqlite not present on the system" ).toUtf8().constData());
 
     // set sqlite driver
     db = QSqlDatabase::addDatabase( "QSQLITE" );
@@ -519,20 +513,16 @@ bool Database::load() {
     if ( !database.exists()) {
         database.open( QFile::WriteOnly );
         database.close();
-        Common::print( CLMsg + QObject::tr( "creating non-existant database - \"%1\"\n" ).arg( dbInfo.fileName()));
+        qDebug() << QObject::tr( "creating non-existant database - \"%1\"" ).arg( dbInfo.fileName());
     }
 
     // set path and open
-    if ( !db.open()) {
-        Common::error( CLFatalError, QObject::tr( "could not load database - \"%1\"\n" ).arg( dbInfo.fileName()));
-        return false;
-    }
+    if ( !db.open())
+        qFatal( QObject::tr( "could not load database - \"%1\"" ).arg( dbInfo.fileName()).toUtf8().constData());
 
     // create database
-    if ( !Database::createStructure()) {
-        Common::error( CLFatalError, QObject::tr( "could not create internal database structure\n" ));
-        return false;
-    }
+    if ( !Database::createStructure())
+        qFatal( QObject::tr( "could not create internal database structure" ).toUtf8().constData());
 
     // delete orphaned logs on init
     Database::removeOrphanedLogs();
@@ -540,7 +530,7 @@ bool Database::load() {
     // enable WAL
     QSqlQuery query;
     if ( !query.exec( "PRAGMA journal_mode=WAL" )) {
-        Common::error( CLSoftError, QObject::tr( "could not enable WAL, reason: %1\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not enable WAL, reason - \"%1\"" ).arg( query.lastError().text());
         return false;
     }
 
@@ -573,7 +563,7 @@ void Database::reindexTasks() {
 
     // announce reindexing
     if ( reindex )
-        Common::print( CLMsg + QObject::tr( "performed task reindexing\n" ), Common::DatabaseDebug );
+        qDebug() << QObject::tr( "performed task reindexing" );
 }
 
 /**
@@ -584,7 +574,7 @@ void Database::unload() {
     bool open = false;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "unloading database\n" ), Common::DatabaseDebug );
+    qDebug() << QObject::tr( "unloading database" );
 
     // close database if open and delete orphaned logs on shutdown
     // according to Qt5 documentation, this must be out of scope
@@ -612,11 +602,11 @@ void Database::removeOrphanedLogs() {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "removing orphaned logs\n" ), Common::LogDebug );
+    qDebug() << QObject::tr( "removing orphaned logs" );
 
     // remove orphaned logs (fixes crash with invalid teamId/taskId)
     if ( !query.exec( "delete from logs where value=0" ) || !query.exec( "delete from logs where teamId not in ( select id from teams )" ) || !query.exec( "delete from logs where taskId not in ( select id from tasks )" ))
-        Common::error( CLSoftError, QObject::tr( "could not delete orphaned logs, reason: %1\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not delete orphaned logs, reason - \"%1\"" ).arg( query.lastError().text());
 }
 
 /**
@@ -631,10 +621,8 @@ void Database::writeBackup() {
     QDir dir( backupPath );
     if ( !dir.exists()) {
         dir.mkpath( backupPath );
-        if ( !dir.exists()) {
-            Common::error( CLFatalError, QObject::tr( "could not create backup path\n" ));
-            return;
-        }
+        if ( !dir.exists())
+            qFatal( QObject::tr( "could not create backup path" ).toUtf8().constData());
     }
     QFile::copy( Main::instance()->path, QString( "%1%2_%3.db" ).arg( backupPath ).arg( QFileInfo( Main::instance()->path ).fileName().remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }

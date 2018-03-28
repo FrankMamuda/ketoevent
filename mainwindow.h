@@ -62,7 +62,6 @@ public slots:
     void taskIndexChanged( int row );
     void setEventTitle();
     void clearTasks();
-    void print( const QString &msg ) { Common::print( StrMsg + msg, Common::GuiMain ); }
     void lock();
 #ifdef APPLET_DEBUG
     void stressTest( int numTeams = 1 );

@@ -46,7 +46,7 @@ void Event::add( const QString &title ) {
     QString eventTitle;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "adding a new event - '%1'\n" ).arg( title ), Common::EventDebug );
+    qDebug() << QObject::tr( "adding a new event - '%1'" ).arg( title );
 
     // copy title
     eventTitle = title;
@@ -70,10 +70,8 @@ void Event::add( const QString &title ) {
     query.bindValue( ":comboOfFourAndMore", KetoEvent::defaultComboOfFourAndMore );
     query.bindValue( ":lock", 0 );
 
-    if ( !query.exec()) {
-        Common::error( CLFatalError, QObject::tr( "could not add event, reason - \"%1\"\n" ).arg( query.lastError().text()));
-        return;
-    }
+    if ( !query.exec())
+        qFatal( QObject::tr( "could not add event, reason - \"%1\"" ).arg( query.lastError().text()).toUtf8().constData());
 
     // select the new entry
     query.exec( QString( "select * from events where id=%1" ).arg( query.lastInsertId().toInt()));
@@ -93,7 +91,7 @@ bool Event::loadEvents() {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading events from database\n" ), Common::EventDebug );
+    qDebug() << QObject::tr( "loading events from database" );
 
     // read all event entries
     query.exec( "select * from events" );
@@ -105,10 +103,10 @@ bool Event::loadEvents() {
 
         // failsafe - api check
         if ( static_cast<unsigned int>( Main::instance()->eventList.last()->api()) < KetoEvent::MinimumAPI ) {
-            Common::error( CLSoftError,
-                     QObject::tr( "incompatible API - '%1', minimum supported '%2'\n" )
+            qCritical() <<
+                     QObject::tr( "incompatible API - '%1', minimum supported '%2'" )
                      .arg( Main::instance()->eventList.last()->api())
-                     .arg( KetoEvent::MinimumAPI ));
+                     .arg( KetoEvent::MinimumAPI );
             Main::instance()->eventList.removeLast();
 
             // rename database
@@ -126,16 +124,14 @@ bool Event::loadEvents() {
 
     // still nothing?
     if ( Main::instance()->eventList.isEmpty()) {
-        Common::error( CLFatalError, QObject::tr( "could not create event\n" ));
+        qFatal( QObject::tr( "could not create event" ).toUtf8().constData());
     }
 
     // fixes crash on empty database
     Event *event = Event::forId( Variable::instance()->integer( "currentEvent" ));
     if ( event == nullptr )
-        if ( Main::instance()->eventList.isEmpty()) {
-            Common::error( CLFatalError, QObject::tr( "no valid events and/or corrupted database\n" ));
-            return false;
-        }
+        if ( Main::instance()->eventList.isEmpty())
+            qFatal( QObject::tr( "no valid events and/or corrupted database" ).toUtf8().constData());
 
         event = Main::instance()->eventList.first();
 
@@ -151,7 +147,7 @@ bool Event::loadEvents() {
  */
 Event *Event::active() {
     if ( Main::instance()->activeEvent == nullptr )
-        Common::error( CLFatalError, QObject::tr( "no valid events\n" ));
+        qFatal( QObject::tr( "no valid events" ).toUtf8().constData());
 
     return Main::instance()->activeEvent;
 }
@@ -163,7 +159,7 @@ Event *Event::active() {
  */
 bool Event::setActive( Event *event ) {
     // announce
-    Common::print( CLMsg + QObject::tr( "setting '%1' as active event\n" ).arg( event->name()), Common::EventDebug );
+    qDebug() << QObject::tr( "setting '%1' as active event" ).arg( event->name());
 
     foreach ( Event *entry, Main::instance()->eventList ) {
         if ( entry == event ) {
@@ -194,7 +190,7 @@ Event *Event::forId( int id ) {
  */
 void Event::buildTTList() {
     // announce
-    Common::print( CLMsg + QObject::tr( "building event TTList\n" ), Common::EventDebug );
+    qDebug() << QObject::tr( "building event TTList" );
 
     // reset model
     Main::instance()->teamModel->beginReset();

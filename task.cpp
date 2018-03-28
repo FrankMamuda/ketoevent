@@ -142,14 +142,13 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
     int max = 0;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "adding a new task - name - '%1'; points - %2; multi - %3; type - %4; style - %5; description - '%6'\n" )
+    qDebug() << QObject::tr( "adding a new task - name - '%1'; points - %2; multi - %3; type - %4; style - %5; description - '%6'" )
              .arg( taskName )
              .arg( points )
              .arg( multi )
              .arg( type )
              .arg( style )
-             .arg( description ),
-             Common::TaskDebug );
+             .arg( description );
 
     // avoid duplicates
     if ( Task::forName( taskName ) != nullptr )
@@ -172,7 +171,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
     query.bindValue( ":description", description );
 
     if ( !query.exec()) {
-        Common::error( CLSoftError, QObject::tr( "could not add task, reason: %1\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not add task, reason - \"%1\"" ).arg( query.lastError().text());
         return;
     }
 
@@ -194,7 +193,7 @@ void Task::loadTasks() {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading tasks from database\n" ), Common::TaskDebug );
+    qDebug() << QObject::tr( "loading tasks from database" );
 
     // read all task entries
     query.exec( "select * from tasks order by parent asc" );

@@ -238,7 +238,7 @@ void EventDialog::on_actionImportLogs_triggered() {
 
             // avoid importing the same database
             if ( !QString::compare( filePath, Main::instance()->path )) {
-                Common::error( StrSoftError, "cannot import current database\n" );
+                qCritical() << this->tr( "cannot import current database" );
                 return;
             }
 
@@ -273,7 +273,7 @@ void EventDialog::on_actionImportTasks_triggered() {
     if ( filePath.endsWith( ".db" )) {
         // avoid importing the same database
         if ( !QString::compare( filePath, Main::instance()->path )) {
-            Common::error( StrSoftError, "cannot import current database\n" );
+            qCritical() << this->tr( "cannot import current database" );
             return;
         }
 
@@ -315,7 +315,7 @@ void EventDialog::on_actionImportTasks_triggered() {
                                info.at( 1 ));               // description
                 } else {
 #ifdef APPLET_DEBUG
-                    Common::print( StrMsg + this->tr( "updating task \"%1\"\n" ).arg( info.at( 0 )).arg( info.count()), Common::EventDebug );
+                    qDebug() << this->tr( "updating task \"%1\"" ).arg( info.at( 0 )).arg( info.count());
 #endif
                     task->setPoints( info.at( 2 ).toInt());
                     task->setMulti( info.at( 3 ).toInt());
@@ -332,7 +332,7 @@ void EventDialog::on_actionImportTasks_triggered() {
         if ( mainWindow != nullptr )
             mainWindow->fillTasks();
     } else {
-        Common::error( StrSoftError, this->tr( "unknown task storage format\n" ));
+        qCritical() << this->tr( "unknown task storage format" );
         return;
     }
 
@@ -362,7 +362,7 @@ void EventDialog::on_actionExportEvent_triggered() {
 
     // forbid overwrite of the current database
     if ( !QString::compare( path, Main::instance()->path )) {
-        Common::error( StrSoftError, this->tr( "cannot overwrite current database\n" ));
+        qCritical() << this->tr( "cannot overwrite current database" );
         return;
     }
 
@@ -372,13 +372,13 @@ void EventDialog::on_actionExportEvent_triggered() {
 
     // check if exists
     if ( !database.exists()) {
-        Common::error( StrSoftError, this->tr( "database \"%1\" does not exist\n" ).arg( dbInfo.fileName()));
+        qCritical() << this->tr( "database \"%1\" does not exist" ).arg( dbInfo.fileName());
         return;
     }
 
     // attach the new database
     if ( !query.exec( QString( "attach '%1' as export" ).arg( path ))) {
-        Common::error( StrSoftError, this->tr( "could not attach database, reason - \"%1\"\n" ).arg( query.lastError().text()));
+        qCritical() << this->tr( "could not attach database, reason - \"%1\"" ).arg( query.lastError().text());
         return;
     }
 

@@ -39,7 +39,6 @@ SOURCES += main.cpp\
     log.cpp \
     database.cpp \
     databaseentry.cpp \
-    common.cpp \
     xmltools.cpp \
     combomodel.cpp \
     rankings.cpp \
@@ -65,7 +64,6 @@ HEADERS  += \
     combo.h \
     database.h \
     databaseentry.h \
-    common.h \
     variable.h \
     callonce.h \
     singleton.h \

@@ -32,19 +32,12 @@
 #include "settingsvariable.h"
 #include "console.h"
 #include "database.h"
-#include "common.h"
 #include "singleton.h"
 
 //
 // defines
 //
 #define FORCE_LATVIAN
-
-// quickly print to DEBUG
-#define QMD( msg ) Common::print( StrMsg + QString( "%1\n" ).arg( msg ), Main::Debug );
-#define QMD1( msg, arg1 ) Common::print( StrMsg + QString( "%1 %2\n" ).arg( msg ).arg( arg1 ), Main::Debug );
-#define QMD2( msg, arg1, arg2 ) Common::print( StrMsg + QString( "%1 %2 %3\n" ).arg( msg ).arg( arg1 ).arg( arg2 ), Main::Debug );
-#define QMD3( msg, arg1, arg2, arg3 ) Common::print( StrMsg + QString( "%1 %2 %3 %4\n" ).arg( msg ).arg( arg1 ).arg( arg2 ).arg( arg3 ), Main::Debug );
 
 //
 // namespace: KetoEvent
@@ -82,7 +75,6 @@ class Main : public QObject {
     Q_OBJECT
     Q_ENUMS( ListTypes )
     Q_PROPERTY( bool initialised READ isInitialised WRITE setInitialised )
-    Q_FLAGS( DebugLevels )
     Q_CLASSINFO( "description", "Applet main class" )
 
 public:
@@ -108,7 +100,6 @@ public:
     // misc
     QString transliterate( const QString &path ) const;
     bool isInitialised() const { return this->m_init; }
-    Common::DebugLevels debugLevel() const { return this->m_debug; }
     Event *activeEvent;
 
     // mem debug
@@ -130,9 +121,6 @@ public slots:
     void setInitialised( bool init = true ) { this->m_init = init; }
     void shutdown( bool ignoreDatabase = false );
 
-    // debug
-    void setDebugLevel( Common::DebugLevels debug ) { this->m_debug = debug; }
-
     // misc
     void sort( ListTypes type );
     void update();
@@ -141,12 +129,8 @@ public slots:
 private:
     int changesCounter;
     bool m_init;
-    Common::DebugLevels m_debug;
 
     // constructor/destructor/instance
     Main( QObject *parent = nullptr );
     static Main *createInstance() { return new Main(); }
 };
-
-// flags
-Q_DECLARE_OPERATORS_FOR_FLAGS( Common::DebugLevels )

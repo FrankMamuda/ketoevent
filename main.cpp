@@ -22,6 +22,7 @@
 #include "main.h"
 #include "mainwindow.h"
 #include <QApplication>
+#include <QMessageBox>
 #include <QTranslator>
 #include "console.h"
 #include "cmd.h"
@@ -63,11 +64,9 @@ MODERNIZE:
  * @brief Main::initialise
  * @param parent
  */
-Main::~Main() { delete this->teamModel; }
-
 bool Main::initialise( QObject *parent ) {
     // announce
-    Common::print( StrMsg + this->tr( "initialising system\n" ), Common::System );
+    qInfo() << this->tr( "initialising system" );
 
     // init cvars
     Variable::instance()->add( "databasePath", this->path );
@@ -136,7 +135,7 @@ bool Main::initialise( QObject *parent ) {
  */
 void Main::shutdown( bool ignoreDatabase ) {    
     // announce
-    Common::print( StrMsg + this->tr( "performing shutdown\n" ), Common::System );
+    qInfo() << this->tr( "performing shutdown" );
 
     if ( this->isInitialised()) {
         // clear parent
@@ -229,7 +228,74 @@ void Main::clearEvent() {
  * @brief Main::Main
  * @param parent
  */
-Main::Main(QObject *parent) : QObject( parent ), activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ), console( nullptr ), teamModel( new TeamListModel()), m_init( false ) {}
+Main::Main( QObject *parent) : QObject( parent ),
+    activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ),
+    console( nullptr ), teamModel( new TeamListModel()),
+    m_init( false ) {}
+
+/**
+ * @brief Main::~Main
+ */
+Main::~Main() { delete this->teamModel; }
+
+// default message handler
+static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
+
+/**
+ * @brief messageFilter
+ * @param type
+ * @param context
+ * @param msg
+ */
+void messageFilter( QtMsgType type, const QMessageLogContext &context, const QString &msg ) {
+    (*QT_DEFAULT_MESSAGE_HANDLER)( type, context, msg );
+
+#ifdef APPLET_DEBUG
+    // EVERYTHING is printed to the console
+    if ( Main::instance()->console != nullptr ) {
+        QString out( msg );
+
+        out = out.remove( "\\" );
+
+        if ( out.startsWith( "\"" ) && out.endsWith( "\"" ))
+            out = out.remove( 0, 1 ).remove( out.length() - 2, 1 );;
+
+        Main::instance()->console->print( /*context.function +*/ out );
+
+    }
+#endif
+
+    if ( type == QtFatalMsg ) {
+        MainWindow *mainWindow;
+
+        mainWindow = qobject_cast<MainWindow*>( Main::instance()->parent());
+        if ( mainWindow != nullptr ) {
+            mainWindow->lock();
+            QMessageBox msgBox;
+            msgBox.setWindowTitle( QObject::tr( "Fatal error" ));
+            msgBox.setText( msg + "\n" + QObject::tr( "Do you want to reset the database (requires restart)?" ));
+            msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
+            msgBox.setIcon( QMessageBox::Critical );
+            int state = msgBox.exec();
+
+            // check options
+            switch ( state ) {
+            case QMessageBox::Yes:
+                Database::unload();
+                QFile::rename( Variable::instance()->string( "databasePath" ), QString( "%1_badDB_%2.db" ).arg( Variable::instance()->string( "databasePath" ).remove( ".db" )).arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                mainWindow->close();
+                break;
+
+            case QMessageBox::No:
+            default:
+                ;
+            }
+        }
+
+        QApplication::quit();
+        exit( 0 );
+    }
+}
 
 /**
  * @brief main
@@ -238,18 +304,16 @@ Main::Main(QObject *parent) : QObject( parent ), activeEvent( nullptr ), alloc( 
  * @return
  */
 int main( int argc, char *argv[] ) {
-    QApplication app( argc, argv );
+    // set console output pattern
+    qSetMessagePattern( "%{if-category}%{category}: %{endif}%{function}: %{message}" );
+
+    // log to file in non-qtcreator environment
+    qInstallMessageHandler( messageFilter );
 
     // init app
+    QApplication app( argc, argv );
     QCoreApplication::setOrganizationName( "factory12" );
     QCoreApplication::setApplicationName( "ketoevent" );
-
-    // set debug level
-#ifdef APPLET_DEBUG
-    Main::instance()->setDebugLevel( Common::System );
-#else
-    Main::instance()->setDebugLevel( Common::NoDebug );
-#endif
 
     // i18n
     QTranslator translator;

@@ -101,14 +101,14 @@ bool Console::completeCommand() {
     }
 
     // print out suggestions
-    Common::print( this->tr( "Available commands and cvars:\n" ), Common::Console );
+    qInfo() << this->tr( "Available commands and cvars:" );
     foreach ( const QString &str, matchedStrings ) {
         // check commands
         if ( Cmd::instance()->keys().contains( str )) {
             QString description;
 
             description = Cmd::instance()->description( str );
-            Common::print( !description.isEmpty() ? QString( "  \"%1\" - %2\n" ).arg( str, description ) : QString( "  \"%1\n" ).arg( str ), Common::Console );
+            qInfo() << ( !description.isEmpty() ? QString( "  \"%1\" - %2" ).arg( str, description ) : QString( "  \"%1" ).arg( str ));
         }
 
         // check variables
@@ -117,12 +117,12 @@ bool Console::completeCommand() {
             VariableEntry entry;
 
             entry = Variable::instance()->list[str];
-            Common::print( this->tr( "  \"%1\" is \"%2\"\n" ).arg( entry.key(), entry.value().toString()), Common::Console );
+            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry.key(), entry.value().toString());
         }
     }
 
     // add extra newline
-    Common::print( "\n", Common::Console );
+    qInfo() << "\n";
 
     // done
     return true;
@@ -257,7 +257,7 @@ void Console::saveHisotry() {
  */
 void Console::init() {
     // announce
-    Common::print( CLMsg + QObject::tr( "initilising console\n" ), Common::Console );
+    qDebug() << QObject::tr( "initilising console" );
 
     if ( Main::instance()->console != nullptr )
         return;

@@ -105,7 +105,7 @@ void MainWindow::initialise( bool reload ) {
     this->connect( this->settingsDialog, SIGNAL( closeSignal( int )), this, SLOT( settingsDialogClosed( int )));
 
     // announce
-    this->print( this->tr( "initialisation complete\n" ));
+    qDebug() << this->tr( "initialisation complete" );
 
 #ifdef APPLET_DEBUG
     this->ui->mainToolBar->insertAction( this->ui->actionExit, this->ui->actionConsole );
@@ -671,7 +671,7 @@ void MainWindow::testTeam( Team *team ) {
 
     // report
     team->calculateCombos();
-    Common::print( StrMsg + QString( "Team \"%1\" has %2 points (should be %3)" ).arg( team->name()).arg( team->points() - team->penalty()).arg( shouldBe ), Common::GuiMain );
+    qInfo() << QString( "Team \"%1\" has %2 points (should be %3)" ).arg( team->name()).arg( team->points() - team->penalty()).arg( shouldBe );
 }
 
 /**
@@ -691,10 +691,7 @@ void MainWindow::stressTest( int numTeams ) {
         this->selectTeam();
         return;
     } else if ( numTeams == -2 ) {
-        if ( !Event::active()->teamList.isEmpty())
-            Common::print( StrMsg + this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()), Common::GuiMain );
-        else
-            Common::print( StrMsg + this->tr( "no teams to perform stress test on" ), Common::GuiMain );
+        qInfo() << ( !Event::active()->teamList.isEmpty() ? this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()) : this->tr( "no teams to perform stress test on" ));
 
         foreach ( Team *team, Event::active()->teamList )
             this->testTeam( team );

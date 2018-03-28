@@ -190,7 +190,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
     Main::instance()->teamModel->beginReset();
 
     // announce
-    Common::print( CLMsg + QObject::tr( "adding new team '%1' with %2 members, reviewed by '%3'\n" ).arg( teamName ).arg( members ).arg( reviewerName ), Common::TeamDebug );
+    qDebug() << QObject::tr( "adding new team '%1' with %2 members, reviewed by '%3'" ).arg( teamName ).arg( members ).arg( reviewerName );
 
     // avoid duplicates
     if ( Team::forName( teamName, true ) != nullptr )
@@ -207,7 +207,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
     query.bindValue( ":eventId", Event::active()->id());
 
     if ( !query.exec()) {
-        Common::error( CLSoftError, QObject::tr( "could not add team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not add team, reason - \"%1\"" ).arg( query.lastError().text());
         return;
     }
 
@@ -237,7 +237,7 @@ void Team::remove( const QString &teamName ) {
     Main::instance()->teamModel->beginReset();
 
     // announce
-    Common::print( CLMsg + QObject::tr( "removing team '%1'\n" ).arg( teamName ), Common::TeamDebug );
+    qDebug() << QObject::tr( "removing team '%1'" ).arg( teamName );
 
     // find team
     team = Team::forName( teamName, true );
@@ -254,10 +254,10 @@ void Team::remove( const QString &teamName ) {
 
     // remove team and logs from db
     if ( !query.exec( QString( "delete from teams where id=%1" ).arg( team->id())))
-        Common::error( CLSoftError, QObject::tr( "could not remove team, reason: \"%1\"\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not remove team, reason - \"%1\"" ).arg( query.lastError().text());
 
     if ( !query.exec( QString( "delete from logs where teamId=%1" ).arg( team->id())))
-        Common::error( CLSoftError, QObject::tr( "could not remove team log, reason: \"%1\"\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not remove team log, reason - \"%1\"" ).arg( query.lastError().text());
 
     // remove from display
     Main::instance()->teamList.removeAll( team );
@@ -276,7 +276,7 @@ void Team::loadTeams() {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading teams form database\n" ), Common::TeamDebug );
+    qDebug() << QObject::tr( "loading teams form database" );
 
     // read all team entries
     query.exec( "select * from teams" );

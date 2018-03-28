@@ -43,7 +43,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        Common::error( StrSoftError, this->tr( "task not set\n" ));
+        qCritical() << this->tr( "task not set" );
         return;
     }
 
@@ -118,7 +118,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
         //this->taskName->setToolTip( this->tr( "%1 points (max %2), multiplied by value" ).arg( this->task()->points()).arg( this->task()->multi()));
         this->multi->setToolTip( this->tr( "Change task multiplier" ));
     } else {
-        Common::error( StrSoftError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
+        qCritical() << this->tr( "invalid task type \"%1\"" ).arg( static_cast<int>( this->task()->type()));
         return;
     }
 
@@ -146,7 +146,7 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
 void TaskWidget::toggleViewState( ViewState state ) {
     // failsafe
     if ( !this->hasTask()) {
-        Common::error( StrSoftError, this->tr( "task not set\n" ));
+        qCritical() << this->tr( "task not set" );
         return;
     }
 
@@ -183,7 +183,7 @@ void TaskWidget::toggleViewState( ViewState state ) {
         break;
 
     case NoState:
-        Common::error( StrSoftError, this->tr( "invalid view state\n" ));
+        qCritical() << this->tr( "invalid view state" );
         break;
     }
 }
@@ -198,10 +198,8 @@ void TaskWidget::saveLog() {
         return;
 
     // failsafe
-    if ( !this->hasTask() || !this->hasTeam()) {
-        Common::error( StrFatalError, this->tr( "task or team not set\n" ));
-        return;
-    }
+    if ( !this->hasTask() || !this->hasTeam())
+        qFatal( this->tr( "task or team not set" ).toUtf8().constData());
 
     // determine type
     if ( this->task()->type() == Task::Check ) {
@@ -211,10 +209,8 @@ void TaskWidget::saveLog() {
             value = false;
     } else if ( this->task()->type() == Task::Multi ) {
         value = this->multi->value();
-    } else {
-        Common::error( StrFatalError, this->tr( "invalid task type \"%1\"\n" ).arg( static_cast<int>( this->task()->type())));
-        return;
-    }
+    } else
+        qFatal( this->tr( "invalid task type \"%1\"" ).arg( static_cast<int>( this->task()->type())).toUtf8().constData());
 
     // set to zero
     if ( value <= 0 && this->hasLog()) {
@@ -281,7 +277,7 @@ void TaskWidget::saveLog() {
 TaskWidget::~TaskWidget() {
     // failsafe
     if ( !this->hasTask()) {
-        Common::error( StrSoftError, this->tr( "task not set\n" ));
+        qCritical() << this->tr( "task not set" );
         return;
     }
 
@@ -323,19 +319,19 @@ void TaskWidget::setLog( Log *log, bool fromDatabase ) {
 
     // failsafe
     if ( !this->hasTask()) {
-        Common::error( StrSoftError, this->tr( "task not set\n" ));
+        qCritical() << this->tr( "task not set" );
         return;
     }
 
     // failsafe
     if ( !this->hasLog()) {
-        Common::error( StrSoftError, this->tr( "log not set\n" ));
+        qCritical() << this->tr( "log not set" );
         return;
     }
 
     // failsafe
     if ( !this->hasTeam()) {
-        Common::error( StrSoftError, this->tr( "team not set\n" ));
+        qCritical() << this->tr( "team not set" );
         return;
     }
 
@@ -418,10 +414,8 @@ void TaskWidget::resetLog() {
     this->m_log = nullptr;
 
     // failsafe - this really should not happen
-    if ( !this->hasTask()) {
-        Common::error( StrFatalError, this->tr( "task not set\n" ));
-        return;
-    }
+    if ( !this->hasTask())
+        qFatal( this->tr( "task not set" ).toUtf8().constData());
 
     // reset values
     if ( this->task()->type() == Task::Check )
@@ -439,7 +433,7 @@ void TaskWidget::setTeam( Team *team ) {
 
     // failsafe
     if ( !this->hasTask() || !this->hasTeam()) {
-        Common::error( StrSoftError, this->tr( "task, team or log not set\n" ));
+        qCritical() << this->tr( "task, team or log not set" );
         return;
     }
 

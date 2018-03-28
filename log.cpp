@@ -64,7 +64,7 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4\n" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId ), Common::LogDebug );
+    qDebug() << QObject::tr( "adding a new log - taskId - %1; teamId - %2; value - %3; comboId - %4" ).arg( taskId ).arg( teamId ).arg( value ).arg( comboId );
 
     // avoid duplicates
     foreach ( log, Main::instance()->logList ) {
@@ -80,7 +80,7 @@ Log *Log::add( int taskId, int teamId, int value, int comboId ) {
     query.bindValue( ":comboId", comboId );
 
     if ( !query.exec()) {
-        Common::error( CLSoftError, QObject::tr( "could not add log, reason: %1\n" ).arg( query.lastError().text()));
+        qCritical() << QObject::tr( "could not add log, reason - \"%1\"" ).arg( query.lastError().text());
         return nullptr;
     }
 
@@ -110,7 +110,7 @@ void Log::loadLogs() {
     QSqlQuery query;
 
     // announce
-    Common::print( CLMsg + QObject::tr( "loading logs form database\n" ), Common::LogDebug );
+    qDebug() << QObject::tr( "loading logs form database" );
 
     // read all log entries
     query.exec( "select * from logs" );

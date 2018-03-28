@@ -73,7 +73,7 @@ void DatabaseEntry::setValue( const QString &name, const QVariant &value ) {
         query.bindValue( ":id", this->record().value( "id" ).toInt());
 
         if ( !query.exec()) {
-            Common::error( StrSoftError, this->tr( "could not store value, reason - \"%1\"\n" ).arg( query.lastError().text()));
+            qCritical() << this->tr( "could not store value, reason - \"%1\"" ).arg( query.lastError().text());
             return;
         }
     }
