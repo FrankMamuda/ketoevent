@@ -28,7 +28,6 @@ ICON = icon.icns
 
 SOURCES += main.cpp\
     taskwidget.cpp \
-    settingsvariable.cpp \
     variable.cpp \
     sort.cpp \
     combo.cpp \
@@ -55,7 +54,6 @@ SOURCES += main.cpp\
 HEADERS  += \
     main.h \
     taskwidget.h \
-    settingsvariable.h \
     cmd.h \
     team.h \
     task.h \
@@ -82,7 +80,8 @@ HEADERS  += \
     rankings.h \
     taskdialog.h \
     dialog.h \
-    tasklistmodel.h
+    tasklistmodel.h \
+    variableentry.h
 
 FORMS += \
     mainwindow.ui \

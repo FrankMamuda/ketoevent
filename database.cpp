@@ -154,7 +154,7 @@ void Database::attach( const QString &path, Import import ) {
         return;
     }
 
-    if ( query.exec( QString( "select * from merge.events where name=\"%1\"" ).arg( Event::active()->name()))) {
+    if ( query.exec( QString( "select * from merge.events where name=\"%1\"" ).arg( EventManager::instance()->active()->name()))) {
         while ( query.next())
             eventId = query.record().value( "id" ).toInt();
     } else {
@@ -164,7 +164,7 @@ void Database::attach( const QString &path, Import import ) {
 
     // failsafe
     if ( eventId < 1 ) {
-        qCritical() << QObject::tr( "database \"%1\" does not contain event \"%2\"" ).arg( dbInfo.fileName()).arg( Event::active()->name());
+        qCritical() << QObject::tr( "database \"%1\" does not contain event \"%2\"" ).arg( dbInfo.fileName()).arg( EventManager::instance()->active()->name());
         goto removeDB;
     }
 
@@ -197,7 +197,7 @@ void Database::attach( const QString &path, Import import ) {
 
     // update connections
     if ( import == TaskImport ) {
-        query.exec( QString( "update merge.tasks set eventId=%1" ).arg( Event::active()->id()));
+        query.exec( QString( "update merge.tasks set eventId=%1" ).arg( EventManager::instance()->active()->id()));
         query.exec( "drop table merge.events" );
         query.exec( "drop table merge.logs" );
         query.exec( "drop table merge.teams" );
@@ -205,7 +205,7 @@ void Database::attach( const QString &path, Import import ) {
     }
 
     if ( import == LogImport ) {
-        query.exec( QString( "update merge.teams set eventId=%1" ).arg( Event::active()->id()));
+        query.exec( QString( "update merge.teams set eventId=%1" ).arg( EventManager::instance()->active()->id()));
         query.exec( "update merge.teams set id=-id" );
         query.exec( QString( "update merge.teams set id=%1-id" ).arg( Database::highestId( TeamId )));
         query.exec( "update merge.logs set id=-id" );

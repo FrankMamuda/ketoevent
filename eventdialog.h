@@ -46,8 +46,6 @@ public slots:
     void fillEvents();
 
 private slots:
-    void bindVars();
-    void on_buttonClose_clicked();
     void on_eventCombo_currentIndexChanged( int index );
     void validate();
     void on_actionAddEvent_triggered();
@@ -60,5 +58,6 @@ private slots:
 
 private:
     Ui::EventDialog *ui;
+    QStringList variables;
 };
 

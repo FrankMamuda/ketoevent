@@ -277,7 +277,7 @@ void TaskDialog::findTask() {
         index = this->taskModel->index( y, 0 );
         // list must be the same as in App_Main, don't match by display role
         if ( index.isValid()) {
-            if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+            if ( EventManager::instance()->active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                 match = true;
                 this->setCurrentMatch( y );
                 break;
@@ -291,7 +291,7 @@ void TaskDialog::findTask() {
             index = this->taskModel->index( y, 0 );
             if ( index.isValid()) {
                 // list must be the same as in App_Main, don't match by display role
-                if ( Event::active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
+                if ( EventManager::instance()->active()->taskList.at( index.row())->name().contains( matchString, Qt::CaseInsensitive )) {
                     match = true;
                     this->setCurrentMatch( y );
                     break;
@@ -379,30 +379,30 @@ void TaskDialog::move( MoveDirection direction ) {
     if ( task == nullptr )
         return;
 
-    y = Event::active()->taskList.indexOf( task );
+    y = EventManager::instance()->active()->taskList.indexOf( task );
 
     if ( direction == Up && y != 0 ) {
         k = y - 1;
 
         // move in database
-        t0 = Event::active()->taskList.at( y )->order();
-        t1 = Event::active()->taskList.at( k )->order();
-        Event::active()->taskList.at( y )->setOrder( t1 );
-        Event::active()->taskList.at( k )->setOrder( t0 );
+        t0 = EventManager::instance()->active()->taskList.at( y )->order();
+        t1 = EventManager::instance()->active()->taskList.at( k )->order();
+        EventManager::instance()->active()->taskList.at( y )->setOrder( t1 );
+        EventManager::instance()->active()->taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        Event::active()->taskList.move( y, k );
-    } else if ( direction == Down && y != Event::active()->taskList.count() - 1 ) {
+        EventManager::instance()->active()->taskList.move( y, k );
+    } else if ( direction == Down && y != EventManager::instance()->active()->taskList.count() - 1 ) {
         k = y + 1;
 
         // move in database
-        t0 = Event::active()->taskList.at( y )->order();
-        t1 = Event::active()->taskList.at( k )->order();
-        Event::active()->taskList.at( y )->setOrder( t1 );
-        Event::active()->taskList.at( k )->setOrder( t0 );
+        t0 = EventManager::instance()->active()->taskList.at( y )->order();
+        t1 = EventManager::instance()->active()->taskList.at( k )->order();
+        EventManager::instance()->active()->taskList.at( y )->setOrder( t1 );
+        EventManager::instance()->active()->taskList.at( k )->setOrder( t0 );
 
         // move in memory
-        Event::active()->taskList.move( y, k );
+        EventManager::instance()->active()->taskList.move( y, k );
     }
 
     // end reset
@@ -435,7 +435,7 @@ void TaskDialog::on_actionRemove_triggered() {
 
     // remove from internal list (both base and current event - there should be
     //   no mismatches, since eventId differs for tasks)
-    Event::active()->taskList.removeOne( task );
+    EventManager::instance()->active()->taskList.removeOne( task );
     Main::instance()->taskList.removeOne( task );
 
     // remove from database
@@ -443,7 +443,7 @@ void TaskDialog::on_actionRemove_triggered() {
 
     // database reindexing must be performed, however this is done in-memory,
     // actual changes are written to disk only when requested
-    foreach ( Task *reorderPtr, Event::active()->taskList ) {
+    foreach ( Task *reorderPtr, EventManager::instance()->active()->taskList ) {
         reorderPtr->setOrder( y );
         y++;
     }
@@ -468,7 +468,7 @@ void TaskDialog::on_actionSort_triggered() {
     Main::instance()->sort( Main::Tasks );
 
     // reindex whole list
-    foreach ( Task *task, Event::active()->taskList ) {
+    foreach ( Task *task, EventManager::instance()->active()->taskList ) {
         task->setOrder( y );
         y++;
     }
@@ -508,13 +508,13 @@ void TaskDialog::changeUpDownState( const QModelIndex &index ) {
         return;
     }
 
-    if ( Event::active()->taskList.count() > 1 && index.row() == 0 ) {
+    if ( EventManager::instance()->active()->taskList.count() > 1 && index.row() == 0 ) {
         this->ui->actionMoveUp->setDisabled( true );
         this->ui->actionMoveDown->setEnabled( true );
         return;
     }
 
-    if ( index.row() > 0 && index.row() == Event::active()->taskList.count() - 1 ) {
+    if ( index.row() > 0 && index.row() == EventManager::instance()->active()->taskList.count() - 1 ) {
         this->ui->actionMoveUp->setEnabled( true );
         this->ui->actionMoveDown->setDisabled( true );
         return;

@@ -33,48 +33,29 @@
 Settings::Settings( QWidget *parent ) : Dialog( parent ), ui( new Ui::Settings ) {
     this->ui->setupUi( this );
 
-    if ( Main::instance()->isInitialised())
-        this->bindVars();
-    else
+    if ( Main::instance()->isInitialised()) {
+        this->variables << Variable::instance()->bind( "backup/changes", this->ui->backupChanges );
+        this->variables << Variable::instance()->bind( "backup/perform", this->ui->backupPerform );
+        this->variables << Variable::instance()->bind( "misc/sortTasks", this->ui->sort );
+        this->variables << Variable::instance()->bind( "misc/hilightLogged", this->ui->hilightEntries );
+        this->variables << Variable::instance()->bind( "databasePath", this->ui->dbPath );
+        this->variables << Variable::instance()->bind( "reviewerName", this->ui->rvName );
+    } else
         this->onRejected();
+
+    this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->onAccepted(); } );
 }
 
 /**
  * @brief Settings::~Settings
  */
 Settings::~Settings() {
-    this->unbindVars();
-    delete ui;
-}
+    foreach ( const QString &key, this->variables )
+        Variable::instance()->unbind( key );
 
-/**
- * @brief Settings::bindVars
- */
-void Settings::bindVars() {
-    // lock vars
-    this->lockVariables();
-
-    // bind vars
-    this->bindVariable( "backup/changes", this->ui->backupChanges );
-    this->bindVariable( "backup/perform", this->ui->backupPerform );
-    this->bindVariable( "misc/sortTasks", this->ui->sort );
-    this->bindVariable( "misc/hilightLogged", this->ui->hilightEntries );
-    this->bindVariable( "databasePath", this->ui->dbPath );
-    this->bindVariable( "reviewerName", this->ui->rvName );
-
-    // unlock vars
-    this->lockVariables( false );
-}
-
-/**
- * @brief Settings::on_backupPerform_stateChanged
- * @param state
- */
-void Settings::on_backupPerform_stateChanged( int state ) {
-    if ( state == Qt::Checked )
-        this->ui->backupChanges->setEnabled( true );
-    else
-        this->ui->backupChanges->setDisabled( true );
+    this->variables.clear();
+    this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
+    delete this->ui;
 }
 
 /**
@@ -117,11 +98,4 @@ void Settings::on_pathButton_clicked() {
     mainWindow = qobject_cast<MainWindow*>( this->parent());
     if ( mainWindow != nullptr )
         mainWindow->initialise( true );
-}
-
-/**
- * @brief Settings::on_closeButton_clicked
- */
-void Settings::on_closeButton_clicked() {
-    this->onAccepted();
 }

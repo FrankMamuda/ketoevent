@@ -129,14 +129,13 @@ bool Event::loadEvents() {
 
     // fixes crash on empty database
     Event *event = Event::forId( Variable::instance()->integer( "currentEvent" ));
-    if ( event == nullptr )
+    if ( event == nullptr && Main::instance()->eventList.isEmpty()) {
         if ( Main::instance()->eventList.isEmpty())
             qFatal( QObject::tr( "no valid events and/or corrupted database" ).toUtf8().constData());
-
-        event = Main::instance()->eventList.first();
-
-    if ( !Event::setActive( event ))
-        Event::setActive( Main::instance()->eventList.first());
+    }
+    event = Main::instance()->eventList.first();
+    if ( !EventManager::instance()->setActive( event ))
+        EventManager::instance()->setActive( Main::instance()->eventList.first());
 
     return true;
 }
@@ -145,11 +144,11 @@ bool Event::loadEvents() {
  * @brief Event::active returns currently active event
  * @return current event entry
  */
-Event *Event::active() {
-    if ( Main::instance()->activeEvent == nullptr )
+Event *EventManager::active() {
+    if ( this->activeEvent == nullptr )
         qFatal( QObject::tr( "no valid events" ).toUtf8().constData());
 
-    return Main::instance()->activeEvent;
+    return this->activeEvent;
 }
 
 /**
@@ -157,14 +156,19 @@ Event *Event::active() {
  * @param event event entry
  * @return success
  */
-bool Event::setActive( Event *event ) {
+bool EventManager::setActive( Event *event ) {
+    if ( event == nullptr )
+        return false;
+
     // announce
     qDebug() << QObject::tr( "setting '%1' as active event" ).arg( event->name());
 
     foreach ( Event *entry, Main::instance()->eventList ) {
         if ( entry == event ) {
-            Main::instance()->activeEvent = entry;
+            this->activeEvent = entry;
             Variable::instance()->setValue( "currentEvent", event->id());
+            Event::buildTTList();
+            emit this->activeEventChanged();
             return true;
         }
     }
@@ -213,4 +217,32 @@ void Event::buildTTList() {
 
     // reset model
     Main::instance()->teamModel->endReset();
+}
+
+/**
+ * @brief EventVariable::value
+ * @return
+ */
+EventVariable::EventVariable( const QString &key, const QVariant &defaultValue, Var::Flags flags ) : Var( key, defaultValue, flags ) {
+    Main::instance()->connect( EventManager::instance(), &EventManager::activeEventChanged, [ key ]() { Variable::instance()->update( key ); } );
+}
+
+/**
+ * @brief EventVariable::value
+ * @return
+ */
+QVariant EventVariable::value() const {
+    if ( EventManager::instance()->active() != nullptr )
+        return EventManager::instance()->active()->record().value( this->key());
+
+    return QVariant();
+}
+
+/**
+ * @brief EventVariable::setValue
+ * @param value
+ */
+void EventVariable::setValue( const QVariant &value ) {    
+    if ( EventManager::instance()->active() != nullptr )
+        return EventManager::instance()->active()->setValue( this->key(), value );
 }

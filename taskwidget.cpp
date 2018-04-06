@@ -30,13 +30,8 @@
  * @brief TaskWidget::TaskWidget
  * @param parentPtr
  */
-TaskWidget::TaskWidget( Task *parentPtr ) {
+TaskWidget::TaskWidget( Task *parentPtr ) : check( nullptr ), multi( nullptr ), m_log( nullptr ) {
     QFont font;
-
-    // reset widgets
-    this->m_log = nullptr;
-    this->check = nullptr;
-    this->multi = nullptr;
 
     // set task
     this->setTask( parentPtr );
@@ -63,9 +58,9 @@ TaskWidget::TaskWidget( Task *parentPtr ) {
     this->info->setMaximumWidth( 32 );
     this->info->setFlat( true );
 
-    if ( !this->task()->description().isEmpty()) {
+    if ( !this->task()->description().isEmpty())
         this->taskLayout->addWidget( this->info );
-    }
+
     this->connect( this->info, SIGNAL( clicked( bool )), this, SLOT( displayInfo()));
 #endif
 

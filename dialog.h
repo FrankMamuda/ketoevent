@@ -22,7 +22,6 @@
 // includes
 //
 #include <QDialog>
-#include "settingsvariable.h"
 #include "main.h"
 #include <QMainWindow>
 
@@ -35,12 +34,10 @@
  */
 class Dialog : public QMainWindow {
     Q_OBJECT
-    Q_PROPERTY( bool variablesLocked READ variablesLocked WRITE lockVariables )
     Q_CLASSINFO( "description", "Settings base class" )
 
 public:
     Dialog( QWidget *parent ) : QMainWindow( parent ) { this->setWindowModality( Qt::ApplicationModal ); }
-    bool variablesLocked() const { return this->m_variablesLocked; }
     enum CloseSignals {
         Accepted = 0,
         Rejected = 1,
@@ -51,23 +48,9 @@ protected:
     void closeEvent( QCloseEvent *ePtr ) { QMainWindow::closeEvent( ePtr ); emit this->closeSignal( Closed ); }
 
 public slots:
-    void lockVariables( bool lock = true ) { this->m_variablesLocked = lock; }
-    void unbindVars() { if ( !Main::instance()->isInitialised()) return; foreach ( SettingsVariable* svar, this->svars ) svar->unbind(); svars.clear(); }
-    void bindVariable( const QString &key, QObject *object ) {
-        SettingsVariable *svar = SettingsVariable::find( key );
-        if ( svar != nullptr ) {
-            this->svars << svar;
-            svar->bind( object, qobject_cast<QObject*>( this ));
-        }
-    }
-    void updateVars() { foreach ( SettingsVariable *svar, this->svars ) svar->setState(); }
     void onAccepted() { this->hide(); emit this->closeSignal( Accepted ); }
     void onRejected() { this->hide(); emit this->closeSignal( Rejected ); }
 
 signals:
     void closeSignal( int );
-
-private:
-    bool m_variablesLocked;
-    QList <SettingsVariable*> svars;
 };

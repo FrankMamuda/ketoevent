@@ -131,14 +131,14 @@ void Cmd::listCvars() {
     if ( !Variable::instance()->list.isEmpty())
         qWarning() << QString( "%1 available console variables:" ).arg( Variable::instance()->list.count());
 
-    foreach ( VariableEntry entry, Variable::instance()->list ) {
-        if ( !QString::compare( entry.key(), "system/consoleHistory" ))
+    foreach ( QSharedPointer<Var> entry, Variable::instance()->list ) {
+        if ( entry->flags() & Var::Hidden )
             continue;
 
-        if ( QString::compare( entry.defaultValue().toString(), entry.value().toString(), Qt::CaseInsensitive ))
-            qInfo() << QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( entry.key()).arg( entry.value().toString()).arg( entry.defaultValue().toString());
+        if ( QString::compare( entry->defaultValue().toString(), entry->value().toString(), Qt::CaseInsensitive ))
+            qInfo() << QString( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( entry->key()).arg( entry->value().toString()).arg( entry->defaultValue().toString());
         else
-            qInfo() << QString( "  \"%1\" is \"%2\"" ).arg( entry.key()).arg( entry.value().toString());
+            qInfo() << QString( "  \"%1\" is \"%2\"" ).arg( entry->key()).arg( entry->value().toString());
     }
 }
 
@@ -153,14 +153,19 @@ void Cmd::cvarSet( const QString &name, const QStringList &args ) {
     }
 
     // NOTE: this is case sensitive
-    if ( Variable::instance()->contains( args.first())) {
+    if ( !Variable::instance()->contains( args.first())) {
         qInfo() << QString( "no such cvar - \"%1\"" ).arg( args.first());
     } else {
-        VariableEntry entry;
+        QSharedPointer<Var> entry;
 
         entry = Variable::instance()->list[args.first()];
-        qInfo() << QString( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 )).arg( entry.key());
-        Variable::instance()->setValue( entry.key(), args.at( 1 ));
+        if ( entry->flags() & Var::ReadOnly ) {
+            qInfo() << QString( "\"%1\" is read only" ).arg( entry->key());
+            return;
+        }
+
+        qInfo() << QString( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 )).arg( entry->key());
+        Variable::instance()->setValue( entry->key(), args.at( 1 ));
     }
 }
 
@@ -174,9 +179,9 @@ void Cmd::dbInfo() {
     // print out memory contents
     qInfo() << QString( "MEMORY: events - %1, teams - %2 (%3), tasks - %4 (%5), logs - %6" )
                    .arg( Main::instance()->eventList.count())
-                   .arg( Event::active()->teamList.count())
+                   .arg( EventManager::instance()->active()->teamList.count())
                    .arg( Main::instance()->teamList.count())
-                   .arg( Event::active()->taskList.count())
+                   .arg( EventManager::instance()->active()->taskList.count())
                    .arg( Main::instance()->taskList.count())
                    .arg( Main::instance()->logList.count());
 
@@ -204,7 +209,7 @@ void Cmd::dbInfo() {
 void Cmd::clearLogs() {
     QSqlQuery query;
 
-    foreach ( Team *team, Event::active()->teamList ) {
+    foreach ( Team *team, EventManager::instance()->active()->teamList ) {
         foreach ( Log *log, team->logList ) {
             log->setValue( 0 );
             query.exec( QString( "delete from logs where value=%1" ).arg( log->id()));
@@ -216,7 +221,7 @@ void Cmd::clearLogs() {
  * @brief Cmd::clearCombos clears ALL combos
  */
 void Cmd::clearCombos() {
-    foreach ( Team *team, Event::active()->teamList ) {
+    foreach ( Team *team, EventManager::instance()->active()->teamList ) {
         foreach ( Log *log, team->logList )
             log->setComboId( -1 );
     }
@@ -231,7 +236,7 @@ void Cmd::teamAdd( const QString &name, const QStringList &args ) {
         qWarning() << this->tr( "usage: %1 [name] [members] - add a new team to the current event" ).arg( name );
         return;
     }
-    Team::add( args.at( 0 ), args.at( 1 ).toInt(), Event::active()->startTime(), Variable::instance()->string( "reviewerName" ), false );
+    Team::add( args.at( 0 ), args.at( 1 ).toInt(), EventManager::instance()->active()->startTime(), Variable::instance()->string( "reviewerName" ), false );
 }
 
 /**
@@ -244,7 +249,7 @@ void Cmd::teamRemove( const QString &name, const QStringList &args ) {
         return;
     }
 
-    if ( Event::active()->teamList.indexOf( Team::forName( args.at( 0 ))) != -1 )
+    if ( EventManager::instance()->active()->teamList.indexOf( Team::forName( args.at( 0 ))) != -1 )
         Team::remove( args.at( 0 ));
 }
 
@@ -260,7 +265,7 @@ void Cmd::teamLogs( const QString &name, const QStringList &args ) {
 
     Team *team = Team::forName( args.at( 0 ));
     int count = 0;
-    if ( Event::active()->teamList.indexOf( team ) != -1 ) {
+    if ( EventManager::instance()->active()->teamList.indexOf( team ) != -1 ) {
         foreach ( Log *log, Main::instance()->logList ) {
             if ( log->teamId() == team->id())
                 count++;
@@ -301,7 +306,7 @@ void Cmd::stressTest( const QString &name, const QStringList &args ) {
     }
 
     if ( !QString::compare( args.first(), "combos" )) {
-        foreach ( Team *team, Event::active()->teamList ) {
+        foreach ( Team *team, EventManager::instance()->active()->teamList ) {
             int numLogs = 0;
 
             foreach ( Log *log, team->logList ) {
@@ -371,7 +376,7 @@ bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
 
     // find the cvar
     if ( Variable::instance()->contains( name )) {
-        VariableEntry entry;
+        QSharedPointer<Var> entry;
 
         entry = Variable::instance()->list[name];
         if ( args.count() >= 1 ) {
@@ -380,7 +385,7 @@ bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
             cvCmd << args;
             this->cvarSet( name, cvCmd );
         } else
-            qInfo() << QString( "%1" ).arg( entry.value().toString());
+            qInfo() << QString( "%1" ).arg( entry->value().toString());
 
         return true;
     }

@@ -39,12 +39,12 @@ Team::Team( const QSqlRecord &record, const QString &table ) {
     this->setCombosCalculated( false );
 
     // failsafe members (min)
-    if ( this->members() < Event::active()->minMembers())
-        this->setMembers( Event::active()->minMembers());
+    if ( this->members() < EventManager::instance()->active()->minMembers())
+        this->setMembers( EventManager::instance()->active()->minMembers());
 
     // failsafe members (max)
-    if ( this->members() > Event::active()->maxMembers())
-        this->setMembers( Event::active()->maxMembers());
+    if ( this->members() > EventManager::instance()->active()->maxMembers())
+        this->setMembers( EventManager::instance()->active()->maxMembers());
 
     // perform updates
     this->connect( this, SIGNAL( changed()), Main::instance(), SLOT( update()));
@@ -86,11 +86,11 @@ void Team::addComboPoints( int &counter ) {
         this->m_combos++;
 
     if ( counter == 2 )
-        this->m_bonus += Event::active()->comboOfTwo();
+        this->m_bonus += EventManager::instance()->active()->comboOfTwo();
     else if ( counter == 3 )
-        this->m_bonus += Event::active()->comboOfThree();
+        this->m_bonus += EventManager::instance()->active()->comboOfThree();
     else if ( counter >= 4 )
-        this->m_bonus += Event::active()->comboOfFourAndMore();
+        this->m_bonus += EventManager::instance()->active()->comboOfFourAndMore();
 
     counter = 0;
 }
@@ -137,7 +137,7 @@ void Team::calculateCombos() {
  * @return
  */
 int Team::timeOnTrack() const {
-    return Event::active()->startTime().secsTo( this->finishTime()) / 60;
+    return EventManager::instance()->active()->startTime().secsTo( this->finishTime()) / 60;
 }
 
 /**
@@ -145,9 +145,9 @@ int Team::timeOnTrack() const {
  * @return
  */
 int Team::penalty() const {
-    int overTime = Event::active()->finishTime().secsTo( this->finishTime()) / 60 + 1;
+    int overTime = EventManager::instance()->active()->finishTime().secsTo( this->finishTime()) / 60 + 1;
     if ( overTime > 0 )
-        return overTime * Event::active()->penalty();
+        return overTime * EventManager::instance()->active()->penalty();
 
     return 0;
 }
@@ -157,7 +157,7 @@ int Team::penalty() const {
  * @return
  */
 bool Team::disqualified() const {
-    if (( Event::active()->finalTime().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
+    if (( EventManager::instance()->active()->finalTime().secsTo( this->finishTime()) / 60 + 1 ) > 0 )
         return true;
 
     return false;
@@ -204,7 +204,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
     query.bindValue( ":finishTime", finishTime.toString( "hh:mm" ));
     query.bindValue( ":lock",  static_cast<int>( lockState ));
     query.bindValue( ":reviewer", reviewerName );
-    query.bindValue( ":eventId", Event::active()->id());
+    query.bindValue( ":eventId", EventManager::instance()->active()->id());
 
     if ( !query.exec()) {
         qCritical() << QObject::tr( "could not add team, reason - \"%1\"" ).arg( query.lastError().text());
@@ -219,7 +219,7 @@ void Team::add( const QString &teamName, int members, QTime finishTime, const QS
         Main::instance()->teamList << new Team( query.record(), "teams" );
 
     // add to event
-    Event::active()->teamList << Main::instance()->teamList.last();
+    EventManager::instance()->active()->teamList << Main::instance()->teamList.last();
 
     // reset model
     Main::instance()->teamModel->endReset();
@@ -261,7 +261,7 @@ void Team::remove( const QString &teamName ) {
 
     // remove from display
     Main::instance()->teamList.removeAll( team );
-    Event::active()->teamList.removeAll( team );
+    EventManager::instance()->active()->teamList.removeAll( team );
 
     // reset model
     Main::instance()->teamModel->endReset();
@@ -298,7 +298,7 @@ void Team::loadTeams() {
 Team *Team::forName( const QString &name, bool currentEvent ) {
     QList <Team*> teamList;
 
-    teamList = currentEvent ? Event::active()->teamList : Main::instance()->teamList;
+    teamList = currentEvent ? EventManager::instance()->active()->teamList : Main::instance()->teamList;
     foreach ( Team *team, teamList ) {
         if ( !QString::compare( name, team->name()))
             return team;

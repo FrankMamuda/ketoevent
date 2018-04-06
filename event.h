@@ -25,16 +25,31 @@
 #include "team.h"
 #include "database.h"
 #include <QTime>
+#include "singleton.h"
+#include "variableentry.h"
 
+//
+// classes
+//
 class Team;
 class Task;
+
+/**
+ * @brief The VariableEntry class
+ */
+class EventVariable : public Var {
+public:
+    EventVariable( const QString &key = QString(), const QVariant &defaultValue = QVariant(), Flags flags = Var::NoFlags );
+    QVariant value() const override;
+    void setValue( const QVariant &value ) override;
+    QSharedPointer<Var> copy() const override { return QSharedPointer<EventVariable>( new EventVariable( *this )); }
+};
 
 /**
  * @brief The Event class
  */
 class Event : public DatabaseEntry {
-    friend class Main;
-
+    Q_OBJECT
     Q_PROPERTY( QString name READ name WRITE setName )
     Q_PROPERTY( int minMembers READ minMembers WRITE setMinMembers )
     Q_PROPERTY( int maxMembers READ maxMembers WRITE setMaxMembers )
@@ -65,10 +80,8 @@ public:
     QList <Task*> taskList;
 
     // static functions
-    static Event *active();
     static Event *forId( int id );
     static void add( const QString &title = QString());
-    static bool setActive( Event *event );
     static void buildTTList();
     static bool loadEvents();
 
@@ -84,7 +97,25 @@ public slots:
     void setStartTime( QTime time ) { this->setValue( "startTime", time.toString( "hh:mm" )); }
     void setFinishTime( QTime time ) { this->setValue( "finishTime", time.toString( "hh:mm" )); }
     void setFinalTime( QTime time ) { this->setValue( "setFinalTime", time.toString( "hh:mm" )); }
+};
+
+/**
+ * @brief The XMLTools class
+ */
+class EventManager : public QObject {
+    Q_OBJECT
+
+public:
+    ~EventManager() {}
+    static EventManager *instance() { return Singleton<EventManager>::instance( EventManager::createInstance ); }
+    Event *active();
+    bool setActive( Event *event );
+    Event *activeEvent;
+
+signals:
+    void activeEventChanged();
 
 private:
-    //static Event *activeEvent;
+    EventManager( QObject *parent = nullptr ) : QObject( parent ), activeEvent( nullptr ) {}
+    static EventManager *createInstance() { return new EventManager(); }
 };

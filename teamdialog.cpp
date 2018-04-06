@@ -37,9 +37,9 @@ TeamDialog::TeamDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::TeamDi
     // set up view
     this->ui->teamList->setModel( Main::instance()->teamModel );
     this->ui->teamList->setAlternatingRowColors( true );
-    this->ui->finishTimeEdit->setMinimumTime( Event::active()->startTime());
-    this->ui->teamMembersEdit->setMinimum( Event::active()->minMembers());
-    this->ui->teamMembersEdit->setMaximum( Event::active()->maxMembers());
+    this->ui->finishTimeEdit->setMinimumTime( EventManager::instance()->active()->startTime());
+    this->ui->teamMembersEdit->setMinimum( EventManager::instance()->active()->minMembers());
+    this->ui->teamMembersEdit->setMaximum( EventManager::instance()->active()->maxMembers());
 
     // hide add/edit widget
     this->toggleAddEditWidget( NoState );
@@ -103,8 +103,8 @@ void TeamDialog::toggleAddEditWidget( AddEditState state ) {
         case AddQuick:
         {
             this->ui->teamNameEdit->clear();
-            this->ui->finishTimeEdit->setTime( Event::active()->finishTime().addSecs( -60 ));
-            this->ui->teamMembersEdit->setValue( Event::active()->minMembers());
+            this->ui->finishTimeEdit->setTime( EventManager::instance()->active()->finishTime().addSecs( -60 ));
+            this->ui->teamMembersEdit->setValue( EventManager::instance()->active()->minMembers());
             this->ui->addEditWidget->setWindowTitle( this->tr( "Add team" ));
             this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
 
@@ -248,8 +248,8 @@ void TeamDialog::closeEvent( QCloseEvent *closeEvent ) {
 
     mainWindow = qobject_cast<MainWindow*>( this->parent());
     if ( mainWindow != nullptr ) {
-        if ( quick && !Event::active()->teamList.isEmpty())
-            mainWindow->selectTeam( Event::active()->teamList.last()->id());
+        if ( quick && !EventManager::instance()->active()->teamList.isEmpty())
+            mainWindow->selectTeam( EventManager::instance()->active()->teamList.last()->id());
         else
             mainWindow->selectTeam();
     }

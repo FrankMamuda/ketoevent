@@ -86,7 +86,6 @@ private slots:
     void fillHeader();
     void currentTeamToggled();
     void clearData();
-    void bindVars();
     void on_closeButton_clicked();
     void on_actionExport_triggered();
     void on_actionRefresh_triggered();
@@ -97,4 +96,5 @@ private:
     QStringList columnHeaders;
     QStandardItemModel *modelPtr;
     RankingsSortModel *proxyModel;
+    QStringList variables;
 };

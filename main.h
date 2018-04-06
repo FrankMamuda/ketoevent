@@ -29,7 +29,6 @@
 #include "combo.h"
 #include "event.h"
 #include "variable.h"
-#include "settingsvariable.h"
 #include "console.h"
 #include "database.h"
 #include "singleton.h"
@@ -95,12 +94,10 @@ public:
     QList <Event*> eventList;
     QList <Task*>  taskListSorted();
     QList <Team*>  teamListSorted();
-    QList <SettingsVariable*> svarList;
 
     // misc
     QString transliterate( const QString &path ) const;
     bool isInitialised() const { return this->m_init; }
-    Event *activeEvent;
 
     // mem debug
 #ifdef APPLET_DEBUG
@@ -114,6 +111,9 @@ public:
     static Main *instance() { return Singleton<Main>::instance( Main::createInstance ); }
 
     TeamListModel *teamModel;
+
+signals:
+    void activeEventChanged();
 
 public slots:
     // init/shutdown

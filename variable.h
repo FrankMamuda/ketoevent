@@ -22,27 +22,21 @@
 // includes
 //
 #include <QMap>
-#include <QVariant>
 #include <QString>
 #include <QMetaMethod>
+#include <QSignalMapper>
+#include <QLoggingCategory>
+#include <QWidget>
+#include "event.h"
 #include "singleton.h"
+#include "variableentry.h"
 
 /**
- * @brief The VariableEntry class
+ * @brief The VariableDebug namespace
  */
-class VariableEntry {
-public:
-    VariableEntry( const QString &key = QString(), const QVariant &defaultValue = QVariant()) : m_key( key ), m_value( defaultValue ), m_defaultValue( defaultValue ) {}
-    QString key() const { return this->m_key; }
-    QVariant value() const { return this->m_value; }
-    QVariant defaultValue() const { return this->m_defaultValue; }
-    void setValue( const QVariant &value ) { m_value = value; }
-
-private:
-    QString m_key;
-    QVariant m_value;
-    QVariant m_defaultValue;
-};
+namespace VariableDebug {
+    const static QLoggingCategory category( "variable" );
+}
 
 /**
  * @brief The Variable class
@@ -51,12 +45,15 @@ class Variable : public QObject {
     Q_OBJECT
 
 public:
-    ~Variable() {}
+    ~Variable();
     static Variable *instance() { return Singleton<Variable>::instance( Variable::createInstance ); }
     bool contains( const QString &key ) const { return this->list.contains( key ); }
 
+    // eventually move this to private
+    QMap<QString, QSharedPointer<Var>> list;
+
     template<typename T>
-    T value( const QString &key, bool defaultValue = false ) { if ( defaultValue ) return qvariant_cast<T>( this->list[key].defaultValue()); return qvariant_cast<T>( this->list[key].value()); }
+    T value( const QString &key, bool defaultValue = false ) { if ( !this->contains( key )) return QVariant().value<T>(); if ( defaultValue ) return qvariant_cast<T>( this->list[key]->defaultValue()); return qvariant_cast<T>( this->list[key]->value()); }
     int integer( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<int>( key, defaultValue ); }
     qreal decimalValue( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<qreal>( key, defaultValue ); }
     bool isEnabled( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<bool>( key, defaultValue ); }
@@ -77,42 +74,58 @@ public:
     void setValue( const QString &key, const T &value, bool initial = false ) {
         if ( initial ) {
             // initial read from configuration file
-            Variable::instance()->list[key].setValue( value );
+            Variable::instance()->list[key]->setValue( value );
         } else {
             QVariant currentValue;
 
             if ( !Variable::instance()->contains( key ))
                 return;
 
-            currentValue = Variable::instance()->list[key].value();
+            currentValue = Variable::instance()->list[key]->value();
 
             // any subsequent value changes emit a valueChanged signal
             if ( value != currentValue ) {
-                Variable::instance()->list[key].setValue( value );
+                Variable::instance()->list[key]->setValue( value );
                 emit valueChanged( key );
                 Variable::instance()->updateConnections( key, value );
             }
         }
     }
 
+    template<typename T>
+    void add( const QString &key, const T &value, Var::Flags flags = Var::NoFlags ) {
+        this->add<Var,T>( key, value, flags );
+    }
+
+    template<class Container, typename T>
+    void add( const QString &key, const T &value, Var::Flags flags = Var::NoFlags ) {
+        if ( !Variable::instance()->list.contains( key ) && !key.isEmpty())
+            Variable::instance()->list[key] = Container( key, QVariant( value ), flags ).copy();
+    }
+
+public slots:
     void setInteger( const QString &key, int value ) { Variable::instance()->setValue<int>( key, value ); }
     void setDecimalValue( const QString &key, qreal value ) { Variable::instance()->setValue<qreal>( key, value ); }
     void enable( const QString &key ) { Variable::instance()->setValue<bool>( key, true ); }
     void disable( const QString &key ) { Variable::instance()->setValue<bool>( key, false ); }
     void setString( const QString &key, const QString &string ) { Variable::instance()->setValue<QString>( key, string ); }
-
-    template<typename T>
-    void add( const QString &key, const T &value ) { if ( !Variable::instance()->list.contains( key ) && !key.isEmpty()) Variable::instance()->list[key] = VariableEntry( key, QVariant( value )); }
     void reset( const QString &key ) { if ( Variable::instance()->contains( key )) Variable::instance()->setValue<QVariant>( key, Variable::instance()->value<QVariant>( key, true )); }
-
-    QMap<QString, VariableEntry> list;
-    QMap<QString, QPair<QObject*, int> > slotList;
     void bind( const QString &key, const QObject *receiver, const char *method );
+    QString bind( const QString &key, QObject *object );
+    QString bind( const QString &key, QWidget *widget ) { return this->bind( key, qobject_cast<QObject*>( widget )); }
+    void unbind( const QString &key );
+    void update( const QString &key ) { emit this->valueChanged( key ); }
 
 signals:
     void valueChanged( const QString &key );
 
+private slots:
+    void setBoundValue( const QString &key, bool internal );
+
 private:
-    explicit Variable() {}
+    explicit Variable();
     static Variable *createInstance() { return new Variable(); }
+    QMap<QString, QObject*>boundVariables;
+    QSignalMapper *signalMapper;
+    QMap<QString, QPair<QObject*, int> > slotList;
 };

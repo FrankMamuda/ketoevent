@@ -198,28 +198,28 @@ void Main::sort( ListTypes type ) {
         QList <Task*>boldList;
         QList <Task*>italicList;
 
-        foreach ( Task *task, Event::active()->taskList ) {
+        foreach ( Task *task, EventManager::instance()->active()->taskList ) {
             if ( task->style() == Task::Regular )
                 regularList << task;
         }
         qSort( regularList.begin(), regularList.end(), listToAscending<Task> );
 
-        foreach ( Task *task, Event::active()->taskList ) {
+        foreach ( Task *task, EventManager::instance()->active()->taskList ) {
             if ( task->style() == Task::Bold )
                 boldList << task;
         }
         qSort( boldList.begin(), boldList.end(), listToAscending<Task> );
 
-        foreach ( Task *task, Event::active()->taskList ) {
+        foreach ( Task *task, EventManager::instance()->active()->taskList ) {
             if ( task->style() == Task::Italic )
                 italicList << task;
         }
         qSort( italicList.begin(), italicList.end(), listToAscending<Task> );
 
-        Event::active()->taskList.clear();
-        Event::active()->taskList.append( regularList );
-        Event::active()->taskList.append( boldList );
-        Event::active()->taskList.append( italicList );
+        EventManager::instance()->active()->taskList.clear();
+        EventManager::instance()->active()->taskList.append( regularList );
+        EventManager::instance()->active()->taskList.append( boldList );
+        EventManager::instance()->active()->taskList.append( italicList );
 
         // clean up
         regularList.clear();
@@ -229,7 +229,7 @@ void Main::sort( ListTypes type ) {
         break;
 
     case Teams:
-        qSort( Event::active()->teamList.begin(), Event::active()->teamList.end(), listToAscending<Team> );
+        qSort( EventManager::instance()->active()->teamList.begin(), EventManager::instance()->active()->teamList.end(), listToAscending<Team> );
         break;
 
     case NoType:
@@ -246,11 +246,11 @@ void Main::sort( ListTypes type ) {
 QList<Task*> Main::taskListSorted() {
     QList <Task*>sortedList;
 
-    if ( Event::active() == nullptr )
+    if ( EventManager::instance()->active() == nullptr )
         return sortedList;
 
     // make a local copy and sort it alphabetically or by logs (or both)
-    sortedList = Event::active()->taskList;
+    sortedList = EventManager::instance()->active()->taskList;
 
     if ( sortedList.isEmpty())
         return sortedList;
@@ -272,11 +272,11 @@ QList<Task*> Main::taskListSorted() {
 QList<Team*> Main::teamListSorted() {
     QList <Team*>sortedList;
 
-    if ( Event::active() == nullptr )
+    if ( EventManager::instance()->active() == nullptr )
         return sortedList;
 
     // make a local copy and sort it alphabetically or by logs (or both)
-    sortedList = Event::active()->teamList;
+    sortedList = EventManager::instance()->active()->teamList;
 
     if ( sortedList.isEmpty())
         return sortedList;

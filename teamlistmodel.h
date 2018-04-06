@@ -33,7 +33,7 @@ class TeamListModel : public QStringListModel {
 
 public:
     TeamListModel( QObject *parentPtr = 0 ) : QStringListModel( parentPtr ) {}
-    int rowCount( const QModelIndex & = QModelIndex()) const { return Event::active()->teamList.count(); }
+    int rowCount( const QModelIndex & = QModelIndex()) const { return EventManager::instance()->active()->teamList.count(); }
     QVariant data( const QModelIndex &, int ) const;
     Qt::ItemFlags flags( const QModelIndex & ) const;
     //void update() { emit this->dataChanged(); }

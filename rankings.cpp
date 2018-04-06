@@ -40,7 +40,7 @@ Rankings::Rankings( QWidget *parent ) : Dialog( parent ), ui( new Ui::Rankings )
 
     // failsafe
     if ( Main::instance()->isInitialised())
-        this->bindVars();
+        this->variables << Variable::instance()->bind( "rankings/current", this->ui->actionCurrentTeam );
     else
         this->onRejected();
 
@@ -62,7 +62,7 @@ Rankings::Rankings( QWidget *parent ) : Dialog( parent ), ui( new Ui::Rankings )
 
     // set up sorting & view model
     this->proxyModel = new RankingsSortModel( this );
-    this->modelPtr = new QStandardItemModel( Event::active()->teamList.count(), NumRankingColumns, this );
+    this->modelPtr = new QStandardItemModel( EventManager::instance()->active()->teamList.count(), NumRankingColumns, this );
     this->proxyModel->setSourceModel( this->modelPtr );
     this->proxyModel->setDynamicSortFilter( true );
     this->ui->rankingView->verticalHeader()->hide();
@@ -146,8 +146,8 @@ void Rankings::fillData() {
 
     // fill data
     for ( y = 0; y < NumRankingColumns; y++ ) {
-        for ( k = 0; k < Event::active()->teamList.count(); k++ ) {
-            Team *team = Event::active()->teamList.at( k );
+        for ( k = 0; k < EventManager::instance()->active()->teamList.count(); k++ ) {
+            Team *team = EventManager::instance()->active()->teamList.at( k );
             MainWindow *mainWindow;
             QStandardItem *itemPtr = new QStandardItem();
             QString text;
@@ -229,7 +229,7 @@ void Rankings::fillData() {
     qSort( pointsList.begin(), pointsList.end(), greaterThan );
 
     // second pass for rank
-    for ( k = 0; k < Event::active()->teamList.count(); k++ ) {
+    for ( k = 0; k < EventManager::instance()->active()->teamList.count(); k++ ) {
         int rankColumn = Rank;
         int pointsColumn = Points;
         this->modelPtr->item( k, rankColumn )->setText( QString( "%1" ).arg( pointsList.indexOf( this->modelPtr->item( k, pointsColumn )->text().toInt()) + 1 ));
@@ -243,7 +243,7 @@ void Rankings::calculateStatistics() {
     int numParcipiants = 0, numTasks = 0, pointsLogged = 0, maxPoints = 0;
 
     // get team stats
-    foreach ( Team *team, Event::active()->teamList ) {
+    foreach ( Team *team, EventManager::instance()->active()->teamList ) {
         numParcipiants += team->members();
         numTasks += team->logList.count();
         team->setCombosCalculated( false );
@@ -252,7 +252,7 @@ void Rankings::calculateStatistics() {
     }
 
     // get max points
-    foreach ( Task *task, Event::active()->taskList ) {
+    foreach ( Task *task, EventManager::instance()->active()->taskList ) {
         if ( task->type() == Task::Check )
             maxPoints += task->points();
         else if ( task->type() == Task::Multi )
@@ -260,10 +260,10 @@ void Rankings::calculateStatistics() {
     }
 
     // display data
-    this->ui->tTeams->setText( QString( "%1\n" ).arg( Event::active()->teamList.count()));
+    this->ui->tTeams->setText( QString( "%1\n" ).arg( EventManager::instance()->active()->teamList.count()));
     this->ui->tPar->setText( QString( "%1\n" ).arg( numParcipiants ));
     this->ui->tTasks->setText( QString( "%1\n" ).arg( numTasks ));
-    this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( Event::active()->taskList.count()));
+    this->ui->tTasksTotal->setText( QString( "%1\n" ).arg( EventManager::instance()->active()->taskList.count()));
     this->ui->tPoints->setText( QString( "%1\n" ).arg( maxPoints ));
     this->ui->tPointsLogged->setText( QString( "%1\n" ).arg( pointsLogged ));
 }
@@ -297,8 +297,12 @@ void Rankings::rescaleWindow() {
 Rankings::~Rankings() {
     this->clearData();
 
-    delete ui;
-    this->unbindVars();
+    foreach ( const QString &key, this->variables )
+        Variable::instance()->unbind( key );
+
+    this->variables.clear();
+
+    delete this->ui;
 
     // this should trigger deletion of QStandardItems
     this->modelPtr->clear();
@@ -307,20 +311,6 @@ Rankings::~Rankings() {
     delete this->modelPtr;
     delete this->proxyModel;
     this->columnHeaders.clear();
-}
-
-/**
- * @brief Rankings::bindVars connects console/settings variables for updates
- */
-void Rankings::bindVars() {
-    // lock vars
-    this->lockVariables();
-
-    // bind vars
-    this->bindVariable( "rankings/current", this->ui->actionCurrentTeam );
-
-    // unlock vars
-    this->lockVariables( false );
 }
 
 /**
@@ -360,7 +350,7 @@ void Rankings::on_actionExport_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Team *team, Event::active()->teamList ) {
+        foreach ( Team *team, EventManager::instance()->active()->teamList ) {
             int points;
 
             if ( team->disqualified())
@@ -414,7 +404,7 @@ void Rankings::on_actionNoLogs_triggered() {
 #ifdef APPLET_DEBUG
     QStringList taskList;
 
-    Event *event = Event::active();
+    Event *event = EventManager::instance()->active();
     if ( event == nullptr )
         return;
 

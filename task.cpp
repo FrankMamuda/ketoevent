@@ -167,7 +167,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
     query.bindValue( ":style", static_cast<Task::Styles>( style ));
     query.bindValue( ":type", static_cast<Task::Types>( type ));
     query.bindValue( ":parent", max + 1 );
-    query.bindValue( ":eventId", Event::active()->id());
+    query.bindValue( ":eventId", EventManager::instance()->active()->id());
     query.bindValue( ":description", description );
 
     if ( !query.exec()) {
@@ -183,7 +183,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
         Main::instance()->taskList << new Task( query.record(), "tasks" );
 
     // add to event
-    Event::active()->taskList << Main::instance()->taskList.last();
+    EventManager::instance()->active()->taskList << Main::instance()->taskList.last();
 }
 
 /**
@@ -210,7 +210,7 @@ void Task::loadTasks() {
  */
 Task *Task::forId( int id ) {
     // search current event ONLY
-    foreach ( Task *task, Event::active()->taskList /*this->base.taskList*/ ) {
+    foreach ( Task *task, EventManager::instance()->active()->taskList /*this->base.taskList*/ ) {
         if ( task->id() == id )
             return task;
     }
@@ -227,7 +227,7 @@ Task *Task::forName( const QString &name, bool currentEvent ) {
     QList <Task*> taskList;
 
     if ( currentEvent )
-        taskList = Event::active()->taskList;
+        taskList = EventManager::instance()->active()->taskList;
     else
         taskList = Main::instance()->taskList;
 

@@ -67,7 +67,7 @@ void MainWindow::initialise( bool reload ) {
         this->ui->actionLogTime->setDisabled( true );
     } else {
         // set minimum for time
-        this->ui->timeFinish->setMinimumTime( Event::active()->startTime());
+        this->ui->timeFinish->setMinimumTime( EventManager::instance()->active()->startTime());
 
         //
         this->ui->comboTeams->setModel( Main::instance()->teamModel );
@@ -132,7 +132,7 @@ void MainWindow::setEventTitle() {
     QString reviewer;
 
     // this really should not happen
-    if ( Event::active() == nullptr ) {
+    if ( EventManager::instance()->active() == nullptr ) {
         this->setWindowTitle( this->tr( "Ketoevent logger" ));
         return;
     }
@@ -141,9 +141,9 @@ void MainWindow::setEventTitle() {
     reviewer = Variable::instance()->string( "reviewerName" );
 
     if ( !reviewer.isEmpty())
-        this->setWindowTitle( this->tr( "Ketoevent logger - %1 (%2)" ).arg( Event::active()->name()).arg( reviewer ));
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1 (%2)" ).arg( EventManager::instance()->active()->name()).arg( reviewer ));
     else
-        this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( Event::active()->name()));
+        this->setWindowTitle( this->tr( "Ketoevent logger - %1" ).arg( EventManager::instance()->active()->name()));
 }
 
 /**
@@ -383,7 +383,7 @@ void MainWindow::fillTasks() {
     if ( Variable::instance()->isEnabled( "misc/sortTasks" )/* || m.cvar( "misc/hilightLogged" )->isEnabled()*/)
         taskList = Main::instance()->taskListSorted();
     else
-        taskList = Event::active()->taskList;
+        taskList = EventManager::instance()->active()->taskList;
 
     foreach ( Task *task, taskList ) {
         QListWidgetItem *itemPtr = new QListWidgetItem();
@@ -504,12 +504,6 @@ void MainWindow::eventDialogClosed( int signal ) {
     // get current id
     newEventId = Variable::instance()->integer( "currentEvent" );
 
-    /*if ( this->eventDialog->importPerformed()) {
-        QMessageBox::warning( this, this->tr( "Database import" ), this->tr( "Database import requires restart" ));
-        Main::instance()->shutdown();
-        return;
-    }*/
-
     if ( signal == Dialog::Accepted ) {
         // compare these two
         if ( newEventId != this->lastEventId()) {
@@ -519,7 +513,8 @@ void MainWindow::eventDialogClosed( int signal ) {
 
         this->setEventTitle();
     } else {
-        Event::setActive( Event::forId( this->lastEventId()));
+        EventManager::instance()->setActive( Event::forId( this->lastEventId()));
+        this->fillTasks();
     }
 }
 
@@ -691,9 +686,9 @@ void MainWindow::stressTest( int numTeams ) {
         this->selectTeam();
         return;
     } else if ( numTeams == -2 ) {
-        qInfo() << ( !Event::active()->teamList.isEmpty() ? this->tr( "performing stress test for %1 custom teams" ).arg( Event::active()->teamList.count()) : this->tr( "no teams to perform stress test on" ));
+        qInfo() << ( !EventManager::instance()->active()->teamList.isEmpty() ? this->tr( "performing stress test for %1 custom teams" ).arg( EventManager::instance()->active()->teamList.count()) : this->tr( "no teams to perform stress test on" ));
 
-        foreach ( Team *team, Event::active()->teamList )
+        foreach ( Team *team, EventManager::instance()->active()->teamList )
             this->testTeam( team );
         return;
     }
@@ -706,8 +701,8 @@ void MainWindow::stressTest( int numTeams ) {
 
     // add a few teams with random logs
     for ( k = 0; k < numTeams; k++ ) {
-        int maxSeconds = Event::active()->startTime().secsTo( Event::active()->finalTime());
-        QTime finishTime = Event::active()->startTime().addSecs( irand( 1, maxSeconds ));
+        int maxSeconds = EventManager::instance()->active()->startTime().secsTo( EventManager::instance()->active()->finalTime());
+        QTime finishTime = EventManager::instance()->active()->startTime().addSecs( irand( 1, maxSeconds ));
         QString teamName = QString( "Stress test %1" ).arg( k );
 
         // remove duplicates

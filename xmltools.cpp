@@ -56,23 +56,26 @@ void XMLTools::write() {
     stream.writeAttribute( "version", "3" );
 
     // switch mode
-    foreach ( VariableEntry var, Variable::instance()->list ) {
-        stream.writeEmptyElement( "variable" );
-        stream.writeAttribute( "key", var.key());
+    foreach ( QSharedPointer<Var> var, Variable::instance()->list ) {
+        if ( var->key().isEmpty() || var->flags() & Var::NoSave )
+            continue;
 
-        if ( !var.value().canConvert<QString>()) {
+        stream.writeEmptyElement( "variable" );
+        stream.writeAttribute( "key", var->key());
+
+        if ( !var->value().canConvert<QString>()) {
             QByteArray array;
             QBuffer buffer(&array);
 
             buffer.open( QIODevice::WriteOnly );
             QDataStream out( &buffer );
 
-            out << var.value();
+            out << var->value();
             buffer.close();
 
             stream.writeAttribute( "binary", QString( array.toBase64()));
         } else {
-            stream.writeAttribute( "value", var.value().toString());
+            stream.writeAttribute( "value", var->value().toString());
         }
     }
 
@@ -161,7 +164,7 @@ void XMLTools::read() {
                 } else
                     value = element.attribute( "value" );
 
-                if ( Variable::instance()->contains( key ))
+                if ( Variable::instance()->contains( key ) && !key.isEmpty())
                     Variable::instance()->setValue( key, value, true );
             }
         }

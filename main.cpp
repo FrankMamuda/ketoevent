@@ -28,23 +28,24 @@
 #include "cmd.h"
 #include "xmltools.h"
 
-//
-// classes
-//
-//class Main m;
-
 /*
 TODO:
-- teamListModel in comboBoxes
-- proper settings variables
+- models for all comboBoxes
+    where database changes (add/edit/load/remove)
+    triggers update (model reset)
 - remove orphaned logs on recalculation
   also check for duplicates in team->logList
+- remove Dialog class
+- lambdas, overrides, singletons
+- threading (database, rankings)
+- qDebug() context
+- database code rewrite (singleton)
+- change icons
+- store last teamId
 
 FUTURE:
 - use listView instead of listWidget to reduce memory footprint
-- output verbocity levels per subsystem
 - use homedir for mac (if applicable)
-- combos for stressTest
 - richText styling? html?
 - unify task and team dialogs (create superclass - less dup code)
 - completers everywhere (find, etc.)
@@ -52,12 +53,6 @@ FUTURE:
 NOTES:
 - currently, there is no need for an API change
 - sort teams alphabetically?
-
-MODERNIZE:
-- lambdas, overrides, singletons
-- threading (database, rankings)
-- qDebug() string routing
-- database code rewrite (singleton)
 */
 
 /**
@@ -69,35 +64,27 @@ bool Main::initialise( QObject *parent ) {
     qInfo() << this->tr( "initialising system" );
 
     // init cvars
-    Variable::instance()->add( "databasePath", this->path );
+    Variable::instance()->add( "databasePath", this->path, Var::ReadOnly );
     Variable::instance()->add( "backup/perform", true );
     Variable::instance()->add( "backup/changes", 25 );
     Variable::instance()->add( "misc/sortTasks", true );
     Variable::instance()->add( "misc/hilightLogged", false );
-    Variable::instance()->add( "currentEvent", -1 );
+    Variable::instance()->add( "currentEvent", -1, ( Var::Hidden | Var::ReadOnly ));
     Variable::instance()->add( "reviewerName", "" );
-    Variable::instance()->add( "system/consoleHistory", "" );
-    Variable::instance()->add( "rankings/current", true );
-    //Variable::instance()->add( "filesystem/last", "" );
+    Variable::instance()->add( "system/consoleHistory", "", Var::Hidden );
+    Variable::instance()->add( "rankings/current", true, Var::Hidden );
 
-    // create settings variables
-    SettingsVariable::add( "startTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
-    SettingsVariable::add( "finishTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
-    SettingsVariable::add( "finalTime", SettingsVariable::TimeEdit, SettingsVariable::EventVar );
-    SettingsVariable::add( "penalty", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "comboOfTwo", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "comboOfThree", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "comboOfFourAndMore", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "minMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "maxMembers", SettingsVariable::SpinBox, SettingsVariable::EventVar );
-    SettingsVariable::add( "backup/changes", SettingsVariable::SpinBox, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "backup/perform", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "misc/sortTasks", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "misc/hilightLogged", SettingsVariable::CheckBox, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "name", SettingsVariable::LineEdit, SettingsVariable::EventVar );
-    SettingsVariable::add( "databasePath", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "reviewerName", SettingsVariable::LineEdit, SettingsVariable::ConsoleVar );
-    SettingsVariable::add( "rankings/current", SettingsVariable::Action, SettingsVariable::ConsoleVar );
+    // add custom vars
+    Variable::instance()->add<EventVariable>( "name", this->tr( "Custom event" ), Var::NoSave );
+    Variable::instance()->add<EventVariable>( "startTime", KetoEvent::defaultStartTime, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "finishTime", KetoEvent::defaultFinishTime, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "finalTime", KetoEvent::defaultFinalTime, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "penalty", KetoEvent::defaultPenaltyPoints, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "comboOfTwo", KetoEvent::defaultComboOfTwo, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "comboOfThree", KetoEvent::defaultComboOfThree, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "comboOfFourAndMore", KetoEvent::defaultComboOfFourAndMore, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "minMembers", KetoEvent::defaultMinMembers, Var::NoSave );
+    Variable::instance()->add<EventVariable>( "maxMembers", KetoEvent::defaultMaxMembers, Var::NoSave );
 
     // load vars
     XMLTools::instance()->read();
@@ -150,11 +137,6 @@ void Main::shutdown( bool ignoreDatabase ) {
 
         // clear entries
         this->clearEvent();
-
-        // ckear settings vars
-        foreach ( SettingsVariable *varPtr, this->svarList )
-            delete varPtr;
-        this->svarList.clear();
 
         // close console
 #ifdef APPLET_DEBUG
@@ -229,7 +211,7 @@ void Main::clearEvent() {
  * @param parent
  */
 Main::Main( QObject *parent) : QObject( parent ),
-    activeEvent( nullptr ), alloc( 0 ), dealloc( 0 ),
+    alloc( 0 ), dealloc( 0 ),
     console( nullptr ), teamModel( new TeamListModel()),
     m_init( false ) {}
 

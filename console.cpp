@@ -69,12 +69,12 @@ bool Console::completeCommand() {
     }
 
     // find matching cvars
-    foreach( VariableEntry entry, Variable::instance()->list ) {
-        if ( !QString::compare( entry.key(), "system/consoleHistory" ))
+    foreach( QSharedPointer<Var> entry, Variable::instance()->list ) {
+        if ( !QString::compare( entry->key(), "system/consoleHistory" ))
             continue;
 
-        if ( entry.key().startsWith( this->ui->input->text()))
-            matchedStrings << entry.key();
+        if ( entry->key().startsWith( this->ui->input->text()))
+            matchedStrings << entry->key();
     }
 
     // complete to shortest string
@@ -114,10 +114,10 @@ bool Console::completeCommand() {
         // check variables
         // NOTE: this is case sensitive
         if ( Variable::instance()->contains( str )) {
-            VariableEntry entry;
+            QSharedPointer<Var> entry;
 
             entry = Variable::instance()->list[str];
-            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry.key(), entry.value().toString());
+            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key(), entry->value().toString());
         }
     }
 

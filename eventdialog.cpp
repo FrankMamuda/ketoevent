@@ -40,10 +40,26 @@ EventDialog::EventDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::Even
     this->ui->setupUi( this );
 
     // bind settings vars
-    if ( Main::instance()->isInitialised())
-        this->bindVars();
+    if ( Main::instance()->isInitialised()) {
+        this->variables << Variable::instance()->bind( "startTime", this->ui->startTime );
+        this->variables << Variable::instance()->bind( "finishTime", this->ui->finishTime );
+        this->variables << Variable::instance()->bind( "finalTime", this->ui->finalTime );
+        this->variables << Variable::instance()->bind( "penalty", this->ui->penalty );
+        this->variables << Variable::instance()->bind( "comboOfTwo", this->ui->sCombo );
+        this->variables << Variable::instance()->bind( "comboOfThree", this->ui->dCombo );
+        this->variables << Variable::instance()->bind( "comboOfFourAndMore", this->ui->tCombo );
+        this->variables << Variable::instance()->bind( "minMembers", this->ui->min );
+        this->variables << Variable::instance()->bind( "maxMembers", this->ui->max );
+    }
 
+    // refocus
+    this->ui->buttonClose->setFocus();
+
+    // fill events
     this->fillEvents();
+
+    // TODO: rename me
+    this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ]() { this->validate(); this->onAccepted(); } );
 }
 
 /**
@@ -52,9 +68,6 @@ EventDialog::EventDialog( QWidget *parent ) : Dialog( parent ), ui( new Ui::Even
 void EventDialog::fillEvents() {
     int y = 0, id = -1;
     Event *event;
-
-    if ( this->variablesLocked())
-        return;
 
     // clear event list
     this->ui->eventCombo->clear();
@@ -77,41 +90,13 @@ void EventDialog::fillEvents() {
  * @brief EventDialog::~EventDialog
  */
 EventDialog::~EventDialog() {
-    this->unbindVars();
-    delete ui;
-}
+    foreach ( const QString &key, this->variables )
+        Variable::instance()->unbind( key );
 
-/**
- * @brief EventDialog::bindVars
- */
-void EventDialog::bindVars() {
-    // lock vars
-    this->lockVariables();
+    this->variables.clear();
 
-    // bind vars
-    this->bindVariable( "startTime", this->ui->startTime );
-    this->bindVariable( "finishTime", this->ui->finishTime );
-    this->bindVariable( "finalTime", this->ui->finalTime );
-    this->bindVariable( "penalty", this->ui->penalty );
-    this->bindVariable( "comboOfTwo", this->ui->sCombo );
-    this->bindVariable( "comboOfThree", this->ui->dCombo );
-    this->bindVariable( "comboOfFourAndMore", this->ui->tCombo );
-    this->bindVariable( "minMembers", this->ui->min );
-    this->bindVariable( "maxMembers", this->ui->max );
-
-    // refocus
-    this->ui->buttonClose->setFocus();
-
-    // unlock vars
-    this->lockVariables( false );
-}
-
-/**
- * @brief EventDialog::on_buttonClose_clicked
- */
-void EventDialog::on_buttonClose_clicked() {
-    this->validate();
-    this->onAccepted();
+    this->disconnect( this->ui->buttonClose, SIGNAL( clicked()));
+    delete this->ui;
 }
 
 /**
@@ -127,12 +112,8 @@ void EventDialog::on_eventCombo_currentIndexChanged( int index ) {
 
     // set current event
     Event *event = Event::forId( this->ui->eventCombo->itemData( index ).toInt());
-    if ( event != nullptr && event != Event::active()) {
-        Event::setActive( event );
-        this->lockVariables();
-        this->updateVars();
-        this->lockVariables( false );
-    }
+    if ( event != nullptr && event != EventManager::instance()->active())
+        EventManager::instance()->setActive( event );
 }
 
 /**
@@ -174,7 +155,7 @@ void EventDialog::on_actionAddEvent_triggered() {
 void EventDialog::on_actionRemoveEvent_triggered() {
     QMessageBox msgBox;
     int state;
-    Event *event = Event::active();
+    Event *event = EventManager::instance()->active();
     QSqlQuery query;
 
     // make sure we cannot delete all events
@@ -184,7 +165,7 @@ void EventDialog::on_actionRemoveEvent_triggered() {
     }
 
     // allow to reconsider
-    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( Event::active()->name()));
+    msgBox.setText( this->tr( "Do you really want to remove \"%1\"?" ).arg( EventManager::instance()->active()->name()));
     msgBox.setStandardButtons( QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton( QMessageBox::Yes );
     msgBox.setIcon( QMessageBox::Warning );
@@ -195,8 +176,8 @@ void EventDialog::on_actionRemoveEvent_triggered() {
     switch ( state ) {
     case QMessageBox::Yes:
         // remove from memory
-        Main::instance()->eventList.removeOne( Event::active());
-        Event::setActive( Main::instance()->eventList.first());
+        Main::instance()->eventList.removeOne( EventManager::instance()->active());
+        EventManager::instance()->setActive( Main::instance()->eventList.first());
 
         // remove from database
         query.exec( QString( "delete from events where id=%1" ).arg( event->id()));
@@ -383,8 +364,8 @@ void EventDialog::on_actionExportEvent_triggered() {
     }
 
     Database::createStructure( "export." );
-    query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( Event::active()->id()));
-    query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( Event::active()->id()));
+    query.exec( QString( "insert into export.tasks select * from tasks where eventId=%1" ).arg( EventManager::instance()->active()->id()));
+    query.exec( QString( "insert into export.events select * from events where id=%1" ).arg( EventManager::instance()->active()->id()));
     query.exec( "detach export" );
 }
 
@@ -419,7 +400,7 @@ void EventDialog::on_actionExportTasks_triggered() {
                .append( "\r" )
        #endif
                .append( "\n" );
-        foreach ( Task *task, Event::active()->taskList ) {
+        foreach ( Task *task, EventManager::instance()->active()->taskList ) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( task->name().replace( ';', ',' ))
                    .arg( task->description().replace( ';', ',' ))
@@ -447,7 +428,7 @@ void EventDialog::on_actionRename_triggered() {
     title = QInputDialog::getText( this, this->tr( "Add an event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok );
     if ( ok && !title.isEmpty()) {
         // FIXME: check for duplicates
-        Event::active()->setName( title );
+        EventManager::instance()->active()->setName( title );
         this->fillEvents();
     } else {
         QMessageBox::warning( this, this->tr( "Set event title" ), this->tr( "Event title not specified" ));
