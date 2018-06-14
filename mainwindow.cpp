@@ -64,7 +64,7 @@ MainWindow::~MainWindow() {
  * @brief MainWindow::currentEventId
  * @return
  */
-int MainWindow::currentEventId() const {
+Id MainWindow::currentEventId() const {
     return Event::instance()->id( this->ui->comboEvent->currentIndex());
 }
 
@@ -96,7 +96,7 @@ void MainWindow::on_buttonRename_clicked() {
     QString text( QInputDialog::getText( this, this->tr( "Rename event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok ));
 
     if ( ok && !text.isEmpty())
-        Event::instance()->setTitle( Event::instance()->id( this->ui->comboEvent->currentIndex()), text );
+        Event::instance()->setTitle( this->ui->comboEvent->currentIndex(), text );
 }
 
 /**
@@ -104,8 +104,8 @@ void MainWindow::on_buttonRename_clicked() {
  * @param index
  */
 void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
-    Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index )));
-    Task::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index )));
+    Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
+    Task::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
     //Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( this->ui->comboTeam->currentIndex())));
 }
 
@@ -114,7 +114,7 @@ void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
  * @param index
  */
 void MainWindow::on_comboTeam_currentIndexChanged( int index ) {
-    Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( index )));
+    Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( index ).value()));
     this->ui->taskView->viewport()->update();    
     this->ui->taskView->setEnabled( index == -1 ? false : true );
 }

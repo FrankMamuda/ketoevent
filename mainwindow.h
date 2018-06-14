@@ -30,6 +30,11 @@ namespace Ui {
 class MainWindow;
 }
 
+//
+// classes
+//
+class Id;
+
 /**
  * @brief The MainWindow class
  */
@@ -40,7 +45,7 @@ class MainWindow final : public QMainWindow {
 public:
     virtual ~MainWindow();
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
-    int currentEventId() const;
+    Id currentEventId() const;
 
 private slots:
     void on_buttonAdd_clicked();

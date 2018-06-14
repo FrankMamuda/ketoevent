@@ -45,8 +45,12 @@ QVariant Table::value( int row, int fieldId ) const {
         return -1;
 
     const QModelIndex index( this->index( row, fieldId ));
-    if ( !index.isValid() || index.row() < 0 || index.row() >= this->count())
+    if ( !index.isValid() || index.row() < 0 || index.row() >= this->count()) {
+        qWarning( Database_::Debug ) << this->tr( "could not retrieve field \"%1\" value from table \"%2\"" )
+                                        .arg( this->field( fieldId )->name())
+                                        .arg( this->tableName()) << !index.isValid() << ( index.row() < 0 ) << ( index.row() >= this->count());
         return -1;
+    }
 
     return QSqlRelationalTableModel::data( index );
 }

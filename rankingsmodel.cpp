@@ -23,13 +23,6 @@
 #include "rankings.h"
 
 /**
- * @brief RankingsModel::RankingsModel
- * @param parent
- */
-RankingsModel::RankingsModel( QObject *parent ) : QAbstractTableModel( parent ) {
-}
-
-/**
  * @brief RankingsModel::headerData
  * @param section
  * @param orientation
@@ -40,7 +33,7 @@ QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, in
     if ( orientation == Qt::Horizontal ) {
         if ( role == Qt::DisplayRole ) {
             if ( section == 0 )
-                return "Title";
+                return "Team\ntitle";
 
             if ( section == 1 )
                 return "Completed";
@@ -52,7 +45,7 @@ QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, in
                 return "Combined";
 
             if ( section == 4 )
-                return "Papilduzdevums";
+                return "Penalty";
 
             if ( section == 5 )
                 return "Points";
@@ -71,7 +64,7 @@ int RankingsModel::rowCount( const QModelIndex &parent ) const {
     if ( parent.isValid())
         return 0;
 
-    return this->list.count();// Rankings::instance()->map.count();
+    return Rankings::instance()->list.count();
 }
 
 /**
@@ -98,22 +91,22 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
 
     if ( role == Qt::DisplayRole ) {
         if ( index.column() == 0 )
-            return this->list.at( index.row()).title; // Rankings::instance()->map.values().at( index.row()).title;
+            return Rankings::instance()->list.at( index.row()).title;
 
         if ( index.column() == 1 )
-            return this->list.at( index.row()).completedTasks; //Rankings::instance()->map.values().at( index.row()).completedTasks;
+            return Rankings::instance()->list.at( index.row()).completedTasks;
 
         if ( index.column() == 2 )
-            return this->list.at( index.row()).combos; //Rankings::instance()->map.values().at( index.row()).points;
+            return Rankings::instance()->list.at( index.row()).combos;
 
         if ( index.column() == 3 )
-            return this->list.at( index.row()).comboTasks; //Rankings::instance()->map.values().at( index.row()).points;
+            return Rankings::instance()->list.at( index.row()).comboTasks;
 
         if ( index.column() == 4 )
-            return this->list.at( index.row()).extra; //Rankings::instance()->map.values().at( index.row()).points;
+            return Rankings::instance()->list.at( index.row()).penalty;
 
         if ( index.column() == 5 )
-            return this->list.at( index.row()).points; //Rankings::instance()->map.values().at( index.row()).points;
+            return Rankings::instance()->list.at( index.row()).points;
     }
 
     return QVariant();

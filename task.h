@@ -77,7 +77,7 @@ public:
     static Task *instance() { static Task *instance( new Task()); return instance; }
     virtual ~Task() {}
 
-    int id( int row ) const { return this->value( row, ID ).toInt(); }
+    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
     void add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Task::NoStyle, const QString &description = QString());
     QString name( int row ) const { return this->value( row, Name ).toString(); }
     int points( int row ) const { return this->value( row, Points ).toInt(); }
@@ -86,7 +86,8 @@ public:
     Types type( int row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
     int order( int row ) const { return this->value( row, Order ).toInt(); }
     QString description( int row ) const { return this->value( row, Desc ).toString(); }
-    int eventId( int row ) const { return this->value( row, Event ).toInt(); }
+    Id eventId( int row ) const { return Id::fromInteger( this->value( row, Event ).toInt()); }
+    int eventRow( int row ) const;
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }

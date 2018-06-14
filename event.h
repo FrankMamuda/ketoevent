@@ -81,7 +81,7 @@ public:
     virtual ~Event() {}
 
     void add( const QString &title );
-    int id( int row ) const { return this->value( row, ID ).toInt(); }
+    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
     QString title( int row ) const { return this->value( row, Title ).toString(); }
     int minMembers( int row ) const { return this->value( row, Min ).toInt(); }
     int maxMembers( int row ) const { return this->value( row, Max ).toInt(); }

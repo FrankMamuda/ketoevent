@@ -61,5 +61,14 @@ void Team::add( const QString &title, int members, const QTime &finishTime, cons
                 finishTime.toString( "hh:mm" ) <<
                 0 <<
                 reviewer <<
-                MainWindow::instance()->currentEventId());
+                MainWindow::instance()->currentEventId().value());
+}
+
+/**
+ * @brief Team::eventRow
+ * @param id
+ * @return
+ */
+int Team::eventRow( int row ) const {
+    return Event::instance()->row( this->eventId( row ));
 }

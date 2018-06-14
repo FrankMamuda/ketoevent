@@ -59,9 +59,6 @@ void Log::add( int taskId, int teamId, int multiplier, int comboId ) {
                 taskId <<
                 teamId <<
                 comboId );
-
-    //if ( Team::instance()->logMap.contains( teamId ))
-    //    Team::instance()->logMap.insert( teamId, this->id( ));
 }
 
 /**
@@ -86,7 +83,7 @@ QVariant Log::data( const QModelIndex &item, int role ) const {
  * @return
  */
 int Log::task( int row ) const {
-    return Task::instance()->row( this->id( row ));
+    return Task::instance()->row( this->taskId( row ));
 }
 
 /**
@@ -95,5 +92,5 @@ int Log::task( int row ) const {
  * @return
  */
 int Log::team( int row ) const {
-    return Team::instance()->row( this->id( row ));
+    return Team::instance()->row( this->teamId( row ));
 }

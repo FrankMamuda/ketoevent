@@ -23,6 +23,7 @@
 //
 #include "modalwindow.h"
 #include <QProgressDialog>
+#include <QSortFilterProxyModel>
 
 //
 // classes
@@ -36,18 +37,24 @@ namespace Ui {
 class Rankings;
 }
 
+/**
+ * @brief The TeamStatistics class
+ */
 class TeamStatistics final {
 public:
     explicit TeamStatistics( const QString &n = QString()) :
-        title( n ), completedTasks( 0 ), combos( 0 ), comboTasks( 0 ), points( 0 ), id( -1 ), extra( 0 ) {}
+        title( n ),
+        completedTasks( 0 ),
+        combos( 0 ),
+        comboTasks( 0 ),
+        points( 0 ),
+        penalty( 0 ) {}
     QString title;
     int completedTasks;
     int combos;
     int comboTasks;
     int points;
-    int id;
-    int extra;
-    QList<int> taskIds;
+    int penalty;
 };
 
 /**
@@ -56,6 +63,7 @@ public:
 class Rankings final : public ModalWindow {
     Q_OBJECT
     Q_DISABLE_COPY( Rankings )
+    friend class RankingsModel;
 
 public:
     static Rankings *instance() { static Rankings *instance( new Rankings()); return instance; }
@@ -70,8 +78,9 @@ protected:
 
 private:
     explicit Rankings();
-    QProgressDialog progress;
     Ui::Rankings *ui;
     QString prevFilter;
     RankingsModel *model;
+    QSortFilterProxyModel *proxyModel;
+    QList<TeamStatistics> list;
 };

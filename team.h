@@ -24,7 +24,6 @@
 #include <QTime>
 #include "table.h"
 
-
 /**
  * @brief The TeamTable namespace
  */
@@ -61,6 +60,7 @@ public:
         Check,
         Multi
     };
+
     enum Styles {
         NoStyle = -1,
         Regular,
@@ -73,15 +73,16 @@ public:
      * @return
      */
     static Team *instance() { static Team *instance( new Team()); return instance; }
-    virtual ~Team() {}
+    virtual ~Team() = default;
 
-    int id( int row ) const { return this->value( row, ID ).toInt(); }
+    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
     void add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
     QString title( int row ) const { return this->value( row, Title ).toString(); }
     int members( int row ) const { return this->value( row, Members ).toInt(); }
     QTime finishTime( int row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
     QString reviewer( int row ) const { return this->value( row, Reviewer ).toString(); }
-    int eventId( int row ) const { return this->value( row, Event ).toInt(); }
+    Id eventId( int row ) const { return Id::fromInteger( this->value( row, Event ).toInt()); }
+    int eventRow( int row ) const;
 
 public slots:
     void setTitle( int row, const QString &title ) { this->setValue( row, Title, title ); }
@@ -91,5 +92,4 @@ public slots:
 
 private:
     explicit Team();
-    QMultiMap<int, int> logMap;
 };

@@ -65,20 +65,20 @@ public:
     virtual ~Log() {}
 
     void add( int taskId, int teamId, int multiplier = 0, int comboId = -1 );
-    int id( int row ) const { return this->value( row, ID ).toInt(); }
+    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
     int multiplier( int row ) const { return this->value( row, Multi ).toInt(); }
-    int taskId( int row ) const { return this->value( row, Task ).toInt(); }
-    int teamId( int row ) const { return this->value( row, Team ).toInt(); }
-    int comboId( int row ) const { return this->value( row, Combo ).toInt(); }
+    Id taskId( int row ) const { return Id::fromInteger( this->value( row, Task ).toInt()); }
+    Id teamId( int row ) const { return Id::fromInteger( this->value( row, Team ).toInt()); }
+    Id comboId( int row ) const { return Id::fromInteger( this->value( row, Combo ).toInt()); }
     QVariant data( const QModelIndex &item, int role = Qt::DisplayRole ) const override;
     int task( int row ) const;
     int team( int row ) const;
 
 public slots:
     void setMultiplier( int row, int multi ) { this->setValue( row, Multi, multi ); }
-    void setTaskId( int row, int id ) { this->setValue( row, Task, id ); }
-    void setTeamId( int row, int id ) { this->setValue( row, Team, id ); }
-    void setComboId( int row, int id ) { this->setValue( row, Combo, id ); }
+    void setTaskId( int row, const Id &id ) { this->setValue( row, Task, id.value()); }
+    void setTeamId( int row, const Id &id ) { this->setValue( row, Team, id.value()); }
+    void setComboId( int row, const Id &id ) { this->setValue( row, Combo, id.value()); }
 
 private:
     explicit Log();

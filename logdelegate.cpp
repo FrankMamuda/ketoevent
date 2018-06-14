@@ -112,7 +112,7 @@ void LogDelegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewI
  */
 void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     int y;
-    const int taskId = Task::instance()->id( index.row());
+    const Id taskId = Task::instance()->id( index.row());
     bool found = false;
     const bool alternate = index.row() % 2;
     QString text( index.model()->data( index, Qt::DisplayRole ).toString());

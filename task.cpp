@@ -68,3 +68,12 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
                 0 <<
                 description );
 }
+
+/**
+ * @brief Task::eventRow
+ * @param row
+ * @return
+ */
+int Task::eventRow( int row ) const {
+    return Event::instance()->row( this->eventId( row ));
+}
