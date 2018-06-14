@@ -21,9 +21,13 @@
 //
 // includes
 //
-#include <QFutureWatcher>
-#include <QMainWindow>
+#include "modalwindow.h"
 #include <QProgressDialog>
+
+//
+// classes
+//
+class RankingsModel;
 
 /**
  * @brief The Ui namespace
@@ -32,10 +36,24 @@ namespace Ui {
 class Rankings;
 }
 
+class TeamStatistics final {
+public:
+    explicit TeamStatistics( const QString &n = QString()) :
+        title( n ), completedTasks( 0 ), combos( 0 ), comboTasks( 0 ), points( 0 ), id( -1 ), extra( 0 ) {}
+    QString title;
+    int completedTasks;
+    int combos;
+    int comboTasks;
+    int points;
+    int id;
+    int extra;
+    QList<int> taskIds;
+};
+
 /**
  * @brief The Rankings class
  */
-class Rankings final : public QMainWindow {
+class Rankings final : public ModalWindow {
     Q_OBJECT
     Q_DISABLE_COPY( Rankings )
 
@@ -46,9 +64,14 @@ public:
 private slots:
     void on_actionUpdate_triggered();
 
+protected:
+    void showEvent( QShowEvent *event );
+    void hideEvent( QHideEvent *event );
+
 private:
-    explicit Rankings( QWidget *parent = nullptr );
+    explicit Rankings();
     QProgressDialog progress;
-    QFutureWatcher<void> futureWatcher;
     Ui::Rankings *ui;
+    QString prevFilter;
+    RankingsModel *model;
 };

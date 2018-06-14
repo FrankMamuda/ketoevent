@@ -86,6 +86,7 @@ public:
     Types type( int row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
     int order( int row ) const { return this->value( row, Order ).toInt(); }
     QString description( int row ) const { return this->value( row, Desc ).toString(); }
+    int eventId( int row ) const { return this->value( row, Event ).toInt(); }
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }

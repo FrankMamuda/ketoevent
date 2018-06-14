@@ -42,9 +42,13 @@ Table::Table( const QString &name ) : m_valid( false ) {
  */
 QVariant Table::value( int row, int fieldId ) const {
     if ( !this->isValid())
-        return QVariant();
+        return -1;
 
-    return QSqlRelationalTableModel::data( this->index( row, fieldId ));
+    const QModelIndex index( this->index( row, fieldId ));
+    if ( !index.isValid() || index.row() < 0 || index.row() >= this->count())
+        return -1;
+
+    return QSqlRelationalTableModel::data( index );
 }
 
 /**
@@ -54,6 +58,10 @@ QVariant Table::value( int row, int fieldId ) const {
 bool Table::select() {
     int y;
     const bool result = QSqlRelationalTableModel::select();
+
+    // fetch more
+    while ( this->canFetchMore())
+        this->fetchMore();
 
     // find primary key
     foreach ( const Field &field, this->fields ) {
@@ -84,6 +92,15 @@ QVariant Table::data( const QModelIndex &item, int role ) const {
     }
 
     return QSqlRelationalTableModel::data( item, role );
+}
+
+/**
+ * @brief Table::setFilter
+ * @param filter
+ */
+void Table::setFilter( const QString &filter ) {
+    QSqlTableModel::setFilter( filter );
+    this->select();
 }
 
 /**
@@ -125,7 +142,7 @@ void Table::add( const QVariantList &arguments ) {
         return;
 
     if ( this->fields.count() != arguments.count())
-        qCCritical( Database_::debug ) << this->tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
+        qCCritical( Database_::Debug ) << this->tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
 
     // insert empty row
     row = this->count();
@@ -142,7 +159,7 @@ void Table::add( const QVariantList &arguments ) {
 
         // compare types
         if ( field->type() != argument.type()) {
-            qCCritical( Database_::debug ) << this->tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.type()).arg( y ).arg( field->format()).arg( field->type());
+            qCCritical( Database_::Debug ) << this->tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.type()).arg( y ).arg( field->format()).arg( field->type());
             this->revert();
             return;
         }
@@ -150,7 +167,7 @@ void Table::add( const QVariantList &arguments ) {
         // check for unique fields
         if ( field->isUnique() && !field->isAutoValue()) {
             if ( this->contains( field, argument )) {
-                qCWarning( Database_::debug )
+                qCWarning( Database_::Debug )
                         << this->tr( "table already has a unique field \"%1\" with value - \"%2\", aborting addition" )
                            .arg( field->name()).arg( argument.toString());
                 this->revert();

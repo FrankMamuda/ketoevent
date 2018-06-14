@@ -24,23 +24,19 @@
 #include "mainwindow.h"
 #include "team.h"
 #include "log.h"
+#include "task.h"
 #include <QtConcurrent>
+#include "event.h"
+#include "rankingsmodel.h"
 
 /**
  * @brief Rankings::Rankings
  * @param parent
  */
-Rankings::Rankings( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Rankings ) {
+Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ) {
     this->ui->setupUi( this );
     this->setWindowModality( Qt::ApplicationModal );
-
-    this->progress.setLabelText( this->tr( "Recalculating stats using %1 thread(s)..." ).arg( QThread::idealThreadCount()));
-
-    // TODO: disconnect
-    this->connect( &this->futureWatcher, SIGNAL( finished()), &this->progress, SLOT( reset()));
-    this->connect( &this->progress, SIGNAL( canceled()), &this->futureWatcher, SLOT(cancel()));
-    this->connect( &this->futureWatcher, SIGNAL( progressRangeChanged( int, int )), &this->progress, SLOT( setRange( int, int )));
-    this->connect( &this->futureWatcher, SIGNAL ( progressValueChanged( int )), &this->progress, SLOT( setValue( int )));
+    this->progress.setLabelText( this->tr( "Recalculating stats..." ));
 }
 
 /**
@@ -50,40 +46,110 @@ Rankings::~Rankings() {
     delete this->ui;
 }
 
-
-/**
- * @brief spin
- * @param iteration
- */
-void spin( int &row ) {
-    int y;
-    //volatile int points;
-    volatile int completed = 0;
-
-    for ( y = 0; y < Log::instance()->count(); y++ ) {
-        if ( Log::instance()->teamId( y ) != row )
-            continue;
-
-        if ( Log::instance()->multiplier( y ) > 0 )
-            completed++;
-    }
-
-    qDebug() << "team" << Team::instance()->title( row ) << "has completed" << completed << "tasks";
-}
-
 /**
  * @brief Rankings::on_actionUpdate_triggered
  */
 void Rankings::on_actionUpdate_triggered() {
-    QVector<int> vector;
+    this->progress.setRange( 0, Team::instance()->count());
+    this->progress.setValue( 0 );
+    this->progress.show();
 
-    // NOTE: it would be faster to just process logs not teams
-    for ( int y = 0; y < Team::instance()->count(); y++ )
-        vector.append( y );
+    if ( this->model == nullptr ) {
+        this->model = new RankingsModel();
 
-    futureWatcher.setFuture( QtConcurrent::map( vector, spin ));
-    this->progress.exec();
-    futureWatcher.waitForFinished();
+        QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel();
+        proxyModel->setSourceModel( this->model );
+        proxyModel->setDynamicSortFilter( true );
 
-    //qDebug() << "Canceled?" << futureWatcher.future().isCanceled();
+        this->ui->tableView->setModel( proxyModel );
+        this->ui->tableView->setWordWrap( true );
+        this->ui->tableView->verticalHeader()->hide();
+        this->ui->tableView->setSortingEnabled( true );
+
+    }
+
+
+    this->model->list.clear();
+
+    int team, log;
+    for ( team = 0; team < Team::instance()->count(); team++ ) {
+        this->progress.setValue( team );
+        TeamStatistics stats( Team::instance()->title( team ));
+        QMap<int,int>combos;
+
+        QList<int> dup;
+
+        for ( log = 0; log < Log::instance()->count(); log++ ) {
+            const int value = Log::instance()->multiplier( log );
+
+            if ( value <= 0 )
+                continue;
+
+            if ( team == Log::instance()->row( Log::instance()->teamId( log ))) {
+                const int taskId = Log::instance()->taskId( log );
+                const int task = Task::instance()->row( taskId );
+                Task::Types type = Task::instance()->type( task );
+
+                if ( dup.contains( taskId ))
+                    continue;
+
+                if ( !QString::compare( Task::instance()->name( task ), "Papilduzdevums" ))
+                    stats.extra = value;
+
+                dup << taskId;
+
+                stats.completedTasks++;
+
+                if ( type == Task::Check )
+                    stats.points += Task::instance()->points( task );
+                else if ( type == Task::Multi )
+                    stats.points += Task::instance()->points( task ) * value;
+
+                const int comboId = Log::instance()->comboId( log );
+                if ( !combos.contains( comboId ) && comboId >= 0 )
+                    combos[comboId] = 0;
+
+                if ( comboId >= 0 ) {
+                    combos[comboId] = combos[comboId] + 1;
+                    stats.comboTasks += 1;
+                }
+            }
+        }
+
+        stats.combos = combos.count();
+        foreach ( int key, combos ) {
+            if ( combos.count( key ) == 2 )
+                stats.points += EventTable::DefaultComboOfTwo;
+
+            if ( combos.count( key ) == 3 )
+                stats.points += EventTable::DefaultComboOfThree;
+
+            if ( combos.count( key ) >= 4 )
+                stats.points += EventTable::DefaultComboOfFourAndMore;
+        } //qDebug() << Team::instance()->title( team ) << combos.count();
+
+        this->model->list << stats;
+    }
+
+    this->model->reset();
+    this->progress.hide();
+}
+
+/**
+ * @brief Rankings::showEvent
+ * @param event
+ */
+void Rankings::showEvent( QShowEvent *event ) {
+    this->prevFilter = Log::instance()->filter();
+    Log::instance()->setFilter( "" );
+    ModalWindow::showEvent( event );
+}
+
+/**
+ * @brief Rankings::hideEvent
+ * @param event
+ */
+void Rankings::hideEvent( QHideEvent *event ) {
+    Log::instance()->setFilter( this->prevFilter );
+    ModalWindow::hideEvent( event );
 }

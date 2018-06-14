@@ -21,28 +21,28 @@
 //
 // includes
 //
-#include "modalwindow.h"
+#include "mainwindow.h"
 
 /**
- * @brief The Ui namespace
+ * @brief The ModalWindow class
  */
-namespace Ui {
-class Settings;
-}
-
-/**
- * @brief The Settings class
- */
-class Settings final : public ModalWindow {
-    Q_DISABLE_COPY( Settings )
+class ModalWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    static Settings *instance() { static Settings *instance( new Settings()); return instance; }
-    ~Settings();
+    explicit ModalWindow( QWidget *parent = nullptr ) : QMainWindow( parent ) {}
+    virtual ~ModalWindow() = default;
 
-private:
-    explicit Settings();
-    QStringList variables;
-    Ui::Settings *ui;
+protected:
+    /**
+     * @brief showEvent
+     * @param event
+     */
+    void showEvent( QShowEvent *event ) override { MainWindow::instance()->setDisabled( true ); QMainWindow::showEvent( event ); }
+
+    /**
+     * @brief hideEvent
+     * @param event
+     */
+    void hideEvent( QHideEvent *event ) override { MainWindow::instance()->setEnabled( true ); QMainWindow::hideEvent( event ); }
 };

@@ -34,8 +34,7 @@ class Table;
  * @brief The Dabanase_ class
  */
 namespace Database_ {
-const static QLoggingCategory debug( "database" );
-const static QString path( ".database2" );
+const static QLoggingCategory Debug( "database" );
 const static  __attribute__((unused)) unsigned int null = 0;
 };
 

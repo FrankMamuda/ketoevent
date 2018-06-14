@@ -33,7 +33,7 @@
  * @brief The Variable_ namespace
  */
 namespace Variable_ {
-    const static QLoggingCategory debug( "variable" );
+    const static QLoggingCategory Debug( "variable" );
 }
 
 /**

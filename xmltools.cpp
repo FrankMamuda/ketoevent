@@ -28,6 +28,73 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QXmlStreamWriter>
+#include "main.h"
+
+/**
+ * @brief XMLTools::read
+ * @param mode
+ * @param object
+ */
+void XMLTools::read() {
+    QString path;
+    QDomDocument document;
+    QDomNode node, childNode;
+    QDomElement element, childElement;
+    QDir configDir( QDir::homePath() + "/" + Main::Path );
+
+#ifdef QT_DEBUG
+    // announce
+    qCInfo( XMLTools_::Debug ) << this->tr( "reading configuration" );
+#endif
+
+    if ( !configDir.exists())
+        configDir.mkpath( configDir.absolutePath());
+
+    // set path
+    path = configDir.absolutePath() + "/" + XMLTools_::ConfigFile;
+
+    // load xml file
+    QFile xmlFile( path );
+
+    if ( !xmlFile.exists() || !xmlFile.open( QFile::ReadOnly | QFile::Text )) {
+        qCCritical( XMLTools_::Debug ) << this->tr( "no configuration file found" );
+        return;
+    }
+
+    document.setContent( &xmlFile );
+    node = document.documentElement().firstChild();
+
+    while ( !node.isNull()) {
+        element = node.toElement();
+
+        if ( !element.isNull()) {
+            if ( !QString::compare( element.tagName(), "variable" )) {
+                QString key;
+                QVariant value;
+
+                childNode = element.firstChild();
+                key = element.attribute( "key" );
+
+                if ( element.hasAttribute( "binary" )) {
+                    QByteArray array;
+                    array = QByteArray::fromBase64( element.attribute( "binary" ).toUtf8().constData());
+                    QBuffer buffer( &array );
+                    buffer.open( QIODevice::ReadOnly );
+                    QDataStream in( &buffer );
+                    in >> value;
+                } else
+                    value = element.attribute( "value" );
+
+                if ( Variable::instance()->contains( key ) && !key.isEmpty())
+                    Variable::instance()->setValue( key, value, true );
+            }
+        }
+        node = node.nextSibling();
+    }
+
+    document.clear();
+    xmlFile.close();
+}
 
 /**
  * @brief XMLTools::write
@@ -35,18 +102,18 @@
  */
 void XMLTools::write() {
     QString path, savedData, newData;
-    QDir configDir( XMLTools_::ConfigPath );
+    QDir configDir( QDir::homePath() + "/" + Main::Path );
 
 #ifdef QT_DEBUG
     // announce
-    qCInfo( XMLTools_::debug ) << this->tr( "writing configuration" );
+    qCInfo( XMLTools_::Debug ) << this->tr( "writing configuration" );
 #endif
 
     if ( !configDir.exists())
         configDir.mkpath( configDir.absolutePath());
 
     // set path
-    path = configDir.absolutePath() + "/" + XMLTools_::Variables;
+    path = configDir.absolutePath() + "/" + XMLTools_::ConfigFile;
 
     // read xml file and create buffer
     QFile xmlFile( path );
@@ -109,78 +176,12 @@ void XMLTools::write() {
     if ( QString::compare( savedData, newData )) {
         // write out as binary (not QIODevice::Text) to avoid CR line endings
         if ( !xmlFile.open( QFile::WriteOnly | QFile::Truncate )) {
-            qCCritical( XMLTools_::debug ) << this->tr( "could not open configuration file \"%1\"" ).arg( path );
+            qCCritical( XMLTools_::Debug ) << this->tr( "could not open configuration file \"%1\"" ).arg( path );
             return;
         }
         xmlFile.write( newData.toUtf8().replace( "\r", "" ));
     }
 
     // close file
-    xmlFile.close();
-}
-
-/**
- * @brief XMLTools::read
- * @param mode
- * @param object
- */
-void XMLTools::read() {
-    QString path;
-    QDomDocument document;
-    QDomNode node, childNode;
-    QDomElement element, childElement;
-    QDir configDir( XMLTools_::ConfigPath );
-
-#ifdef QT_DEBUG
-    // announce
-    qCInfo( XMLTools_::debug ) << this->tr( "reading configuration" );
-#endif
-
-    if ( !configDir.exists())
-        configDir.mkpath( configDir.absolutePath());
-
-    // set path
-    path = configDir.absolutePath() + "/" + XMLTools_::Variables;
-
-    // load xml file
-    QFile xmlFile( path );
-
-    if ( !xmlFile.exists() || !xmlFile.open( QFile::ReadOnly | QFile::Text )) {
-        qCCritical( XMLTools_::debug ) << this->tr( "no configuration file found" );
-        return;
-    }
-
-    document.setContent( &xmlFile );
-    node = document.documentElement().firstChild();
-
-    while ( !node.isNull()) {
-        element = node.toElement();
-
-        if ( !element.isNull()) {
-            if ( !QString::compare( element.tagName(), "variable" )) {
-                QString key;
-                QVariant value;
-
-                childNode = element.firstChild();
-                key = element.attribute( "key" );
-
-                if ( element.hasAttribute( "binary" )) {
-                    QByteArray array;
-                    array = QByteArray::fromBase64( element.attribute( "binary" ).toUtf8().constData());
-                    QBuffer buffer( &array );
-                    buffer.open( QIODevice::ReadOnly );
-                    QDataStream in( &buffer );
-                    in >> value;
-                } else
-                    value = element.attribute( "value" );
-
-                if ( Variable::instance()->contains( key ) && !key.isEmpty())
-                    Variable::instance()->setValue( key, value, true );
-            }
-        }
-        node = node.nextSibling();
-    }
-
-    document.clear();
     xmlFile.close();
 }

@@ -81,6 +81,7 @@ public:
     int members( int row ) const { return this->value( row, Members ).toInt(); }
     QTime finishTime( int row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
     QString reviewer( int row ) const { return this->value( row, Reviewer ).toString(); }
+    int eventId( int row ) const { return this->value( row, Event ).toInt(); }
 
 public slots:
     void setTitle( int row, const QString &title ) { this->setValue( row, Title, title ); }

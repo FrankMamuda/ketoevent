@@ -21,28 +21,21 @@
 //
 // includes
 //
-#include "modalwindow.h"
+#include <QAbstractTableModel>
+#include "rankings.h"
 
 /**
- * @brief The Ui namespace
+ * @brief The RankingsModel class
  */
-namespace Ui {
-class Settings;
-}
-
-/**
- * @brief The Settings class
- */
-class Settings final : public ModalWindow {
-    Q_DISABLE_COPY( Settings )
+class RankingsModel : public QAbstractTableModel {
     Q_OBJECT
 
 public:
-    static Settings *instance() { static Settings *instance( new Settings()); return instance; }
-    ~Settings();
-
-private:
-    explicit Settings();
-    QStringList variables;
-    Ui::Settings *ui;
+    explicit RankingsModel( QObject *parent = nullptr );
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
+    int rowCount( const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount( const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
+    void reset() { this->beginResetModel(); this->endResetModel(); }
+    QList<TeamStatistics> list;
 };

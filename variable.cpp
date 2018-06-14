@@ -143,7 +143,7 @@ QString Variable::bind( const QString &key, QObject *object ) {
             this->signalMapper->setMapping( comboBox, key );
         }
     } else {
-        qCWarning( Variable_::debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
+        qCWarning( Variable_::Debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
     }
 
     return key;
@@ -255,11 +255,11 @@ void Variable::setBoundValue( const QString &key, bool internal ) {
                     }
                 }
             } else {
-                qCWarning( Variable_::debug, this->tr( "void comboBox for variable \"%1\"" ).arg( key ).toUtf8().constData());
+                qCWarning( Variable_::Debug, this->tr( "void comboBox for variable \"%1\"" ).arg( key ).toUtf8().constData());
             }
         }
     } else {
-        qCWarning( Variable_::debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
+        qCWarning( Variable_::Debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
     }
 
     // force update

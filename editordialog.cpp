@@ -20,26 +20,28 @@
 // includes
 //
 #include "editordialog.h"
+#include "mainwindow.h"
 #include "ui_editordialog.h"
+#include <QCommonStyle>
 #include <QDebug>
 
 /**
  * @brief EditorDialog::EditorDialog
  * @param parent
  */
-EditorDialog::EditorDialog( QWidget *parent ) : QMainWindow( parent ),
+EditorDialog::EditorDialog() :
     container( nullptr ),
     dock( nullptr ),
     toolBar( nullptr ),
-    ui( new Ui::EditorDialog ) {
-    // get default app style for button icons
-    QStyle *style( qApp->style());
+    ui( new Ui::EditorDialog )
+{
+    QCommonStyle style;
 
     qDebug() << "new edit dialog";
 
     // set up ui
     this->ui->setupUi( this );
-    this->ui->buttonClose->setIcon( style->standardIcon( QStyle::SP_DialogCloseButton ));
+    this->ui->buttonClose->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
     this->container = this->ui->listView;
     this->dock = this->ui->dockWidget;
     this->hideDock();
@@ -110,5 +112,5 @@ void EditorDialog::setToolBar( QToolBar *widget ) {
 void EditorDialog::closeEvent( QCloseEvent *event ) {
     qDebug() << "close edit dialog";
     this->disconnect( this->container, SIGNAL( clicked( QModelIndex )));
-    QMainWindow::closeEvent( event );
+    ModalWindow::closeEvent( event );
 }

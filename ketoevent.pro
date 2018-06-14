@@ -43,7 +43,8 @@ SOURCES += \
     rankings.cpp \
     variable.cpp \
     xmltools.cpp \
-    settings.cpp
+    settings.cpp \
+    rankingsmodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -68,7 +69,10 @@ HEADERS += \
     variable.h \
     xmltools.h \
     settings.h \
-    variableentry.h
+    variableentry.h \
+    modalwindow.h \
+    rankingsmodel.h \
+    main.h
 
 FORMS += \
         mainwindow.ui \

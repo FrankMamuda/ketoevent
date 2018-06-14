@@ -21,6 +21,8 @@
 //
 // includes
 //
+#include "modalwindow.h"
+
 #include <QCloseEvent>
 #include <QDockWidget>
 #include <QListView>
@@ -37,7 +39,7 @@ class EditorDialog;
 /**
  * @brief The EditorDialog class
  */
-class EditorDialog final : public QMainWindow {
+class EditorDialog final : public ModalWindow {
     Q_OBJECT
     Q_DISABLE_COPY( EditorDialog )
 
@@ -54,10 +56,10 @@ public slots:
     void setToolBar( QToolBar *widget );
 
 protected:
-    void closeEvent( QCloseEvent *event );
+    void closeEvent( QCloseEvent *event ) override;
 
 private:
-    explicit EditorDialog( QWidget *parent = nullptr );
+    explicit EditorDialog();
     QToolBar *toolBar;
     Ui::EditorDialog *ui;
 };

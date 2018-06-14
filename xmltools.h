@@ -29,11 +29,8 @@
  * @brief The XML namespace
  */
 namespace XMLTools_ {
-const static QString Variables( "configuration.xml" );
-const static QLoggingCategory debug( "xml" );
-
-// FIXME: duplicate
-const static QString ConfigPath( QDir::homePath() + "/.database2/" );
+static constexpr const char __attribute__((unused)) *ConfigFile( "configuration.xml" );
+const static QLoggingCategory Debug( "xml" );
 }
 
 /**

@@ -50,10 +50,11 @@ public:
     int count() const { return this->rowCount(); }
     QVariant value( int row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
-    bool select();
+    bool select() override;
     QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
-    QVariant data( const QModelIndex &item, int role ) const;
+    QVariant data( const QModelIndex &item, int role ) const override;
     int row( int id ) const { if ( this->map.contains( id )) return this->map[id].row(); return -1; }
+    virtual void setFilter( const QString &filter ) override;
 
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }

@@ -28,18 +28,19 @@
 #include "database.h"
 #include "table.h"
 #include "field.h"
+#include "main.h"
 
 /**
  * @brief Database::Database
  * @param parent
  */
 Database::Database( QObject *parent ) : QObject( parent ) {
-    QDir path( QDir::homePath() + "/" + Database_::path );
+    QDir path( QDir::homePath() + "/" + Main::Path );
     QFile file( path.absolutePath() + "/" + "database.db" );
     QSqlDatabase database( QSqlDatabase::database());
 
     if ( !path.exists()) {
-        qCDebug( Database_::debug ) << this->tr( "making non-existant database path \"%1\"" ).arg( path.absolutePath());
+        qCDebug( Database_::Debug ) << this->tr( "making non-existant database path \"%1\"" ).arg( path.absolutePath());
         path.mkpath( path.absolutePath());
 
         if ( !path.exists())
@@ -50,14 +51,14 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     if ( !file.exists()) {
         file.open( QFile::WriteOnly );
         file.close();
-        qCDebug( Database_::debug ) << this->tr( "creating non-existant database" );
+        qCDebug( Database_::Debug ) << this->tr( "creating non-existant database" );
 
         if ( !file.exists())
             qFatal( QT_TR_NOOP_UTF8( "unable to create database file" ));
     }
 
     // announce
-    qCInfo( Database_::debug ) << this->tr( "loading database" );
+    qCInfo( Database_::Debug ) << this->tr( "loading database" );
 
     // failsafe
     if ( !database.isDriverAvailable( "QSQLITE" ))
@@ -81,10 +82,10 @@ Database::~Database() {
     bool open = false;
 
     // announce
-    qCInfo( Database_::debug ) << this->tr( "unloading database" );
+    qCInfo( Database_::Debug ) << this->tr( "unloading database" );
 
     // TODO: clean up orphans
-    qCInfo( Database_::debug ) << this->tr( "clearing tables" );
+    qCInfo( Database_::Debug ) << this->tr( "clearing tables" );
     qDeleteAll( this->tables );
 
     // according to Qt5 documentation, this must be out of scope
@@ -118,14 +119,14 @@ void Database::add( Table *table ) {
 
     // announce
     if ( !tables.count())
-        qCInfo( Database_::debug ) << this->tr( "creating an empty database" );
+        qCInfo( Database_::Debug ) << this->tr( "creating an empty database" );
 
     // validate schema
     foreach ( QString tableName, tables ) {
         if ( !QString::compare( table->tableName(), tableName )) {
             foreach ( const Field &field, table->fields ) {
                 if ( !database.record( table->tableName()).contains( field->name())) {
-                    qCCritical( Database_::debug ) << this->tr( "database field mismatch" );
+                    qCCritical( Database_::Debug ) << this->tr( "database field mismatch" );
                     return;
                 }
             }
@@ -138,7 +139,7 @@ void Database::add( Table *table ) {
         table->setValid();
     } else {
         // announce
-        qCInfo( Database_::debug ) << this->tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
+        qCInfo( Database_::Debug ) << this->tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
 
         // prepare statement
         foreach ( const Field &field, table->fields ) {
@@ -149,7 +150,7 @@ void Database::add( Table *table ) {
         }
 
         if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName()).arg( statement )))
-            qCCritical( Database_::debug ) << this->tr( "could not create table - \"%1\", reason - \"%2\"" ).arg( table->tableName()).arg( query.lastError().text());
+            qCCritical( Database_::Debug ) << this->tr( "could not create table - \"%1\", reason - \"%2\"" ).arg( table->tableName()).arg( query.lastError().text());
     }
 
     // create table model
@@ -157,7 +158,7 @@ void Database::add( Table *table ) {
 
     // load data
     if ( !table->select()) {
-        qCCritical( Database_::debug ) << this->tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
+        qCCritical( Database_::Debug ) << this->tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
         table->setValid( false );
     }
 }

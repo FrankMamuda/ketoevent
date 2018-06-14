@@ -16,33 +16,6 @@
  *
  */
 
-#pragma once
-
-//
-// includes
-//
-#include "modalwindow.h"
-
-/**
- * @brief The Ui namespace
- */
-namespace Ui {
-class Settings;
+namespace Main {
+static constexpr const char __attribute__((unused)) *Path = ".database2";
 }
-
-/**
- * @brief The Settings class
- */
-class Settings final : public ModalWindow {
-    Q_DISABLE_COPY( Settings )
-    Q_OBJECT
-
-public:
-    static Settings *instance() { static Settings *instance( new Settings()); return instance; }
-    ~Settings();
-
-private:
-    explicit Settings();
-    QStringList variables;
-    Ui::Settings *ui;
-};

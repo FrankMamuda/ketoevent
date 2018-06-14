@@ -28,9 +28,10 @@
  * @brief Settings::Settings
  * @param parent
  */
-Settings::Settings( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::Settings ) {
+Settings::Settings() : ui( new Ui::Settings ) {
     QCommonStyle style;
 
+    this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
     this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
     this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );

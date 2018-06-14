@@ -50,9 +50,7 @@ private slots:
     void on_comboTeam_currentIndexChanged( int index );
     void on_actionEditor_triggered();
     void on_actionTasks_triggered();
-
     void on_actionRankings_triggered();
-
     void on_actionSettings_triggered();
 
 private:

@@ -62,7 +62,4 @@ void Team::add( const QString &title, int members, const QTime &finishTime, cons
                 0 <<
                 reviewer <<
                 MainWindow::instance()->currentEventId());
-
-    // FIXME: does not work!!
-    this->submitAll();
 }
