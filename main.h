@@ -16,6 +16,20 @@
  *
  */
 
+#pragma once
+
+//
+// includes
+//
+#include <QtGlobal>
+
+/**
+ * namespace Main
+ */
 namespace Main {
+#ifdef Q_CC_MSVC
+static constexpr const *Path = ".database2";
+#else
 static constexpr const char __attribute__((unused)) *Path = ".database2";
+#endif
 }

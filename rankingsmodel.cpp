@@ -30,6 +30,8 @@
  * @return
  */
 QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, int role ) const {
+    // TODO: add rank
+
     if ( orientation == Qt::Horizontal ) {
         if ( role == Qt::DisplayRole ) {
             if ( section == 0 )
@@ -108,6 +110,12 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
         if ( index.column() == 5 )
             return Rankings::instance()->list.at( index.row()).points;
     }
+
+    if ( role == Qt::TextAlignmentRole )
+        return Qt::AlignCenter;
+
+    if ( role == Qt::TextColorRole && index.column() == 4 && Rankings::instance()->list.at( index.row()).penalty > 0 )
+        return QColor( Qt::red );
 
     return QVariant();
 }

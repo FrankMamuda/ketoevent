@@ -12,5 +12,7 @@
         <file alias="log_remove">icons/log_remove.png</file>
         <file alias="log_toggled">icons/log_toggled.png</file>
         <file alias="log_unchecked">icons/log_unchecked.png</file>
+        <file alias="update">icons/update.png</file>
+        <file alias="export">icons/export.png</file>
     </qresource>
 </RCC>

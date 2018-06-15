@@ -40,9 +40,11 @@ class TaskEdit final : public QWidget {
 public:
     static TaskEdit *instance() { static TaskEdit *instance = new TaskEdit(); return instance; }
     virtual ~TaskEdit();
-    void reset();
+    void reset( bool edit = false );
+    bool isEditing() const { return this->m_edit; }
 
 private:
     explicit TaskEdit( QWidget *parent = nullptr );
     Ui::TaskEdit *ui;
+    bool m_edit;
 };

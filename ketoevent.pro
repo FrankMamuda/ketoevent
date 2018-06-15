@@ -72,7 +72,8 @@ HEADERS += \
     variableentry.h \
     modalwindow.h \
     rankingsmodel.h \
-    main.h
+    main.h \
+    combobox.h
 
 FORMS += \
         mainwindow.ui \

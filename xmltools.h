@@ -29,7 +29,11 @@
  * @brief The XML namespace
  */
 namespace XMLTools_ {
+#ifdef Q_CC_MSVC
+static constexpr const *ConfigFile( "configuration.xml" );
+#else
 static constexpr const char __attribute__((unused)) *ConfigFile( "configuration.xml" );
+#endif
 const static QLoggingCategory Debug( "xml" );
 }
 

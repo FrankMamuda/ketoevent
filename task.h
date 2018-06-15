@@ -40,6 +40,7 @@ class Task final : public Table {
     Q_ENUMS( Types )
     Q_ENUMS( Styles )
     friend class Log;
+    friend class TaskEdit;
 
 public:
     enum Fields {
@@ -63,6 +64,7 @@ public:
         Check,
         Multi
     };
+
     enum Styles {
         NoStyle = -1,
         Regular,
@@ -88,6 +90,7 @@ public:
     QString description( int row ) const { return this->value( row, Desc ).toString(); }
     Id eventId( int row ) const { return Id::fromInteger( this->value( row, Event ).toInt()); }
     int eventRow( int row ) const;
+    QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }
@@ -100,4 +103,6 @@ public slots:
 
 private:
     explicit Task();
+    QMap<Types,QString> types;
+    QMap<Styles,QString> styles;
 };

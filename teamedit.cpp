@@ -24,6 +24,7 @@
 #include "team.h"
 #include "teamedit.h"
 #include "ui_teamedit.h"
+#include "variable.h"
 #include <QCommonStyle>
 #include <QMessageBox>
 
@@ -31,15 +32,16 @@
  * @brief TeamEdit::TeamEdit
  * @param parent
  */
-TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit ) {
+TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit ), m_edit( false ) {
     QCommonStyle style;
+    const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
 
     // set up defaults
     this->ui->setupUi( this );
-    this->ui->membersInteger->setMinimum( EventTable::DefaultMinMembers );
-    this->ui->membersInteger->setMaximum( EventTable::DefaultMaxMembers );
-    this->ui->finishTime->setMinimumTime( QTime::fromString( EventTable::DefaultStartTime, "hh:mm" ));
-    this->ui->finishTime->setMaximumTime( QTime::fromString( EventTable::DefaultFinalTime, "hh:mm" ));
+    this->ui->membersInteger->setMinimum( Event::instance()->minMembers( event ));
+    this->ui->membersInteger->setMaximum( Event::instance()->maxMembers( event ));
+    this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
+    this->ui->finishTime->setMaximumTime( Event::instance()->finishTime( event ));
     this->ui->addButton->setIcon( style.standardIcon( QStyle::SP_DialogOkButton ));
     this->ui->cancelButton->setIcon( style.standardIcon( QStyle::SP_DialogCancelButton ));
 
@@ -62,13 +64,25 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
             return;
 
         // abort on existing team
-        if ( Team::instance()->contains( Team::Title, teamTitle )) {
+        if ( Team::instance()->contains( Team::Title, teamTitle ) && !this->isEditing()) {
             QMessageBox::information( this, this->tr( "Team already exists" ), this->tr( "Team already exists\nChoose a different title" ));
             return;
         }
 
-        // if everything is ok, add a new team
-        Team::instance()->add( teamTitle, this->ui->membersInteger->value(), this->ui->finishTime->time(), this->ui->reviewerEdit->text());
+        // if everything is ok, add a new task
+        if ( !this->isEditing()) {
+            Team::instance()->add( teamTitle,
+                                   this->ui->membersInteger->value(),
+                                   this->ui->finishTime->time(),
+                                   this->ui->reviewerEdit->text());
+
+        } else {
+            const int team = EditorDialog::instance()->container->currentIndex().row();
+            Team::instance()->setTitle( team, teamTitle );
+            Team::instance()->setMembers( team, this->ui->membersInteger->value());
+            Team::instance()->setFinishTime( team, this->ui->finishTime->time());
+            Team::instance()->setReviewer( team, this->ui->reviewerEdit->text());
+        }
 
         // close dock
         if ( EditorDialog::instance()->isDockVisible())
@@ -99,7 +113,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
-    });
+    } );
 }
 
 /**
@@ -120,14 +134,25 @@ TeamEdit::~TeamEdit() {
 /**
  * @brief TeamEdit::reset
  */
-void TeamEdit::reset() {
-    // reset ui components to default values
-    this->ui->titleEdit->clear();
-    this->ui->finishTime->setTime( this->ui->finishTime->minimumTime());
-    this->ui->membersInteger->setValue( EventTable::DefaultMembers );
+void TeamEdit::reset( bool edit ) {
+    this->m_edit = edit;
+
+    if ( !this->isEditing()) {
+        // reset ui components to default values
+        this->ui->titleEdit->clear();
+        this->ui->finishTime->setTime( this->ui->finishTime->minimumTime());
+        this->ui->membersInteger->setValue( EventTable::DefaultMembers );
+        this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
+    } else {
+        const int team = EditorDialog::instance()->container->currentIndex().row();
+
+        this->ui->titleEdit->setText( Team::instance()->title( team ));
+        this->ui->finishTime->setTime( Team::instance()->finishTime( team ));
+        this->ui->membersInteger->setValue( Team::instance()->members( team ));
+        this->ui->reviewerEdit->setText( Team::instance()->reviewer( team ));
+    }
 
     // TODO: set default reviewer
-    //this->ui->reviewerEdit->setText()
     this->ui->titleEdit->setFocus();
     this->ui->addButton->setDefault( false );
     this->ui->addButton->setAutoDefault( false );

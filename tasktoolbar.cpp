@@ -43,7 +43,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task" ));
-            TaskEdit::instance()->reset();
+            TaskEdit::instance()->reset( true );
         }
     } );
 

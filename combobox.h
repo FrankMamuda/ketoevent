@@ -21,30 +21,44 @@
 //
 // includes
 //
-#include <QWidget>
+#include <QComboBox>
 
 /**
- * @brief The Ui namespace
+ * @brief The ComboBox class
  */
-namespace Ui {
-class TeamEdit;
-}
-
-/**
- * @brief The TeamEdit class
- */
-class TeamEdit final : public QWidget {
+class ComboBox final : public QComboBox {
     Q_OBJECT
-    Q_DISABLE_COPY( TeamEdit )
 
 public:
-    static TeamEdit *instance() { static TeamEdit *instance = new TeamEdit(); return instance; }
-    virtual ~TeamEdit();
-    void reset( bool edit = false );
-    bool isEditing() const { return this->m_edit; }
+    explicit ComboBox( QWidget *parent = nullptr ) : QComboBox( parent ) {}
 
-private:
-    explicit TeamEdit( QWidget *parent = nullptr );
-    Ui::TeamEdit *ui;
-    bool m_edit;
+    /**
+     * @brief addItems
+     * @param items
+     */
+    void addItems( const QStringList &items ) {
+        QComboBox::addItems( items );
+        emit this->activated( this->currentIndex());
+    }
+
+    /**
+     * @brief hidePopup
+     */
+    void hidePopup() override {
+      QComboBox::hidePopup();
+      emit popupHidden();
+    }
+
+public slots:
+    /**
+     * @brief setCurrentIndex
+     * @param index
+     */
+    void setCurrentIndex( int index ) {
+        QComboBox::setCurrentIndex( index );
+        emit this->activated( index );
+    }
+
+signals:
+    void popupHidden();
 };

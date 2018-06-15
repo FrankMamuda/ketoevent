@@ -35,7 +35,11 @@ class Table;
  */
 namespace Database_ {
 const static QLoggingCategory Debug( "database" );
+#ifdef Q_CC_MSVC
+const static unsigned int null = 0;
+#else
 const static  __attribute__((unused)) unsigned int null = 0;
+#endif
 };
 
 

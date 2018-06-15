@@ -42,7 +42,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team" ));
-            TeamEdit::instance()->reset();
+            TeamEdit::instance()->reset( true );
         }
     } );
 

@@ -27,6 +27,9 @@
 #include "task.h"
 #include "event.h"
 #include "rankingsmodel.h"
+#include <QCommonStyle>
+#include <QFileDialog>
+#include <QTextStream>
 #include <QThread>
 
 /**
@@ -34,9 +37,11 @@
  * @param parent
  */
 Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nullptr ) {
+    QCommonStyle style;
     this->ui->setupUi( this );
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->progressBar->hide();
+    this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
 }
 
 /**
@@ -75,11 +80,13 @@ void Rankings::on_actionUpdate_triggered() {
 
     // get event related variables
     const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
+    const QTime eventStartTime( Event::instance()->startTime( event ));
     const QTime eventFinishTime( Event::instance()->finishTime( event ));
     const int penaltyPoints( Event::instance()->penalty( event ));
 
     // go through team list (might seem a little less efficient than going through logs,
-    // but in reality there is not that much of performance penalty)
+    // but in reality there is not that much of a performance penalty
+    // team method also avoids unnecessary complexity over calculation by logs
     for ( int team = 0; team < Team::instance()->count(); team++ ) {
         TeamStatistics stats( Team::instance()->title( team ));
         QMap<Id, int> combos;
@@ -88,13 +95,8 @@ void Rankings::on_actionUpdate_triggered() {
         // update progress bar
         this->ui->progressBar->setValue( team );
 
+        // TODO: remove me
         QObject().thread()->usleep( 1000 * 20 );
-
-        // calculate penalty points
-        // TODO: check finalTime
-        const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
-        if ( overTime > 0 )
-            stats.penalty = penaltyPoints * overTime;
 
         // go through logs
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
@@ -146,6 +148,16 @@ void Rankings::on_actionUpdate_triggered() {
                 stats.points += EventTable::DefaultComboOfFourAndMore;
         }
 
+
+        // calculate penalty points
+        // TODO: check finalTime
+        const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
+        stats.time = eventStartTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
+        if ( overTime > 0 ) {
+            stats.penalty = penaltyPoints * overTime;
+            stats.points -= stats.penalty;
+        }
+
         // add team stats to list
         this->list << stats;
     }
@@ -172,6 +184,10 @@ void Rankings::showEvent( QShowEvent *event ) {
     this->prevFilter = Log::instance()->filter();
     Log::instance()->setFilter( "" );
     ModalWindow::showEvent( event );
+
+    // calculate results on first open
+   // if ( this->model == nullptr )
+        //this->on_actionUpdate_triggered();
 }
 
 /**
@@ -181,4 +197,70 @@ void Rankings::showEvent( QShowEvent *event ) {
 void Rankings::hideEvent( QHideEvent *event ) {
     Log::instance()->setFilter( this->prevFilter );
     ModalWindow::hideEvent( event );
+}
+
+/**
+ * @brief Rankings::on_closeButton_clicked
+ */
+void Rankings::on_closeButton_clicked() {
+    this->hide();
+}
+
+/**
+ * @brief Rankings::on_actionExport_triggered
+ */
+void Rankings::on_actionExport_triggered() {
+    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+
+    // check for empty filenames
+    if ( path.isEmpty())
+        return;
+
+    // add extension
+    if ( !path.endsWith( ".csv" ))
+        path.append( ".csv" );
+
+    // create file
+    QFile csv( path );
+
+    if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
+        QTextStream out( &csv );
+#ifdef Q_OS_WIN
+        out.setCodec( "Windows-1257" );
+#else
+        out.setCodec( "UTF-8" );
+#endif
+        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" )
+       #ifdef Q_OS_WIN
+               .append( "\r" )
+       #endif
+               .append( "\n" );
+
+        foreach ( TeamStatistics team, this->list ) {
+            int points;
+
+            //if ( team->disqualified())
+            //    points = 0;
+            //else
+            //    points = team->points() - team->penalty();
+
+            // TODO: add this to calculation
+            if ( points <= 0 )
+                points = 0;
+
+            out << QString( "%1;%2;%3;%4;%5;%6%7" )
+                   .arg( team.title )
+                   .arg( team.completedTasks )
+                   .arg( team.combos )
+                   .arg( team.time )
+                   .arg( team.penalty )
+                   .arg( team.points )
+       #ifdef Q_OS_WIN
+                   .arg( "\r\n" );
+#else
+                   .arg( "\n" );
+#endif
+        }
+    }
+    csv.close();
 }

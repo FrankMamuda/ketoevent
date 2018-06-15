@@ -48,13 +48,15 @@ public:
         combos( 0 ),
         comboTasks( 0 ),
         points( 0 ),
-        penalty( 0 ) {}
+        penalty( 0 ),
+        time( 0 ) {}
     QString title;
     int completedTasks;
     int combos;
     int comboTasks;
     int points;
     int penalty;
+    int time;
 };
 
 /**
@@ -71,6 +73,8 @@ public:
 
 private slots:
     void on_actionUpdate_triggered();
+    void on_closeButton_clicked();
+    void on_actionExport_triggered();
 
 protected:
     void showEvent( QShowEvent *event );

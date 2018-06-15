@@ -24,6 +24,8 @@
 #include "database.h"
 #include "event.h"
 
+#include <QFont>
+
 //
 // namespaces
 //
@@ -45,6 +47,13 @@ Task::Task() : Table( TaskTable::Name ) {
 
     // set relation
     this->setRelation( Event, QSqlRelation( EventTable::Name, Event::instance()->field( Event::ID )->name(), Event::instance()->field( Event::Title )->name()));
+
+    // map types and styles
+    this->types[Check]      = QT_TR_NOOP_UTF8( "Check" );
+    this->types[Multi]      = QT_TR_NOOP_UTF8( "Multi" );
+    this->styles[Regular]   = QT_TR_NOOP_UTF8( "Regular" );
+    this->styles[Bold]      = QT_TR_NOOP_UTF8( "Bold" );
+    this->styles[Italic]    = QT_TR_NOOP_UTF8( "Italic" );
 }
 
 /**
@@ -76,4 +85,29 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
  */
 int Task::eventRow( int row ) const {
     return Event::instance()->row( this->eventId( row ));
+}
+
+/**
+ * @brief Task::data
+ * @param idx
+ * @param role
+ * @return
+ */
+QVariant Task::data( const QModelIndex &index, int role ) const {
+    if ( role == Qt::FontRole ) {
+        const int row = index.row();
+        QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
+
+        if ( Task::instance()->style( row ) == Task::Italic ) {
+            font.setItalic( true );
+            return font;
+        }
+
+        if ( Task::instance()->style( row ) == Task::Bold ) {
+            font.setBold( true );
+            return font;
+        }
+    }
+
+    return Table::data( index, role );
 }

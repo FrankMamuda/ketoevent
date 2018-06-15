@@ -29,6 +29,16 @@
  */
 namespace EventTable {
 const static QString Name( "events" );
+#ifdef Q_CC_MSVC
+const static int Version = 9;
+const static int DefaultMinMembers = 1;
+const static int DefaultMembers = 2;
+const static int DefaultMaxMembers = 3;
+const static int DefaultComboOfTwo = 1;
+const static int DefaultComboOfThree = 3;
+const static int DefaultComboOfFourAndMore = 5;
+const static int DefaultPenaltyPoints = 5;
+#else
 const static __attribute__((unused)) int Version = 9;
 const static __attribute__((unused)) int DefaultMinMembers = 1;
 const static __attribute__((unused)) int DefaultMembers = 2;
@@ -37,6 +47,7 @@ const static __attribute__((unused)) int DefaultComboOfTwo = 1;
 const static __attribute__((unused)) int DefaultComboOfThree = 3;
 const static __attribute__((unused)) int DefaultComboOfFourAndMore = 5;
 const static __attribute__((unused)) int DefaultPenaltyPoints = 5;
+#endif
 const static QString DefaultStartTime( "10:00" );
 const static QString DefaultFinishTime( "15:00" );
 const static QString DefaultFinalTime( "15:30" );
