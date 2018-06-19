@@ -27,6 +27,7 @@
 #include "task.h"
 #include "event.h"
 #include "rankingsmodel.h"
+#include "variable.h"
 #include <QCommonStyle>
 #include <QFileDialog>
 #include <QTextStream>
@@ -42,6 +43,12 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->progressBar->hide();
     this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
+
+    this->ui->teamCombo->setModel( Team::instance());
+    this->ui->teamCombo->setModelColumn( Team::Title );
+
+    this->ui->teamCombo->setObjectName( "Two" );
+    Variable::instance()->bind( "teamId", this->ui->teamCombo );
 }
 
 /**
@@ -49,6 +56,14 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
  */
 Rankings::~Rankings() {
     delete this->ui;
+}
+
+/**
+ * @brief Rankings::isDisplayingCurrentTeam
+ * @return
+ */
+bool Rankings::isDisplayingCurrentTeam() const {
+    return this->ui->actionCurrent_team->isChecked();
 }
 
 /**
@@ -185,6 +200,10 @@ void Rankings::showEvent( QShowEvent *event ) {
     Log::instance()->setFilter( "" );
     ModalWindow::showEvent( event );
 
+    // scale window to contents
+    this->ui->tableView->resizeColumnsToContents();
+    this->ui->tableView->resizeRowsToContents();
+
     // calculate results on first open
    // if ( this->model == nullptr )
         //this->on_actionUpdate_triggered();
@@ -264,3 +283,4 @@ void Rankings::on_actionExport_triggered() {
     }
     csv.close();
 }
+

@@ -22,6 +22,7 @@
 // includes
 //
 #include <QComboBox>
+//#include <QDebug>
 
 /**
  * @brief The ComboBox class

@@ -33,6 +33,8 @@
 #include "teamtoolbar.h"
 #include "rankings.h"
 #include "settings.h"
+#include "variable.h"
+#include "database.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -51,6 +53,10 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     this->ui->taskView->setModelColumn( Task::Name );
     this->ui->taskView->setItemDelegate( new LogDelegate( this->ui->taskView ));
     //this->ui->taskView->setParent( this );
+
+    Variable::instance()->bind( "eventId", this->ui->comboEvent );
+    this->ui->comboTeam->setObjectName( "One" );
+    Variable::instance()->bind( "teamId", this->ui->comboTeam );
 }
 
 /**
@@ -66,6 +72,17 @@ MainWindow::~MainWindow() {
  */
 Id MainWindow::currentEventId() const {
     return Event::instance()->id( this->ui->comboEvent->currentIndex());
+}
+
+/**
+ * @brief MainWindow::currentTeamId
+ * @return
+ */
+Id MainWindow::currentTeamId() const {
+    if ( !Database::instance()->hasInitialised())
+        return Id::fromInteger( -1 );
+
+    return Team::instance()->id( this->ui->comboTeam->currentIndex());
 }
 
 /**
@@ -104,9 +121,11 @@ void MainWindow::on_buttonRename_clicked() {
  * @param index
  */
 void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
+    if ( !Database::instance()->hasInitialised())
+        return;
+
     Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
     Task::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
-    //Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( this->ui->comboTeam->currentIndex())));
 }
 
 /**
@@ -114,6 +133,10 @@ void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
  * @param index
  */
 void MainWindow::on_comboTeam_currentIndexChanged( int index ) {
+    if ( !Database::instance()->hasInitialised())
+        return;
+
+    // NOTE: is this really needed?
     Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( index ).value()));
     this->ui->taskView->viewport()->update();    
     this->ui->taskView->setEnabled( index == -1 ? false : true );

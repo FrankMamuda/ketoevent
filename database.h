@@ -59,13 +59,16 @@ public:
     static Database *instance() { static Database *instance( new Database()); return instance; }
     ~Database();
     void add( Table *table );
+    bool hasInitialised() const { return this->m_initialised; }
 
 private:
     explicit Database( QObject *parent = nullptr );
+    void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
 
     /**
      * @brief createInstance
      * @return
      */
     QMap<QString, Table*> tables;
+    bool m_initialised;
 };

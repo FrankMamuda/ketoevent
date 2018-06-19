@@ -73,7 +73,8 @@ HEADERS += \
     modalwindow.h \
     rankingsmodel.h \
     main.h \
-    combobox.h
+    combobox.h \
+    widget.h
 
 FORMS += \
         mainwindow.ui \

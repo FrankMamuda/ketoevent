@@ -36,6 +36,11 @@ namespace Variable_ {
     const static QLoggingCategory Debug( "variable" );
 }
 
+//
+// classes
+//
+class Widget;
+
 /**
  * @brief The Variable class
  */
@@ -115,20 +120,16 @@ public slots:
     void setString( const QString &key, const QString &string ) { Variable::instance()->setValue<QString>( key, string ); }
     void reset( const QString &key ) { if ( Variable::instance()->contains( key )) Variable::instance()->setValue<QVariant>( key, Variable::instance()->value<QVariant>( key, true )); }
     void bind( const QString &key, const QObject *receiver, const char *method );
-    QString bind( const QString &key, QObject *object );
-    QString bind( const QString &key, QWidget *widget ) { return this->bind( key, qobject_cast<QObject*>( widget )); }
-    void unbind( const QString &key );
+    QString bind( const QString &key, QWidget *widget );
+    void unbind( const QString &key, QWidget *widget = nullptr );
     void update( const QString &key ) { emit this->valueChanged( key ); }
 
 signals:
     void valueChanged( const QString &key );
-
-private slots:
-    void setBoundValue( const QString &key, bool internal );
+    void widgetChanged( const QString &key, Widget *widget, const QVariant &value );
 
 private:
     explicit Variable();
-    QMap<QString, QObject*>boundVariables;
-    QSignalMapper *signalMapper;
+    QMultiMap<QString, Widget*> boundVariables;
     QMap<QString, QPair<QObject*, int> > slotList;
 };

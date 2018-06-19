@@ -46,6 +46,7 @@ public:
     virtual ~MainWindow();
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
     Id currentEventId() const;
+    Id currentTeamId() const;
 
 private slots:
     void on_buttonAdd_clicked();

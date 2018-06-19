@@ -70,6 +70,7 @@ class Rankings final : public ModalWindow {
 public:
     static Rankings *instance() { static Rankings *instance( new Rankings()); return instance; }
     virtual ~Rankings();
+    bool isDisplayingCurrentTeam() const;
 
 private slots:
     void on_actionUpdate_triggered();

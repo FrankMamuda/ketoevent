@@ -29,12 +29,13 @@
 #include "table.h"
 #include "field.h"
 #include "main.h"
+#include "variable.h"
 
 /**
  * @brief Database::Database
  * @param parent
  */
-Database::Database( QObject *parent ) : QObject( parent ) {
+Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false ) {
     QDir path( QDir::homePath() + "/" + Main::Path );
     QFile file( path.absolutePath() + "/" + "database.db" );
     QSqlDatabase database( QSqlDatabase::database());
@@ -72,6 +73,9 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     // set path and open
     if ( !database.open())
         qFatal( QT_TR_NOOP_UTF8( "could not load database" ));
+
+    // done
+    this->setInitialised();
 }
 
 /**
@@ -83,6 +87,11 @@ Database::~Database() {
 
     // announce
     qCInfo( Database_::Debug ) << this->tr( "unloading database" );
+    this->setInitialised( false );
+
+    // unbind variables
+    Variable::instance()->unbind( "eventId" );
+    Variable::instance()->unbind( "teamId" );
 
     // TODO: clean up orphans
     qCInfo( Database_::Debug ) << this->tr( "clearing tables" );

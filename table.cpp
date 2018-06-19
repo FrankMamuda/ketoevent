@@ -67,12 +67,6 @@ bool Table::select() {
     while ( this->canFetchMore())
         this->fetchMore();
 
-    // find primary key
-    foreach ( const Field &field, this->fields ) {
-        if ( field->isPrimary())
-            this->m_primaryField = field;
-    }
-
     // build id to row map
     this->map.clear();
     if ( !this->primaryField().isNull()) {
@@ -90,10 +84,12 @@ bool Table::select() {
  * @return
  */
 QVariant Table::data( const QModelIndex &item, int role ) const {
-    if ( role == IDRole ) {
-        if ( !this->primaryField()->isNull())
-            return this->record( item.row()).value( this->primaryField()->id()).toInt();
-    }
+    if ( !Database::instance()->hasInitialised())
+        return QVariant();
+
+    if ( role == IDRole || role == Qt::UserRole )
+        // FIXME: this fails for no reason: this->primaryField()->isNull() sometimes returns true, sometimes false
+        return this->record( item.row()).value( this->primaryField()->id()).toInt();
 
     return QSqlRelationalTableModel::data( item, role );
 }
@@ -132,7 +128,10 @@ void Table::addField( int id, const QString &fieldName, QVariant::Type type, con
     if ( this->fields.contains( id ))
         return;
 
-    this->fields[id] = Field( new Field_( id, fieldName, type, format, unique, autoValue ));
+    Field field( new Field_( id, fieldName, type, format, unique, autoValue ));
+    this->fields[id] = field;
+    if ( field->isPrimary() && this->primaryField().isNull())
+        this->m_primaryField = field;
 }
 
 /**

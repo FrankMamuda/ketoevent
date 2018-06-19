@@ -16,6 +16,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QComboBox" name="teamCombo"/>
+    </item>
+    <item>
      <widget class="QTableView" name="tableView">
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
@@ -98,6 +101,9 @@
    </property>
   </action>
   <action name="actionCurrent_team">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Current team</string>
    </property>

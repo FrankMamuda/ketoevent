@@ -31,10 +31,6 @@
 #include "variable.h"
 
 //
-// TODO: use string literals
-//
-
-//
 // sort out ui element naming
 // nameType vs typeName
 // closeButton vs buttonClose
@@ -52,6 +48,8 @@ int main( int argc, char *argv[] ) {
 
     // set variable defaults
     Variable::instance()->add( "reviewerName", "" );
+    Variable::instance()->add( "eventId", -1 );
+    Variable::instance()->add( "teamId", -1 );
 
     // read configuration
     XMLTools::instance()->read();

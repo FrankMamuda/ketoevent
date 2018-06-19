@@ -21,6 +21,7 @@
 //
 #include "rankingsmodel.h"
 #include "rankings.h"
+#include "team.h"
 
 /**
  * @brief RankingsModel::headerData
@@ -92,8 +93,17 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
         return QVariant();
 
     if ( role == Qt::DisplayRole ) {
-        if ( index.column() == 0 )
-            return Rankings::instance()->list.at( index.row()).title;
+        if ( index.column() == 0 ) {
+            if ( !Rankings::instance()->isDisplayingCurrentTeam()) {
+                return Rankings::instance()->list.at( index.row()).title;
+            } else {
+                const int team = Team::instance()->row( MainWindow::instance()->currentTeamId());
+                const QString title( Team::instance()->title( team ));
+
+                if ( !QString::compare( title, Rankings::instance()->list.at( index.row()).title ))
+                    return Rankings::instance()->list.at( index.row()).title;
+            }
+        }
 
         if ( index.column() == 1 )
             return Rankings::instance()->list.at( index.row()).completedTasks;

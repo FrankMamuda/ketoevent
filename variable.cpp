@@ -23,7 +23,9 @@
 //
 // includes
 //
+#include "team.h"
 #include "variable.h"
+#include "widget.h"
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
@@ -35,18 +37,31 @@
 /**
  * @brief Variable::Variable
  */
-Variable::Variable() : signalMapper( new QSignalMapper( this )) {
-    this->connect( this, &Variable::valueChanged, [ this ]( const QString &key ) { this->setBoundValue( key, false ); } );
-    this->connect( this->signalMapper, static_cast< void( QSignalMapper::* )( const QString & )>( &QSignalMapper::mapped ), [ this ]( const QString &key ) { this->setBoundValue( key, true ); } );
+Variable::Variable() {
+    // update widgets on variable change
+    this->connect( this, &Variable::valueChanged, [ this ]( const QString &key ) {
+        foreach ( Widget *widget, this->boundVariables.values( key )) {
+            widget->setValue( this->value<QVariant>( key ));
+        }
+    } );
+
+    // update variable and sibling widgets on widget change
+    this->connect( this, &Variable::widgetChanged, [ this ]( const QString &key, Widget *widget, const QVariant &value ) {
+        foreach ( Widget *boundWidget, this->boundVariables.values( key )) {
+            if ( boundWidget == widget )
+                this->setValue( key, value );
+            else
+                boundWidget->setValue( value );
+        }
+    } );
 }
 
 /**
  * @brief Variable::~Variable
  */
 Variable::~Variable() {
+    this->disconnect( this, SIGNAL( widgetChanged( QString, Widget *, QVariant & )));
     this->disconnect( this, SIGNAL( valueChanged( QString )));
-    this->disconnect( this->signalMapper, SIGNAL( mapped( QString )));
-    delete this->signalMapper;
 }
 
 /**
@@ -56,8 +71,8 @@ Variable::~Variable() {
  * @param method
  */
 void Variable::bind( const QString &key, const QObject *receiver, const char *method ) {
-   QPair<QObject*, int> slot;
-   int code;
+    QPair<QObject*, int> slot;
+    int code;
 
     if ( key.isEmpty())
         return;
@@ -83,69 +98,11 @@ void Variable::bind( const QString &key, const QObject *receiver, const char *me
  * @param key
  * @param widget
  */
-QString Variable::bind( const QString &key, QObject *object ) {
-    this->boundVariables[key] = object;
-    this->setBoundValue( key, false );
-
-    // determine widget type
-    if ( !QString::compare( object->metaObject()->className(), "QCheckBox" )) {
-        QCheckBox *checkBox;
-        checkBox = qobject_cast<QCheckBox*>( object );
-
-        // connect for further updates
-        if ( checkBox != nullptr ) {
-            this->connect( checkBox, SIGNAL( stateChanged( int )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( checkBox, key );
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QAction" )) {
-        QAction *action;
-        action = qobject_cast<QAction*>( object );
-
-        // connect for further updates
-        if ( action != nullptr ) {
-            this->connect( action, SIGNAL( toggled( bool )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( action, key );
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QLineEdit" )) {
-        QLineEdit *lineEdit;
-        lineEdit = qobject_cast<QLineEdit*>( object );
-
-        // connect for further updates
-        if ( lineEdit != nullptr ) {
-            this->connect( lineEdit, SIGNAL( textChanged( QString )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( lineEdit, key );
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QTimeEdit" )) {
-        QTimeEdit *timeEdit;
-        timeEdit = qobject_cast<QTimeEdit*>( object );
-
-        // connect for further updates
-        if ( timeEdit != nullptr ) {
-            this->connect( timeEdit, SIGNAL( timeChanged( QTime )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( timeEdit, key );
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QSpinBox" )) {
-        QSpinBox *spinBox;
-        spinBox = qobject_cast<QSpinBox*>( object );
-
-        // connect for further updates
-        if ( spinBox != nullptr ) {
-            this->connect( spinBox, SIGNAL( valueChanged( int )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( spinBox, key );
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QComboBox" )) {
-        QComboBox *comboBox;
-        comboBox = qobject_cast<QComboBox*>( object );
-
-        // connect for further updates
-        if ( comboBox != nullptr ) {
-            this->connect( comboBox, SIGNAL( currentIndexChanged( int )), this->signalMapper, SLOT( map()));
-            this->signalMapper->setMapping( comboBox, key );
-        }
-    } else {
-        qCWarning( Variable_::Debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
-    }
-
+QString Variable::bind( const QString &key, QWidget *widget ) {
+    Widget *boundWidget( new Widget( widget ));
+    boundWidget->setValue( this->value<QVariant>( key ));
+    this->connect( boundWidget, &Widget::changed, [ this, key, boundWidget ]( const QVariant &value ) { emit this->widgetChanged( key, boundWidget, value ); } );
+    this->boundVariables.insert( key, boundWidget );
     return key;
 }
 
@@ -153,119 +110,21 @@ QString Variable::bind( const QString &key, QObject *object ) {
  * @brief Variable::unbind
  * @param key
  */
-void Variable::unbind( const QString &key ) {
+void Variable::unbind( const QString &key, QWidget *widget ) {
     if ( this->boundVariables.contains( key )) {
-        QObject *object;
+        QList<Widget*> widgetList( this->boundVariables.values( key ));
 
-        object = this->boundVariables[key];
-        this->signalMapper->removeMappings( object );
-        this->boundVariables.remove( key );
-    }
-}
-
-/**
- * @brief Variable::setBoundValue
- * @param key
- * @param internal
- */
-void Variable::setBoundValue( const QString &key, bool internal ) {
-    QObject *object;
-
-    if ( !this->boundVariables.contains( key ))
-        return;
-
-    // get widget and block it's signals
-    object = this->boundVariables[key];
-    object->blockSignals( true );
-
-    // determine widget type
-    if ( !QString::compare( object->metaObject()->className(), "QCheckBox" )) {
-        QCheckBox *checkBox;
-
-        checkBox = qobject_cast<QCheckBox*>( object );
-
-        if ( checkBox != nullptr ) {
-            if ( internal )
-                this->setValue<bool>( key, checkBox->isChecked(), true );
-            else
-                checkBox->setChecked( this->isEnabled( key ));
+        if ( widget == nullptr ) {
+            qDeleteAll( widgetList );
+            this->boundVariables.remove( key );
+            return;
         }
-    } else if ( !QString::compare( object->metaObject()->className(), "QAction" )) {
-        QAction *action;
 
-        action = qobject_cast<QAction*>( object );
-
-        if ( action != nullptr ) {
-            if ( internal )
-                this->setValue<bool>( key, action->isChecked(), true );
-            else
-                action->setChecked( this->isEnabled( key ));
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QTimeEdit" )) {
-        QTimeEdit *timeEdit;
-
-        timeEdit = qobject_cast<QTimeEdit*>( object );
-
-        if ( timeEdit != nullptr ) {
-            QTime time;
-
-            if ( internal )
-                this->setValue<QTime>( key, timeEdit->time(), true );
-            else
-                timeEdit->setTime( this->value<QTime>( key ));
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QLineEdit" )) {
-        QLineEdit *lineEdit;
-
-        lineEdit = qobject_cast<QLineEdit*>( object );
-
-        if ( lineEdit != nullptr ) {
-            if ( internal )
-                this->setValue<QString>( key, lineEdit->text(), true );
-            else
-                lineEdit->setText( this->string( key ));
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QSpinBox" )) {
-        QSpinBox *spinBox;
-
-        spinBox = qobject_cast<QSpinBox*>( object );
-
-        if ( spinBox != nullptr ) {
-            if ( internal )
-                this->setValue<int>( key, spinBox->value(), true );
-            else
-                spinBox->setValue( this->integer( key ));
-        }
-    } else if ( !QString::compare( object->metaObject()->className(), "QComboBox" )) {
-        QComboBox *comboBox;
-
-        comboBox = qobject_cast<QComboBox*>( object );
-
-        if ( comboBox != nullptr ) {
-            if ( comboBox->currentIndex() != -1 ) {
-                if ( internal )
-                    this->setValue( key, comboBox->currentData(), true );
-                else {
-                    int y;
-                    for ( y = 0; y < comboBox->count(); y++ ) {
-                        if ( comboBox->itemData( y ) == this->value<QVariant>( key )) {
-                            comboBox->setCurrentIndex( y );
-                            break;
-                        }
-                    }
-                }
-            } else {
-                qCWarning( Variable_::Debug, this->tr( "void comboBox for variable \"%1\"" ).arg( key ).toUtf8().constData());
+        foreach ( Widget *compare, this->boundVariables.values( key )) {
+            if ( compare->widget == widget ) {
+                this->boundVariables.remove( key, compare );
+                delete compare;
             }
         }
-    } else {
-        qCWarning( Variable_::Debug, this->tr( "unsupported container \"%1\"" ).arg( object->metaObject()->className()).toUtf8().constData());
     }
-
-    // force update
-    if ( internal )
-        this->updateConnections( key, this->value<QVariant>( key ));
-
-    // unblock signals
-    object->blockSignals( false );
 }
