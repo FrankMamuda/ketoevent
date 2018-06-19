@@ -47,14 +47,22 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
-    this->ui->teamCombo->setObjectName( "Two" );
     Variable::instance()->bind( "teamId", this->ui->teamCombo );
+    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent_team );
+
+    // TODO: disconnect me
+    Variable::instance()->bind( "teamId", this->ui->tableView->viewport(), SLOT( repaint()));
+    this->connect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
 }
 
 /**
  * @brief Rankings::~Rankings
  */
 Rankings::~Rankings() {
+    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
+    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent_team );
+    this->disconnect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )));
+
     delete this->ui;
 }
 
@@ -256,7 +264,7 @@ void Rankings::on_actionExport_triggered() {
                .append( "\n" );
 
         foreach ( TeamStatistics team, this->list ) {
-            int points;
+            //int points;
 
             //if ( team->disqualified())
             //    points = 0;
@@ -264,8 +272,8 @@ void Rankings::on_actionExport_triggered() {
             //    points = team->points() - team->penalty();
 
             // TODO: add this to calculation
-            if ( points <= 0 )
-                points = 0;
+            //if ( points <= 0 )
+            //    points = 0;
 
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( team.title )

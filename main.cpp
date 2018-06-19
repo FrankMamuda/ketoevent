@@ -50,6 +50,7 @@ int main( int argc, char *argv[] ) {
     Variable::instance()->add( "reviewerName", "" );
     Variable::instance()->add( "eventId", -1 );
     Variable::instance()->add( "teamId", -1 );
+    Variable::instance()->add( "rankingsCurrent", true );
 
     // read configuration
     XMLTools::instance()->read();

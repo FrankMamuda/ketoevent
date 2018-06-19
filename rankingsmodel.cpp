@@ -36,22 +36,22 @@ QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, in
     if ( orientation == Qt::Horizontal ) {
         if ( role == Qt::DisplayRole ) {
             if ( section == 0 )
-                return "Team\ntitle";
+                return QT_TR_NOOP_UTF8( "Team\ntitle" );
 
             if ( section == 1 )
-                return "Completed";
+                return QT_TR_NOOP_UTF8( "Completed" );
 
             if ( section == 2 )
-                return "Combos";
+                return QT_TR_NOOP_UTF8( "Combos" );
 
             if ( section == 3 )
-                return "Combined";
+                return QT_TR_NOOP_UTF8( "Combined" );
 
             if ( section == 4 )
-                return "Penalty";
+                return QT_TR_NOOP_UTF8( "Penalty" );
 
             if ( section == 5 )
-                return "Points";
+                return QT_TR_NOOP_UTF8( "Points" );
         }
     }
 

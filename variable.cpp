@@ -41,17 +41,24 @@ Variable::Variable() {
     // update widgets on variable change
     this->connect( this, &Variable::valueChanged, [ this ]( const QString &key ) {
         foreach ( Widget *widget, this->boundVariables.values( key )) {
-            widget->setValue( this->value<QVariant>( key ));
+            QVariant var( this->value<QVariant>( key ));
+
+            qDebug() << "set widget" << key << var;
+            //if ( widget->value() != this->validate( var ))
+                widget->setValue( var );
         }
     } );
 
     // update variable and sibling widgets on widget change
     this->connect( this, &Variable::widgetChanged, [ this ]( const QString &key, Widget *widget, const QVariant &value ) {
         foreach ( Widget *boundWidget, this->boundVariables.values( key )) {
-            if ( boundWidget == widget )
+            if ( boundWidget == widget ) {
+                qDebug() << "set var" << key << value;
                 this->setValue( key, value );
-            else
+            } else {
                 boundWidget->setValue( value );
+                qDebug() << "set foreign widget" << key << value;
+            }
         }
     } );
 }
@@ -98,11 +105,14 @@ void Variable::bind( const QString &key, const QObject *receiver, const char *me
  * @param key
  * @param widget
  */
-QString Variable::bind( const QString &key, QWidget *widget ) {
-    Widget *boundWidget( new Widget( widget ));
+QString Variable::bind( const QString &key, QObject *object ) {
+    Widget *boundWidget( new Widget( object ));
+
+    qDebug() << "set initial value" << key << this->value<QVariant>( key ) << this->value<QVariant>( key ).toInt();
     boundWidget->setValue( this->value<QVariant>( key ));
     this->connect( boundWidget, &Widget::changed, [ this, key, boundWidget ]( const QVariant &value ) { emit this->widgetChanged( key, boundWidget, value ); } );
     this->boundVariables.insert( key, boundWidget );
+
     return key;
 }
 
@@ -110,18 +120,18 @@ QString Variable::bind( const QString &key, QWidget *widget ) {
  * @brief Variable::unbind
  * @param key
  */
-void Variable::unbind( const QString &key, QWidget *widget ) {
+void Variable::unbind( const QString &key, QObject *object ) {
     if ( this->boundVariables.contains( key )) {
         QList<Widget*> widgetList( this->boundVariables.values( key ));
 
-        if ( widget == nullptr ) {
+        if ( object == nullptr ) {
             qDeleteAll( widgetList );
             this->boundVariables.remove( key );
             return;
         }
 
         foreach ( Widget *compare, this->boundVariables.values( key )) {
-            if ( compare->widget == widget ) {
+            if ( compare->widget == object ) {
                 this->boundVariables.remove( key, compare );
                 delete compare;
             }

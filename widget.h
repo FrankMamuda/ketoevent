@@ -78,13 +78,13 @@ public:
      * @brief Widget
      * @param w
      */
-    Widget( QWidget *w ) : m_type( NoType ), widget( w ) {
+    Widget( QObject *w ) : m_type( NoType ), widget( w ) {
         // determine widget type
         if ( !QString::compare( widget->metaObject()->className(), "QCheckBox" )) {
             this->connection = this->connect( qobject_cast<QCheckBox*>( widget ), SIGNAL( stateChanged( int )), this, SLOT( valueChanged()));
             this->m_type = CheckBox;
         } else if ( !QString::compare( widget->metaObject()->className(), "QAction" )) {
-            this->connection = this->connect( qobject_cast<QAction*>( widget ), SIGNAL( toggled( bool )), this, SLOT( valueChanged()));
+            this->connection = this->connect( qobject_cast<QAction*>( widget ), SIGNAL( triggered( bool )), this, SLOT( valueChanged()));
             this->m_type = Action;
         } else if ( !QString::compare( widget->metaObject()->className(), "QLineEdit" )) {
             this->connection = this->connect( qobject_cast<QLineEdit*>( widget ), SIGNAL( textChanged( QString )), this, SLOT( valueChanged()));
@@ -153,7 +153,7 @@ public slots:
         if ( this->widget == nullptr )
             return;
 
-        this->widget->blockSignals( true );
+        this->blockSignals( true );
 
         switch ( this->type()) {
         case CheckBox:
@@ -197,7 +197,7 @@ public slots:
             break;
         }
 
-        this->widget->blockSignals( false );
+        this->blockSignals( false );
     }
 
 private slots:
@@ -208,6 +208,6 @@ signals:
 
 private:
     Types m_type;
-    QWidget *widget;
+    QObject *widget;
     QMetaObject::Connection connection;
 };
