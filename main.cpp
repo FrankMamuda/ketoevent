@@ -29,6 +29,7 @@
 #include "editordialog.h"
 #include "xmltools.h"
 #include "variable.h"
+#include "console.h"
 
 //
 // sort out ui element naming
@@ -36,6 +37,28 @@
 // closeButton vs buttonClose
 //
 
+
+// default message handler
+static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
+static Console *console = nullptr;
+
+/**
+ * @brief messageFilter
+ * @param type
+ * @param context
+ * @param msg
+ */
+void messageFilter( QtMsgType type, const QMessageLogContext &context, const QString &msg ) {
+    ( *QT_DEFAULT_MESSAGE_HANDLER )( type, context, msg );
+
+    if ( type == QtFatalMsg ) {
+        QApplication::quit();
+        exit( 0 );
+    }
+
+    if ( console != nullptr )
+        console->print( msg );
+}
 
 /**
  * @brief qMain
@@ -45,6 +68,12 @@
  */
 int main( int argc, char *argv[] ) {
     QApplication a( argc, argv );
+
+    // set console output pattern
+    qSetMessagePattern( "%{if-category}%{category}: %{endif}%{function}: %{message}" );
+
+    // log to file in non-qtcreator environment
+    qInstallMessageHandler( messageFilter );
 
     // set variable defaults
     Variable::instance()->add( "reviewerName", "" );
@@ -65,8 +94,14 @@ int main( int argc, char *argv[] ) {
     // show main window
     MainWindow::instance()->show();
 
+    // initialize console
+    console = Console::instance();
+
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
+        delete console;
+        console = nullptr;
+
         XMLTools::instance()->write();
 
         if ( Database::instance() != nullptr )
@@ -75,7 +110,7 @@ int main( int argc, char *argv[] ) {
         if ( EditorDialog::instance() != nullptr )
             delete EditorDialog::instance();
 
-        // remove toolbars, team task widgets, mainwindow
+        // TODO: remove toolbars, team task widgets, mainwindow
     } );
 
     return a.exec();

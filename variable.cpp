@@ -17,10 +17,6 @@
  */
 
 //
-// FIXME: for some reason there's always an empty (nameless) variable in map
-//
-
-//
 // includes
 //
 #include "team.h"
@@ -43,8 +39,7 @@ Variable::Variable() {
         foreach ( Widget *widget, this->boundVariables.values( key )) {
             QVariant var( this->value<QVariant>( key ));
 
-            qDebug() << "set widget" << key << var;
-            //if ( widget->value() != this->validate( var ))
+            if ( widget->value() != var )
                 widget->setValue( var );
         }
     } );
@@ -53,11 +48,9 @@ Variable::Variable() {
     this->connect( this, &Variable::widgetChanged, [ this ]( const QString &key, Widget *widget, const QVariant &value ) {
         foreach ( Widget *boundWidget, this->boundVariables.values( key )) {
             if ( boundWidget == widget ) {
-                qDebug() << "set var" << key << value;
                 this->setValue( key, value );
             } else {
                 boundWidget->setValue( value );
-                qDebug() << "set foreign widget" << key << value;
             }
         }
     } );
@@ -103,12 +96,12 @@ void Variable::bind( const QString &key, const QObject *receiver, const char *me
 /**
  * @brief Variable::bind
  * @param key
- * @param widget
+ * @param object
+ * @return
  */
 QString Variable::bind( const QString &key, QObject *object ) {
     Widget *boundWidget( new Widget( object ));
 
-    qDebug() << "set initial value" << key << this->value<QVariant>( key ) << this->value<QVariant>( key ).toInt();
     boundWidget->setValue( this->value<QVariant>( key ));
     this->connect( boundWidget, &Widget::changed, [ this, key, boundWidget ]( const QVariant &value ) { emit this->widgetChanged( key, boundWidget, value ); } );
     this->boundVariables.insert( key, boundWidget );
@@ -119,6 +112,7 @@ QString Variable::bind( const QString &key, QObject *object ) {
 /**
  * @brief Variable::unbind
  * @param key
+ * @param object
  */
 void Variable::unbind( const QString &key, QObject *object ) {
     if ( this->boundVariables.contains( key )) {

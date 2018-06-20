@@ -44,7 +44,9 @@ SOURCES += \
     variable.cpp \
     xmltools.cpp \
     settings.cpp \
-    rankingsmodel.cpp
+    rankingsmodel.cpp \
+    cmd.cpp \
+    console.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -74,7 +76,9 @@ HEADERS += \
     rankingsmodel.h \
     main.h \
     combobox.h \
-    widget.h
+    widget.h \
+    cmd.h \
+    console.h
 
 FORMS += \
         mainwindow.ui \
@@ -83,7 +87,8 @@ FORMS += \
     teamedit.ui \
     taskedit.ui \
     rankings.ui \
-    settings.ui
+    settings.ui \
+    console.ui
 
 RESOURCES += \
     resources.qrc

@@ -35,6 +35,7 @@
 #include "settings.h"
 #include "variable.h"
 #include "database.h"
+#include "console.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -178,4 +179,11 @@ void MainWindow::on_actionRankings_triggered() {
  */
 void MainWindow::on_actionSettings_triggered() {
     Settings::instance()->show();
+}
+
+/**
+ * @brief MainWindow::on_actionConsole_triggered
+ */
+void MainWindow::on_actionConsole_triggered() {
+    Console::instance()->show();
 }

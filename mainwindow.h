@@ -58,6 +58,7 @@ private slots:
     void on_actionTasks_triggered();
     void on_actionRankings_triggered();
     void on_actionSettings_triggered();
+    void on_actionConsole_triggered();
 
 private:
     explicit MainWindow( QWidget *parent = nullptr );

@@ -40,6 +40,7 @@ namespace Variable_ {
 // classes
 //
 class Widget;
+class XMLTools;
 
 /**
  * @brief The Variable class
@@ -47,6 +48,9 @@ class Widget;
 class Variable final : public QObject {
     Q_DISABLE_COPY( Variable )
     Q_OBJECT
+    friend class XMLTools;
+    friend class Cmd;
+    friend class Console;
 
 public:
     ~Variable();
@@ -58,12 +62,8 @@ public:
     static Variable *instance() { static Variable *instance( new Variable()); return instance; }
     bool contains( const QString &key ) const { return this->list.contains( key ); }
 
-    // eventually move this to private
-    QMap<QString, QSharedPointer<VariableEntry>> list;
-
     template<typename T>
     T value( const QString &key, bool defaultValue = false ) { if ( !this->contains( key )) return QVariant().value<T>(); if ( defaultValue ) return qvariant_cast<T>( this->list[key]->defaultValue()); return qvariant_cast<T>( this->list[key]->value()); }
-    QVariant variant( const QString &key, bool defaultValue = false ) { if ( !this->contains( key )) return QVariant(); if ( defaultValue ) return this->list[key]->defaultValue(); return this->list[key]->value(); }
     int integer( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<int>( key, defaultValue ); }
     qreal decimalValue( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<qreal>( key, defaultValue ); }
     bool isEnabled( const QString &key, bool defaultValue = false ) { return Variable::instance()->value<bool>( key, defaultValue ); }
@@ -153,6 +153,7 @@ signals:
 
 private:
     explicit Variable();
+    QMap<QString, QSharedPointer<VariableEntry>> list;
     QMultiMap<QString, Widget*> boundVariables;
     QMap<QString, QPair<QObject*, int> > slotList;
 };
