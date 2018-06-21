@@ -41,7 +41,7 @@
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
-//static QStringList history = QStringList();
+//static QStringList history;
 
 /**
  * @brief messageFilter
@@ -57,14 +57,15 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    /*if ( console != nullptr ) {
-        printf( "replay" );
+    if ( Main::Console != nullptr ) {
+        /*if ( !history.isEmpty()) {
             foreach ( const QString &entry, history )
-                console->print( entry );
+                qobject_cast<Console*>( Main::Console )->print( entry );
+            history.clear();
+        }*/
 
-        //console->print( msg );
-    } else {
-        printf( "append %i%i", history.count(), ( console != nullptr ));
+        qobject_cast<Console*>( Main::Console )->print( msg );
+    }/* else {
         history << msg;
     }*/
 }
@@ -104,15 +105,15 @@ int main( int argc, char *argv[] ) {
     MainWindow::instance()->show();
 
     // initialize console
-    Console::instance();
+    Main::Console = Console::instance();
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
         XMLTools::instance()->write();
 
+        Main::Console = nullptr;
         GarbageMan::instance()->clear();
         delete GarbageMan::instance();
-
 
         if ( Database::instance() != nullptr )
             delete Database::instance();

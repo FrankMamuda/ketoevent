@@ -55,6 +55,9 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     Variable::instance()->bind( "teamId", this->ui->tableView->viewport(), SLOT( repaint()));
     this->connect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
 
+    // set window icon
+    this->setWindowIcon( QIcon( ":/icons/rankings" ));
+
     // add to garbage man
     GarbageMan::instance()->add( this );
 }

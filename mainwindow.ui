@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Scavenger Hunt Logger</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/ketone</normaloff>:/icons/ketone</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0" colspan="3">
@@ -57,6 +61,12 @@
    <property name="allowedAreas">
     <set>Qt::TopToolBarArea</set>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
@@ -76,16 +86,28 @@
    <addaction name="actionSettings"/>
   </widget>
   <action name="actionEditor">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/teams</normaloff>:/icons/teams</iconset>
+   </property>
    <property name="text">
     <string>Teams</string>
    </property>
   </action>
   <action name="actionTasks">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/tasks</normaloff>:/icons/tasks</iconset>
+   </property>
    <property name="text">
     <string>Tasks</string>
    </property>
   </action>
   <action name="actionRankings">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rankings</normaloff>:/icons/rankings</iconset>
+   </property>
    <property name="text">
     <string>Rankings</string>
    </property>
@@ -100,6 +122,10 @@
    </property>
   </action>
   <action name="actionConsole">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/console</normaloff>:/icons/console</iconset>
+   </property>
    <property name="text">
     <string>Console</string>
    </property>

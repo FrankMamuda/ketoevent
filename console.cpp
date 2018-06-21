@@ -41,6 +41,9 @@ Console::Console() : ui( new Ui::Console ) {
     this->edit->installEventFilter( this );
     this->edit->history = Variable::instance()->string( "system/consoleHistory" ).split( ";" );
 
+    // set window icon
+    this->setWindowIcon( QIcon( ":/icons/console" ));
+
     // announce
     this->print( this->tr( "This is the console. Type 'help' if unsure what to do.\n" ));
 }

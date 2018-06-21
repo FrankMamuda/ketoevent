@@ -39,6 +39,9 @@ Settings::Settings() : ui( new Ui::Settings ) {
 
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
 
+    // set window icon
+    this->setWindowIcon( QIcon( ":/icons/overflow" ));
+
     // add to garbage man
     GarbageMan::instance()->add( this );
 }

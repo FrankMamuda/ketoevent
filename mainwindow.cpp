@@ -41,8 +41,12 @@
  * @brief MainWindow::MainWindow
  * @param parent
  */
-MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ) {
+MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ) {    
+    // set up ui
     this->ui->setupUi( this );
+    this->ui->buttonAdd->setIcon( QIcon( ":/icons/add" ));
+    this->ui->buttonRemove->setIcon( QIcon( ":/icons/remove" ));
+    this->ui->buttonRename->setIcon( QIcon( ":/icons/edit" ));
 
     this->ui->comboEvent->setModel( Event::instance());
     this->ui->comboEvent->setModelColumn( Event::Title );
@@ -152,11 +156,15 @@ void MainWindow::on_comboTeam_currentIndexChanged( int index ) {
  * @brief MainWindow::on_actionEditor_triggered
  */
 void MainWindow::on_actionEditor_triggered() {
-    EditorDialog::instance()->show();
-    EditorDialog::instance()->container->setModel( Team::instance());
-    EditorDialog::instance()->container->setModelColumn( Team::Title );
-    EditorDialog::instance()->setToolBar( TeamToolBar::instance());
-    EditorDialog::instance()->setWindowTitle( this->tr( "Team manager" ));
+    EditorDialog *editor( EditorDialog::instance());
+
+    editor->show();
+    editor->container->setModel( Team::instance());
+    editor->container->setModelColumn( Team::Title );
+    editor->setToolBar( TeamToolBar::instance());
+    editor->setWindowTitle( this->tr( "Team manager" ));
+    editor->setWindowIcon( QIcon( ":/icons/teams" ));
+
     TeamToolBar::instance()->show();
 }
 
@@ -164,11 +172,15 @@ void MainWindow::on_actionEditor_triggered() {
  * @brief MainWindow::on_actionTasks_triggered
  */
 void MainWindow::on_actionTasks_triggered() {
-    EditorDialog::instance()->show();
-    EditorDialog::instance()->container->setModel( Task::instance());
-    EditorDialog::instance()->container->setModelColumn( Task::Name );
-    EditorDialog::instance()->setToolBar( TaskToolBar::instance());
-    EditorDialog::instance()->setWindowTitle( this->tr( "Task manager" ));
+    EditorDialog *editor( EditorDialog::instance());
+
+    editor->show();
+    editor->container->setModel( Task::instance());
+    editor->container->setModelColumn( Task::Name );
+    editor->setToolBar( TaskToolBar::instance());
+    editor->setWindowTitle( this->tr( "Task manager" ));
+    editor->setWindowIcon( QIcon( ":/icons/tasks" ));
+
     TaskToolBar::instance()->show();
 }
 
@@ -176,7 +188,7 @@ void MainWindow::on_actionTasks_triggered() {
  * @brief MainWindow::on_actionRankings_triggered
  */
 void MainWindow::on_actionRankings_triggered() {
-    Rankings::instance()->show();
+    Rankings::instance()->show();    
 }
 
 /**

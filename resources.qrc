@@ -15,5 +15,10 @@
         <file alias="update">icons/update.png</file>
         <file alias="export">icons/export.png</file>
         <file alias="overflow">icons/overflow.png</file>
+        <file alias="console">icons/console.png</file>
+        <file alias="rankings">icons/rankings.png</file>
+        <file alias="tasks">icons/tasks.png</file>
+        <file alias="teams">icons/teams.png</file>
+        <file alias="ketone">icons/ketone.png</file>
     </qresource>
 </RCC>
