@@ -72,8 +72,8 @@
    <addaction name="actionEditor"/>
    <addaction name="actionTasks"/>
    <addaction name="actionRankings"/>
-   <addaction name="actionSettings"/>
    <addaction name="actionConsole"/>
+   <addaction name="actionSettings"/>
   </widget>
   <action name="actionEditor">
    <property name="text">
@@ -91,6 +91,10 @@
    </property>
   </action>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/overflow</normaloff>:/icons/overflow</iconset>
+   </property>
    <property name="text">
     <string>Settings</string>
    </property>
@@ -109,6 +113,8 @@
    <header>taskview.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -14,5 +14,6 @@
         <file alias="log_unchecked">icons/log_unchecked.png</file>
         <file alias="update">icons/update.png</file>
         <file alias="export">icons/export.png</file>
+        <file alias="overflow">icons/overflow.png</file>
     </qresource>
 </RCC>

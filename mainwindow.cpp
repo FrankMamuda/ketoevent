@@ -58,6 +58,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     Variable::instance()->bind( "eventId", this->ui->comboEvent );
     this->ui->comboTeam->setObjectName( "One" );
     Variable::instance()->bind( "teamId", this->ui->comboTeam );
+
+    // insert spacer
+    QWidget *spacer( new QWidget());
+    spacer->setSizePolicy( QSizePolicy::Expanding,QSizePolicy::Preferred );
+    this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
 }
 
 /**
