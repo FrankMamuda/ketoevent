@@ -23,6 +23,7 @@
 #include "team.h"
 #include "teamtoolbar.h"
 #include "teamedit.h"
+#include "main.h"
 #include <QDebug>
 #include <QMessageBox>
 
@@ -63,4 +64,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     this->connect( EditorDialog::instance()->container, &QListView::clicked, [ this, remove ]( const QModelIndex &index ) {
         remove->setEnabled( index.isValid());
     } );
+
+    // add to garbage man
+    //GarbageMan::instance()->add( this );
 }

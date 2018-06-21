@@ -28,6 +28,7 @@
 #include "event.h"
 #include "rankingsmodel.h"
 #include "variable.h"
+#include "main.h"
 #include <QCommonStyle>
 #include <QFileDialog>
 #include <QTextStream>
@@ -53,6 +54,9 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     // TODO: disconnect me
     Variable::instance()->bind( "teamId", this->ui->tableView->viewport(), SLOT( repaint()));
     this->connect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**

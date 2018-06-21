@@ -21,6 +21,7 @@
 //
 // includes
 //
+#include "main.h"
 #include "modalwindow.h"
 #include <QLineEdit>
 #include <QMouseEvent>
@@ -52,7 +53,7 @@ class Console : public ModalWindow {
     Q_DISABLE_COPY( Console )
 
 public:
-    static Console *instance() { static Console *instance( new Console()); return instance; }
+    static Console *instance() { static Console *instance( new Console()); GarbageMan::instance()->add( instance ); return instance; }
     virtual ~Console();
 
 public slots:

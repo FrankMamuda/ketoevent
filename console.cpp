@@ -23,6 +23,7 @@
 #include "console.h"
 #include "ui_console.h"
 #include "variable.h"
+#include "main.h"
 
 #ifdef QT_DEBUG
 
@@ -48,6 +49,7 @@ Console::Console() : ui( new Ui::Console ) {
  * @brief Console::~Console
  */
 Console::~Console() {
+    qDebug() << "delete console";
     Variable::instance()->setValue( "system/consoleHistory", this->edit->history.join( ";" ));
     this->edit->removeEventFilter( this );
     delete this->ui;

@@ -21,6 +21,7 @@
 //
 // includes
 //
+#include <QSharedPointer>
 #include <QtGlobal>
 
 /**
@@ -33,3 +34,44 @@ static constexpr const *Path = ".database2";
 static constexpr const char __attribute__((unused)) *Path = ".database2";
 #endif
 }
+
+/**
+ * @brief The GarbageMan class
+ */
+class GarbageMan final {
+public:    
+    /**
+     * @brief instance
+     * @return
+     */
+    static GarbageMan *instance() { static GarbageMan *instance( new GarbageMan()); return instance; }
+    GarbageMan( const GarbageMan & ) = delete;
+    ~GarbageMan() = default;
+
+    /**
+     * @brief add adds pointers (singletons) to garbage collection list
+     * @param object
+     */
+    void add( QObject *object ) {
+        if ( !this->garbage.contains( object ))
+            this->garbage << object;
+    }
+
+    /**
+     * @brief clear deletes poiners in reverse order
+     */
+    void clear() {
+        std::reverse( this->garbage.begin(), this->garbage.end());
+        foreach ( QObject *object, this->garbage ) {
+            if ( object != nullptr ) {
+                delete object;
+                object = nullptr;
+            }
+        }
+        this->garbage.clear();
+    }
+
+private:
+    explicit GarbageMan() = default;
+    QList<QObject*> garbage;
+};

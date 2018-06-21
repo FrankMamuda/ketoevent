@@ -37,7 +37,7 @@
  * @brief Cmd::Cmd
  * @param parent
  */
-Cmd::Cmd( QObject *parent) : QObject( parent ) {
+Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
 
     // add common commands
@@ -47,6 +47,10 @@ Cmd::Cmd( QObject *parent) : QObject( parent ) {
     this->add( "cv_set", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); }, this->tr( "set console variable value" ));
     this->add( "db_info", +[]( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); }, this->tr( "display database information" ));
     this->add( "help", listCmd, this->tr( "same as cmd_list" ));
+
+    // add to garbage man
+    this->setObjectName( "Cmd" );
+    GarbageMan::instance()->add( this );
 }
 
 /**

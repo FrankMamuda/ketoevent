@@ -20,6 +20,7 @@
 // includes
 //
 #include <QCommonStyle>
+#include "main.h"
 #include "settings.h"
 #include "ui_settings.h"
 #include "variable.h"
@@ -37,6 +38,9 @@ Settings::Settings() : ui( new Ui::Settings ) {
     this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );
 
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**

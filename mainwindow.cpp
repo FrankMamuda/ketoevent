@@ -187,3 +187,17 @@ void MainWindow::on_actionSettings_triggered() {
 void MainWindow::on_actionConsole_triggered() {
     Console::instance()->show();
 }
+
+/**
+ * @brief MainWindow::closeEvent
+ * @param event
+ */
+void MainWindow::closeEvent( QCloseEvent *event ) {
+    // disallow closing when modal windows are open
+    if ( !this->isEnabled()) {
+        event->ignore();
+        return;
+    }
+
+    QMainWindow::closeEvent( event );
+}

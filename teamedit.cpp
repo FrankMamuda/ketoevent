@@ -21,6 +21,7 @@
 //
 #include "editordialog.h"
 #include "event.h"
+#include "main.h"
 #include "team.h"
 #include "teamedit.h"
 #include "ui_teamedit.h"
@@ -114,6 +115,9 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
     } );
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**

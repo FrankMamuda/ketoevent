@@ -22,7 +22,6 @@
 // includes
 //
 #include "modalwindow.h"
-
 #include <QCloseEvent>
 #include <QDockWidget>
 #include <QListView>

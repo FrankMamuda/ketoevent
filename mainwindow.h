@@ -60,6 +60,9 @@ private slots:
     void on_actionSettings_triggered();
     void on_actionConsole_triggered();
 
+protected:
+    void closeEvent( QCloseEvent *event ) override;
+
 private:
     explicit MainWindow( QWidget *parent = nullptr );
     Ui::MainWindow *ui;

@@ -21,6 +21,8 @@
 //
 // includes
 //
+#include "main.h"
+
 #include <QMap>
 #include <QObject>
 
@@ -92,7 +94,7 @@ public:
      * @brief instance
      * @return
      */
-    static Cmd *instance() { static Cmd *instance( new Cmd()); return instance; }
+    static Cmd *instance() { static Cmd *instance( new Cmd()); /*GarbageMan::instance()->add( instance );*/ return instance; }
 
 private:
     bool executeTokenized( const QString &, const QStringList & );

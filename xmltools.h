@@ -21,6 +21,8 @@
 //
 // includes
 //
+#include "main.h"
+
 #include <QDir>
 #include <QLoggingCategory>
 #include <QMap>
@@ -51,5 +53,5 @@ public:
     void read();
 
 private:
-    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) {}
+    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) { this->setObjectName( "XMLTools" ); GarbageMan::instance()->add( this ); }
 };

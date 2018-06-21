@@ -20,6 +20,7 @@
 // includes
 //
 #include "editordialog.h"
+#include "main.h"
 #include "mainwindow.h"
 #include "ui_editordialog.h"
 #include <QCommonStyle>
@@ -37,8 +38,6 @@ EditorDialog::EditorDialog() :
 {
     QCommonStyle style;
 
-    qDebug() << "new edit dialog";
-
     // set up ui
     this->ui->setupUi( this );
     this->ui->buttonClose->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
@@ -50,13 +49,15 @@ EditorDialog::EditorDialog() :
     this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ] () {
         this->close();
     } );
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**
  * @brief EditorDialog::~EditorDialog
  */
 EditorDialog::~EditorDialog() {
-    qDebug() << "delete edit dialog";
     this->disconnect( this->ui->buttonClose, SIGNAL( clicked()));
     delete this->ui;
 }
@@ -110,7 +111,7 @@ void EditorDialog::setToolBar( QToolBar *widget ) {
  * @param event
  */
 void EditorDialog::closeEvent( QCloseEvent *event ) {
-    qDebug() << "close edit dialog";
+    this->hideDock();
     this->disconnect( this->container, SIGNAL( clicked( QModelIndex )));
     ModalWindow::closeEvent( event );
 }

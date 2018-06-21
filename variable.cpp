@@ -19,6 +19,7 @@
 //
 // includes
 //
+#include "main.h"
 #include "team.h"
 #include "variable.h"
 #include "widget.h"
@@ -60,7 +61,7 @@ Variable::Variable() {
  * @brief Variable::~Variable
  */
 Variable::~Variable() {
-    this->disconnect( this, SIGNAL( widgetChanged( QString, Widget *, QVariant & )));
+    this->disconnect( this, SIGNAL( widgetChanged( QString, Widget*, QVariant )));
     this->disconnect( this, SIGNAL( valueChanged( QString )));
 }
 

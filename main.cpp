@@ -30,6 +30,7 @@
 #include "xmltools.h"
 #include "variable.h"
 #include "console.h"
+#include "main.h"
 
 //
 // sort out ui element naming
@@ -40,7 +41,7 @@
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
-static Console *console = nullptr;
+//static QStringList history = QStringList();
 
 /**
  * @brief messageFilter
@@ -56,8 +57,16 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    if ( console != nullptr )
-        console->print( msg );
+    /*if ( console != nullptr ) {
+        printf( "replay" );
+            foreach ( const QString &entry, history )
+                console->print( entry );
+
+        //console->print( msg );
+    } else {
+        printf( "append %i%i", history.count(), ( console != nullptr ));
+        history << msg;
+    }*/
 }
 
 /**
@@ -95,20 +104,20 @@ int main( int argc, char *argv[] ) {
     MainWindow::instance()->show();
 
     // initialize console
-    console = Console::instance();
+    Console::instance();
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
-        delete console;
-        console = nullptr;
-
         XMLTools::instance()->write();
+
+        GarbageMan::instance()->clear();
+        delete GarbageMan::instance();
+
 
         if ( Database::instance() != nullptr )
             delete Database::instance();
 
-        if ( EditorDialog::instance() != nullptr )
-            delete EditorDialog::instance();
+        delete Variable::instance();
 
         // TODO: remove toolbars, team task widgets, mainwindow
     } );

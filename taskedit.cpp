@@ -20,6 +20,7 @@
 // includes
 //
 #include "editordialog.h"
+#include "main.h"
 #include "task.h"
 #include "taskedit.h"
 #include "ui_taskedit.h"
@@ -161,6 +162,9 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
     } );
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**

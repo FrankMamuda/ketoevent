@@ -20,6 +20,7 @@
 // includes
 //
 #include "editordialog.h"
+#include "main.h"
 #include "task.h"
 #include "taskedit.h"
 #include "tasktoolbar.h"
@@ -76,4 +77,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         moveUp->setEnabled( index.isValid() && index.row() != 0 );
         moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
     } );
+
+    // add to garbage man
+    //GarbageMan::instance()->add( this );
 }

@@ -30,7 +30,7 @@ class ModalWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit ModalWindow( QWidget *parent = nullptr ) : QMainWindow( parent ) {}
+    explicit ModalWindow( QWidget *parent = nullptr ) : QMainWindow( parent ) { this->setWindowModality( Qt::ApplicationModal ); }
     virtual ~ModalWindow() = default;
 
 protected:
