@@ -67,6 +67,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     QWidget *spacer( new QWidget());
     spacer->setSizePolicy( QSizePolicy::Expanding,QSizePolicy::Preferred );
     this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
+
+    //for ( int y= 0; y <Task::instance()->count(); y++ )
+    //    qDebug() << Task::instance()->order( y );
 }
 
 /**
@@ -135,7 +138,7 @@ void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
         return;
 
     Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
-    Task::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
+    Task::instance()->setFilter( QString( "eventId=%1 order by parent asc" ).arg( Event::instance()->id( index ).value()));
 }
 
 /**

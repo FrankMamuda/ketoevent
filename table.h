@@ -71,9 +71,9 @@ public:
     int count() const { return this->rowCount(); }
     QVariant value( int row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
-    bool select() override;
+    virtual bool select() override;
     QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
-    QVariant data( const QModelIndex &item, int role ) const override;
+    virtual QVariant data( const QModelIndex &item, int role ) const override;
     int row( const Id &id ) const { if ( this->map.contains( id.value())) return this->map[id.value()].row(); return -1; }
     virtual void setFilter( const QString &filter ) override;
 

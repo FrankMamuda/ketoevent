@@ -23,6 +23,7 @@
 #include "field.h"
 #include "database.h"
 #include "event.h"
+#include "mainwindow.h"
 
 #include <QFont>
 
@@ -54,6 +55,9 @@ Task::Task() : Table( TaskTable::Name ) {
     this->styles[Regular]   = QT_TR_NOOP_UTF8( "Regular" );
     this->styles[Bold]      = QT_TR_NOOP_UTF8( "Bold" );
     this->styles[Italic]    = QT_TR_NOOP_UTF8( "Italic" );
+
+    // sort by order
+    this->setSort( Task::Order, Qt::AscendingOrder );
 }
 
 /**
@@ -66,6 +70,13 @@ Task::Task() : Table( TaskTable::Name ) {
  * @param description
  */
 void Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
+    int y, highest = -1;
+
+    // find highest order
+    for ( y = 0; y < this->count(); y++ )
+        highest = qMax( highest, this->order( y ));
+
+    // add a new team
     Table::add( QVariantList() <<
                 Database_::null <<
                 taskName <<
@@ -73,8 +84,8 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
                 multi <<
                 static_cast<int>( style ) <<
                 static_cast<int>( type ) <<
-                0 <<
-                0 <<
+                highest + 1 <<
+                MainWindow::instance()->currentEventId().value() <<
                 description );
 }
 

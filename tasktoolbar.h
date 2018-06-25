@@ -36,4 +36,7 @@ public:
 
 private:
     explicit TaskToolBar( QWidget *parent = nullptr );
+    QAction *moveUp;
+    QAction *moveDown;
+    QAction *remove;
 };

@@ -78,7 +78,8 @@ HEADERS += \
     combobox.h \
     widget.h \
     cmd.h \
-    console.h
+    console.h \
+    taskfiltered.h
 
 FORMS += \
         mainwindow.ui \

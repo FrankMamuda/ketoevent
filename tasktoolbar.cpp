@@ -49,7 +49,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // remove action
-    QAction *remove( this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Task" ), [ this ]() {
+    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Task" ), [ this ]() {
         const QModelIndex index( EditorDialog::instance()->container->currentIndex());
 
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
@@ -58,24 +58,57 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         const QString name( Task::instance()->name( index.row()));
         if ( QMessageBox::question( this, this->tr( "Remove task" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( name )) == QMessageBox::Yes )
             Task::instance()->remove( index.row());
-    } ));
-    remove->setEnabled( false );
+    } );
+    this->remove->setEnabled( false );
+
+    // button test lambda
+    auto buttonTest = [ this ]( const QModelIndex &index ) {
+        this->remove->setEnabled( index.isValid());
+        this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
+        this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
+    };
+
+    // move up/down lambda
+    auto move = [ this, buttonTest ]( bool up ) {
+        QListView *container( EditorDialog::instance()->container );
+        const QModelIndex index( container->currentIndex());
+        const QModelIndex other( container->model()->index( container->currentIndex().row() + ( up ? -1 : 1 ), 0 ));
+
+        if ( EditorDialog::instance()->isDockVisible() || !index.isValid() || !other.isValid())
+            return;
+
+        // use ids in lookup
+        const Id id0 = Task::instance()->id( index.row());
+        const Id id1 = Task::instance()->id( other.row());
+        const int order0 = Task::instance()->order( index.row());
+        const int order1 = Task::instance()->order( other.row());
+
+        // swap order
+        Task::instance()->setOrder( Task::instance()->row( id0 ), order1 );
+        Task::instance()->setOrder( Task::instance()->row( id1 ), order0 );
+
+        Task::instance()->select();
+        const QModelIndex current( container->model()->index( Task::instance()->row( id0 ), 0 ));
+        container->setCurrentIndex( current );
+        container->setFocus();
+        buttonTest( current );
+    };
 
     // move up action
-    QAction *moveUp( this->addAction( QIcon( ":/icons/up" ), this->tr( "Move up" ), [ this ]() {
-    } ));
+    this->moveUp = this->addAction( QIcon( ":/icons/up" ), this->tr( "Move up" ), [ move ]() {
+        move( true );
+    } );
     moveUp->setEnabled( false );
 
     // move down action
-    QAction *moveDown( this->addAction( QIcon( ":/icons/down" ), this->tr( "Move down" ), [ this ]() {
-    } ));
+    this->moveDown = this->addAction( QIcon( ":/icons/down" ), this->tr( "Move down" ), [ move ]() {
+        move( false );
+    } );
     moveDown->setEnabled( false );
 
     // button test
-    this->connect( EditorDialog::instance()->container, &QListView::clicked, [ this, remove, moveUp, moveDown ]( const QModelIndex &index ) {
-        remove->setEnabled( index.isValid());
-        moveUp->setEnabled( index.isValid() && index.row() != 0 );
-        moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
+    this->connect( EditorDialog::instance()->container, &QListView::clicked, [ buttonTest ]( const QModelIndex &index ) {
+        buttonTest( index );
     } );
 
     // add to garbage man
