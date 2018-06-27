@@ -70,7 +70,7 @@ public:
     Id taskId( int row ) const { return Id::fromInteger( this->value( row, Task ).toInt()); }
     Id teamId( int row ) const { return Id::fromInteger( this->value( row, Team ).toInt()); }
     Id comboId( int row ) const { return Id::fromInteger( this->value( row, Combo ).toInt()); }
-    virtual QVariant data( const QModelIndex &item, int role = Qt::DisplayRole ) const override;
+    QVariant data( const QModelIndex &item, int role = Qt::DisplayRole ) const override;
     int task( int row ) const;
     int team( int row ) const;
 

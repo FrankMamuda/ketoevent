@@ -36,6 +36,7 @@
 #include "variable.h"
 #include "database.h"
 #include "console.h"
+#include "combos.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -70,12 +71,20 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
     //for ( int y= 0; y <Task::instance()->count(); y++ )
     //    qDebug() << Task::instance()->order( y );
+
+
+    // bind for sorting updates
+    Variable::instance()->bind( "sortByType", this, SLOT( updateTasks()));
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
+    Variable::instance()->unbind( "teamId", this->ui->comboTeam );
     delete this->ui;
 }
 
@@ -138,7 +147,7 @@ void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
         return;
 
     Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
-    Task::instance()->setFilter( QString( "eventId=%1 order by parent asc" ).arg( Event::instance()->id( index ).value()));
+    this->updateTasks();
 }
 
 /**
@@ -149,8 +158,6 @@ void MainWindow::on_comboTeam_currentIndexChanged( int index ) {
     if ( !Database::instance()->hasInitialised())
         return;
 
-    // NOTE: is this really needed?
-    Log::instance()->setFilter( QString( "teamId=%1" ).arg( Team::instance()->id( index ).value()));
     this->ui->taskView->viewport()->update();    
     this->ui->taskView->setEnabled( index == -1 ? false : true );
 }
@@ -209,6 +216,17 @@ void MainWindow::on_actionConsole_triggered() {
 }
 
 /**
+ * @brief MainWindow::updateTasks
+ */
+void MainWindow::updateTasks() {
+    if ( Variable::instance()->isEnabled( "sortByType" ))
+        Task::instance()->setFilter( QString( "eventId=%1 order by %2, %3 asc" ).arg( Event::instance()->id( this->ui->comboEvent->currentIndex()).value()).arg( Task::instance()->fieldName( Task::Type )).arg( Task::instance()->fieldName( Task::Name )));
+    else
+        Task::instance()->setFilter( QString( "eventId=%1 order by %2 asc" ).arg( Event::instance()->id( this->ui->comboEvent->currentIndex()).value()).arg( Task::instance()->fieldName( Task::Order )));
+
+}
+
+/**
  * @brief MainWindow::closeEvent
  * @param event
  */
@@ -220,4 +238,11 @@ void MainWindow::closeEvent( QCloseEvent *event ) {
     }
 
     QMainWindow::closeEvent( event );
+}
+
+/**
+ * @brief MainWindow::on_actionCombos_triggered
+ */
+void MainWindow::on_actionCombos_triggered() {
+    Combos::instance()->show();
 }

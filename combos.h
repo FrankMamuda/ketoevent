@@ -21,44 +21,30 @@
 //
 // includes
 //
-#include <QComboBox>
+#include "modalwindow.h"
 
 /**
- * @brief The ComboBox class
+ * @brief The Ui namespace
  */
-class ComboBox final : public QComboBox {
+namespace Ui {
+class Combos;
+}
+
+/**
+ * @brief The Combos class
+ */
+class Combos final : public QMainWindow {
+    Q_DISABLE_COPY( Combos )
     Q_OBJECT
 
 public:
-    explicit ComboBox( QWidget *parent = nullptr ) : QComboBox( parent ) {}
+    static Combos *instance() { static Combos *instance( new Combos()); return instance; }
+    ~Combos();
 
-    /**
-     * @brief addItems
-     * @param items
-     */
-    void addItems( const QStringList &items ) {
-        QComboBox::addItems( items );
-        emit this->activated( this->currentIndex());
-    }
+private slots:
+    void on_teamCombo_currentIndexChanged(int index);
 
-    /**
-     * @brief hidePopup
-     */
-    void hidePopup() override {
-      QComboBox::hidePopup();
-      emit popupHidden();
-    }
-
-public slots:
-    /**
-     * @brief setCurrentIndex
-     * @param index
-     */
-    void setCurrentIndex( int index ) {
-        QComboBox::setCurrentIndex( index );
-        emit this->activated( index );
-    }
-
-signals:
-    void popupHidden();
+private:
+    explicit Combos();
+    Ui::Combos *ui;
 };

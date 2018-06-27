@@ -24,6 +24,7 @@
 #include "task.h"
 #include "taskedit.h"
 #include "tasktoolbar.h"
+#include "variable.h"
 #include <QCommonStyle>
 #include <QDebug>
 #include <QMessageBox>
@@ -63,13 +64,57 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
     // button test lambda
     auto buttonTest = [ this ]( const QModelIndex &index ) {
+        if ( Variable::instance()->isEnabled( "sortByType" )) {
+            this->moveUp->setDisabled( true );
+            this->moveDown->setDisabled( true );
+        } else {
+            this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
+            this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
+        }
+
         this->remove->setEnabled( index.isValid());
-        this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
-        this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
     };
 
     // move up/down lambda
     auto move = [ this, buttonTest ]( bool up ) {
+        // NOTE: reordering is required for duplicates
+        //       (there should not be any, if all works as intended)
+        //       non-sequential order does not cause problems however
+
+        // test integrity
+        QSet<int> orderSet;
+        bool reindex = false;
+        int y;
+        for ( y = 0; y < Task::instance()->count(); y++ ) {
+            const int order = Task::instance()->order( y );
+            if ( orderSet.contains( order )) {
+                if ( QMessageBox::question( this, this->tr( "Corrupted order" ),
+                                            this->tr( "Tasks have corrupted order. Perform reindexing? This cannot be undone." )) == QMessageBox::Yes ) {
+                    reindex = true;
+                }
+                break;
+            } else {
+                orderSet << order;
+            }
+        }
+
+        // reindex tasks if requested
+        if ( reindex ) {
+            QList<Id> idList;
+
+            // get id list
+            for ( int y = 0; y < Task::instance()->count(); y++ )
+                idList << Task::instance()->id( y );
+
+            // reorder tasks accordint to id list
+            y = 0;
+            foreach ( const Id id, idList ) {
+                Task::instance()->setOrder( Task::instance()->row( id ), y );
+                y++;
+            }
+        }
+
+        // get container pointer and order indexes
         QListView *container( EditorDialog::instance()->container );
         const QModelIndex index( container->currentIndex());
         const QModelIndex other( container->model()->index( container->currentIndex().row() + ( up ? -1 : 1 ), 0 ));
@@ -77,7 +122,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid() || !other.isValid())
             return;
 
-        // use ids in lookup
+        // use ids in lookup (QPersistentModel index should work too?)
         const Id id0 = Task::instance()->id( index.row());
         const Id id1 = Task::instance()->id( other.row());
         const int order0 = Task::instance()->order( index.row());
@@ -109,8 +154,6 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // button test
     this->connect( EditorDialog::instance()->container, &QListView::clicked, [ buttonTest ]( const QModelIndex &index ) {
         buttonTest( index );
-    } );
-
-    // add to garbage man
-    //GarbageMan::instance()->add( this );
+    } );    
 }
+

@@ -68,7 +68,7 @@ public:
     Table( const QString &tableName = QString());
     virtual ~Table() { this->setValid( false ); this->clear(); }
     bool isValid() const { return this->m_valid; }
-    int count() const { return this->rowCount(); }
+    int count() const;
     QVariant value( int row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
     virtual bool select() override;
@@ -76,6 +76,7 @@ public:
     virtual QVariant data( const QModelIndex &item, int role ) const override;
     int row( const Id &id ) const { if ( this->map.contains( id.value())) return this->map[id.value()].row(); return -1; }
     virtual void setFilter( const QString &filter ) override;
+    QString fieldName( int id ) const;
 
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }

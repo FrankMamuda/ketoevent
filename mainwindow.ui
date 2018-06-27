@@ -83,6 +83,7 @@
    <addaction name="actionTasks"/>
    <addaction name="actionRankings"/>
    <addaction name="actionConsole"/>
+   <addaction name="actionCombos"/>
    <addaction name="actionSettings"/>
   </widget>
   <action name="actionEditor">
@@ -128,6 +129,11 @@
    </property>
    <property name="text">
     <string>Console</string>
+   </property>
+  </action>
+  <action name="actionCombos">
+   <property name="text">
+    <string>Combos</string>
    </property>
   </action>
  </widget>

@@ -59,6 +59,8 @@ private slots:
     void on_actionRankings_triggered();
     void on_actionSettings_triggered();
     void on_actionConsole_triggered();
+    void updateTasks();
+    void on_actionCombos_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;

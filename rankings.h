@@ -79,12 +79,11 @@ private slots:
 
 protected:
     void showEvent( QShowEvent *event );
-    void hideEvent( QHideEvent *event );
 
 private:
     explicit Rankings();
     Ui::Rankings *ui;
-    QString prevFilter;
+    //QString prevFilter;
     RankingsModel *model;
     QSortFilterProxyModel *proxyModel;
     QList<TeamStatistics> list;

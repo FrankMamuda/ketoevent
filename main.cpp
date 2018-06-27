@@ -90,6 +90,7 @@ int main( int argc, char *argv[] ) {
     Variable::instance()->add( "eventId", -1 );
     Variable::instance()->add( "teamId", -1 );
     Variable::instance()->add( "rankingsCurrent", true );
+    Variable::instance()->add( "sortByType", true );
 
     // read configuration
     XMLTools::instance()->read();
@@ -119,8 +120,6 @@ int main( int argc, char *argv[] ) {
             delete Database::instance();
 
         delete Variable::instance();
-
-        // TODO: remove toolbars, team task widgets, mainwindow
     } );
 
     return a.exec();

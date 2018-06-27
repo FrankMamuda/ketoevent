@@ -24,7 +24,6 @@
 #include "database.h"
 #include "event.h"
 #include "mainwindow.h"
-
 #include <QFont>
 
 //

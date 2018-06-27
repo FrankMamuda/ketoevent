@@ -48,7 +48,7 @@ class HistoryEdit;
 /**
  * @brief The Console class
  */
-class Console : public ModalWindow {
+class Console final : public ModalWindow {
     Q_OBJECT
     Q_DISABLE_COPY( Console )
 
@@ -61,9 +61,9 @@ public slots:
     bool completeCommand();
 
 protected:
-    virtual void mousePressEvent( QMouseEvent *event ) override { this->m_windowPos = event->pos(); }
-    virtual void mouseMoveEvent( QMouseEvent *event ) override { if ( event->buttons() && Qt::LeftButton ) this->move( this->pos() + event->pos() - this->m_windowPos ); }
-    virtual bool eventFilter( QObject *object, QEvent *event ) override;
+    void mousePressEvent( QMouseEvent *event ) override { this->m_windowPos = event->pos(); }
+    void mouseMoveEvent( QMouseEvent *event ) override { if ( event->buttons() && Qt::LeftButton ) this->move( this->pos() + event->pos() - this->m_windowPos ); }
+    bool eventFilter( QObject *object, QEvent *event ) override;
 
 private slots:
     void on_input_returnPressed();

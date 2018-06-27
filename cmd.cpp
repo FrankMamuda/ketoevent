@@ -148,7 +148,6 @@ void Cmd::cvarSet( const QString &name, const QStringList &args ) {
         return;
     }
 
-    // NOTE: this is case sensitive
     if ( !Variable::instance()->contains( args.first())) {
         qInfo() << this->tr( "no such cvar - \"%1\"" ).arg( args.first());
     } else {

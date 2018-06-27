@@ -211,8 +211,8 @@ void Rankings::on_actionUpdate_triggered() {
  * @param event
  */
 void Rankings::showEvent( QShowEvent *event ) {
-    this->prevFilter = Log::instance()->filter();
-    Log::instance()->setFilter( "" );
+    //this->prevFilter = Log::instance()->filter();
+    //Log::instance()->setFilter( "" );
     ModalWindow::showEvent( event );
 
     // scale window to contents
@@ -222,15 +222,6 @@ void Rankings::showEvent( QShowEvent *event ) {
     // calculate results on first open
    // if ( this->model == nullptr )
         //this->on_actionUpdate_triggered();
-}
-
-/**
- * @brief Rankings::hideEvent
- * @param event
- */
-void Rankings::hideEvent( QHideEvent *event ) {
-    Log::instance()->setFilter( this->prevFilter );
-    ModalWindow::hideEvent( event );
 }
 
 /**

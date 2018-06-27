@@ -38,8 +38,7 @@
 void XMLTools::read() {
     QString path;
     QDomDocument document;
-    QDomNode node, childNode;
-    QDomElement element, childElement;
+    QDomNode node;
     QDir configDir( QDir::homePath() + "/" + Main::Path );
 
 #ifdef QT_DEBUG
@@ -65,25 +64,22 @@ void XMLTools::read() {
     node = document.documentElement().firstChild();
 
     while ( !node.isNull()) {
-        element = node.toElement();
+        QDomElement element( node.toElement());
 
         if ( !element.isNull()) {
             if ( !QString::compare( element.tagName(), "variable" )) {
-                QString key;
+                const QString key( element.attribute( "key" ));
                 QVariant value;
 
-                childNode = element.firstChild();
-                key = element.attribute( "key" );
-
                 if ( element.hasAttribute( "binary" )) {
-                    QByteArray array;
-                    array = QByteArray::fromBase64( element.attribute( "binary" ).toUtf8().constData());
+                    QByteArray array( QByteArray::fromBase64( element.attribute( "binary" ).toUtf8().constData()));
                     QBuffer buffer( &array );
                     buffer.open( QIODevice::ReadOnly );
                     QDataStream in( &buffer );
                     in >> value;
-                } else
+                } else {
                     value = element.attribute( "value" );
+                }
 
                 if ( Variable::instance()->contains( key ) && !key.isEmpty())
                     Variable::instance()->setValue( key, value, true );

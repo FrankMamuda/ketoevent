@@ -46,7 +46,9 @@ SOURCES += \
     settings.cpp \
     rankingsmodel.cpp \
     cmd.cpp \
-    console.cpp
+    console.cpp \
+    combos.cpp \
+    combomodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -79,7 +81,9 @@ HEADERS += \
     widget.h \
     cmd.h \
     console.h \
-    taskfiltered.h
+    taskfiltered.h \
+    combos.h \
+    combomodel.h
 
 FORMS += \
         mainwindow.ui \
@@ -89,7 +93,8 @@ FORMS += \
     taskedit.ui \
     rankings.ui \
     settings.ui \
-    console.ui
+    console.ui \
+    combos.ui
 
 RESOURCES += \
     resources.qrc

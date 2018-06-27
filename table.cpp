@@ -35,6 +35,14 @@ Table::Table( const QString &name ) : m_valid( false ) {
 }
 
 /**
+ * @brief Table::count
+ * @return
+ */
+int Table::count() const {
+    return Database::instance()->hasInitialised() ? this->rowCount() : 0;
+}
+
+/**
  * @brief Table::value
  * @param row
  * @param fieldId
@@ -101,6 +109,15 @@ QVariant Table::data( const QModelIndex &item, int role ) const {
 void Table::setFilter( const QString &filter ) {
     QSqlTableModel::setFilter( filter );
     this->select();
+}
+
+/**
+ * @brief Table::fieldName
+ * @param id
+ * @return
+ */
+QString Table::fieldName( int id ) const {
+    return this->field( id )->name();
 }
 
 /**

@@ -19,43 +19,54 @@
 //
 // includes
 //
-#include <QCommonStyle>
+#include "combomodel.h"
+#include "combos.h"
 #include "main.h"
-#include "settings.h"
-#include "ui_settings.h"
+#include "team.h"
+#include "ui_combos.h"
 #include "variable.h"
+#include <QCommonStyle>
+
 
 /**
- * @brief Settings::Settings
- * @param parent
+ * @brief Combos::Combos
  */
-Settings::Settings() : ui( new Ui::Settings ) {
+Combos::Combos() : ui( new Ui::Combos ) {
     QCommonStyle style;
 
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
     this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
-    this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );
-    this->variables << Variable::instance()->bind( "sortByType", this->ui->sortByTypeCheck );
-
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
 
     // set window icon
-    this->setWindowIcon( QIcon( ":/icons/overflow" ));
+    //this->setWindowIcon( QIcon( ":/icons/overflow" ));
 
-    // add to garbage man
+    // connect for updates
+    this->ui->view->setModel( ComboModel::instance());
+    this->ui->teamCombo->setModel( Team::instance());
+    this->ui->teamCombo->setModelColumn( Team::Title );
+
+    // FIXME: set current teamId without binding!!!
+    Variable::instance()->bind( "teamId", this->ui->teamCombo );
+
     GarbageMan::instance()->add( this );
 }
 
 /**
- * @brief Settings::~Settings
+ * @brief Combos::~Combos
  */
-Settings::~Settings() {
-    // unbind vars
-    foreach ( const QString &key, this->variables )
-        Variable::instance()->unbind( key );
-    this->variables.clear();
-
+Combos::~Combos() {
+    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
     delete this->ui;
+}
+
+/**
+ * @brief Combos::on_teamCombo_currentIndexChanged
+ * @param index
+ */
+void Combos::on_teamCombo_currentIndexChanged( int index ) {
+    ComboModel::instance()->reset( Team::instance()->id( index ));
+    this->ui->view->reset();
 }

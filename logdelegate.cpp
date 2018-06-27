@@ -27,6 +27,7 @@
 #include "task.h"
 #include "logeditor.h"
 #include "taskview.h"
+#include "mainwindow.h"
 
 /**
  * @brief LogDelegate::LogDelegate
@@ -129,7 +130,7 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
     // find matching log
     // not the fastest lookup, but performance is a non-issue currently
     for ( y = 0; y < Log::instance()->count(); y++ ) {
-        if ( Log::instance()->taskId( y ) == taskId ) {
+        if ( Log::instance()->taskId( y ) == taskId && Log::instance()->teamId( y ) == MainWindow::instance()->currentTeamId()) {
 
             // TODO: only if value > 0
             found = true;
