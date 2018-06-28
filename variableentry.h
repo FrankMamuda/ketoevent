@@ -27,9 +27,9 @@
 /**
  * @brief The Var class
  */
-class VariableEntry final {
+class Var final {
 public:
-    enum Flag {
+    enum class Flag {
         NoFlags  = 0x0,
         ReadOnly = 0x1,
         NoSave   = 0x2,
@@ -37,16 +37,16 @@ public:
     };
     Q_DECLARE_FLAGS( Flags, Flag )
 
-    explicit VariableEntry( const QString &key = QString(), const QVariant &defaultValue = QVariant(), Flags flags = NoFlags ) : m_key( key ), m_value( defaultValue ), m_defaultValue( defaultValue ), m_flags( flags ) {}
-    virtual ~VariableEntry() = default;
+    explicit Var( const QString &key = QString(), const QVariant &defaultValue = QVariant(), Flags flags = Flag::NoFlags ) : m_key( key ), m_value( defaultValue ), m_defaultValue( defaultValue ), m_flags( flags ) {}
+    virtual ~Var() = default;
     QString key() const { return this->m_key; }
     Flags flags() const { return this->m_flags; }
     virtual QVariant value() const { return this->m_value; }
     QVariant defaultValue() const { return this->m_defaultValue; }
     virtual void setValue( const QVariant &value ) { m_value = value; }
-    VariableEntry& operator = ( const VariableEntry & ) = default;
-    VariableEntry( const VariableEntry& ) = default;
-    virtual QSharedPointer<VariableEntry> copy() const { return QSharedPointer<VariableEntry>( new VariableEntry( *this )); }
+    Var& operator = ( const Var & ) = default;
+    Var( const Var& ) = default;
+    virtual QSharedPointer<Var> copy() const { return QSharedPointer<Var>( new Var( *this )); }
 
 private:
     QString m_key;
@@ -55,4 +55,4 @@ private:
     Flags m_flags;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS( VariableEntry::Flags )
+Q_DECLARE_OPERATORS_FOR_FLAGS( Var::Flags )

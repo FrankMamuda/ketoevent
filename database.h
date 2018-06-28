@@ -49,7 +49,6 @@ const static  __attribute__((unused)) unsigned int null = 0;
 class Database final : public QObject {
     Q_OBJECT
     Q_DISABLE_COPY( Database )
-    Q_ENUMS( Types )
 
 public:
     /**

@@ -31,25 +31,9 @@
 class Field_;
 
 /**
- * @brief The Id class used to avoid row/id mixups
+ * @brief The Id enum strong-typed id
  */
-class Id {
-public:
-    explicit Id() = default;
-    Id( const Id &s ) : m_value( s.value()) {}
-    Id &operator=( const Id &s ) { this->m_value = s.value(); return *this; }
-    int value() const { return this->m_value; }
-    void setValue( const int v ) { this->m_value = v; }
-    static Id fromInteger( const int v ) { Id id; id.setValue( v ); return id; }
-    bool operator==( const Id &other ) const { return this->value() == other.value(); }
-    bool operator>( const Id &other ) const { return this->value() > other.value(); }
-    bool operator<( const Id &other ) const { return this->value() < other.value(); }
-    bool operator>=( const Id &other ) const { return this->value() >= other.value(); }
-    bool operator<=( const Id &other ) const { return this->value() <= other.value(); }
-
-private:
-    int m_value;
-};
+enum class Id : int { Invalid = -1 };
 
 /**
  * @brief The Table_ class
@@ -74,7 +58,7 @@ public:
     virtual bool select() override;
     QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
     virtual QVariant data( const QModelIndex &item, int role ) const override;
-    int row( const Id &id ) const { if ( this->map.contains( id.value())) return this->map[id.value()].row(); return -1; }
+    int row( const Id &id ) const { if ( this->map.contains( id )) return this->map[id].row(); return -1; }
     virtual void setFilter( const QString &filter ) override;
     QString fieldName( int id ) const;
 
@@ -87,7 +71,7 @@ public slots:
 
 protected:
     QMap<int, QSharedPointer<Field_>> fields;
-    QMap<int, QPersistentModelIndex> map;
+    QMap<Id, QPersistentModelIndex> map;
     QSharedPointer<Field_> field( int id ) const;
     bool contains( const QSharedPointer<Field_> &field, const QVariant &value ) const;
 

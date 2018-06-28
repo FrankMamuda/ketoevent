@@ -75,13 +75,13 @@ public:
     static Team *instance() { static Team *instance( new Team()); return instance; }
     virtual ~Team() = default;
 
-    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
+    Id id( int row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     void add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
     QString title( int row ) const { return this->value( row, Title ).toString(); }
     int members( int row ) const { return this->value( row, Members ).toInt(); }
     QTime finishTime( int row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
     QString reviewer( int row ) const { return this->value( row, Reviewer ).toString(); }
-    Id eventId( int row ) const { return Id::fromInteger( this->value( row, Event ).toInt()); }
+    Id eventId( int row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     int eventRow( int row ) const;
 
 public slots:

@@ -20,5 +20,7 @@
         <file alias="tasks">icons/tasks.png</file>
         <file alias="teams">icons/teams.png</file>
         <file alias="ketone">icons/ketone.png</file>
+        <file alias="combos">icons/combos.png</file>
+        <file alias="name">icons/name.png</file>
     </qresource>
 </RCC>

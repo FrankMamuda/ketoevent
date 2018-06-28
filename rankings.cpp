@@ -49,11 +49,11 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     this->ui->teamCombo->setModelColumn( Team::Title );
 
     Variable::instance()->bind( "teamId", this->ui->teamCombo );
-    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent_team );
+    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
 
     // TODO: disconnect me
     Variable::instance()->bind( "teamId", this->ui->tableView->viewport(), SLOT( repaint()));
-    this->connect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
+    this->connect( this->ui->actionCurrent, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/rankings" ));
@@ -67,8 +67,8 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
  */
 Rankings::~Rankings() {
     Variable::instance()->unbind( "teamId", this->ui->teamCombo );
-    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent_team );
-    this->disconnect( this->ui->actionCurrent_team, SIGNAL( toggled( bool )));
+    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
+    this->disconnect( this->ui->actionCurrent, SIGNAL( toggled( bool )));
 
     delete this->ui;
 }
@@ -78,7 +78,7 @@ Rankings::~Rankings() {
  * @return
  */
 bool Rankings::isDisplayingCurrentTeam() const {
-    return this->ui->actionCurrent_team->isChecked();
+    return this->ui->actionCurrent->isChecked();
 }
 
 /**
@@ -150,14 +150,14 @@ void Rankings::on_actionUpdate_triggered() {
             stats.completedTasks++;
 
             // calculate points form completed tasks
-            stats.points += Task::instance()->points( task ) * (( type == Task::Multi ) ? value : 1 );
+            stats.points += Task::instance()->points( task ) * (( type == Task::Types::Multi ) ? value : 1 );
 
             // build combo map
             const Id comboId = Log::instance()->comboId( log );
-            if ( !combos.contains( comboId ) && comboId.value() >= 0 )
+            if ( !combos.contains( comboId ) && comboId > Id::Invalid )
                 combos[comboId] = 0;
 
-            if ( comboId.value() >= 0 ) {
+            if ( comboId > Id::Invalid ) {
                 combos[comboId] = combos[comboId] + 1;
                 stats.comboTasks += 1;
             }
@@ -167,7 +167,7 @@ void Rankings::on_actionUpdate_triggered() {
         stats.combos = combos.count();
 
         // calculate bonus points from combos
-        foreach ( int count, combos ) {
+        foreach ( const int count, combos ) {
             if ( count == 2 )
                 stats.points += EventTable::DefaultComboOfTwo;
 
@@ -261,7 +261,7 @@ void Rankings::on_actionExport_triggered() {
        #endif
                .append( "\n" );
 
-        foreach ( TeamStatistics team, this->list ) {
+        foreach ( const TeamStatistics &team, this->list ) {
             //int points;
 
             //if ( team->disqualified())

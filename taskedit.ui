@@ -30,55 +30,41 @@
    </item>
    <item row="0" column="1" colspan="2">
     <layout class="QGridLayout" name="optionsLayout">
-     <item row="2" column="4">
-      <widget class="ComboBox" name="styleCombo">
-       <property name="toolTip">
-        <string>Style to hilight special tasks</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="descLabel">
-       <property name="text">
-        <string>Description</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLabel" name="multiLabel">
-       <property name="text">
-        <string>Max multiplier</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="ComboBox" name="typeCombo">
-       <property name="toolTip">
-        <string>Task type (either checkbox or a multiplier task)</string>
-       </property>
-       <property name="maxCount">
-        <number>10</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
+     <item row="1" column="1">
       <widget class="QLabel" name="pointsLabel">
        <property name="text">
         <string>Points</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="2" column="1">
       <widget class="QLabel" name="typeLabel">
        <property name="text">
         <string>Type</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1" colspan="4">
-      <widget class="QLineEdit" name="descEdit"/>
+     <item row="1" column="2">
+      <widget class="QSpinBox" name="pointsInteger">
+       <property name="toolTip">
+        <string>Points for completion</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>999</number>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="4">
+     <item row="0" column="2" colspan="4">
+      <widget class="QLineEdit" name="nameEdit">
+       <property name="placeholderText">
+        <string>Type task name here</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
       <widget class="QSpinBox" name="multiInteger">
        <property name="toolTip">
         <string>Maximum point multiplier</string>
@@ -94,41 +80,17 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1" colspan="4">
-      <widget class="QLineEdit" name="nameEdit">
-       <property name="placeholderText">
-        <string>Type task name here</string>
-       </property>
-      </widget>
+     <item row="3" column="2" colspan="4">
+      <widget class="QLineEdit" name="descEdit"/>
      </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="pointsInteger">
-       <property name="toolTip">
-        <string>Points for completion</string>
-       </property>
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>999</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
+     <item row="0" column="1">
       <widget class="QLabel" name="nameLabel">
        <property name="text">
         <string>Name</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QLabel" name="styleLabel">
-       <property name="text">
-        <string>Style</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2" rowspan="2">
+     <item row="1" column="3" rowspan="2">
       <spacer name="optionsSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -141,6 +103,60 @@
        </property>
       </spacer>
      </item>
+     <item row="2" column="4">
+      <widget class="QLabel" name="styleLabel">
+       <property name="text">
+        <string>Style</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLabel" name="multiLabel">
+       <property name="text">
+        <string>Max multiplier</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="descLabel">
+       <property name="text">
+        <string>Description</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="ComboBox" name="typeCombo">
+       <property name="toolTip">
+        <string>Task type (either checkbox or a multiplier task)</string>
+       </property>
+       <property name="maxCount">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="5">
+      <widget class="ComboBox" name="styleCombo">
+       <property name="toolTip">
+        <string>Style to hilight special tasks</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="namePixmap">
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="resources.qrc">:/icons/name</pixmap>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
@@ -152,6 +168,8 @@
    <header>combobox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

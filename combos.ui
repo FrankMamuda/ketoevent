@@ -18,7 +18,23 @@
     <item>
      <layout class="QVBoxLayout" name="comboLayout" stretch="0,0,0,1,0">
       <item>
-       <layout class="QHBoxLayout" name="teamLayout" stretch="1,2">
+       <layout class="QHBoxLayout" name="teamLayout" stretch="0,1,2">
+        <item>
+         <widget class="QLabel" name="teamPixmap">
+          <property name="maximumSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="resources.qrc">:/icons/teams</pixmap>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QLabel" name="teamLabel">
           <property name="text">
@@ -103,6 +119,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -79,7 +79,7 @@ bool Table::select() {
     this->map.clear();
     if ( !this->primaryField().isNull()) {
         for ( y = 0; y < this->count(); y++ )
-            this->map[this->record( y ).value( this->primaryField()->id()).toInt()] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
+            this->map[static_cast<Id>( this->record( y ).value( this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
     }
 
     return result;
@@ -197,7 +197,7 @@ void Table::add( const QVariantList &arguments ) {
 
         // add to id/row map
         if ( field->isPrimary())
-            this->map[argument.toInt()] = QPersistentModelIndex( this->index( row, field->id()));
+            this->map[static_cast<Id>( argument.toInt())] = QPersistentModelIndex( this->index( row, field->id()));
         else
             this->setData( this->index( this->count() - 1, y ), argument );
     }
@@ -214,7 +214,7 @@ void Table::remove( int row ) {
         return;
 
     if ( !this->primaryField().isNull())
-        this->map.remove( this->record( row ).value( this->primaryField()->id()).toInt());
+        this->map.remove( static_cast<Id>( this->record( row ).value( this->primaryField()->id()).toInt()));
 
     this->removeRow( row );
     this->select();

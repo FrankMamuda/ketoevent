@@ -74,7 +74,7 @@ bool Console::completeCommand() {
     }
 
     // find matching cvars
-    foreach ( QSharedPointer<VariableEntry> entry, Variable::instance()->list ) {
+    foreach ( const QSharedPointer<Var> &entry, Variable::instance()->list ) {
         if ( !QString::compare( entry->key(), "system/consoleHistory" ))
             continue;
 
@@ -116,7 +116,7 @@ bool Console::completeCommand() {
 
         // check variables
         if ( Variable::instance()->contains( str )) {
-            QSharedPointer<VariableEntry> entry( Variable::instance()->list[str] );
+            QSharedPointer<Var> entry( Variable::instance()->list[str] );
             qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key(), entry->value().toString());
         }
     }

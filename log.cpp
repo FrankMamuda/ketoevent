@@ -52,13 +52,13 @@ Log::Log() : Table( LogTable::Name ) {
  * @param multiplier
  * @param comboId
  */
-void Log::add( int taskId, int teamId, int multiplier, int comboId ) {
+void Log::add(const Id &taskId, const Id &teamId, int multiplier, const Id &comboId ) {
     Table::add( QVariantList() <<
                 Database_::null <<
                 multiplier <<
-                taskId <<
-                teamId <<
-                comboId );
+                static_cast<int>( taskId ) <<
+                static_cast<int>( teamId ) <<
+                static_cast<int>( comboId ) );
 }
 
 /**

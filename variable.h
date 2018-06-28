@@ -122,12 +122,12 @@ public:
     }
 
     template<typename T>
-    void add( const QString &key, const T &value, VariableEntry::Flags flags = VariableEntry::NoFlags ) {
-        this->add<VariableEntry,T>( key, value, flags );
+    void add( const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags ) {
+        this->add<Var,T>( key, value, flags );
     }
 
     template<class Container, typename T>
-    void add( const QString &key, const T &value, VariableEntry::Flags flags = VariableEntry::NoFlags ) {
+    void add( const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags ) {
         QVariant var( this->validate( value ));
 
         if ( !Variable::instance()->list.contains( key ) && !key.isEmpty())
@@ -153,7 +153,7 @@ signals:
 
 private:
     explicit Variable();
-    QMap<QString, QSharedPointer<VariableEntry>> list;
+    QMap<QString, QSharedPointer<Var>> list;
     QMultiMap<QString, Widget*> boundVariables;
     QMap<QString, QPair<QObject*, int> > slotList;
 };

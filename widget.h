@@ -52,7 +52,7 @@ class Widget final : public QObject {
     friend class Variable;
 
 public:
-    enum Types {
+    enum class Types {
         NoType = -1,
         CheckBox,
         Action,
@@ -78,26 +78,26 @@ public:
      * @brief Widget
      * @param w
      */
-    Widget( QObject *w ) : m_type( NoType ), widget( w ) {
+    Widget( QObject *w ) : m_type( Types::NoType ), widget( w ) {
         // determine widget type
         if ( !QString::compare( widget->metaObject()->className(), "QCheckBox" )) {
             this->connection = this->connect( qobject_cast<QCheckBox*>( widget ), SIGNAL( stateChanged( int )), this, SLOT( valueChanged()));
-            this->m_type = CheckBox;
+            this->m_type = Types::CheckBox;
         } else if ( !QString::compare( widget->metaObject()->className(), "QAction" )) {
             this->connection = this->connect( qobject_cast<QAction*>( widget ), SIGNAL( triggered( bool )), this, SLOT( valueChanged()));
-            this->m_type = Action;
+            this->m_type = Types::Action;
         } else if ( !QString::compare( widget->metaObject()->className(), "QLineEdit" )) {
             this->connection = this->connect( qobject_cast<QLineEdit*>( widget ), SIGNAL( textChanged( QString )), this, SLOT( valueChanged()));
-            this->m_type = LineEdit;
+            this->m_type = Types::LineEdit;
         } else if ( !QString::compare( widget->metaObject()->className(), "QTimeEdit" )) {
             this->connection = this->connect( qobject_cast<QTimeEdit*>( widget ), SIGNAL( timeChanged( QTime )), this, SLOT( valueChanged()));
-            this->m_type = TimeEdit;
+            this->m_type = Types::TimeEdit;
         } else if ( !QString::compare( widget->metaObject()->className(), "QSpinBox" )) {
             this->connection = this->connect( qobject_cast<QSpinBox*>( widget ), SIGNAL( valueChanged( int )), this, SLOT( valueChanged()));
-            this->m_type = SpinBox;
+            this->m_type = Types::SpinBox;
         } else if ( !QString::compare( widget->metaObject()->className(), "QComboBox" )) {
             this->connection = this->connect( qobject_cast<QComboBox*>( widget ), SIGNAL( currentIndexChanged( int )), this, SLOT( valueChanged()));
-            this->m_type = ComboBox;
+            this->m_type = Types::ComboBox;
         } else {
             qCWarning( Widget_::Debug ) << this->tr( "unsupported container \"%1\"" ).arg( widget->metaObject()->className());
         }
@@ -117,22 +117,22 @@ public:
             return QVariant();
 
         switch ( this->type()) {
-        case CheckBox:
+        case Types::CheckBox:
             return qobject_cast<QCheckBox*>( this->widget )->isChecked();
 
-        case Action:
+        case Types::Action:
             return qobject_cast<QAction*>( this->widget )->isChecked();
 
-        case LineEdit:
+        case Types::LineEdit:
             return qobject_cast<QLineEdit*>( this->widget )->text();
 
-        case TimeEdit:
+        case Types::TimeEdit:
             return qobject_cast<QTimeEdit*>( this->widget )->time();
 
-        case SpinBox:
+        case Types::SpinBox:
             return qobject_cast<QSpinBox*>( this->widget )->value();
 
-        case ComboBox:
+        case Types::ComboBox:
         {
             QComboBox *comboBox( qobject_cast<QComboBox*>( this->widget ));
             QAbstractItemModel *model( comboBox->model());
@@ -141,7 +141,7 @@ public:
         }
             break;
 
-        case NoType:
+        case Types::NoType:
             break;
         }
 
@@ -156,27 +156,27 @@ public slots:
         this->blockSignals( true );
 
         switch ( this->type()) {
-        case CheckBox:
+        case Types::CheckBox:
             qobject_cast<QCheckBox*>( this->widget )->setChecked( static_cast<bool>( value.toInt()));
             break;
 
-        case Action:
+        case Types::Action:
             qobject_cast<QAction*>( this->widget )->setChecked( static_cast<bool>( value.toInt()));
             break;
 
-        case LineEdit:
+        case Types::LineEdit:
             qobject_cast<QLineEdit*>( this->widget )->setText( value.toString());
             break;
 
-        case TimeEdit:
+        case Types::TimeEdit:
             qobject_cast<QTimeEdit*>( this->widget )->setTime( value.toTime());
             break;
 
-        case SpinBox:
+        case Types::SpinBox:
             qobject_cast<QSpinBox*>( this->widget )->setValue( value.toInt());
             break;
 
-        case ComboBox:
+        case Types::ComboBox:
         {
             QComboBox *comboBox( qobject_cast<QComboBox*>( this->widget ));
             QAbstractItemModel *model( comboBox->model());
@@ -193,7 +193,7 @@ public slots:
         }
             break;
 
-        case NoType:
+        case Types::NoType:
             break;
         }
 

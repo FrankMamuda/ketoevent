@@ -127,8 +127,8 @@ void Cmd::listCvars() {
     if ( !Variable::instance()->list.isEmpty())
         qWarning() << this->tr( "%1 available console variables:" ).arg( Variable::instance()->list.count());
 
-    foreach ( QSharedPointer<VariableEntry> entry, Variable::instance()->list ) {
-        if ( entry->flags() & VariableEntry::Hidden )
+    foreach ( const QSharedPointer<Var> &entry, Variable::instance()->list ) {
+        if ( entry->flags() & Var::Flag::Hidden )
             continue;
 
         if ( QString::compare( entry->defaultValue().toString(), entry->value().toString(), Qt::CaseInsensitive ))
@@ -151,10 +151,10 @@ void Cmd::cvarSet( const QString &name, const QStringList &args ) {
     if ( !Variable::instance()->contains( args.first())) {
         qInfo() << this->tr( "no such cvar - \"%1\"" ).arg( args.first());
     } else {
-        QSharedPointer<VariableEntry> entry;
+        QSharedPointer<Var> entry;
 
         entry = Variable::instance()->list[args.first()];
-        if ( entry->flags() & VariableEntry::ReadOnly ) {
+        if ( entry->flags() & Var::Flag::ReadOnly ) {
             qInfo() << this->tr( "\"%1\" is read only" ).arg( entry->key());
             return;
         }
@@ -209,7 +209,7 @@ bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
 
     // find the cvar
     if ( Variable::instance()->contains( name )) {
-        QSharedPointer<VariableEntry> entry;
+        QSharedPointer<Var> entry;
 
         entry = Variable::instance()->list[name];
         if ( args.count() >= 1 ) {
@@ -289,7 +289,7 @@ bool Cmd::execute( const QString &buffer ) {
     separated = buffer.split( QRegExp( ";|\\n" ));
 
     // parse separated command strings
-    foreach ( QString string, separated ) {
+    foreach ( const QString &string, separated ) {
         // tokenize & execute command
         if ( this->tokenize( string, command, arguments ))
             counter += this->executeTokenized( command, arguments );

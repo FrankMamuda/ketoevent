@@ -42,10 +42,12 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // setup comboboxes
     this->connect<void( QComboBox::* )( int )>( this->ui->typeCombo, &QComboBox::activated, [ this ]( int index ) {
-        if ( index == Task::Check ) {
+        const Task::Types type = static_cast<Task::Types>( index );
+
+        if ( type == Task::Types::Check ) {
             this->ui->multiLabel->hide();
             this->ui->multiInteger->hide();
-        } else if ( index == Task::Multi ) {
+        } else if ( type == Task::Types::Multi ) {
             this->ui->multiLabel->show();
             this->ui->multiInteger->show();
         }

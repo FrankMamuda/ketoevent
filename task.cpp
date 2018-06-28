@@ -49,11 +49,11 @@ Task::Task() : Table( TaskTable::Name ) {
     this->setRelation( Event, QSqlRelation( EventTable::Name, Event::instance()->field( Event::ID )->name(), Event::instance()->field( Event::Title )->name()));
 
     // map types and styles
-    this->types[Check]      = QT_TR_NOOP_UTF8( "Check" );
-    this->types[Multi]      = QT_TR_NOOP_UTF8( "Multi" );
-    this->styles[Regular]   = QT_TR_NOOP_UTF8( "Regular" );
-    this->styles[Bold]      = QT_TR_NOOP_UTF8( "Bold" );
-    this->styles[Italic]    = QT_TR_NOOP_UTF8( "Italic" );
+    this->types[Types::Check]     = QT_TR_NOOP_UTF8( "Check" );
+    this->types[Types::Multi]     = QT_TR_NOOP_UTF8( "Multi" );
+    this->styles[Styles::Regular] = QT_TR_NOOP_UTF8( "Regular" );
+    this->styles[Styles::Bold]    = QT_TR_NOOP_UTF8( "Bold" );
+    this->styles[Styles::Italic]  = QT_TR_NOOP_UTF8( "Italic" );
 
     // sort by order
     this->setSort( Task::Order, Qt::AscendingOrder );
@@ -84,7 +84,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
                 static_cast<int>( style ) <<
                 static_cast<int>( type ) <<
                 highest + 1 <<
-                MainWindow::instance()->currentEventId().value() <<
+                static_cast<int>( MainWindow::instance()->currentEventId()) <<
                 description );
 }
 
@@ -108,12 +108,12 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         const int row = index.row();
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
 
-        if ( Task::instance()->style( row ) == Task::Italic ) {
+        if ( Task::instance()->style( row ) == Styles::Italic ) {
             font.setItalic( true );
             return font;
         }
 
-        if ( Task::instance()->style( row ) == Task::Bold ) {
+        if ( Task::instance()->style( row ) == Styles::Bold ) {
             font.setBold( true );
             return font;
         }

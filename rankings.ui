@@ -80,7 +80,7 @@
    </attribute>
    <addaction name="actionUpdate"/>
    <addaction name="actionExport"/>
-   <addaction name="actionCurrent_team"/>
+   <addaction name="actionCurrent"/>
   </widget>
   <action name="actionUpdate">
    <property name="icon">
@@ -100,7 +100,7 @@
     <string>Export</string>
    </property>
   </action>
-  <action name="actionCurrent_team">
+  <action name="actionCurrent">
    <property name="checkable">
     <bool>true</bool>
    </property>

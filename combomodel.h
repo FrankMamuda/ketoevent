@@ -58,7 +58,7 @@ public slots:
 
 private:
     explicit ComboModel() { GarbageMan::instance()->add( this ); }
-    QMap<int, QString> map;
+    QMap<Id, QString> map;
     QMap<QString, QRgb> colours;
     static QList<QRgb> colourList;
 };

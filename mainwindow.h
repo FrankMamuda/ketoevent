@@ -33,7 +33,7 @@ class MainWindow;
 //
 // classes
 //
-class Id;
+enum class Id;
 
 /**
  * @brief The MainWindow class
@@ -49,18 +49,15 @@ public:
     Id currentTeamId() const;
 
 private slots:
-    void on_buttonAdd_clicked();
-    void on_buttonRemove_clicked();
-    void on_buttonRename_clicked();
-    void on_comboEvent_currentIndexChanged( int index );
-    void on_comboTeam_currentIndexChanged( int index );
-    void on_actionEditor_triggered();
     void on_actionTasks_triggered();
     void on_actionRankings_triggered();
     void on_actionSettings_triggered();
     void on_actionConsole_triggered();
     void updateTasks();
     void on_actionCombos_triggered();
+    void on_eventCombo_currentIndexChanged( int index );
+    void on_teamCombo_currentIndexChanged( int index );
+    void on_actionTeams_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;

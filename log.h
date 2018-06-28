@@ -64,21 +64,21 @@ public:
     static Log *instance() { static Log *instance( new Log()); return instance; }
     virtual ~Log() {}
 
-    void add( int taskId, int teamId, int multiplier = 0, int comboId = -1 );
-    Id id( int row ) const { return Id::fromInteger( this->value( row, ID ).toInt()); }
+    void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
+    Id id( int row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     int multiplier( int row ) const { return this->value( row, Multi ).toInt(); }
-    Id taskId( int row ) const { return Id::fromInteger( this->value( row, Task ).toInt()); }
-    Id teamId( int row ) const { return Id::fromInteger( this->value( row, Team ).toInt()); }
-    Id comboId( int row ) const { return Id::fromInteger( this->value( row, Combo ).toInt()); }
+    Id taskId( int row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
+    Id teamId( int row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
+    Id comboId( int row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
     QVariant data( const QModelIndex &item, int role = Qt::DisplayRole ) const override;
     int task( int row ) const;
     int team( int row ) const;
 
 public slots:
     void setMultiplier( int row, int multi ) { this->setValue( row, Multi, multi ); }
-    void setTaskId( int row, const Id &id ) { this->setValue( row, Task, id.value()); }
-    void setTeamId( int row, const Id &id ) { this->setValue( row, Team, id.value()); }
-    void setComboId( int row, const Id &id ) { this->setValue( row, Combo, id.value()); }
+    void setTaskId( int row, const Id &id ) { this->setValue( row, Task, static_cast<int>( id )); }
+    void setTeamId( int row, const Id &id ) { this->setValue( row, Team, static_cast<int>( id )); }
+    void setComboId( int row, const Id &id ) { this->setValue( row, Combo, static_cast<int>( id )); }
 
 private:
     explicit Log();

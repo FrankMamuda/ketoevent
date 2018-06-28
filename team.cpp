@@ -61,7 +61,7 @@ void Team::add( const QString &title, int members, const QTime &finishTime, cons
                 finishTime.toString( "hh:mm" ) <<
                 0 <<
                 reviewer <<
-                MainWindow::instance()->currentEventId().value());
+                static_cast<int>( MainWindow::instance()->currentEventId()));
 }
 
 /**

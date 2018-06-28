@@ -124,8 +124,8 @@ void XMLTools::write() {
     stream.writeAttribute( "version", "3" );
 
     // switch mode
-    foreach ( QSharedPointer<VariableEntry> var, Variable::instance()->list ) {
-        if ( var->key().isEmpty() || var->flags() & VariableEntry::NoSave )
+    foreach ( const QSharedPointer<Var> &var, Variable::instance()->list ) {
+        if ( var->key().isEmpty() || var->flags() & Var::Flag::NoSave )
             continue;
 
         stream.writeEmptyElement( "variable" );

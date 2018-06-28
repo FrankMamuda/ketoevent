@@ -61,15 +61,15 @@ void ComboModel::reset( const Id &id ) {
             const Id comboId = Log::instance()->comboId( y );
             const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( y ))));
 
-            if ( comboId.value() >= 0 ) {
-                this->map.insertMulti( comboId.value(), taskName );
-                this->colours[taskName] = ComboModel::colourForId( comboId.value());
+            if ( comboId > Id::Invalid ) {
+                this->map.insertMulti( comboId, taskName );
+                this->colours[taskName] = ComboModel::colourForId( static_cast<int>( comboId ));
             }
         }
     }
 
     // build display list
-    foreach ( const int &comboId, this->map.uniqueKeys()) {
+    foreach ( const Id &comboId, this->map.uniqueKeys()) {
         foreach ( const QString &taskName, this->map.values( comboId ))
             list << taskName;
     }

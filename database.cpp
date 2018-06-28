@@ -131,7 +131,7 @@ void Database::add( Table *table ) {
         qCInfo( Database_::Debug ) << this->tr( "creating an empty database" );
 
     // validate schema
-    foreach ( QString tableName, tables ) {
+    foreach ( const QString &tableName, tables ) {
         if ( !QString::compare( table->tableName(), tableName )) {
             foreach ( const Field &field, table->fields ) {
                 if ( !database.record( table->tableName()).contains( field->name())) {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>439</height>
+    <width>481</width>
+    <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,36 +18,55 @@
     <normaloff>:/icons/ketone</normaloff>:/icons/ketone</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="3">
-     <widget class="QComboBox" name="comboEvent"/>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="eventLayout">
+      <item>
+       <widget class="QLabel" name="eventPixmap">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/name</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="eventCombo"/>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0" colspan="3">
+    <item>
+     <layout class="QHBoxLayout" name="teamLayout">
+      <item>
+       <widget class="QLabel" name="teamPixmap">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/teams</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="teamCombo"/>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="TaskView" name="taskView"/>
-    </item>
-    <item row="3" column="1">
-     <widget class="QPushButton" name="buttonRemove">
-      <property name="text">
-       <string>Remove</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="buttonAdd">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="2">
-     <widget class="QPushButton" name="buttonRename">
-      <property name="text">
-       <string>Rename</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="QComboBox" name="comboTeam"/>
     </item>
    </layout>
   </widget>
@@ -79,14 +98,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionEditor"/>
+   <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
    <addaction name="actionRankings"/>
    <addaction name="actionConsole"/>
    <addaction name="actionCombos"/>
    <addaction name="actionSettings"/>
   </widget>
-  <action name="actionEditor">
+  <action name="actionTeams">
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/teams</normaloff>:/icons/teams</iconset>
@@ -132,6 +151,10 @@
    </property>
   </action>
   <action name="actionCombos">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/combos</normaloff>:/icons/combos</iconset>
+   </property>
    <property name="text">
     <string>Combos</string>
    </property>

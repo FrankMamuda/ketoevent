@@ -45,24 +45,20 @@
 MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ) {    
     // set up ui
     this->ui->setupUi( this );
-    this->ui->buttonAdd->setIcon( QIcon( ":/icons/add" ));
-    this->ui->buttonRemove->setIcon( QIcon( ":/icons/remove" ));
-    this->ui->buttonRename->setIcon( QIcon( ":/icons/edit" ));
+    this->ui->eventCombo->setModel( Event::instance());
+    this->ui->eventCombo->setModelColumn( Event::Title );
 
-    this->ui->comboEvent->setModel( Event::instance());
-    this->ui->comboEvent->setModelColumn( Event::Title );
-
-    this->ui->comboTeam->setModel( Team::instance());
-    this->ui->comboTeam->setModelColumn( Team::Title );
+    this->ui->teamCombo->setModel( Team::instance());
+    this->ui->teamCombo->setModelColumn( Team::Title );
 
     this->ui->taskView->setModel( Task::instance());
     this->ui->taskView->setModelColumn( Task::Name );
     this->ui->taskView->setItemDelegate( new LogDelegate( this->ui->taskView ));
     //this->ui->taskView->setParent( this );
 
-    Variable::instance()->bind( "eventId", this->ui->comboEvent );
-    this->ui->comboTeam->setObjectName( "One" );
-    Variable::instance()->bind( "teamId", this->ui->comboTeam );
+    Variable::instance()->bind( "eventId", this->ui->eventCombo );
+    this->ui->teamCombo->setObjectName( "One" );
+    Variable::instance()->bind( "teamId", this->ui->teamCombo );
 
     // insert spacer
     QWidget *spacer( new QWidget());
@@ -84,7 +80,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
-    Variable::instance()->unbind( "teamId", this->ui->comboTeam );
+    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
     delete this->ui;
 }
 
@@ -93,7 +89,7 @@ MainWindow::~MainWindow() {
  * @return
  */
 Id MainWindow::currentEventId() const {
-    return Event::instance()->id( this->ui->comboEvent->currentIndex());
+    return Event::instance()->id( this->ui->eventCombo->currentIndex());
 }
 
 /**
@@ -102,15 +98,15 @@ Id MainWindow::currentEventId() const {
  */
 Id MainWindow::currentTeamId() const {
     if ( !Database::instance()->hasInitialised())
-        return Id::fromInteger( -1 );
+        return Id::Invalid;
 
-    return Team::instance()->id( this->ui->comboTeam->currentIndex());
+    return Team::instance()->id( this->ui->teamCombo->currentIndex());
 }
 
 /**
  * @brief MainWindow::on_buttonAdd_clicked
  */
-void MainWindow::on_buttonAdd_clicked() {
+/*void MainWindow::on_buttonAdd_clicked() {
     bool ok;
     QString text;
 
@@ -118,54 +114,36 @@ void MainWindow::on_buttonAdd_clicked() {
     text = QInputDialog::getText( this, this->tr( "Add an event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok );
     if ( ok && !text.isEmpty())
         Event::instance()->add( text );
-}
+}*/
 
 /**
- * @brief MainWindow::on_buttonRemove_clicked
- */
-void MainWindow::on_buttonRemove_clicked() {
-    Event::instance()->remove( this->ui->comboEvent->currentIndex());
-}
-
-/**
- * @brief MainWindow::on_buttonRename_clicked
- */
-void MainWindow::on_buttonRename_clicked() {
-    bool ok;
-    QString text( QInputDialog::getText( this, this->tr( "Rename event" ), this->tr( "Title:" ), QLineEdit::Normal, "", &ok ));
-
-    if ( ok && !text.isEmpty())
-        Event::instance()->setTitle( this->ui->comboEvent->currentIndex(), text );
-}
-
-/**
- * @brief MainWindow::on_comboEvent_currentIndexChanged
+ * @brief MainWindow::on_eventCombo_currentIndexChanged
  * @param index
  */
-void MainWindow::on_comboEvent_currentIndexChanged( int index ) {
+void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
     if ( !Database::instance()->hasInitialised())
         return;
 
-    Team::instance()->setFilter( QString( "eventId=%1" ).arg( Event::instance()->id( index ).value()));
+    Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( index ))));
     this->updateTasks();
 }
 
 /**
- * @brief MainWindow::on_comboTeam_currentIndexChanged
+ * @brief MainWindow::on_teamCombo_currentIndexChanged
  * @param index
  */
-void MainWindow::on_comboTeam_currentIndexChanged( int index ) {
+void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     if ( !Database::instance()->hasInitialised())
         return;
 
-    this->ui->taskView->viewport()->update();    
+    this->ui->taskView->viewport()->update();
     this->ui->taskView->setEnabled( index == -1 ? false : true );
 }
 
 /**
- * @brief MainWindow::on_actionEditor_triggered
+ * @brief MainWindow::on_actionTeams_triggered
  */
-void MainWindow::on_actionEditor_triggered() {
+void MainWindow::on_actionTeams_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
     editor->show();
@@ -220,9 +198,9 @@ void MainWindow::on_actionConsole_triggered() {
  */
 void MainWindow::updateTasks() {
     if ( Variable::instance()->isEnabled( "sortByType" ))
-        Task::instance()->setFilter( QString( "eventId=%1 order by %2, %3 asc" ).arg( Event::instance()->id( this->ui->comboEvent->currentIndex()).value()).arg( Task::instance()->fieldName( Task::Type )).arg( Task::instance()->fieldName( Task::Name )));
+        Task::instance()->setFilter( QString( "eventId=%1 order by %2, %3 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Type )).arg( Task::instance()->fieldName( Task::Name )));
     else
-        Task::instance()->setFilter( QString( "eventId=%1 order by %2 asc" ).arg( Event::instance()->id( this->ui->comboEvent->currentIndex()).value()).arg( Task::instance()->fieldName( Task::Order )));
+        Task::instance()->setFilter( QString( "eventId=%1 order by %2 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Order )));
 
 }
 
