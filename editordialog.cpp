@@ -23,7 +23,6 @@
 #include "main.h"
 #include "mainwindow.h"
 #include "ui_editordialog.h"
-#include <QCommonStyle>
 #include <QDebug>
 
 /**
@@ -36,11 +35,9 @@ EditorDialog::EditorDialog() :
     toolBar( nullptr ),
     ui( new Ui::EditorDialog )
 {
-    QCommonStyle style;
-
     // set up ui
     this->ui->setupUi( this );
-    this->ui->buttonClose->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
+    this->ui->buttonClose->setIcon( QIcon( ":/icons/close" ));
     this->container = this->ui->listView;
     this->dock = this->ui->dockWidget;
     this->hideDock();

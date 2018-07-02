@@ -25,22 +25,18 @@
 #include "team.h"
 #include "ui_combos.h"
 #include "variable.h"
-#include <QCommonStyle>
-
 
 /**
  * @brief Combos::Combos
  */
 Combos::Combos() : ui( new Ui::Combos ) {
-    QCommonStyle style;
-
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
-    this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
+    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
 
     // set window icon
-    //this->setWindowIcon( QIcon( ":/icons/overflow" ));
+    this->setWindowIcon( QIcon( ":/icons/combos" ));
 
     // connect for updates
     this->ui->view->setModel( ComboModel::instance());

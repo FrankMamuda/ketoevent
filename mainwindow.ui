@@ -68,6 +68,9 @@
     <item>
      <widget class="TaskView" name="taskView"/>
     </item>
+    <item>
+     <widget class="QLineEdit" name="findEdit"/>
+    </item>
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">

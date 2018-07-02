@@ -33,7 +33,12 @@
  * @brief LogDelegate::LogDelegate
  * @param parent
  */
-LogDelegate::LogDelegate( QObject *parent ) : QStyledItemDelegate( parent ), m_edit( false ) { }
+LogDelegate::LogDelegate( QObject *parent ) : QStyledItemDelegate( parent ), m_edit( false ) {
+    this->checked.load( ":/icons/log_checked" );
+    this->unchecked.load( ":/icons/log_unchecked" );
+    this->remove.load( ":/icons/log_remove" );
+    this->toggle.load( ":/icons/log_toggle" );
+}
 
 /**
  * @brief LogDelegate::createEditor
@@ -46,13 +51,16 @@ QWidget *LogDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem 
 
     qDebug() << "create editor";
 
-    row = index.model()->data( index, Log::TaskRole ).toInt();
+    // TODO: use source model mapping
+
+
+    // row = index.model()->data( index, Log::TaskRole ).toInt();
     editor = new LogEditor( parent );
     //editor->setFrame(false);
-    if ( row != -1 )
+    /*if ( row != -1 )
         editor->setName( Task::instance()->name( row ));
 
-    this->m_edit = true;
+    this->m_edit = true;*/
     return editor;//new QSpinBox( parent );//editor;
 }
 
@@ -64,6 +72,8 @@ QWidget *LogDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem 
 void LogDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const {
     Q_UNUSED( editor )
     Q_UNUSED( index )
+
+    // TODO: use source model mapping
 
     /*QSpinBox *spinBox;
     int value;
@@ -83,6 +93,8 @@ void LogDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, cons
     Q_UNUSED( editor )
     Q_UNUSED( model )
     Q_UNUSED( index )
+
+    // TODO: use source model mapping
 
     /*QSpinBox *spinBox;
     int value;
@@ -111,13 +123,13 @@ void LogDelegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewI
  * @param option
  * @param index
  */
-void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     int y;
-    const Id taskId = Task::instance()->id( index.row());
+    // NOTE: correct mapping to the source model
+    const Id taskId = Task::instance()->id( qobject_cast<QSortFilterProxyModel *>( const_cast<QAbstractItemModel *>( index.model()))->mapToSource( index ).row());
     bool found = false;
     const bool alternate = index.row() % 2;
     QString text( index.model()->data( index, Qt::DisplayRole ).toString());
-    QPixmap pixmap;
 
     // get display rect
     QRect textRect( option.rect );
@@ -148,12 +160,10 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
         QModelIndex under( qobject_cast<TaskView *>( this->parent())->check );
         if ( under.isValid()) {
             u = true;
-            pixmap.load( found ? ":/icons/log_remove" : ":/icons/log_toggle" );
-            painter->drawPixmap( pixmapRect, pixmap);
+            painter->drawPixmap( pixmapRect, found ? this->remove : this->toggle );
         } else {
             if ( !found ) {
-                pixmap.load( ":/icons/log_unchecked" );
-                painter->drawPixmap( pixmapRect, pixmap);
+                painter->drawPixmap( pixmapRect, this->unchecked );
             } else {
 
             }
@@ -162,8 +172,7 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
     }
 
     if ( found && !u ) {
-        pixmap.load( ":/icons/log_checked" );
-        painter->drawPixmap( pixmapRect, pixmap);
+        painter->drawPixmap( pixmapRect, this->checked );
     }
 }
 

@@ -25,7 +25,6 @@
 #include "taskedit.h"
 #include "tasktoolbar.h"
 #include "variable.h"
-#include <QCommonStyle>
 #include <QDebug>
 #include <QMessageBox>
 

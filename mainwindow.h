@@ -21,7 +21,9 @@
 //
 // includes
 //
+#include <QCompleter>
 #include <QMainWindow>
+#include <QSortFilterProxyModel>
 
 /**
  * @brief The Ui namespace
@@ -65,4 +67,6 @@ protected:
 private:
     explicit MainWindow( QWidget *parent = nullptr );
     Ui::MainWindow *ui;
+    QCompleter completer;
+    QSortFilterProxyModel *filter;
 };

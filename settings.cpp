@@ -19,7 +19,6 @@
 //
 // includes
 //
-#include <QCommonStyle>
 #include "main.h"
 #include "settings.h"
 #include "ui_settings.h"
@@ -30,11 +29,9 @@
  * @param parent
  */
 Settings::Settings() : ui( new Ui::Settings ) {
-    QCommonStyle style;
-
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
-    this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
+    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
     this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );
     this->variables << Variable::instance()->bind( "sortByType", this->ui->sortByTypeCheck );
 

@@ -41,4 +41,8 @@ public:
 
 private:
     mutable bool m_edit;
+    QPixmap checked;
+    QPixmap unchecked;
+    QPixmap remove;
+    QPixmap toggle;
 };

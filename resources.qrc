@@ -22,5 +22,6 @@
         <file alias="ketone">icons/ketone.png</file>
         <file alias="combos">icons/combos.png</file>
         <file alias="name">icons/name.png</file>
+        <file alias="close">icons/close.png</file>
     </qresource>
 </RCC>

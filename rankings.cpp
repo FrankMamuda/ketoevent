@@ -29,7 +29,6 @@
 #include "rankingsmodel.h"
 #include "variable.h"
 #include "main.h"
-#include <QCommonStyle>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QThread>
@@ -39,11 +38,10 @@
  * @param parent
  */
 Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nullptr ) {
-    QCommonStyle style;
     this->ui->setupUi( this );
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->progressBar->hide();
-    this->ui->closeButton->setIcon( style.standardIcon( QStyle::SP_DialogCloseButton ));
+    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
 
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );

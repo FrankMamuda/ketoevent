@@ -42,7 +42,7 @@
  * @brief MainWindow::MainWindow
  * @param parent
  */
-MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ) {    
+MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ), filter( new QSortFilterProxyModel()) {
     // set up ui
     this->ui->setupUi( this );
     this->ui->eventCombo->setModel( Event::instance());
@@ -51,16 +51,21 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
-    this->ui->taskView->setModel( Task::instance());
+    // setup task/logView
+    // TODO: handle proxy model indexes properly!!!
+    this->filter->setFilterKeyColumn( Task::Name );
+    this->filter->setFilterCaseSensitivity( Qt::CaseInsensitive );
+    this->filter->setSourceModel( Task::instance());
+    this->ui->taskView->setModel( this->filter );
     this->ui->taskView->setModelColumn( Task::Name );
     this->ui->taskView->setItemDelegate( new LogDelegate( this->ui->taskView ));
-    //this->ui->taskView->setParent( this );
 
     Variable::instance()->bind( "eventId", this->ui->eventCombo );
     this->ui->teamCombo->setObjectName( "One" );
     Variable::instance()->bind( "teamId", this->ui->teamCombo );
 
     // insert spacer
+    // TODO: delete me?
     QWidget *spacer( new QWidget());
     spacer->setSizePolicy( QSizePolicy::Expanding,QSizePolicy::Preferred );
     this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
@@ -68,12 +73,32 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     //for ( int y= 0; y <Task::instance()->count(); y++ )
     //    qDebug() << Task::instance()->order( y );
 
-
     // bind for sorting updates
     Variable::instance()->bind( "sortByType", this, SLOT( updateTasks()));
 
     // add to garbage man
     GarbageMan::instance()->add( this );
+
+
+    this->completer.setModel( Task::instance());
+    this->ui->findEdit->setCompleter( &this->completer );
+    this->completer.setCompletionColumn( Task::Name );
+    this->completer.setCaseSensitivity( Qt::CaseInsensitive );
+    /*this->connect<void( QCompleter::* )( const QModelIndex & )>( &this->completer, &QCompleter::activated, [ this ]( const QModelIndex &index ) {
+        this->ui->taskView->setCurrentIndex( index );
+        this->ui->taskView->scrollTo( index );
+        qDebug() << "activated" << index.row();
+    } );*/
+
+    /*this->connect<void( QCompleter::* )( const QString & )>( &this->completer, &QCompleter::activated, [ this ]( const QString &text ) {
+        qDebug() << "activated" << text;
+        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterKeyColumn( Task::Name );
+        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterRegExp( text );
+    } );*/
+
+    this->connect( this->ui->findEdit, &QLineEdit::textChanged, [ this ]( const QString &text ) {
+        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterRegExp( text );
+    } );
 }
 
 /**
@@ -81,6 +106,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
  */
 MainWindow::~MainWindow() {
     Variable::instance()->unbind( "teamId", this->ui->teamCombo );
+    delete this->filter;
     delete this->ui;
 }
 
