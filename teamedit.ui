@@ -6,58 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>101</height>
+    <width>326</width>
+    <height>102</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="3" column="1">
-    <widget class="QPushButton" name="cancelButton">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2">
-    <layout class="QGridLayout" name="optionsLayout" columnstretch="0,1,0,1,0">
-     <item row="0" column="3">
-      <widget class="QLabel" name="membersLabel">
+    <layout class="QGridLayout" name="teamLayout">
+     <item row="1" column="1">
+      <widget class="QLabel" name="reviewerLabel">
        <property name="text">
-        <string>Members</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QSpinBox" name="membersInteger"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="titleLabel">
-       <property name="text">
-        <string>Title</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="4">
-      <layout class="QHBoxLayout" name="finishLayout">
-       <item>
-        <widget class="QTimeEdit" name="finishTime"/>
-       </item>
-       <item>
-        <widget class="QToolButton" name="finishButton">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="3">
-      <widget class="QLabel" name="finishLabel">
-       <property name="text">
-        <string>Finish</string>
+        <string>Reviewer</string>
        </property>
       </widget>
      </item>
@@ -68,17 +30,56 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="reviewerLabel">
-       <property name="text">
-        <string>Reviewer</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
+     <item row="1" column="2">
       <widget class="QLineEdit" name="reviewerEdit">
        <property name="placeholderText">
         <string>Type reviewer's name here</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLabel" name="finishLabel">
+       <property name="text">
+        <string>Finish</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QTimeEdit" name="finishTime"/>
+     </item>
+     <item row="1" column="4">
+      <widget class="QToolButton" name="finishButton">
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/icons/time</normaloff>:/icons/time</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="membersPixmap">
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="resources.qrc">:/icons/teams</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -98,7 +99,10 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="0" column="6">
+      <widget class="QSpinBox" name="membersInteger"/>
+     </item>
+     <item row="1" column="0">
       <widget class="QLabel" name="reviewerPixmap">
        <property name="maximumSize">
         <size>
@@ -117,12 +121,54 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="5">
+      <widget class="QLabel" name="membersLabel">
+       <property name="text">
+        <string>Members</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="titleLabel">
+       <property name="text">
+        <string>Title</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3" rowspan="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="1" column="0">
     <widget class="QPushButton" name="addButton">
      <property name="text">
       <string>Add</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/accept</normaloff>:/icons/accept</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
      </property>
     </widget>
    </item>

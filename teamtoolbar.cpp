@@ -40,7 +40,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // edit action
-    this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
+    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team" ));
             TeamEdit::instance()->reset( true );
@@ -48,7 +48,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // remove action
-    QAction *remove( this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Team" ), [ this ]() {
+    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Team" ), [ this ]() {
         const QModelIndex index( EditorDialog::instance()->container->currentIndex());
 
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
@@ -57,14 +57,24 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
         const QString title( Team::instance()->title( index.row()));
         if ( QMessageBox::question( this, this->tr( "Remove team" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes )
             Team::instance()->remove( index.row());
-    } ));
-    remove->setEnabled( false );
-
-    // button test
-    this->connect( EditorDialog::instance()->container, &QListView::clicked, [ this, remove ]( const QModelIndex &index ) {
-        remove->setEnabled( index.isValid());
     } );
 
+    // button test (disconnected in ~EditorDialog)
+    this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
+    this->buttonTest();
+
     // add to garbage man
-    //GarbageMan::instance()->add( this );
+    GarbageMan::instance()->add( this );
 }
+
+/**
+ * @brief TaskToolBar::buttonTest
+ * @param index
+ */
+void TeamToolBar::buttonTest( const QModelIndex &index ) {
+    this->edit->setEnabled( index.isValid());
+    this->remove->setEnabled( index.isValid());
+};
+
+
+

@@ -23,5 +23,9 @@
         <file alias="combos">icons/combos.png</file>
         <file alias="name">icons/name.png</file>
         <file alias="close">icons/close.png</file>
+        <file alias="multi">icons/multi.png</file>
+        <file alias="style">icons/style.png</file>
+        <file alias="accept">icons/accept.png</file>
+        <file alias="time">icons/time.png</file>
     </qresource>
 </RCC>

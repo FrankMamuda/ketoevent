@@ -33,12 +33,8 @@
  * @param parent
  */
 TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit ), m_edit( false ) {
-    QCommonStyle style;
-
     // set up defaults
     this->ui->setupUi( this );
-    this->ui->addButton->setIcon( style.standardIcon( QStyle::SP_DialogOkButton ));
-    this->ui->cancelButton->setIcon( style.standardIcon( QStyle::SP_DialogCancelButton ));
 
     // setup comboboxes
     this->connect<void( QComboBox::* )( int )>( this->ui->typeCombo, &QComboBox::activated, [ this ]( int index ) {
@@ -47,9 +43,11 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
         if ( type == Task::Types::Check ) {
             this->ui->multiLabel->hide();
             this->ui->multiInteger->hide();
+            this->ui->multiPixmap->hide();
         } else if ( type == Task::Types::Multi ) {
             this->ui->multiLabel->show();
             this->ui->multiInteger->show();
+            this->ui->multiPixmap->show();
         }
     } );
     this->ui->typeCombo->addItems( Task::instance()->types.values());

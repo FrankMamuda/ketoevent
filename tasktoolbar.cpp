@@ -41,7 +41,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // edit action
-    this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Task" ), [ this ]() {
+    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task" ));
             TaskEdit::instance()->reset( true );
@@ -61,21 +61,8 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
     this->remove->setEnabled( false );
 
-    // button test lambda
-    auto buttonTest = [ this ]( const QModelIndex &index ) {
-        if ( Variable::instance()->isEnabled( "sortByType" )) {
-            this->moveUp->setDisabled( true );
-            this->moveDown->setDisabled( true );
-        } else {
-            this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
-            this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
-        }
-
-        this->remove->setEnabled( index.isValid());
-    };
-
     // move up/down lambda
-    auto move = [ this, buttonTest ]( bool up ) {
+    auto move = [ this ]( bool up ) {
         // NOTE: reordering is required for duplicates
         //       (there should not be any, if all works as intended)
         //       non-sequential order does not cause problems however
@@ -135,7 +122,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         const QModelIndex current( container->model()->index( Task::instance()->row( id0 ), 0 ));
         container->setCurrentIndex( current );
         container->setFocus();
-        buttonTest( current );
+        this->buttonTest( current );
     };
 
     // move up action
@@ -150,9 +137,26 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
     moveDown->setEnabled( false );
 
-    // button test
-    this->connect( EditorDialog::instance()->container, &QListView::clicked, [ buttonTest ]( const QModelIndex &index ) {
-        buttonTest( index );
-    } );    
+    // button test (disconnected in ~EditorDialog)
+    this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
+    this->buttonTest();
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
+/**
+ * @brief TaskToolBar::buttonTest
+ * @param index
+ */
+void TaskToolBar::buttonTest( const QModelIndex &index ) {
+    if ( Variable::instance()->isEnabled( "sortByType" )) {
+        this->moveUp->setDisabled( true );
+        this->moveDown->setDisabled( true );
+    } else {
+        this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
+        this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
+    }
+    this->edit->setEnabled( index.isValid());
+    this->remove->setEnabled( index.isValid());
+};

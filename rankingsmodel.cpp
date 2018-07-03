@@ -22,6 +22,7 @@
 #include "rankingsmodel.h"
 #include "rankings.h"
 #include "team.h"
+#include "ui_rankings.h"
 
 /**
  * @brief RankingsModel::headerData
@@ -31,26 +32,27 @@
  * @return
  */
 QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, int role ) const {
-    // TODO: add rank
-
     if ( orientation == Qt::Horizontal ) {
         if ( role == Qt::DisplayRole ) {
-            if ( section == 0 )
+            if ( section == Rank )
+                return QT_TR_NOOP_UTF8( "Rank" );
+
+            if ( section == TeamTitle )
                 return QT_TR_NOOP_UTF8( "Team\ntitle" );
 
-            if ( section == 1 )
+            if ( section == Completed )
                 return QT_TR_NOOP_UTF8( "Completed" );
 
-            if ( section == 2 )
+            if ( section == Combos )
                 return QT_TR_NOOP_UTF8( "Combos" );
 
-            if ( section == 3 )
+            if ( section == Combined )
                 return QT_TR_NOOP_UTF8( "Combined" );
 
-            if ( section == 4 )
+            if ( section == Penalty )
                 return QT_TR_NOOP_UTF8( "Penalty" );
 
-            if ( section == 5 )
+            if ( section == Points )
                 return QT_TR_NOOP_UTF8( "Points" );
         }
     }
@@ -79,7 +81,7 @@ int RankingsModel::columnCount( const QModelIndex &parent ) const {
     if ( parent.isValid())
         return 0;
 
-    return 6;
+    return ColumnCount;
 }
 
 /**
@@ -93,11 +95,14 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
         return QVariant();
 
     if ( role == Qt::DisplayRole ) {
-        if ( index.column() == 0 ) {
+        if ( index.column() == Rank )
+            return Rankings::instance()->list.at( index.row()).rank;
+
+        if ( index.column() == TeamTitle ) {
             if ( !Rankings::instance()->isDisplayingCurrentTeam()) {
                 return Rankings::instance()->list.at( index.row()).title;
             } else {
-                const int team = Team::instance()->row( MainWindow::instance()->currentTeamId());
+                const int team = Rankings::instance()->ui->teamCombo->currentIndex();
                 const QString title( Team::instance()->title( team ));
 
                 if ( !QString::compare( title, Rankings::instance()->list.at( index.row()).title ))
@@ -105,26 +110,26 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
             }
         }
 
-        if ( index.column() == 1 )
+        if ( index.column() == Completed )
             return Rankings::instance()->list.at( index.row()).completedTasks;
 
-        if ( index.column() == 2 )
+        if ( index.column() == Combos )
             return Rankings::instance()->list.at( index.row()).combos;
 
-        if ( index.column() == 3 )
+        if ( index.column() == Combined )
             return Rankings::instance()->list.at( index.row()).comboTasks;
 
-        if ( index.column() == 4 )
+        if ( index.column() == Penalty )
             return Rankings::instance()->list.at( index.row()).penalty;
 
-        if ( index.column() == 5 )
+        if ( index.column() == Points )
             return Rankings::instance()->list.at( index.row()).points;
     }
 
     if ( role == Qt::TextAlignmentRole )
         return Qt::AlignCenter;
 
-    if ( role == Qt::TextColorRole && index.column() == 4 && Rankings::instance()->list.at( index.row()).penalty > 0 )
+    if ( role == Qt::TextColorRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
         return QColor( Qt::red );
 
     return QVariant();

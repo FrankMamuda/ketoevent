@@ -43,9 +43,7 @@ Combos::Combos() : ui( new Ui::Combos ) {
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
-    // FIXME: set current teamId without binding!!!
-    Variable::instance()->bind( "teamId", this->ui->teamCombo );
-
+    // add to garbage man
     GarbageMan::instance()->add( this );
 }
 
@@ -53,7 +51,6 @@ Combos::Combos() : ui( new Ui::Combos ) {
  * @brief Combos::~Combos
  */
 Combos::~Combos() {
-    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
     delete this->ui;
 }
@@ -65,4 +62,16 @@ Combos::~Combos() {
 void Combos::on_teamCombo_currentIndexChanged( int index ) {
     ComboModel::instance()->reset( Team::instance()->id( index ));
     this->ui->view->reset();
+}
+
+/**
+ * @brief Combos::showEvent
+ * @param event
+ */
+void Combos::showEvent( QShowEvent *event ) {
+    ModalWindow::showEvent( event );
+
+    // set current team
+    const int currentTeamRow = Team::instance()->row( MainWindow::instance()->currentTeamId());
+    this->ui->teamCombo->setCurrentIndex( currentTeamRow );
 }

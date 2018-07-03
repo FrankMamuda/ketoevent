@@ -22,6 +22,7 @@
 // includes
 //
 #include "toolbar.h"
+#include <QModelIndex>
 
 /**
  * @brief The TaskToolBar class
@@ -34,9 +35,13 @@ public:
     static TaskToolBar *instance() { static TaskToolBar *instance = new TaskToolBar(); return instance; }
     virtual ~TaskToolBar() = default;
 
+public slots:
+    void buttonTest (const QModelIndex &index = QModelIndex());
+
 private:
     explicit TaskToolBar( QWidget *parent = nullptr );
     QAction *moveUp;
     QAction *moveDown;
+    QAction *edit;
     QAction *remove;
 };

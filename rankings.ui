@@ -16,7 +16,27 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QComboBox" name="teamCombo"/>
+     <layout class="QHBoxLayout" name="treamLayout">
+      <item>
+       <widget class="QLabel" name="teamPixmap">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/teams</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="teamCombo"/>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QTableView" name="tableView">

@@ -22,6 +22,7 @@
 // includes
 //
 #include "toolbar.h"
+#include <QModelIndex>
 
 /**
  * @brief The TeamToolBar class
@@ -34,6 +35,11 @@ public:
     static TeamToolBar *instance() { static TeamToolBar *instance = new TeamToolBar(); return instance; }
     virtual ~TeamToolBar() = default;
 
+public slots:
+    void buttonTest( const QModelIndex &index = QModelIndex());
+
 private:
     explicit TeamToolBar( QWidget *parent = nullptr );
+    QAction *edit;
+    QAction *remove;
 };

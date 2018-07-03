@@ -28,8 +28,23 @@
  */
 class RankingsModel : public QAbstractTableModel {
     Q_OBJECT
+    Q_ENUMS( Columns )
 
 public:
+    enum Columns {
+        NoColumn = -1,
+        Rank,
+        TeamTitle,
+        Completed,
+        Combos,
+        Combined,
+        Penalty,
+        Points,
+
+        // do not remove
+        ColumnCount
+    };
+
     explicit RankingsModel( QObject *parent = nullptr ) : QAbstractTableModel( parent ) { }
     QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
     int rowCount( const QModelIndex &parent = QModelIndex()) const override;

@@ -16,11 +16,34 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QLineEdit" name="reviewerEdit">
-      <property name="placeholderText">
-       <string>Type reviewer name here</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="reviewerLayout">
+      <item>
+       <widget class="QLabel" name="reviewerPixmap">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/ketone</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="reviewerEdit">
+        <property name="placeholderText">
+         <string>Type reviewer name here</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QCheckBox" name="sortByTypeCheck">
@@ -39,6 +62,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

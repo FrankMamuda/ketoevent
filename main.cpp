@@ -32,16 +32,8 @@
 #include "console.h"
 #include "main.h"
 
-//
-// sort out ui element naming
-// nameType vs typeName
-// closeButton vs buttonClose
-//
-
-
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
-//static QStringList history;
 
 /**
  * @brief messageFilter
@@ -57,17 +49,8 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    if ( Main::Console != nullptr ) {
-        /*if ( !history.isEmpty()) {
-            foreach ( const QString &entry, history )
-                qobject_cast<Console*>( Main::Console )->print( entry );
-            history.clear();
-        }*/
-
+    if ( Main::Console != nullptr )
         qobject_cast<Console*>( Main::Console )->print( msg );
-    }/* else {
-        history << msg;
-    }*/
 }
 
 /**
@@ -91,6 +74,7 @@ int main( int argc, char *argv[] ) {
     Variable::instance()->add( "teamId", -1 );
     Variable::instance()->add( "rankingsCurrent", true );
     Variable::instance()->add( "sortByType", true );
+    Variable::instance()->add( "system/consoleHistory", "" );
 
     // read configuration
     XMLTools::instance()->read();
@@ -110,10 +94,12 @@ int main( int argc, char *argv[] ) {
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
-        XMLTools::instance()->write();
-
+        delete Console::instance();
         Main::Console = nullptr;
+
+        XMLTools::instance()->write();
         GarbageMan::instance()->clear();
+
         delete GarbageMan::instance();
 
         if ( Database::instance() != nullptr )

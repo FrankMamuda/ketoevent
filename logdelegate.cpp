@@ -51,7 +51,7 @@ QWidget *LogDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem 
 
     qDebug() << "create editor";
 
-    // TODO: use source model mapping
+    // NOTE: must use source model mapping
 
 
     // row = index.model()->data( index, Log::TaskRole ).toInt();
@@ -73,7 +73,7 @@ void LogDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) con
     Q_UNUSED( editor )
     Q_UNUSED( index )
 
-    // TODO: use source model mapping
+    // NOTE: must use source model mapping
 
     /*QSpinBox *spinBox;
     int value;
@@ -94,7 +94,7 @@ void LogDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, cons
     Q_UNUSED( model )
     Q_UNUSED( index )
 
-    // TODO: use source model mapping
+    // NOTE: must use source model mapping
 
     /*QSpinBox *spinBox;
     int value;
@@ -143,9 +143,8 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
     // not the fastest lookup, but performance is a non-issue currently
     for ( y = 0; y < Log::instance()->count(); y++ ) {
         if ( Log::instance()->taskId( y ) == taskId && Log::instance()->teamId( y ) == MainWindow::instance()->currentTeamId()) {
-
-            // TODO: only if value > 0
-            found = true;
+            if ( Log::instance()->multiplier( y ) > 0 )
+                found = true;
         }
     }
 

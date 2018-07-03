@@ -49,7 +49,8 @@ public:
         comboTasks( 0 ),
         points( 0 ),
         penalty( 0 ),
-        time( 0 ) {}
+        time( 0 ),
+        rank( 0 ) {}
     QString title;
     int completedTasks;
     int combos;
@@ -57,6 +58,7 @@ public:
     int points;
     int penalty;
     int time;
+    int rank;
 };
 
 /**
@@ -83,7 +85,6 @@ protected:
 private:
     explicit Rankings();
     Ui::Rankings *ui;
-    //QString prevFilter;
     RankingsModel *model;
     QSortFilterProxyModel *proxyModel;
     QList<TeamStatistics> list;

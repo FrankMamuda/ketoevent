@@ -37,6 +37,7 @@
 #include "database.h"
 #include "console.h"
 #include "combos.h"
+#include "main.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -52,7 +53,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     this->ui->teamCombo->setModelColumn( Team::Title );
 
     // setup task/logView
-    // TODO: handle proxy model indexes properly!!!
+    // NOTE: must handle proxy model indexes properly!
     this->filter->setFilterKeyColumn( Task::Name );
     this->filter->setFilterCaseSensitivity( Qt::CaseInsensitive );
     this->filter->setSourceModel( Task::instance());
@@ -60,8 +61,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     this->ui->taskView->setModelColumn( Task::Name );
     this->ui->taskView->setItemDelegate( new LogDelegate( this->ui->taskView ));
 
+    // bind event/team variables to comboBoxes
     Variable::instance()->bind( "eventId", this->ui->eventCombo );
-    this->ui->teamCombo->setObjectName( "One" );
     Variable::instance()->bind( "teamId", this->ui->teamCombo );
 
     // insert spacer
@@ -70,41 +71,27 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     spacer->setSizePolicy( QSizePolicy::Expanding,QSizePolicy::Preferred );
     this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
 
-    //for ( int y= 0; y <Task::instance()->count(); y++ )
-    //    qDebug() << Task::instance()->order( y );
-
     // bind for sorting updates
     Variable::instance()->bind( "sortByType", this, SLOT( updateTasks()));
 
-    // add to garbage man
-    GarbageMan::instance()->add( this );
-
-
+    // set up completer
     this->completer.setModel( Task::instance());
     this->ui->findEdit->setCompleter( &this->completer );
     this->completer.setCompletionColumn( Task::Name );
     this->completer.setCaseSensitivity( Qt::CaseInsensitive );
-    /*this->connect<void( QCompleter::* )( const QModelIndex & )>( &this->completer, &QCompleter::activated, [ this ]( const QModelIndex &index ) {
-        this->ui->taskView->setCurrentIndex( index );
-        this->ui->taskView->scrollTo( index );
-        qDebug() << "activated" << index.row();
-    } );*/
-
-    /*this->connect<void( QCompleter::* )( const QString & )>( &this->completer, &QCompleter::activated, [ this ]( const QString &text ) {
-        qDebug() << "activated" << text;
-        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterKeyColumn( Task::Name );
-        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterRegExp( text );
-    } );*/
-
     this->connect( this->ui->findEdit, &QLineEdit::textChanged, [ this ]( const QString &text ) {
         qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterRegExp( text );
     } );
+
+    // add to garbage man
+    GarbageMan::instance()->add( this );
 }
 
 /**
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
+    Variable::instance()->unbind( "eventId", this->ui->eventCombo );
     Variable::instance()->unbind( "teamId", this->ui->teamCombo );
     delete this->filter;
     delete this->ui;
@@ -173,12 +160,14 @@ void MainWindow::on_actionTeams_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
     editor->show();
+    editor->container->clearSelection();
     editor->container->setModel( Team::instance());
     editor->container->setModelColumn( Team::Title );
     editor->setToolBar( TeamToolBar::instance());
     editor->setWindowTitle( this->tr( "Team manager" ));
     editor->setWindowIcon( QIcon( ":/icons/teams" ));
 
+    TeamToolBar::instance()->buttonTest();
     TeamToolBar::instance()->show();
 }
 
@@ -189,12 +178,14 @@ void MainWindow::on_actionTasks_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
     editor->show();
+    editor->container->clearSelection();
     editor->container->setModel( Task::instance());
     editor->container->setModelColumn( Task::Name );
     editor->setToolBar( TaskToolBar::instance());
     editor->setWindowTitle( this->tr( "Task manager" ));
     editor->setWindowIcon( QIcon( ":/icons/tasks" ));
 
+    TaskToolBar::instance()->buttonTest();
     TaskToolBar::instance()->show();
 }
 
@@ -223,11 +214,11 @@ void MainWindow::on_actionConsole_triggered() {
  * @brief MainWindow::updateTasks
  */
 void MainWindow::updateTasks() {
+    // NOTE: this could also be done through proxy model
     if ( Variable::instance()->isEnabled( "sortByType" ))
         Task::instance()->setFilter( QString( "eventId=%1 order by %2, %3 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Type )).arg( Task::instance()->fieldName( Task::Name )));
     else
         Task::instance()->setFilter( QString( "eventId=%1 order by %2 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Order )));
-
 }
 
 /**

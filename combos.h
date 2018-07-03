@@ -33,13 +33,16 @@ class Combos;
 /**
  * @brief The Combos class
  */
-class Combos final : public QMainWindow {
+class Combos final : public ModalWindow {
     Q_DISABLE_COPY( Combos )
     Q_OBJECT
 
 public:
     static Combos *instance() { static Combos *instance( new Combos()); return instance; }
     ~Combos();
+
+protected:
+    void showEvent( QShowEvent *event );
 
 private slots:
     void on_teamCombo_currentIndexChanged(int index);

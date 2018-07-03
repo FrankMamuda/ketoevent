@@ -21,9 +21,8 @@
 //
 // includes
 //
-#include "main.h"
-#include "modalwindow.h"
 #include <QLineEdit>
+#include <QMainWindow>
 #include <QMouseEvent>
 
 #ifdef QT_DEBUG
@@ -48,12 +47,12 @@ class HistoryEdit;
 /**
  * @brief The Console class
  */
-class Console final : public ModalWindow {
+class Console final : public QMainWindow {
     Q_OBJECT
     Q_DISABLE_COPY( Console )
 
 public:
-    static Console *instance() { static Console *instance( new Console()); GarbageMan::instance()->add( instance ); return instance; }
+    static Console *instance() { static Console *instance( new Console()); return instance; }
     virtual ~Console();
 
 public slots:

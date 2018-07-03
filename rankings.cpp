@@ -38,20 +38,23 @@
  * @param parent
  */
 Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nullptr ) {
+    // set up ui
     this->ui->setupUi( this );
+
+    // make sure this window blocks other windows
     this->setWindowModality( Qt::ApplicationModal );
+
+    // set up progressbar and team selector
     this->ui->progressBar->hide();
     this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
-
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
-    Variable::instance()->bind( "teamId", this->ui->teamCombo );
+    // bind currentTeam action to a variable
+    // and repaint table when either team or currentTeam variable changes
     Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
-
-    // TODO: disconnect me
-    Variable::instance()->bind( "teamId", this->ui->tableView->viewport(), SLOT( repaint()));
     this->connect( this->ui->actionCurrent, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
+    this->connect( this->ui->teamCombo, SIGNAL( currentIndexChanged( int )), this->ui->tableView->viewport(), SLOT( repaint()));
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/rankings" ));
@@ -64,9 +67,9 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
  * @brief Rankings::~Rankings
  */
 Rankings::~Rankings() {
-    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
-    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
+    Variable::instance()->unbind( "rankingsCurrent", this->ui->actionCurrent );
     this->disconnect( this->ui->actionCurrent, SIGNAL( toggled( bool )));
+    this->disconnect( this->ui->teamCombo, SIGNAL( currentIndexChanged( int )));
 
     delete this->ui;
 }
@@ -110,6 +113,7 @@ void Rankings::on_actionUpdate_triggered() {
     const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
     const QTime eventStartTime( Event::instance()->startTime( event ));
     const QTime eventFinishTime( Event::instance()->finishTime( event ));
+    const QTime eventFinalTime( Event::instance()->finalTime( event ));
     const int penaltyPoints( Event::instance()->penalty( event ));
 
     // go through team list (might seem a little less efficient than going through logs,
@@ -122,9 +126,6 @@ void Rankings::on_actionUpdate_triggered() {
 
         // update progress bar
         this->ui->progressBar->setValue( team );
-
-        // TODO: remove me
-        QObject().thread()->usleep( 1000 * 20 );
 
         // go through logs
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
@@ -178,13 +179,16 @@ void Rankings::on_actionUpdate_triggered() {
 
 
         // calculate penalty points
-        // TODO: check finalTime
         const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
         stats.time = eventStartTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
         if ( overTime > 0 ) {
             stats.penalty = penaltyPoints * overTime;
             stats.points -= stats.penalty;
+            stats.points = qMax( stats.points, 0 );
         }
+        const int penaltyTime = eventFinishTime.secsTo( eventFinalTime );
+        if ( overTime > penaltyTime )
+            stats.points = 0;
 
         // add team stats to list
         this->list << stats;
@@ -197,11 +201,31 @@ void Rankings::on_actionUpdate_triggered() {
     this->ui->progressBar->hide();
 
     // sort by points
-    this->proxyModel->sort( 5, Qt::DescendingOrder );
+    this->proxyModel->sort( RankingsModel::Points, Qt::DescendingOrder );
 
     // scale window to contents
     this->ui->tableView->resizeColumnsToContents();
     this->ui->tableView->resizeRowsToContents();
+
+    // calculate rank
+    // NOTE: a really dumb way to do it
+    QMap<int,int> map;
+    int y = 0;
+    foreach ( const TeamStatistics &stats, this->list ) {
+        map.insertMulti( stats.points, y );
+        y++;
+    }
+    QList<int>points = map.uniqueKeys();
+    std::sort( points.begin(), points.end(), std::greater<int>());
+    y = 1;
+    foreach ( const int p, points ) {
+        foreach ( int index, map.values( p )) {
+            TeamStatistics stats = this->list.at( index );
+            stats.rank = y;
+            this->list.replace( index, stats );
+        }
+        y++;
+    }
 }
 
 /**
@@ -209,17 +233,15 @@ void Rankings::on_actionUpdate_triggered() {
  * @param event
  */
 void Rankings::showEvent( QShowEvent *event ) {
-    //this->prevFilter = Log::instance()->filter();
-    //Log::instance()->setFilter( "" );
     ModalWindow::showEvent( event );
 
     // scale window to contents
     this->ui->tableView->resizeColumnsToContents();
     this->ui->tableView->resizeRowsToContents();
 
-    // calculate results on first open
-   // if ( this->model == nullptr )
-        //this->on_actionUpdate_triggered();
+    // set current team
+    const int currentTeamRow = Team::instance()->row( MainWindow::instance()->currentTeamId());
+    this->ui->teamCombo->setCurrentIndex( currentTeamRow );
 }
 
 /**

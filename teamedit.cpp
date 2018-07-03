@@ -26,7 +26,6 @@
 #include "teamedit.h"
 #include "ui_teamedit.h"
 #include "variable.h"
-#include <QCommonStyle>
 #include <QMessageBox>
 
 /**
@@ -34,7 +33,6 @@
  * @param parent
  */
 TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit ), m_edit( false ) {
-    QCommonStyle style;
     const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
 
     // set up defaults
@@ -42,9 +40,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     this->ui->membersInteger->setMinimum( Event::instance()->minMembers( event ));
     this->ui->membersInteger->setMaximum( Event::instance()->maxMembers( event ));
     this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
-    this->ui->finishTime->setMaximumTime( Event::instance()->finishTime( event ));
-    this->ui->addButton->setIcon( style.standardIcon( QStyle::SP_DialogOkButton ));
-    this->ui->cancelButton->setIcon( style.standardIcon( QStyle::SP_DialogCancelButton ));
+    this->ui->finishTime->setMaximumTime( Event::instance()->finalTime( event ));
 
     // empty team title check
     auto emptyTitle = [ this ]() {
@@ -116,6 +112,11 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
             EditorDialog::instance()->hideDock();
     } );
 
+    // connect time button
+    this->connect( this->ui->finishButton, &QToolButton::pressed, [ this ]() {
+        this->ui->finishTime->setTime( QTime::currentTime());
+    } );
+
     // add to garbage man
     GarbageMan::instance()->add( this );
 }
@@ -130,6 +131,7 @@ TeamEdit::~TeamEdit() {
     this->disconnect( this->ui->titleEdit, SIGNAL( returnPressed()));
     this->disconnect( this->ui->membersInteger, SIGNAL( editingFinished()));
     this->disconnect( this->ui->finishTime, SIGNAL( editingFinished()));
+    this->disconnect( this->ui->finishButton, SIGNAL( pressed()));
 
     // delete ui
     delete this->ui;
@@ -156,7 +158,6 @@ void TeamEdit::reset( bool edit ) {
         this->ui->reviewerEdit->setText( Team::instance()->reviewer( team ));
     }
 
-    // TODO: set default reviewer
     this->ui->titleEdit->setFocus();
     this->ui->addButton->setDefault( false );
     this->ui->addButton->setAutoDefault( false );
