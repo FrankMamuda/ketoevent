@@ -52,9 +52,10 @@ Team::Team() : Table( TeamTable::Name ) {
  * @param members
  * @param finishTime
  * @param reviewer
+ * @return
  */
-void Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
-    Table::add( QVariantList() <<
+Id Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
+    return Table::add( QVariantList() <<
                 Database_::null <<
                 title <<
                 members <<

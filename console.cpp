@@ -25,8 +25,6 @@
 #include "variable.h"
 #include "main.h"
 
-#ifdef QT_DEBUG
-
 /**
  * @brief Console::Console
  */
@@ -205,4 +203,3 @@ void Console::on_input_returnPressed() {
     this->edit->clear();
 }
 
-#endif

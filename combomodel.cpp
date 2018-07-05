@@ -23,7 +23,7 @@
 #include "log.h"
 #include "mainwindow.h"
 #include "task.h"
-#include <QDebug>
+#include "event.h"
 
 // initialize colors
 QList<QRgb> ComboModel::colourList = ( QList<QRgb>() << 1073774592 << 1082195712 << 1082163200 << 1090453632 << 1082130687 << 1073774720 << 1073807232 );
@@ -69,8 +69,22 @@ void ComboModel::reset( const Id &id ) {
     }
 
     // build display list
+    this->combos = this->map.uniqueKeys().count();
+    this->points = 0;
     foreach ( const Id &comboId, this->map.uniqueKeys()) {
-        foreach ( const QString &taskName, this->map.values( comboId ))
+        const QStringList taskNames( this->map.values( comboId ));
+        const int count = taskNames.count();
+
+        if ( count == 2 )
+            this->points += EventTable::DefaultComboOfTwo;
+
+        if ( count == 3 )
+            this->points += EventTable::DefaultComboOfThree;
+
+        if ( count >= 4 )
+            this->points += EventTable::DefaultComboOfFourAndMore;
+
+        foreach ( const QString &taskName, taskNames )
             list << taskName;
     }
 

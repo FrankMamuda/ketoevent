@@ -22,6 +22,7 @@
 // includes
 //
 #include "mainwindow.h"
+#include <QKeyEvent>
 
 /**
  * @brief The ModalWindow class
@@ -45,4 +46,15 @@ protected:
      * @param event
      */
     void hideEvent( QHideEvent *event ) override { MainWindow::instance()->setEnabled( true ); QMainWindow::hideEvent( event ); }
+
+    /**
+     * @brief MainWindow::keyPressEvent
+     * @param event
+     */
+    void keyPressEvent( QKeyEvent *event ) override {
+    if ( event->key() == Qt::Key_Escape )
+        this->hide();
+
+        QMainWindow::keyPressEvent( event );
+    }
 };

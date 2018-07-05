@@ -24,6 +24,7 @@
 #include <QCompleter>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
+#include <QTimeEdit>
 
 /**
  * @brief The Ui namespace
@@ -50,6 +51,9 @@ public:
     Id currentEventId() const;
     Id currentTeamId() const;
 
+public slots:
+    void setCurrentTeam( const Id &id );
+
 private slots:
     void on_actionTasks_triggered();
     void on_actionRankings_triggered();
@@ -60,6 +64,7 @@ private slots:
     void on_eventCombo_currentIndexChanged( int index );
     void on_teamCombo_currentIndexChanged( int index );
     void on_actionTeams_triggered();
+    void on_actionAddQuick_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;
@@ -69,4 +74,8 @@ private:
     Ui::MainWindow *ui;
     QCompleter completer;
     QSortFilterProxyModel *filter;
+    QWidget *spacer;
+    QWidget *quickSpacerLeft;
+    QWidget *quickSpacerRight;
+    QTimeEdit *timeEdit;
 };

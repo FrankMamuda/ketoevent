@@ -177,7 +177,6 @@ void Rankings::on_actionUpdate_triggered() {
                 stats.points += EventTable::DefaultComboOfFourAndMore;
         }
 
-
         // calculate penalty points
         const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
         stats.time = eventStartTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
@@ -245,17 +244,16 @@ void Rankings::showEvent( QShowEvent *event ) {
 }
 
 /**
- * @brief Rankings::on_closeButton_clicked
- */
-void Rankings::on_closeButton_clicked() {
-    this->hide();
-}
-
-/**
  * @brief Rankings::on_actionExport_triggered
  */
 void Rankings::on_actionExport_triggered() {
     QString path( QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+#ifdef Q_OS_WIN
+    const bool win32 = true;
+#else
+    const bool win32 = false;
+#endif
+
 
     // check for empty filenames
     if ( path.isEmpty())
@@ -270,29 +268,10 @@ void Rankings::on_actionExport_triggered() {
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &csv );
-#ifdef Q_OS_WIN
-        out.setCodec( "Windows-1257" );
-#else
-        out.setCodec( "UTF-8" );
-#endif
-        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" )
-       #ifdef Q_OS_WIN
-               .append( "\r" )
-       #endif
-               .append( "\n" );
+        out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
+        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" ).append( win32 ? "\r" : "\n" );
 
         foreach ( const TeamStatistics &team, this->list ) {
-            //int points;
-
-            //if ( team->disqualified())
-            //    points = 0;
-            //else
-            //    points = team->points() - team->penalty();
-
-            // TODO: add this to calculation
-            //if ( points <= 0 )
-            //    points = 0;
-
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( team.title )
                    .arg( team.completedTasks )
@@ -300,11 +279,7 @@ void Rankings::on_actionExport_triggered() {
                    .arg( team.time )
                    .arg( team.penalty )
                    .arg( team.points )
-       #ifdef Q_OS_WIN
-                   .arg( "\r\n" );
-#else
-                   .arg( "\n" );
-#endif
+                   .arg( win32 ? "\r" : "\n" );
         }
     }
     csv.close();

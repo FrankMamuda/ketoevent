@@ -136,6 +136,7 @@ public:
         {
             QComboBox *comboBox( qobject_cast<QComboBox*>( this->widget ));
             QAbstractItemModel *model( comboBox->model());
+
             if ( model != nullptr )
                 return model->data( model->index( comboBox->currentIndex(), 0 ), Qt::UserRole );
         }

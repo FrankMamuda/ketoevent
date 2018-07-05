@@ -76,7 +76,7 @@ public:
 
 private slots:
     void on_actionUpdate_triggered();
-    void on_closeButton_clicked();
+    void on_closeButton_clicked() { this->hide(); }
     void on_actionExport_triggered();
 
 protected:

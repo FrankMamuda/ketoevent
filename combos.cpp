@@ -62,6 +62,8 @@ Combos::~Combos() {
 void Combos::on_teamCombo_currentIndexChanged( int index ) {
     ComboModel::instance()->reset( Team::instance()->id( index ));
     this->ui->view->reset();
+    this->ui->combosEdit->setText( QString::number( ComboModel::instance()->combos ));
+    this->ui->pointsEdit->setText( QString::number( ComboModel::instance()->points ));
 }
 
 /**

@@ -45,7 +45,7 @@ protected:
     void showEvent( QShowEvent *event );
 
 private slots:
-    void on_teamCombo_currentIndexChanged(int index);
+    void on_teamCombo_currentIndexChanged( int index );
 
 private:
     explicit Combos();

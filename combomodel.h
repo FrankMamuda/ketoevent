@@ -32,6 +32,7 @@
 class ComboModel final : public QStringListModel {
     Q_DISABLE_COPY( ComboModel )
     Q_OBJECT
+    friend class Combos;
 
 public:
     static ComboModel *instance() { static ComboModel *instance( new ComboModel()); return instance; }
@@ -57,8 +58,10 @@ public slots:
     void reset( const Id &id );
 
 private:
-    explicit ComboModel() { GarbageMan::instance()->add( this ); }
+    explicit ComboModel() : combos( 0 ), points( 0 ) { GarbageMan::instance()->add( this ); }
     QMap<Id, QString> map;
     QMap<QString, QRgb> colours;
     static QList<QRgb> colourList;
+    int combos;
+    int points;
 };

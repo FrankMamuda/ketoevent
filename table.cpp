@@ -30,7 +30,7 @@
  * @param name
  * @param map
  */
-Table::Table( const QString &name ) : m_valid( false ) {
+Table::Table( const QString &name ) : m_valid( false ), m_hasPrimary( false ) {
     this->setTable( name );
 }
 
@@ -56,7 +56,8 @@ QVariant Table::value( int row, int fieldId ) const {
     if ( !index.isValid() || index.row() < 0 || index.row() >= this->count()) {
         qWarning( Database_::Debug ) << this->tr( "could not retrieve field \"%1\" value from table \"%2\"" )
                                         .arg( this->field( fieldId )->name())
-                                        .arg( this->tableName()) << !index.isValid() << ( index.row() < 0 ) << ( index.row() >= this->count());
+                                        .arg( this->tableName()) << !index.isValid()
+                                     << ( index.row() < 0 ) << ( index.row() >= this->count()) << row;
         return -1;
     }
 
@@ -96,8 +97,7 @@ QVariant Table::data( const QModelIndex &item, int role ) const {
         return QVariant();
 
     if ( role == IDRole || role == Qt::UserRole )
-        // FIXME: this fails for no reason: this->primaryField()->isNull() sometimes returns true, sometimes false
-        return this->record( item.row()).value( this->primaryField()->id()).toInt();
+        return this->hasPrimaryField() ? this->record( item.row()).value( this->primaryField()->id()).toInt() : -1;
 
     return QSqlRelationalTableModel::data( item, role );
 }
@@ -147,25 +147,27 @@ void Table::addField( int id, const QString &fieldName, QVariant::Type type, con
 
     Field field( new Field_( id, fieldName, type, format, unique, autoValue ));
     this->fields[id] = field;
-    if ( field->isPrimary() && this->primaryField().isNull())
+    if ( field->isPrimary() && this->primaryField().isNull()) {
         this->m_primaryField = field;
+        this->m_hasPrimary = true;
+    }
 }
 
 /**
  * @brief Table::add
  * @param name
  */
-void Table::add( const QVariantList &arguments ) {
-    int y, row;
+Id Table::add( const QVariantList &arguments ) {
+    int y;
 
     if ( !this->isValid())
-        return;
+        return Id::Invalid;
 
     if ( this->fields.count() != arguments.count())
         qCCritical( Database_::Debug ) << this->tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
 
     // insert empty row
-    row = this->count();
+    const int row = this->count();
     this->insertRow( row );
 
     // prepare statement
@@ -181,7 +183,7 @@ void Table::add( const QVariantList &arguments ) {
         if ( field->type() != argument.type()) {
             qCCritical( Database_::Debug ) << this->tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.type()).arg( y ).arg( field->format()).arg( field->type());
             this->revert();
-            return;
+            return Id::Invalid;
         }
 
         // check for unique fields
@@ -191,18 +193,28 @@ void Table::add( const QVariantList &arguments ) {
                         << this->tr( "table already has a unique field \"%1\" with value - \"%2\", aborting addition" )
                            .arg( field->name()).arg( argument.toString());
                 this->revert();
-                return;
+                return Id::Invalid;
             }
         }
 
-        // add to id/row map
-        if ( field->isPrimary())
-            this->map[static_cast<Id>( argument.toInt())] = QPersistentModelIndex( this->index( row, field->id()));
-        else
+        // set data if field is not primary
+        if ( !field->isPrimary())
             this->setData( this->index( this->count() - 1, y ), argument );
+        else
+            this->m_hasPrimary = true;
     }
 
     this->submit();
+
+    // add to id/row map
+    if ( this->hasPrimaryField()) {
+        const int primaryFieldId = this->primaryField()->id();
+        const Id id = static_cast<Id>( this->value( row, primaryFieldId ).toInt());
+        this->map[id] = QPersistentModelIndex( this->index( row, primaryFieldId ));
+        return id;
+    }
+
+    return Id::Invalid;
 }
 
 /**

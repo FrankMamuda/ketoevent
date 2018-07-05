@@ -52,6 +52,7 @@ public:
     Table( const QString &tableName = QString());
     virtual ~Table() { this->setValid( false ); this->clear(); }
     bool isValid() const { return this->m_valid; }
+    bool hasPrimaryField() const { return this->m_hasPrimary; }
     int count() const;
     QVariant value( int row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
@@ -65,7 +66,7 @@ public:
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }
     void addField( int id, const QString &fieldName = QString(), QVariant::Type type = QVariant::Invalid, const QString &format = QString( "text" ), bool unique = false, bool autoValue = false );
-    void add( const QVariantList &arguments );
+    Id add( const QVariantList &arguments );
     void remove( int row );
     void setValue( int row, int fieldId, const QVariant &value );
 
@@ -77,5 +78,6 @@ protected:
 
 private:
     bool m_valid;
+    bool m_hasPrimary;
     QSharedPointer<Field_> m_primaryField;
 };

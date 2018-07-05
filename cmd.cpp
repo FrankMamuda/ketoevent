@@ -30,9 +30,6 @@
 #include <QSqlQuery>
 #include <QDebug>
 
-// only available in debugging mode
-#ifdef QT_DEBUG
-
 /**
  * @brief Cmd::Cmd
  * @param parent
@@ -300,5 +297,3 @@ bool Cmd::execute( const QString &buffer ) {
 
     return false;
 }
-
-#endif

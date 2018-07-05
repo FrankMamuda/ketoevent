@@ -76,7 +76,7 @@ public:
     virtual ~Team() = default;
 
     Id id( int row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    void add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
+    Id add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
     QString title( int row ) const { return this->value( row, Title ).toString(); }
     int members( int row ) const { return this->value( row, Members ).toInt(); }
     QTime finishTime( int row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }

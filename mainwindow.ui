@@ -69,7 +69,38 @@
      <widget class="TaskView" name="taskView"/>
     </item>
     <item>
-     <widget class="QLineEdit" name="findEdit"/>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="findPixmap">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/icons/find</pixmap>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="findEdit"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="clearButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/clear</normaloff>:/icons/clear</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -107,6 +138,38 @@
    <addaction name="actionConsole"/>
    <addaction name="actionCombos"/>
    <addaction name="actionSettings"/>
+  </widget>
+  <widget class="QToolBar" name="quickBar">
+   <property name="windowTitle">
+    <string>quickBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::BottomToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>BottomToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionAddQuick"/>
+   <addaction name="actionLogTime"/>
+   <addaction name="actionCombine"/>
   </widget>
   <action name="actionTeams">
    <property name="icon">
@@ -160,6 +223,36 @@
    </property>
    <property name="text">
     <string>Combos</string>
+   </property>
+  </action>
+  <action name="actionAddQuick">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
+   </property>
+   <property name="text">
+    <string>Quickly add team</string>
+   </property>
+  </action>
+  <action name="actionLogTime">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/time</normaloff>:/icons/time</iconset>
+   </property>
+   <property name="text">
+    <string>Log current time</string>
+   </property>
+  </action>
+  <action name="actionCombine">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/combos</normaloff>:/icons/combos</iconset>
+   </property>
+   <property name="text">
+    <string>Combine logs</string>
    </property>
   </action>
  </widget>

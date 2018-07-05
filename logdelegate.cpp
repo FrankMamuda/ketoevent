@@ -46,16 +46,15 @@ LogDelegate::LogDelegate( QObject *parent ) : QStyledItemDelegate( parent ), m_e
  * @return
  */
 QWidget *LogDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index ) const {
-    LogEditor *editor;
-    int row;
+    LogEditor *editor( nullptr );
 
-    qDebug() << "create editor";
+    Q_UNUSED( editor )
+    Q_UNUSED( parent )
+    Q_UNUSED( index )
 
     // NOTE: must use source model mapping
-
-
-    // row = index.model()->data( index, Log::TaskRole ).toInt();
-    editor = new LogEditor( parent );
+    //const int row = index.model()->data( index, Log::TaskRole ).toInt();
+    //editor = new LogEditor( parent );
     //editor->setFrame(false);
     /*if ( row != -1 )
         editor->setName( Task::instance()->name( row ));
@@ -76,9 +75,7 @@ void LogDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) con
     // NOTE: must use source model mapping
 
     /*QSpinBox *spinBox;
-    int value;
-
-    value = index.model()->data( index, Log::MultiRole ).toInt();
+    const int value = index.model()->data( index, Log::MultiRole ).toInt();
     spinBox = qobject_cast<QSpinBox*>( editor );
     spinBox->setValue( value );*/
 }
@@ -97,13 +94,10 @@ void LogDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, cons
     // NOTE: must use source model mapping
 
     /*QSpinBox *spinBox;
-    int value;
-
     spinBox = qobject_cast<QSpinBox*>( editor );
     spinBox->interpretText();
-    value = spinBox->value();
+    const int value = spinBox->value();
     model->setData( index, value, Log::MultiRole );*/
-    qDebug() << "end edit";
 
     this->m_edit = false;
 }
@@ -125,6 +119,11 @@ void LogDelegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewI
  */
 void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     int y;
+
+    const Id teamId = MainWindow::instance()->currentTeamId();
+    if ( teamId == Id::Invalid )
+        return;
+
     // NOTE: correct mapping to the source model
     const Id taskId = Task::instance()->id( qobject_cast<QSortFilterProxyModel *>( const_cast<QAbstractItemModel *>( index.model()))->mapToSource( index ).row());
     bool found = false;
@@ -141,8 +140,8 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
 
     // find matching log
     // not the fastest lookup, but performance is a non-issue currently
-    for ( y = 0; y < Log::instance()->count(); y++ ) {
-        if ( Log::instance()->taskId( y ) == taskId && Log::instance()->teamId( y ) == MainWindow::instance()->currentTeamId()) {
+    for ( y = 0; y < Log::instance()->count(); y++ ) {        
+        if ( Log::instance()->taskId( y ) == taskId && Log::instance()->teamId( y ) == teamId ) {
             if ( Log::instance()->multiplier( y ) > 0 )
                 found = true;
         }

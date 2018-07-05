@@ -43,6 +43,9 @@ public:
     void reset( bool edit = false );
     bool isEditing() const { return this->m_edit; }
 
+public slots:
+    void setCurrentTime();
+
 private:
     explicit TeamEdit( QWidget *parent = nullptr );
     Ui::TeamEdit *ui;

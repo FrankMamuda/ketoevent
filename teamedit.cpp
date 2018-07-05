@@ -42,6 +42,10 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
     this->ui->finishTime->setMaximumTime( Event::instance()->finalTime( event ));
 
+    // only visible in quick add
+    this->setWindowTitle( this->tr( "Add team" ));
+    this->setWindowIcon( QIcon( ":/icons/teams" ));
+
     // empty team title check
     auto emptyTitle = [ this ]() {
         // warn upon empty team title
@@ -67,8 +71,9 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         }
 
         // if everything is ok, add a new task
+        Id teamId = Id::Invalid;
         if ( !this->isEditing()) {
-            Team::instance()->add( teamTitle,
+            teamId = Team::instance()->add( teamTitle,
                                    this->ui->membersInteger->value(),
                                    this->ui->finishTime->time(),
                                    this->ui->reviewerEdit->text());
@@ -84,6 +89,12 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         // close dock
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
+        else {
+            if ( teamId != Id::Invalid )
+                MainWindow::instance()->setCurrentTeam( teamId );
+
+            this->close();
+        }
     });
 
     // shortcut from title to members
@@ -110,11 +121,13 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
+        else
+            this->close();
     } );
 
     // connect time button
     this->connect( this->ui->finishButton, &QToolButton::pressed, [ this ]() {
-        this->ui->finishTime->setTime( QTime::currentTime());
+        this->setCurrentTime();
     } );
 
     // add to garbage man
@@ -161,4 +174,11 @@ void TeamEdit::reset( bool edit ) {
     this->ui->titleEdit->setFocus();
     this->ui->addButton->setDefault( false );
     this->ui->addButton->setAutoDefault( false );
+}
+
+/**
+ * @brief TeamEdit::setCurrentTime
+ */
+void TeamEdit::setCurrentTime() {
+    this->ui->finishTime->setTime( QTime::currentTime());
 }

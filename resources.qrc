@@ -27,5 +27,7 @@
         <file alias="style">icons/style.png</file>
         <file alias="accept">icons/accept.png</file>
         <file alias="time">icons/time.png</file>
+        <file alias="star">icons/star.png</file>
+        <file alias="type">icons/type.png</file>
     </qresource>
 </RCC>

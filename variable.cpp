@@ -73,13 +73,12 @@ Variable::~Variable() {
  */
 void Variable::bind( const QString &key, const QObject *receiver, const char *method ) {
     QPair<QObject*, int> slot;
-    int code;
 
     if ( key.isEmpty())
         return;
 
     // check if method is a slot
-    code = (( static_cast<int>( *method ) - '0' ) & 0x3 );
+    const int code = (( static_cast<int>( *method ) - '0' ) & 0x3 );
     if ( code != 1 )
         return;
 

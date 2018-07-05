@@ -25,8 +25,6 @@
 #include <QMainWindow>
 #include <QMouseEvent>
 
-#ifdef QT_DEBUG
-
 //
 // namespace: Ui
 //
@@ -108,5 +106,3 @@ private:
     int m_historyOffset;
     QStringList history;
 };
-
-#endif
