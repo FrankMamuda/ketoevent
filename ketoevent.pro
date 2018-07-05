@@ -81,7 +81,6 @@ HEADERS += \
     widget.h \
     cmd.h \
     console.h \
-    taskfiltered.h \
     combos.h \
     combomodel.h
 

@@ -29,7 +29,7 @@
  */
 namespace Main {
 #ifdef Q_CC_MSVC
-static constexpr const *Path = ".database2";
+static constexpr const char *Path = ".database2";
 static QObject *Console( nullptr );
 #else
 static constexpr const char __attribute__((unused)) *Path = ".database2";

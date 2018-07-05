@@ -22,7 +22,6 @@
 // includes
 //
 #include "main.h"
-
 #include <QDir>
 #include <QLoggingCategory>
 #include <QMap>
@@ -32,7 +31,7 @@
  */
 namespace XMLTools_ {
 #ifdef Q_CC_MSVC
-static constexpr const *ConfigFile( "configuration.xml" );
+static constexpr const char *ConfigFile( "configuration.xml" );
 #else
 static constexpr const char __attribute__((unused)) *ConfigFile( "configuration.xml" );
 #endif

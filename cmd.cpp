@@ -38,12 +38,12 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
 
     // add common commands
-    this->add( "cmd_list", +listCmd, this->tr( "list all available commands" ));
-    this->add( "con_print", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->print( name, args ); }, this->tr( "print text to console" ));
-    this->add( "cv_list", +[]( const QString &, const QStringList & ) { Cmd::instance()->listCvars(); }, this->tr( "list all available console variables" ));
-    this->add( "cv_set", +[]( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); }, this->tr( "set console variable value" ));
-    this->add( "db_info", +[]( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); }, this->tr( "display database information" ));
-    this->add( "help", listCmd, this->tr( "same as cmd_list" ));
+    this->add( "cmd_list", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "list all available commands" ));
+    this->add( "con_print", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->print( name, args ); } ), this->tr( "print text to console" ));
+    this->add( "cv_list", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->listCvars(); } ), this->tr( "list all available console variables" ));
+    this->add( "cv_set", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); } ), this->tr( "set console variable value" ));
+    this->add( "db_info", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); } ), this->tr( "display database information" ));
+    this->add( "help", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "same as cmd_list" ));
 
     // add to garbage man
     this->setObjectName( "Cmd" );
