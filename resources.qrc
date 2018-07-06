@@ -29,5 +29,10 @@
         <file alias="time">icons/time.png</file>
         <file alias="star">icons/star.png</file>
         <file alias="type">icons/type.png</file>
+        <file alias="log_points">icons/log_points.png</file>
+        <file alias="log_multiplier">icons/log_multiplier.png</file>
+        <file alias="log_cross">icons/log_cross.png</file>
+        <file alias="log_edit">icons/log_edit.png</file>
+        <file alias="log_equals">icons/log_equals.png</file>
     </qresource>
 </RCC>

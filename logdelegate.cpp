@@ -38,6 +38,11 @@ LogDelegate::LogDelegate( QObject *parent ) : QStyledItemDelegate( parent ), m_e
     this->unchecked.load( ":/icons/log_unchecked" );
     this->remove.load( ":/icons/log_remove" );
     this->toggle.load( ":/icons/log_toggle" );
+    this->points.load( ":/icons/log_points" );
+    this->cross.load( ":/icons/log_cross" );
+    this->multi.load( ":/icons/log_multiplier" );
+    this->edit.load( ":/icons/log_edit" );
+    this->equals.load( ":/icons/log_equals" );
 }
 
 /**
@@ -138,14 +143,21 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
     if ( alternate )
         painter->fillRect( option.rect, QColor::fromRgb( 0, 0, 0, 8 ));
 
+
+    int count = 0;
+
     // find matching log
     // not the fastest lookup, but performance is a non-issue currently
     for ( y = 0; y < Log::instance()->count(); y++ ) {        
         if ( Log::instance()->taskId( y ) == taskId && Log::instance()->teamId( y ) == teamId ) {
+            count = Log::instance()->multiplier( y );
             if ( Log::instance()->multiplier( y ) > 0 )
                 found = true;
         }
     }
+
+    //const Id taskId = Task::instance()->id( Log::instance())
+    const int taskPoints = Task::instance()->points( Task::instance()->row( taskId ));
 
     // draw task name as a multiline text
     painter->drawText( textRect, Qt::AlignVCenter | Qt::TextWordWrap, text );
@@ -159,6 +171,10 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
         if ( under.isValid()) {
             u = true;
             painter->drawPixmap( pixmapRect, found ? this->remove : this->toggle );
+
+            if ( count > 1 && found ) {
+                painter->drawPixmap( pixmapRect.translated( -32, 0 ), this->edit );
+            }
         } else {
             if ( !found ) {
                 painter->drawPixmap( pixmapRect, this->unchecked );
@@ -170,7 +186,44 @@ void LogDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, 
     }
 
     if ( found && !u ) {
-        painter->drawPixmap( pixmapRect, this->checked );
+        if ( count > 1 ) {
+            painter->save();
+            QFont font;
+            font.setBold( true );
+            font.setPixelSize( 16 );
+            painter->setFont( font );
+            painter->setPen( QColor( Qt::white ));
+
+            QRect newRect( pixmapRect.translated( -40, 0 ));
+
+            // points
+            painter->drawPixmap( newRect, this->points );
+            painter->drawText( newRect.translated( 0, -1 ), Qt::AlignCenter, QString::number( count ));
+
+            // cross
+            QRect otherRect( newRect.translated( -40, 0 ));
+            otherRect.setWidth( 72 );
+            painter->drawPixmap( otherRect, this->cross );
+
+            // multi
+            QRect otherRect2( newRect.translated( -40, 0 ));
+            painter->drawPixmap( otherRect2, this->multi );
+            painter->drawText( otherRect2.translated( 0, -1 ), Qt::AlignCenter, QString::number( taskPoints ));
+
+            // equals
+            QRect equalsRect( pixmapRect.translated( -40, 0 ));
+            equalsRect.setWidth( 72 );
+            painter->drawPixmap( equalsRect, this->equals );
+
+            // total
+            painter->drawPixmap( pixmapRect, this->multi );
+            painter->drawText( pixmapRect.translated( 0, -1 ), Qt::AlignCenter, QString::number( count * taskPoints ));
+
+
+            painter->restore();
+        } else {
+            painter->drawPixmap( pixmapRect, this->checked );
+        }
     }
 }
 

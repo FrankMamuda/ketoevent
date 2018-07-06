@@ -45,4 +45,9 @@ private:
     QPixmap unchecked;
     QPixmap remove;
     QPixmap toggle;
+    QPixmap points;
+    QPixmap cross;
+    QPixmap multi;
+    QPixmap edit;
+    QPixmap equals;
 };

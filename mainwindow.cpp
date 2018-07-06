@@ -118,9 +118,15 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         const int teamRow = Team::instance()->row( teamId );
 
         // check for valid time
+        const QTime startTime = Event::instance()->startTime( Event::instance()->row( eventId ));
         const QTime finalTime = Event::instance()->finalTime( Event::instance()->row( eventId ));
         if ( time > finalTime ) {
             this->timeEdit->setTime( finalTime );
+            return;
+        }
+
+        if ( time < startTime ) {
+            this->timeEdit->setTime( startTime );
             return;
         }
 

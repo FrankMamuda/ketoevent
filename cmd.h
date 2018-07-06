@@ -22,12 +22,8 @@
 // includes
 //
 #include "main.h"
-
 #include <QMap>
 #include <QObject>
-
-// only available in debugging mode
-#ifdef QT_DEBUG
 
 //
 // defines
@@ -114,5 +110,3 @@ public slots:
     void dbInfo();
     void listCvars();
 };
-
-#endif
