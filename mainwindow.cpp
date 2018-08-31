@@ -26,7 +26,7 @@
 #include "task.h"
 #include "team.h"
 #include "log.h"
-#include "logdelegate.h"
+#include "delegate.h"
 #include <QDebug>
 #include "editordialog.h"
 #include "tasktoolbar.h"
@@ -67,7 +67,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->filter->setSourceModel( Task::instance());
     this->ui->taskView->setModel( this->filter );
     this->ui->taskView->setModelColumn( Task::Name );
-    this->ui->taskView->setItemDelegate( new LogDelegate( this->ui->taskView ));
+    this->ui->taskView->setItemDelegate( new Delegate( this->ui->taskView ));
 
     // bind event/team variables to comboBoxes
     Variable::instance()->bind( "eventId", this->ui->eventCombo );

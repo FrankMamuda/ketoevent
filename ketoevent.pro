@@ -32,8 +32,6 @@ SOURCES += \
     task.cpp \
     team.cpp \
     log.cpp \
-    logdelegate.cpp \
-    logeditor.cpp \
     taskview.cpp \
     editordialog.cpp \
     teamtoolbar.cpp \
@@ -48,7 +46,9 @@ SOURCES += \
     cmd.cpp \
     console.cpp \
     combos.cpp \
-    combomodel.cpp
+    combomodel.cpp \
+    delegate.cpp \
+    item.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -59,8 +59,6 @@ HEADERS += \
     task.h \
     team.h \
     log.h \
-    logdelegate.h \
-    logeditor.h \
     taskview.h \
     editordialog.h \
     teamtoolbar.h \
@@ -82,11 +80,12 @@ HEADERS += \
     cmd.h \
     console.h \
     combos.h \
-    combomodel.h
+    combomodel.h \
+    delegate.h \
+    item.h
 
 FORMS += \
         mainwindow.ui \
-    logeditor.ui \
     editordialog.ui \
     teamedit.ui \
     taskedit.ui \

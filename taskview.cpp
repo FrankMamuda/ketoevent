@@ -20,32 +20,83 @@
 // includes
 //
 #include "taskview.h"
+#include "delegate.h"
 #include <QDebug>
 
 /**
- * @brief TaskView::TaskView
- * @param parent
- */
-TaskView::TaskView( QWidget *parent ) : QListView( parent ) {
-    this->setMouseTracking( true );
-}
-
-/**
- * @brief TaskView::mouseMoveEvent
+ * @brief TaskView::mouseReleaseEvent
  * @param event
  */
 void TaskView::mouseMoveEvent( QMouseEvent *event ) {
-    QModelIndex current( this->indexAt( this->viewport()->mapFromGlobal( QCursor::pos())));
-    QModelIndex under( current );
-    QPoint pos( this->viewport()->mapToGlobal( this->visualRect( current ).topRight()));
-
-    if ( !QRect( pos.x() - 32, pos.y(), 32, 32 ).contains( QCursor::pos()))
-        under = QModelIndex();
-
-    if ( this->check != under ) {
-        this->check = under;
-        this->update( current );
+    if ( this->model() != nullptr && this->itemDelegate() != nullptr ) {
+        Delegate *delegate( qobject_cast<Delegate*>( this->itemDelegate()));
+        if ( delegate != nullptr )
+            delegate->setMousePos( event->pos());
     }
 
     QListView::mouseMoveEvent( event );
+}
+
+/**
+ * @brief TaskView::mouseReleaseEvent
+ * @param event
+ */
+void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
+    if ( this->model() != nullptr && this->itemDelegate() != nullptr && event->button() == Qt::LeftButton ) {
+        Delegate *delegate( qobject_cast<Delegate*>( this->itemDelegate()));
+        if ( delegate != nullptr ) {
+            int y;
+
+            for ( y = 0; y < this->model()->rowCount(); y++ ) {
+                const QModelIndex index( this->model()->index( y, 0 ));
+
+                if ( this->visualRect( index ).contains( event->pos())) {
+                    delegate->setMousePos( event->pos());
+                    Item::Actions action = delegate->action( index );
+                    switch ( action ) {
+                    case Item::NoAction:
+                        break;
+
+                    case Item::Set:
+                        // TODO:
+                        //this->model()->setData( index, true, Model::Value );
+                        break;
+
+                    case Item::Edit:
+                        this->edit( index );
+                        break;
+
+                    case Item::Remove:
+                        // TODO:
+                        //this->model()->setData( index, 0, Model::Value );
+                        break;
+
+                    case Item::Combine:
+                        qDebug() << "combine";
+                        break;
+
+                    case Item::SetNumeric:
+                        this->edit( index );
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    QListView::mouseReleaseEvent( event );
+}
+
+/**
+ * @brief ListView::leaveEvent
+ * @param event
+ */
+void TaskView::leaveEvent( QEvent *event ) {
+    if ( this->model() != nullptr && this->itemDelegate() != nullptr ) {
+        Delegate *delegate( qobject_cast<Delegate*>( this->itemDelegate()));
+        if ( delegate != nullptr )
+            delegate->setMousePos( QPoint(), true );
+    }
+
+    QListView::leaveEvent( event );
 }

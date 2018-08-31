@@ -91,6 +91,7 @@ public:
     Id eventId( int row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     int eventRow( int row ) const;
     QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
+    int logValue( int row, bool *hasLog = nullptr ) const;
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }

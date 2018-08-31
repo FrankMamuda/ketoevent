@@ -8,10 +8,6 @@
         <file alias="info">icons/info.png</file>
         <file alias="remove">icons/remove.png</file>
         <file alias="up">icons/up.png</file>
-        <file alias="log_checked">icons/log_checked.png</file>
-        <file alias="log_remove">icons/log_remove.png</file>
-        <file alias="log_toggled">icons/log_toggled.png</file>
-        <file alias="log_unchecked">icons/log_unchecked.png</file>
         <file alias="update">icons/update.png</file>
         <file alias="export">icons/export.png</file>
         <file alias="overflow">icons/overflow.png</file>
@@ -29,10 +25,12 @@
         <file alias="time">icons/time.png</file>
         <file alias="star">icons/star.png</file>
         <file alias="type">icons/type.png</file>
-        <file alias="log_points">icons/log_points.png</file>
-        <file alias="log_multiplier">icons/log_multiplier.png</file>
-        <file alias="log_cross">icons/log_cross.png</file>
-        <file alias="log_edit">icons/log_edit.png</file>
-        <file alias="log_equals">icons/log_equals.png</file>
+        <file alias="combine">icons/combine.png</file>
+        <file alias="cross">icons/cross.png</file>
+        <file alias="equals">icons/equals.png</file>
+        <file alias="editLog">icons/editLog.png</file>
+        <file alias="removeLog">icons/removeLog.png</file>
+        <file alias="check">icons/check.png</file>
+        <file alias="number">icons/number.png</file>
     </qresource>
 </RCC>

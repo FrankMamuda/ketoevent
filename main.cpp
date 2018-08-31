@@ -59,6 +59,7 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
  * @param argv
  * @return
  */
+// TODO: register all metatypes
 int main( int argc, char *argv[] ) {
     QApplication a( argc, argv );
 

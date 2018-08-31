@@ -16,16 +16,13 @@
  *
  */
 
-//
-// includes
-//
-
 #pragma once
 
 //
 // includes
 //
 #include <QListView>
+#include <QResizeEvent>
 
 /**
  * @brief The TaskView class
@@ -34,10 +31,23 @@ class TaskView : public QListView {
     Q_OBJECT
 
 public:
-    explicit TaskView( QWidget *parent = nullptr );
-    QModelIndex check;
-    QModelIndex combine;
+    /**
+     * @brief ListView
+     * @param parent
+     */
+    explicit TaskView( QWidget *parent = nullptr ) : QListView( parent ) { this->setMouseTracking( true ); }
+    ~TaskView() = default;
 
 protected:
+    /**
+     * @brief resizeEvent
+     * @param event
+     */
+    void resizeEvent( QResizeEvent *event ) override { QListView::resizeEvent( event ); }
     void mouseMoveEvent( QMouseEvent *event ) override;
+    void mouseReleaseEvent( QMouseEvent *event ) override;
+    void leaveEvent( QEvent *event ) override;
+
+private:
+    QModelIndex m_focus;
 };

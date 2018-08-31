@@ -24,6 +24,7 @@
 #include "database.h"
 #include "event.h"
 #include "mainwindow.h"
+#include "log.h"
 #include <QFont>
 
 //
@@ -104,8 +105,9 @@ int Task::eventRow( int row ) const {
  * @return
  */
 QVariant Task::data( const QModelIndex &index, int role ) const {
+    const int row = index.row();
+
     if ( role == Qt::FontRole ) {
-        const int row = index.row();
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
 
         if ( Task::instance()->style( row ) == Styles::Italic ) {
@@ -119,5 +121,45 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         }
     }
 
+    if ( role == Qt::DisplayRole || role == Qt::EditRole || role == Name )
+        return this->name( row );
+
+    if ( role == Mult )
+        return this->multi( row );
+
+    if ( role == Type )
+        return static_cast<int>( this->type( row ));
+
+    if ( role == Style )
+        return static_cast<int>( this->style( row ));
+
     return Table::data( index, role );
+}
+
+/**
+ * @brief Task::logValue
+ * @param hasLog
+ * @return
+ */
+int Task::logValue( int row, bool *hasLog ) const {
+    // FIXME: THIS IS SLOW
+
+    const Id teamId = MainWindow::instance()->currentTeamId();
+    const Id taskId = this->id( row );
+    int y = 0;
+
+    if ( hasLog != nullptr )
+        *hasLog = false;
+
+    for ( y = 0; y < Log::instance()->count(); y++ ) {
+        if ( Log::instance()->teamId( y ) == teamId && Log::instance()->taskId( y ) == taskId ) {
+
+            if ( hasLog != nullptr )
+                *hasLog = true;
+
+            return Log::instance()->multiplier( y );
+        }
+    }
+
+    return 0;
 }
