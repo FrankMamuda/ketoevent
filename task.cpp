@@ -137,29 +137,19 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
 }
 
 /**
- * @brief Task::logValue
- * @param hasLog
+ * @brief Task::multiplier
+ * @param row
  * @return
  */
-int Task::logValue( int row, bool *hasLog ) const {
-    // FIXME: THIS IS SLOW
+int Task::multiplier( int row ) const {
+    return Log::instance()->multiplier( this->id( row ), MainWindow::instance()->currentTeamId());
+}
 
-    const Id teamId = MainWindow::instance()->currentTeamId();
-    const Id taskId = this->id( row );
-    int y = 0;
-
-    if ( hasLog != nullptr )
-        *hasLog = false;
-
-    for ( y = 0; y < Log::instance()->count(); y++ ) {
-        if ( Log::instance()->teamId( y ) == teamId && Log::instance()->taskId( y ) == taskId ) {
-
-            if ( hasLog != nullptr )
-                *hasLog = true;
-
-            return Log::instance()->multiplier( y );
-        }
-    }
-
-    return 0;
+/**
+ * @brief Task::setMultiplier
+ * @param row
+ * @param value
+ */
+void Task::setMultiplier( int row, int value ) {
+    Log::instance()->setMultiplier( value, this->id( row ), MainWindow::instance()->currentTeamId());
 }

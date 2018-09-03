@@ -59,8 +59,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Set:
-                        // TODO:
-                        //this->model()->setData( index, true, Model::Value );
+                        Task::instance()->setMultiplier( index.row(), true );
                         break;
 
                     case Item::Edit:
@@ -68,8 +67,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Remove:
-                        // TODO:
-                        //this->model()->setData( index, 0, Model::Value );
+                        Task::instance()->setMultiplier( index.row(), false );
                         break;
 
                     case Item::Combine:
@@ -96,7 +94,7 @@ void TaskView::leaveEvent( QEvent *event ) {
     if ( this->model() != nullptr && this->itemDelegate() != nullptr ) {
         Delegate *delegate( qobject_cast<Delegate*>( this->itemDelegate()));
         if ( delegate != nullptr )
-            delegate->setMousePos( QPoint(), true );
+            delegate->setMousePos( QPoint( this->rect().x() - 1, 0 ), true );
     }
 
     QListView::leaveEvent( event );

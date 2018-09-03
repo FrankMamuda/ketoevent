@@ -66,7 +66,10 @@ public:
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
     Id id( int row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    QList<Id> ids( const Id &taskId, const Id &teamId ) const;
+    Id id( const Id &taskId, const Id &teamId ) const { return  this->ids( taskId, teamId ).first(); };
     int multiplier( int row ) const { return this->value( row, Multi ).toInt(); }
+    int multiplier( const Id &taskId, const Id &teamId ) const;
     Id taskId( int row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
     Id teamId( int row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
     Id comboId( int row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
@@ -76,6 +79,7 @@ public:
 
 public slots:
     void setMultiplier( int row, int multi ) { this->setValue( row, Multi, multi ); }
+    void setMultiplier( int multi, const Id &taskId, const Id &teamId );
     void setTaskId( int row, const Id &id ) { this->setValue( row, Task, static_cast<int>( id )); }
     void setTeamId( int row, const Id &id ) { this->setValue( row, Team, static_cast<int>( id )); }
     void setComboId( int row, const Id &id ) { this->setValue( row, Combo, static_cast<int>( id )); }

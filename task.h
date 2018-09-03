@@ -91,7 +91,7 @@ public:
     Id eventId( int row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     int eventRow( int row ) const;
     QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
-    int logValue( int row, bool *hasLog = nullptr ) const;
+    int multiplier( int row ) const;
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }
@@ -101,6 +101,7 @@ public slots:
     void setType( int row, Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
     void setOrder( int row, int position ) { this->setValue( row, Order, position ); }
     void setDescription( int row, const QString &description ) { this->setValue( row, Desc, description ); }
+    void setMultiplier( int row, int value );
 
 private:
     explicit Task();

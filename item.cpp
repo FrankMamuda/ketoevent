@@ -42,7 +42,11 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const bool isEditorActive = ( this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
     const bool edit = ( this->delegate->currentEditIndex() == index );
     const bool hover = edit ? false : this->rect.contains( this->delegate->mousePos());
-    const int value = Task::instance()->logValue( index.row());
+#ifdef VALUE_CACHE
+    const int value = this->delegate->values[index];
+#else
+    const int value = Task::instance()->multiplier( index.row());
+#endif
     const int points = Task::instance()->points( index.row());
     const Task::Types type = Task::instance()->type( index.row());
     const int isSelected = edit ? false : ( index == this->delegate->currentIndex());
@@ -164,7 +168,11 @@ Item::Actions Item::action( const QModelIndex &index ) const {
     // retrieve model values
     const bool edit = ( this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
     const Task::Types type = Task::instance()->type( index.row());
-    const bool hasValue = Task::instance()->logValue( index.row()) > 0;
+#ifdef VALUE_CACHE
+    const bool hasValue = this->delegate->values[index] > 0;
+#else
+    const bool hasValue = Task::instance()->multiplier( index.row()) > 0;
+#endif
 
     // don't allow clicks in editing mode
     if ( edit )

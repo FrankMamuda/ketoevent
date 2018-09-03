@@ -43,7 +43,11 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     // draw cross/equals lambda
     auto drawCrossEquals = [ this, painter, index, rect, type, edit ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
-        const bool hasValue = Task::instance()->logValue( index.row()) > 0;
+#ifdef VALUE_CACHE
+        const bool hasValue = this->values[index] > 0;
+#else
+        const bool hasValue = Task::instance()->multiplier( index.row()) > 0;
+#endif
         QRect small( rect.right() + Delegate::ButtonWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
         if ( type == Task::Types::Check )
@@ -89,7 +93,15 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
  */
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
+
+    // TODO: proper width
+    //size.setWidth( this->view()->viewport()->width() );
     size.setHeight( Delegate::ItemHeight );
+
+#ifdef VALUE_CACHE
+    this->values[index] = Task::instance()->multiplier( index.row());
+#endif
+
     return size;
 }
 
@@ -182,6 +194,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
     this->m_currentEditIndex = index;
 
     // set up widget
+    // TODO:
     edit->setMaximum( 4096 );
     edit->setAlignment( Qt::AlignCenter );
     edit->setButtonSymbols( QAbstractSpinBox::NoButtons );
@@ -198,7 +211,12 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
  */
 void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
-    const int value = Task::instance()->logValue( index.row());
+
+#ifdef VALUE_CACHE
+    const int value = this->values[index];
+#else
+    const int value = Task::instance()->multiplier( index.row());
+#endif
 
     // TODO: ALSO SET LIMITS
     editWidget->setValue( value );
@@ -214,10 +232,7 @@ void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const 
 void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
     editWidget->interpretText();
-
-    // TODO:
-    Q_UNUSED( index )
-    //this->model->setData( index, editWidget->value(), Model::Value );
+    Task::instance()->setMultiplier( index.row(), editWidget->value() );
 }
 
 /**

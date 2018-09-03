@@ -31,6 +31,11 @@
 //
 class Model;
 
+//
+// defines
+//
+#define VALUE_CACHE
+
 /**
  * @brief The Delegate class
  */
@@ -83,6 +88,9 @@ private:
 
     // button sizes
     mutable QMap<QModelIndex, QRect> rectSizes;
+#ifdef VALUE_CACHE
+    mutable QMap<QModelIndex, int> values;
+#endif
     mutable int m_value;
 };
 
