@@ -29,6 +29,7 @@
  */
 class TaskView : public QListView {
     Q_OBJECT
+    friend class Delegate;
 
 public:
     /**

@@ -43,7 +43,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const bool edit = ( this->delegate->currentEditIndex() == index );
     const bool hover = edit ? false : this->rect.contains( this->delegate->mousePos());
     const int value = Task::instance()->logValue( index.row());
-    const int multi = Task::instance()->multi( index.row());
+    const int points = Task::instance()->points( index.row());
     const Task::Types type = Task::instance()->type( index.row());
     const int isSelected = edit ? false : ( index == this->delegate->currentIndex());
     const bool hasValue = edit ? true : value > 0;
@@ -128,7 +128,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
             painter->drawPixmap( this->rect, Delegate::Combine());
         } else {
             drawEllipse( hasValue ? Blue : LtBlue );
-            drawText( QString::number( multi ));
+            drawText( QString::number( points ));
         }
         break;
 
@@ -141,7 +141,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
             painter->drawPixmap( this->rect, Delegate::Remove());
         } else {
             drawEllipse( !hasValue ? LtBlue : Blue );
-            drawText( QString::number( multi * ( edit ? this->delegate->currentEditorValue() : value )));
+            drawText( QString::number( points * ( edit ? this->delegate->currentEditorValue() : value )));
         }
 
         break;

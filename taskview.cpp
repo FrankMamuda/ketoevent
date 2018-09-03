@@ -21,6 +21,7 @@
 //
 #include "taskview.h"
 #include "delegate.h"
+#include "task.h"
 #include <QDebug>
 
 /**
@@ -48,7 +49,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
             int y;
 
             for ( y = 0; y < this->model()->rowCount(); y++ ) {
-                const QModelIndex index( this->model()->index( y, 0 ));
+                const QModelIndex index( this->model()->index( y, Task::instance()->Name ));
 
                 if ( this->visualRect( index ).contains( event->pos())) {
                     delegate->setMousePos( event->pos());

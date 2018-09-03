@@ -40,7 +40,7 @@ class Delegate : public QStyledItemDelegate {
     friend class EditWidget;
 
 public:
-    explicit Delegate( QWidget *parent = nullptr, Model *parentModel = nullptr ) : QStyledItemDelegate( parent ), model( parentModel ) {}
+    explicit Delegate( QWidget *parent = nullptr ) : QStyledItemDelegate( parent ) {}
     void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
     QSize sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
     QPoint mousePos() const { return this->m_pos; }
@@ -63,7 +63,6 @@ public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );
 
 private:
-    Model *model;
     QPoint m_pos;
     QModelIndex m_currentIndex;
     mutable QModelIndex m_currentEditIndex;
@@ -75,15 +74,14 @@ private:
 
     // pixmaps
     static const QPixmap Check()  { static QPixmap p( ":/icons/check" ); return p; }
-    static const QPixmap Edit()   { static QPixmap p( ":/icons/edit" ); return p; }
-    static const QPixmap Remove() { static QPixmap p( ":/icons/remove" ); return p; }
+    static const QPixmap Edit()   { static QPixmap p( ":/icons/editLog" ); return p; }
+    static const QPixmap Remove() { static QPixmap p( ":/icons/removeLog" ); return p; }
     static const QPixmap Number() { static QPixmap p( ":/icons/number" ); return p; }
     static const QPixmap Combine() { static QPixmap p( ":/icons/combine" ); return p; }
     static const QPixmap Cross()  { static QPixmap p( ":/icons/cross" ); return p; }
     static const QPixmap Equals() { static QPixmap p( ":/icons/equals" ); return p; }
 
     // button sizes
-    mutable QMap<QModelIndex, int> buttonSizes;
     mutable QMap<QModelIndex, QRect> rectSizes;
     mutable int m_value;
 };

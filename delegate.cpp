@@ -37,8 +37,8 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
 
-    if ( !this->view()->viewport()->rect().contains( this->view()->visualRect( index )))
-        return;
+    // store rectSize
+    this->rectSizes[index] = rect;
 
     // draw cross/equals lambda
     auto drawCrossEquals = [ this, painter, index, rect, type, edit ]() {
@@ -79,10 +79,6 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
         foreground.setAlpha( 16 );
         painter->fillRect( option.rect, foreground );
     }
-
-    // store buttonSize
-    this->buttonSizes[index] = buttonSize;
-    this->rectSizes[index] = rect;
 }
 
 /**
@@ -94,7 +90,6 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
     size.setHeight( Delegate::ItemHeight );
-    size.setWidth( size.width() + this->buttonSizes[index] );
     return size;
 }
 
@@ -142,7 +137,7 @@ void Delegate::setMousePos( const QPoint &pos, bool outside ) {
     int y;
 
     // failsafe
-    if ( this->model == nullptr || this->view() == nullptr || this->m_pos == pos )
+    if ( this->view() == nullptr || this->m_pos == pos )
         return;
 
     // store position
@@ -157,9 +152,9 @@ void Delegate::setMousePos( const QPoint &pos, bool outside ) {
     // search for a rect that contains mouse
     bool found = false;
     for ( y = 0; y < Task::instance()->count(); y++ ) {
-        const QModelIndex index( Task::instance()->index( y, 0 ));
+        const QModelIndex index( this->view()->model()->index( y, Task::instance()->Name ));
 
-        if ( this->view()->visualRect( index ).contains( this->view()->mapFromGlobal( QCursor::pos()))) {
+        if ( this->view()->visualRect( index ).contains( pos )) {
             this->view()->update( this->currentIndex());
             this->m_currentIndex = index;
             this->view()->update( this->currentIndex());
