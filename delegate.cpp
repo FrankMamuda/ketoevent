@@ -194,8 +194,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
     this->m_currentEditIndex = index;
 
     // set up widget
-    // TODO:
-    edit->setMaximum( 4096 );
+    edit->setMaximum( Task::instance()->multi( index.row()));
     edit->setAlignment( Qt::AlignCenter );
     edit->setButtonSymbols( QAbstractSpinBox::NoButtons );
     edit->setStyleSheet( "QSpinBox { background-color: transparent; color: white; text-align: center; selection-background-color: transparent; } QSpinBox::up-button { width: 0px; } QSpinBox::down-button { width: 0px; }" );
@@ -218,7 +217,6 @@ void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const 
     const int value = Task::instance()->multiplier( index.row());
 #endif
 
-    // TODO: ALSO SET LIMITS
     editWidget->setValue( value );
     this->m_value = value;
 }
@@ -318,10 +316,12 @@ QValidator::State EditWidget::validate( QString &input, int &pos ) const {
     font.setPointSizeF( this->height() * 0.64 );
 
     // store font & value
-    this->font = Delegate::fontSizeForWidth( input, font, this->width());
-    this->delegate->m_value = input.toInt( &ok );
+    // FIXME: still doesnt work as intended
+    this->delegate->m_value = qMin( input.toInt( &ok ), Task::instance()->multi( index.row()));
     if ( !ok )
         this->delegate->m_value = 0;
+
+    this->font = Delegate::fontSizeForWidth( QString::number( this->delegate->m_value ), font, this->width());
 
     // update item on change
     this->delegate->view()->update( this->delegate->currentEditIndex());
