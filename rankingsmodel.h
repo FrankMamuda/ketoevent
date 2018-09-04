@@ -52,3 +52,6 @@ public:
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
     void reset() { this->beginResetModel(); this->endResetModel(); }
 };
+
+// declare enums
+Q_DECLARE_METATYPE( RankingsModel::Columns )

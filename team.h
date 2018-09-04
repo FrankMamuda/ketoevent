@@ -55,19 +55,6 @@ public:
         Count
     };
 
-    enum Types {
-        NoType = -1,
-        Check,
-        Multi
-    };
-
-    enum Styles {
-        NoStyle = -1,
-        Regular,
-        Bold,
-        Italic
-    };
-
     /**
      * @brief instance
      * @return
@@ -93,3 +80,7 @@ public slots:
 private:
     explicit Team();
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Team::Fields )
+

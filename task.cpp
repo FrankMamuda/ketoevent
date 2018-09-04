@@ -46,9 +46,6 @@ Task::Task() : Table( TaskTable::Name ) {
     this->addField( Event,  "eventId",     QVariant::Int,    "integer" );
     this->addField( Desc,   "description", QVariant::String, "varchar( 512 )" );
 
-    // set relation
-    this->setRelation( Event, QSqlRelation( EventTable::Name, Event::instance()->field( Event::ID )->name(), Event::instance()->field( Event::Title )->name()));
-
     // map types and styles
     this->types[Types::Check]     = QT_TR_NOOP_UTF8( "Check" );
     this->types[Types::Multi]     = QT_TR_NOOP_UTF8( "Multi" );

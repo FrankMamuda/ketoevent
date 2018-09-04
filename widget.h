@@ -212,3 +212,6 @@ private:
     QObject *widget;
     QMetaObject::Connection connection;
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Widget::Types )

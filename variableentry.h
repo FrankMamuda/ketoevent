@@ -55,4 +55,5 @@ private:
     Flags m_flags;
 };
 
+// declare flags
 Q_DECLARE_OPERATORS_FOR_FLAGS( Var::Flags )

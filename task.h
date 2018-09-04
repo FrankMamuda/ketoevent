@@ -108,3 +108,8 @@ private:
     QMap<Types,QString> types;
     QMap<Styles,QString> styles;
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Task::Fields )
+Q_DECLARE_METATYPE( Task::Types )
+Q_DECLARE_METATYPE( Task::Styles )

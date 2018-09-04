@@ -33,7 +33,7 @@
  */
 void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     const Task::Types type = Task::instance()->type( index.row());
-    const int buttonSize = ( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth;
+    const int buttonSize = this->buttonSizes[index];
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
 
@@ -93,9 +93,11 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
  */
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
+    const Task::Types type = Task::instance()->type( index.row());
+    const int buttonSize = ( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth;
 
-    // TODO: proper width
-    //size.setWidth( this->view()->viewport()->width() );
+    this->buttonSizes[index] = buttonSize;
+    size.setWidth( buttonSize );
     size.setHeight( Delegate::ItemHeight );
 
 #ifdef VALUE_CACHE
@@ -192,6 +194,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
 
     // store current index
     this->m_currentEditIndex = index;
+    this->currentEditWidget = edit;
 
     // set up widget
     edit->setMaximum( Task::instance()->multi( index.row()));
@@ -250,6 +253,7 @@ void Delegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewItem
 void Delegate::destroyEditor( QWidget *editor, const QModelIndex &index ) const {
     // reset index and delete widget
     this->m_currentEditIndex = QModelIndex();
+    this->currentEditWidget = nullptr;
     QStyledItemDelegate::destroyEditor( editor, index );
 }
 
@@ -262,7 +266,7 @@ void EditWidget::paintEvent( QPaintEvent *event ) {
     const Item item( Item::Editor, QRect( 0, 0, Delegate::ButtonWidth, Delegate::ItemHeight ), this->delegate );
 
     // set font size determined in fontSizeForWidth
-    this->setFont( this->font );
+    //this->setFont( this->font );
 
     // paint background
     item.paint( &painter, this->index );
@@ -302,30 +306,25 @@ QFont Delegate::fontSizeForWidth( const QString &text, const QFont &baseFont, qr
 }
 
 /**
- * @brief EditWidget::validate
- * @param input
- * @param pos
+ * @brief Delegate::currentEditorValue
  * @return
  */
-QValidator::State EditWidget::validate( QString &input, int &pos ) const {
-    bool ok;
+int Delegate::currentEditorValue() const {
+    if ( this->currentEditIndex() == QModelIndex() || this->currentEditWidget == nullptr )
+        return 0;
+
+    // get widget
+    EditWidget *edit( qobject_cast<EditWidget*>( this->currentEditWidget ));
 
     // get font
-    QFont font( QSpinBox::font());
+    QFont font( edit->font());
     font.setBold( true );
-    font.setPointSizeF( this->height() * 0.64 );
-
-    // store font & value
-    // FIXME: still doesnt work as intended
-    this->delegate->m_value = qMin( input.toInt( &ok ), Task::instance()->multi( index.row()));
-    if ( !ok )
-        this->delegate->m_value = 0;
-
-    this->font = Delegate::fontSizeForWidth( QString::number( this->delegate->m_value ), font, this->width());
+    font.setPointSizeF( edit->height() * 0.64 );
+    edit->setFont( Delegate::fontSizeForWidth( QString::number( edit->value()), font, edit->width()));
 
     // update item on change
-    this->delegate->view()->update( this->delegate->currentEditIndex());
+    this->view()->update( this->currentEditIndex());
 
-    // continue validation
-    return QSpinBox::validate( input, pos );
+    // return value
+    return edit->value();
 }

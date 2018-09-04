@@ -37,6 +37,7 @@ class MainWindow;
 // classes
 //
 enum class Id;
+Q_DECLARE_METATYPE( Id )
 
 /**
  * @brief The MainWindow class

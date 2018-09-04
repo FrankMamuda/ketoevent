@@ -87,3 +87,7 @@ public slots:
 private:
     explicit Log();
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Log::Fields )
+Q_DECLARE_METATYPE( Log::Roles )

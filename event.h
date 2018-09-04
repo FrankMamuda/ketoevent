@@ -119,3 +119,7 @@ public slots:
 private:
     explicit Event();
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Event::Fields )
+

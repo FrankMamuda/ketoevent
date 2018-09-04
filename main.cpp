@@ -31,6 +31,16 @@
 #include "variable.h"
 #include "console.h"
 #include "main.h"
+#include "item.h"
+#include "rankingsmodel.h"
+#include "widget.h"
+
+//
+// GENERAL TODO LIST
+//
+//   - implement working combos
+//   - implement imports (at least pure stats)
+//
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( 0 );
@@ -59,9 +69,24 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
  * @param argv
  * @return
  */
-// TODO: register all metatypes
 int main( int argc, char *argv[] ) {
     QApplication a( argc, argv );
+
+    // register metatypes
+    qRegisterMetaType<Item::Actions>();
+    qRegisterMetaType<Item::Types>();
+    qRegisterMetaType<Event::Fields>();
+    qRegisterMetaType<Log::Fields>();
+    qRegisterMetaType<Log::Roles>();
+    qRegisterMetaType<Id>();
+    qRegisterMetaType<RankingsModel::Columns>();
+    qRegisterMetaType<Table::Roles>();
+    qRegisterMetaType<Task::Fields>();
+    qRegisterMetaType<Task::Types>();
+    qRegisterMetaType<Task::Styles>();
+    qRegisterMetaType<Team::Fields>();
+    //qRegisterMetaType<Var::Flags>();
+    qRegisterMetaType<Widget::Types>();
 
     // set console output pattern
     qSetMessagePattern( "%{if-category}%{category}: %{endif}%{function}: %{message}" );

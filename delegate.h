@@ -62,7 +62,7 @@ public:
     void destroyEditor( QWidget *editor, const QModelIndex &index ) const override;
 
     static QFont fontSizeForWidth( const QString &text, const QFont &baseFont, qreal width );
-    int currentEditorValue() const { return this->m_value; }
+    int currentEditorValue() const;
 
 public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );
@@ -71,6 +71,7 @@ private:
     QPoint m_pos;
     QModelIndex m_currentIndex;
     mutable QModelIndex m_currentEditIndex;
+    mutable QWidget *currentEditWidget = nullptr;
 
     // constants
     static const int ButtonWidth = 32;
@@ -88,6 +89,7 @@ private:
 
     // button sizes
     mutable QMap<QModelIndex, QRect> rectSizes;
+    mutable QMap<QModelIndex, int> buttonSizes;
 #ifdef VALUE_CACHE
     mutable QMap<QModelIndex, int> values;
 #endif
@@ -105,10 +107,8 @@ public:
 
 protected:
     void paintEvent( QPaintEvent *event ) override;
-    QValidator::State validate( QString &input, int &pos ) const override;
 
 private:
     const Delegate *delegate;
     QModelIndex index;
-    mutable QFont font;
 };

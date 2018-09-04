@@ -64,7 +64,6 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     };
 
     // text drawing lambda
-    // NOTE: there is not that much of a performance penalty to do caching
     auto drawText = [ this, painter ]( const QString &text ) {
         QFont font( painter->font());
 

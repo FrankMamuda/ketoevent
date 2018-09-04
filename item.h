@@ -90,6 +90,6 @@ private:
     static const QColor LtRed;
 };
 
-// decalre enums
+// declare enums
 Q_DECLARE_METATYPE( Item::Actions )
 Q_DECLARE_METATYPE( Item::Types )

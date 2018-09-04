@@ -38,7 +38,7 @@ enum class Id : int { Invalid = -1 };
 /**
  * @brief The Table_ class
  */
-class Table : public QSqlRelationalTableModel {
+class Table : public QSqlTableModel {
     Q_OBJECT
     Q_ENUMS( Roles )
     Q_DISABLE_COPY( Table )
@@ -81,3 +81,6 @@ private:
     bool m_hasPrimary;
     QSharedPointer<Field_> m_primaryField;
 };
+
+// declare enums
+Q_DECLARE_METATYPE( Table::Roles )

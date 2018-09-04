@@ -40,10 +40,6 @@ Log::Log() : Table( LogTable::Name ) {
     this->addField( Task,  "taskId",  QVariant::Int,  "integer" );
     this->addField( Team,  "teamId",  QVariant::Int,  "integer" );
     this->addField( Combo, "comboId", QVariant::Int,  "integer" );
-
-    // set relation
-    this->setRelation( Task, QSqlRelation( TaskTable::Name, Task::instance()->field( Task::ID )->name(), Task::instance()->field( Task::Name )->name()));
-    this->setRelation( Team, QSqlRelation( TeamTable::Name, Team::instance()->field( Team::ID )->name(), Team::instance()->field( Team::Title )->name()));
 }
 
 /**

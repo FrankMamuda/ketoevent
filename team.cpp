@@ -41,9 +41,6 @@ Team::Team() : Table( TeamTable::Name ) {
     this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
     this->addField( Reviewer, "reviewer",   QVariant::String, "varchar( 64 )" );
     this->addField( Event,    "eventId",    QVariant::Int,    "integer" );
-
-    // set relation
-    this->setRelation( Event, QSqlRelation( EventTable::Name, Event::instance()->field( Event::ID )->name(), Event::instance()->field( Event::Title )->name()));
 }
 
 /**
