@@ -130,6 +130,9 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
     if ( role == Style )
         return static_cast<int>( this->style( row ));
 
+    if ( role == Qt::ToolTipRole )
+        return QVariant();
+
     return Table::data( index, role );
 }
 
@@ -140,6 +143,15 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
  */
 int Task::multiplier( int row ) const {
     return Log::instance()->multiplier( this->id( row ), MainWindow::instance()->currentTeamId());
+}
+
+/**
+ * @brief Task::comboId
+ * @param row
+ * @return
+ */
+Id Task::comboId( int row ) const {
+    return Log::instance()->comboId( this->id( row ), MainWindow::instance()->currentTeamId());
 }
 
 /**

@@ -92,6 +92,7 @@ public:
     int eventRow( int row ) const;
     QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
     int multiplier( int row ) const;
+    Id comboId( int row ) const;
 
 public slots:
     void setName( int row, const QString &name ) { this->setValue( row, Name, name ); }

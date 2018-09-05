@@ -86,6 +86,8 @@ private:
     static const QColor LtBlue;
     static const QColor Gray;
     static const QColor LtGray;
+    static const QColor Black;
+    static const QColor LtBlack;
     static const QColor Red;
     static const QColor LtRed;
 };

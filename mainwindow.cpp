@@ -86,7 +86,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->completer.setCompletionColumn( Task::Name );
     this->completer.setCaseSensitivity( Qt::CaseInsensitive );
     this->connect( this->ui->findEdit, &QLineEdit::textChanged, [ this ]( const QString &text ) {
-        qobject_cast<QSortFilterProxyModel*>( this->ui->taskView->model())->setFilterRegExp( text );
+        this->filter->setFilterRegExp( text );
     } );
 
     // set up secondary toolBar
@@ -230,6 +230,8 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     if ( static_cast<int>( teamId ) != -1 )
         time = Team::instance()->finishTime( Team::instance()->row( teamId ));
     this->timeEdit->setTime( time );
+
+    this->updateTasks();
 }
 
 /**
@@ -292,12 +294,31 @@ void MainWindow::on_actionConsole_triggered() {
 /**
  * @brief MainWindow::updateTasks
  */
-void MainWindow::updateTasks() {
-    // NOTE: this could also be done through proxy model
-    if ( Variable::instance()->isEnabled( "sortByType" ))
-        Task::instance()->setFilter( QString( "eventId=%1 order by %2, %3 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Type )).arg( Task::instance()->fieldName( Task::Name )));
-    else
-        Task::instance()->setFilter( QString( "eventId=%1 order by %2 asc" ).arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex()))).arg( Task::instance()->fieldName( Task::Order )));
+void MainWindow::updateTasks( bool filterByCombo, Id comboId ) {
+    const bool sort = Variable::instance()->isEnabled( "sortByType" );
+
+    // NOTE: THIS!
+    Task::instance()->setFilter(
+                QString( "eventId=%1 %2"
+                         "order by %3 %4" )
+                /*1*/.arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex())))
+                /*2*/ .arg( filterByCombo ?
+                                QString( "and %1 in ( select %2 from %3 where %4=%5 and %6=%7 )" )
+                                /*2.1*/.arg( Task::instance()->fieldName( Task::ID ))
+                                /*2.2*/.arg( Log::instance()->fieldName( Log::Task ))
+                                /*2.3*/.arg( Log::instance()->tableName())
+                                /*2.4*/.arg( Log::instance()->fieldName( Log::Team ))
+                                /*2.5*/.arg( static_cast<int>( this->currentTeamId()))
+                                /*2.6*/.arg( Log::instance()->fieldName( Log::Combo ))
+                                /*2.7*/.arg( static_cast<int>( comboId )) :
+                                "" )
+                /*3*/.arg( sort ?
+                               Task::instance()->fieldName( Task::Type ) :
+                               Task::instance()->fieldName( Task::Order ))
+                /*4*/.arg( sort ?
+                               QString( ", %1 asc" )
+                               /*4.1*/.arg( Task::instance()->fieldName( Task::Name )) :
+                               "" ));
 }
 
 /**

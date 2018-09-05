@@ -102,6 +102,26 @@ int Log::multiplier( const Id &taskId, const Id &teamId ) const {
 }
 
 /**
+ * @brief Log::comboId
+ * @param taskId
+ * @param teamId
+ * @return
+ */
+Id Log::comboId( const Id &taskId, const Id &teamId ) const {
+    const QList<Id> list( this->ids( taskId, teamId ));
+
+    if ( list.count() > 1 )
+         qWarning( Database_::Debug ) << this->tr( "multiple log entries for taskId=%1, teamId=%1" )
+                                         .arg( static_cast<int>( taskId ))
+                                         .arg( static_cast<int>( teamId ));
+
+    if ( list.first() != Id::Invalid )
+        return this->comboId( this->row( list.first()));
+
+    return Id::Invalid;
+}
+
+/**
  * @brief Log::data
  * @param item
  * @param role
@@ -156,10 +176,10 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
         else
             Log::instance()->setMultiplier( row, multi );
 
-        if ( multi <= 0 )
-            qDebug() << "delete log at row" << row;
-        else
-            qDebug() << "change log at row" << row;
+        //if ( multi <= 0 )
+        //     qDebug() << "delete log at row" << row;
+        //else
+        //    qDebug() << "change log at row" << row;
     } else {
         qDebug() << "new log";
         Log::instance()->add( taskId, teamId, multi );

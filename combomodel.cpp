@@ -47,7 +47,6 @@ QVariant ComboModel::data( const QModelIndex &index, int role ) const {
 /**
  * @brief ComboModel::reset
  */
-#include <QDebug>
 void ComboModel::reset( const Id &id ) {
     QStringList list;
 
@@ -57,7 +56,6 @@ void ComboModel::reset( const Id &id ) {
     this->colours.clear();
 
     // build comboId/taskName map and taskName/colour map
-    qDebug() << "TEST" << Log::instance()->count();
     for ( int y = 0; y < Log::instance()->count(); y++ ) {
         if ( Log::instance()->teamId( y ) == id ) {
             const Id comboId = Log::instance()->comboId( y );

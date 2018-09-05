@@ -51,6 +51,7 @@ public:
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
     Id currentEventId() const;
     Id currentTeamId() const;
+    QModelIndex proxyIndex( const QModelIndex &index ) const { return this->filter->mapToSource( index ); }
 
 public slots:
     void setCurrentTeam( const Id &id );
@@ -60,7 +61,7 @@ private slots:
     void on_actionRankings_triggered();
     void on_actionSettings_triggered();
     void on_actionConsole_triggered();
-    void updateTasks();
+    void updateTasks( bool filterByCombo = false, Id comboId = static_cast<Id>( -1 ));
     void on_actionCombos_triggered();
     void on_eventCombo_currentIndexChanged( int index );
     void on_teamCombo_currentIndexChanged( int index );

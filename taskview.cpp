@@ -59,7 +59,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Set:
-                        Task::instance()->setMultiplier( index.row(), true );
+                        Task::instance()->setMultiplier( delegate->proxy( index ).row(), true );
                         break;
 
                     case Item::Edit:
@@ -67,11 +67,11 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Remove:
-                        Task::instance()->setMultiplier( index.row(), false );
+                        Task::instance()->setMultiplier( delegate->proxy( index ).row(), false );
                         break;
 
                     case Item::Combine:
-                        qDebug() << "combine";
+                        qDebug() << "combine" << delegate->combos[index];
                         break;
 
                     case Item::SetNumeric:

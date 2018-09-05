@@ -30,6 +30,8 @@ const QColor Item::Blue    = { 0, 174, 255, 196 };
 const QColor Item::LtBlue  = lighter( Blue );
 const QColor Item::Gray    = { 64, 64, 64, 196 };
 const QColor Item::LtGray  = lighter( Gray );
+const QColor Item::Black   = { 0, 0, 0, 196 };
+const QColor Item::LtBlack = { 0, 0, 0, 128 };
 const QColor Item::Red     = { 190, 0, 0, 196 };
 const QColor Item::LtRed   = lighter( Red );
 
@@ -42,15 +44,12 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const bool isEditorActive = ( this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
     const bool edit = ( this->delegate->currentEditIndex() == index );
     const bool hover = edit ? false : this->rect.contains( this->delegate->mousePos());
-#ifdef VALUE_CACHE
     const int value = this->delegate->values[index];
-#else
-    const int value = Task::instance()->multiplier( index.row());
-#endif
-    const int points = Task::instance()->points( index.row());
-    const Task::Types type = Task::instance()->type( index.row());
+    const int points = Task::instance()->points( this->delegate->proxy( index ).row());
+    const Task::Types type = Task::instance()->type( this->delegate->proxy( index ).row());
     const int isSelected = edit ? false : ( index == this->delegate->currentIndex());
     const bool hasValue = edit ? true : value > 0;
+    const Id comboId = static_cast<Id>( this->delegate->combos[index] );
 
     // don't draw anything in edit mode
     if ( isEditorActive && !edit )
@@ -64,7 +63,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     };
 
     // text drawing lambda
-    auto drawText = [ this, painter ]( const QString &text ) {
+    auto drawText = [ this, painter ]( const QString &text, const QColor colour = Qt::white ) {
         QFont font( painter->font());
 
         // set up text
@@ -74,10 +73,10 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 
         // set up painter and draw text
         painter->save();
-        painter->setPen( Qt::white );
+        painter->setPen( colour );
         painter->setFont( font );
         painter->setRenderHint( QPainter::TextAntialiasing, true );
-        painter->drawText( this->rect, text, { Qt::AlignCenter } );
+        painter->drawText( this->rect.adjusted( 0, -2, 0, 0 ), text, { Qt::AlignCenter } );
         painter->restore();
     };
 
@@ -127,8 +126,14 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
             break;
 
         if ( isSelected && ( hasValue || type == Task::Types::Check )) {
-            drawEllipse( hover ? Blue : LtBlue );
-            painter->drawPixmap( this->rect, Delegate::Combine());
+            if ( comboId != Id::Invalid ) {
+                painter->setPen( { hover ? Black : LtBlack, 2.0 } );
+                drawEllipse( Qt::white );
+                drawText( QString::number( this->delegate->relativeCombos[static_cast<int>( comboId )] ), hover ? Black : LtBlack );
+            } else {
+                drawEllipse( hover ? Blue : LtBlue );
+                painter->drawPixmap( this->rect, Delegate::Combine());
+            }
         } else {
             drawEllipse( hasValue ? Blue : LtBlue );
             drawText( QString::number( points ));
@@ -166,12 +171,8 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 Item::Actions Item::action( const QModelIndex &index ) const {
     // retrieve model values
     const bool edit = ( this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
-    const Task::Types type = Task::instance()->type( index.row());
-#ifdef VALUE_CACHE
+    const Task::Types type = Task::instance()->type( this->delegate->proxy( index ).row());
     const bool hasValue = this->delegate->values[index] > 0;
-#else
-    const bool hasValue = Task::instance()->multiplier( index.row()) > 0;
-#endif
 
     // don't allow clicks in editing mode
     if ( edit )

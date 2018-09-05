@@ -21,6 +21,7 @@
 //
 // includes
 //
+#include <QSortFilterProxyModel>
 #include <QSpinBox>
 #include <QStyledItemDelegate>
 #include "item.h"
@@ -31,11 +32,6 @@
 //
 class Model;
 
-//
-// defines
-//
-#define VALUE_CACHE
-
 /**
  * @brief The Delegate class
  */
@@ -43,6 +39,7 @@ class Delegate : public QStyledItemDelegate {
     Q_OBJECT
     friend class Item;
     friend class EditWidget;
+    friend class TaskView;
 
 public:
     explicit Delegate( QWidget *parent = nullptr ) : QStyledItemDelegate( parent ) {}
@@ -63,6 +60,8 @@ public:
 
     static QFont fontSizeForWidth( const QString &text, const QFont &baseFont, qreal width );
     int currentEditorValue() const;
+
+    QModelIndex proxy( const QModelIndex &index ) const;
 
 public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );
@@ -90,9 +89,10 @@ private:
     // button sizes
     mutable QMap<QModelIndex, QRect> rectSizes;
     mutable QMap<QModelIndex, int> buttonSizes;
-#ifdef VALUE_CACHE
     mutable QMap<QModelIndex, int> values;
-#endif
+    mutable QMap<QModelIndex, int> combos;
+    mutable QMap<int, int> relativeCombos;
+    mutable int lastComboId = 0;
     mutable int m_value;
 };
 

@@ -73,6 +73,7 @@ public:
     Id taskId( int row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
     Id teamId( int row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
     Id comboId( int row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
+    Id comboId( const Id &taskId, const Id &teamId ) const;
     QVariant data( const QModelIndex &item, int role = Qt::DisplayRole ) const override;
     int task( int row ) const;
     int team( int row ) const;
