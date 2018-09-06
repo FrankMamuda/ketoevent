@@ -39,6 +39,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
     const Id comboId = static_cast<Id>( this->combos[index] );
+    const bool isComboActive = MainWindow::instance()->isComboModeActive();
 
     // save state
     painter->save();
@@ -57,12 +58,12 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     this->rectSizes[index] = rect;
 
     // draw cross/equals lambda
-    auto drawCrossEquals = [ this, painter, index, rect, type, edit ]() {
+    auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
         const bool hasValue = this->values[index] > 0;
         QRect small( rect.right() + Delegate::ButtonWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
-        if ( type == Task::Types::Check )
+        if ( type == Task::Types::Check || isComboActive )
             return;
 
         if (( hasValue && !isSelected ) || ( !hasValue && isSelected )) {
@@ -72,8 +73,8 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     };
 
     // draw items
-    if ( this->currentEditIndex() == QModelIndex() || edit ) {
-        if ( edit ) {
+    if ( this->currentEditIndex() == QModelIndex() || edit || isComboActive ) {
+        if ( edit || ( isComboActive && comboId != Id::Invalid )) {
             QColor highlight( option.palette.highlight().color());
             highlight.setAlpha( 128 );
             painter->fillRect( option.rect, highlight );
@@ -90,7 +91,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     painter->drawText( rect, QFontMetrics( painter->font()).elidedText( Task::instance()->name( this->proxy( index ).row()), Qt::ElideRight, rect.width()), { Qt::AlignLeft | Qt::AlignVCenter } );
 
     // disable view
-    if ( this->currentEditIndex() != QModelIndex() && !edit ) {
+    if ( this->currentEditIndex() != QModelIndex() && !edit && !isComboActive ) {
         QColor foreground( option.palette.foreground().color());
         foreground.setAlpha( 16 );
         painter->fillRect( option.rect, foreground );
@@ -98,12 +99,6 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // restore state
     painter->restore();
-
-    // DEBUG
-    //QStyleOptionViewItem optionX( option );
-    //optionX.rect.setX( optionX.rect.x() + 350 );
-    //optionX.rect.setWidth( optionX.rect.width() - 350 );
-    //QStyledItemDelegate::paint( painter, optionX, index );
 }
 
 /**
@@ -115,7 +110,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
     const Task::Types type = Task::instance()->type( this->proxy( index ).row());
-    const int buttonSize = ( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth;
+    const int buttonSize = MainWindow::instance()->isComboModeActive() ? Delegate::ButtonWidth : (( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth );
 
     this->buttonSizes[index] = buttonSize;
     size.setWidth( buttonSize );
@@ -134,14 +129,18 @@ QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex 
 QList<Item> Delegate::getItems( const QModelIndex &index ) const {
     const QRect rect( this->rectSizes[index] );
     QRect button( rect.right(), rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight );
+    const Item multi( Item::Multi, button, this );
+
+    if ( MainWindow::instance()->isComboModeActive())
+        return QList<Item>() << multi;
 
     return Task::instance()->type( this->proxy( index ).row()) == Task::Types::Multi ?
-                QList<Item>() << Item( Item::Multi, button, this ) <<
+                QList<Item>() << multi <<
                                  Item( Item::Numeric, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this ) <<
                                  Item( Item::Sum, button.translated(( Delegate::ButtonWidth + Delegate::SmallWidth ) * 2, 0 ), this )
                                  :
                                  QList<Item>() <<
-                                 Item( Item::Multi, button, this ) <<
+                                 multi <<
                                  Item( Item::Checkable, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this );
 }
 
@@ -202,6 +201,25 @@ void Delegate::setMousePos( const QPoint &pos, bool outside ) {
         this->view()->update( this->currentIndex());
         this->m_currentIndex = QModelIndex();
     }
+}
+
+/**
+ * @brief Delegate::reset
+ */
+void Delegate::reset() {
+    this->m_pos = QPoint();
+    this->m_currentIndex = QModelIndex();
+    this->m_currentEditIndex = QModelIndex();
+    this->currentEditWidget = nullptr;
+
+    // button sizes
+    this->rectSizes.clear();
+    this->buttonSizes.clear();
+    this->values.clear();
+    this->combos.clear();
+    this->relativeCombos.clear();
+    this->lastComboId = 0;
+    this->m_value = 0;
 }
 
 /**

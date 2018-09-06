@@ -259,6 +259,15 @@
     <string>Combine logs</string>
    </property>
   </action>
+  <action name="actionDone">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/accept</normaloff>:/icons/accept</iconset>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

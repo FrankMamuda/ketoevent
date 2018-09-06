@@ -78,7 +78,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
 
     // bind for sorting updates
-    Variable::instance()->bind( "sortByType", this, SLOT( updateTasks()));
+    Variable::instance()->bind( "sortByType", this, SLOT( setTaskFilter()));
 
     // set up completer
     this->completer.setModel( Task::instance());
@@ -101,6 +101,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     // currentTime button
     this->connect( this->ui->actionLogTime, &QAction::triggered, [ this ]() {
         this->timeEdit->setTime( QTime::currentTime());
+    } );
+
+    // done button
+    this->connect( this->ui->actionDone, &QAction::triggered, [ this ]() {
+        this->setTaskFilter();
     } );
 
     // time updater
@@ -157,6 +162,7 @@ MainWindow::~MainWindow() {
     this->disconnect( this->ui->actionLogTime, SLOT( triggered( bool )));
     this->disconnect( this->timeEdit, SLOT( timeChanged( QTime )));
     this->disconnect( this->ui->clearButton, SLOT( pressed()));
+    this->disconnect( this->ui->actionDone, SLOT( triggered( bool )));
 
     // delete ui elements
     delete this->timeEdit;
@@ -211,7 +217,7 @@ void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
         return;
 
     Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( index ))));
-    this->updateTasks();
+    this->setTaskFilter();
 }
 
 /**
@@ -222,6 +228,13 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     if ( !Database::instance()->hasInitialised())
         return;
 
+    if ( this->ui->taskView->itemDelegate() != nullptr ) {
+        Delegate *delegate( qobject_cast<Delegate*>( this->ui->taskView->itemDelegate()));
+
+        if ( delegate != nullptr )
+            delegate->reset();
+    }
+
     this->ui->taskView->viewport()->update();
     this->ui->taskView->setEnabled( index == -1 ? false : true );
 
@@ -231,7 +244,7 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
         time = Team::instance()->finishTime( Team::instance()->row( teamId ));
     this->timeEdit->setTime( time );
 
-    this->updateTasks();
+    this->setTaskFilter();
 }
 
 /**
@@ -292,10 +305,39 @@ void MainWindow::on_actionConsole_triggered() {
 }
 
 /**
- * @brief MainWindow::updateTasks
+ * @brief MainWindow::setTaskFilter
  */
-void MainWindow::updateTasks( bool filterByCombo, Id comboId ) {
+void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
     const bool sort = Variable::instance()->isEnabled( "sortByType" );
+
+    // turning off
+    // FIXME: SMTH WRONG
+    qDebug() << this->isComboModeActive() << filterByCombo;
+    //if ( this->isComboModeActive() && !filterByCombo )
+    //    emit this->comboModeDisabled();
+
+    // make sure to store this variable
+    this->m_comboMode = filterByCombo;
+    this->m_currentCombo = comboId;
+
+    // disable ui components
+    this->ui->actionTeams->setDisabled( filterByCombo );
+    this->ui->actionTasks->setDisabled( filterByCombo );
+    this->ui->actionRankings->setDisabled( filterByCombo );
+    this->ui->actionSettings->setDisabled( filterByCombo );
+    //this->ui->actionConsole->setDisabled( filterByCombo );
+    this->ui->actionCombos->setDisabled( filterByCombo );
+    this->ui->actionAddQuick->setDisabled( filterByCombo );
+    this->ui->actionLogTime->setDisabled( filterByCombo );
+    this->ui->actionCombine->setDisabled( filterByCombo );
+    this->ui->teamCombo->setDisabled( filterByCombo );
+    this->ui->eventCombo->setDisabled( filterByCombo );
+    this->timeEdit->setDisabled( filterByCombo );
+
+    if ( filterByCombo )
+        this->ui->toolBar->insertAction( this->ui->actionTeams, this->ui->actionDone );
+    else
+        this->ui->toolBar->removeAction( this->ui->actionDone );
 
     // NOTE: THIS!
     Task::instance()->setFilter(
@@ -303,14 +345,15 @@ void MainWindow::updateTasks( bool filterByCombo, Id comboId ) {
                          "order by %3 %4" )
                 /*1*/.arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex())))
                 /*2*/ .arg( filterByCombo ?
-                                QString( "and %1 in ( select %2 from %3 where %4=%5 and %6=%7 )" )
+                                QString( "and %1 in ( select %2 from %3 where %4=%5 and ( %6=%7 or %6=-1 ) and %8>0 )" )
                                 /*2.1*/.arg( Task::instance()->fieldName( Task::ID ))
                                 /*2.2*/.arg( Log::instance()->fieldName( Log::Task ))
                                 /*2.3*/.arg( Log::instance()->tableName())
                                 /*2.4*/.arg( Log::instance()->fieldName( Log::Team ))
                                 /*2.5*/.arg( static_cast<int>( this->currentTeamId()))
                                 /*2.6*/.arg( Log::instance()->fieldName( Log::Combo ))
-                                /*2.7*/.arg( static_cast<int>( comboId )) :
+                                /*2.7*/.arg( static_cast<int>( comboId ))
+                                /*2.8*/.arg( Log::instance()->fieldName( Log::Multi )) :
                                 "" )
                 /*3*/.arg( sort ?
                                Task::instance()->fieldName( Task::Type ) :

@@ -65,6 +65,7 @@ public:
 
 public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );
+    void reset();
 
 private:
     QPoint m_pos;

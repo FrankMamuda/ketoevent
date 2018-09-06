@@ -22,7 +22,10 @@
 #include "taskview.h"
 #include "delegate.h"
 #include "task.h"
+#include "mainwindow.h"
+#include "log.h"
 #include <QDebug>
+#include <QSqlQuery>
 
 /**
  * @brief TaskView::mouseReleaseEvent
@@ -71,11 +74,52 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Combine:
-                        qDebug() << "combine" << delegate->combos[index];
+                        if ( MainWindow::instance()->isComboModeActive())
+                            MainWindow::instance()->setTaskFilter();
+                        else {
+                            // FIXME: if invalid, add a new one (not combined)
+                            // FIXME: quit if no combos selected
+                            // FIXME: disallow single log combo
+                            // FIXME: something wrong with refresh in Combos dialog
+                            // FIXME: rare -1 value warning in combo dialog
+                            // TODO: better sorting of combos (logged first)
+                            // TODO: restore position in list after filtering
+                            Id id = static_cast<Id>( delegate->combos[index] );
+                            if ( id == Id::Invalid ) {
+                                QSqlQuery query;
+                                query.exec( "select max( comboId ) from logs" );
+                                if ( query.next()) {
+                                    id = static_cast<Id>( query.value( 0 ).toInt() + 1 );
+                                } else {
+                                    id = static_cast<Id>( 0 );
+                                }
+                            }
+
+                            const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->proxy( index ).row()), MainWindow::instance()->currentTeamId()));
+                            if ( ids.first() != Id::Invalid )
+                                Log::instance()->setComboId( Log::instance()->row( ids.first()), id );
+
+                            MainWindow::instance()->setTaskFilter( true, id );
+                        }
                         break;
 
                     case Item::SetNumeric:
                         this->edit( index );
+                        break;
+
+                    case Item::AddCombo:
+                    {
+                        const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->proxy( index ).row()), MainWindow::instance()->currentTeamId()));
+                        if ( ids.first() != Id::Invalid )
+                            Log::instance()->setComboId( Log::instance()->row( ids.first()), MainWindow::instance()->currentComboId());
+                        //qDebug() << "ADD COMBO for" << Task::instance()->name( delegate->proxy( index ).row()) << "with comboId" << (int )MainWindow::instance()->currentComboId();
+                    }
+                        break;
+
+                    case Item::RemoveCombo:
+                        const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->proxy( index ).row()), MainWindow::instance()->currentTeamId()));
+                        if ( ids.first() != Id::Invalid )
+                            Log::instance()->setComboId( Log::instance()->row( ids.first()), Id::Invalid );
                         break;
                     }
                 }

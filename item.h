@@ -53,7 +53,9 @@ public:
         Edit,
         Remove,
         Combine,
-        SetNumeric
+        SetNumeric,
+        AddCombo,
+        RemoveCombo
     };
 
     /**
