@@ -310,12 +310,6 @@ void MainWindow::on_actionConsole_triggered() {
 void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
     const bool sort = Variable::instance()->isEnabled( "sortByType" );
 
-    // turning off
-    // FIXME: SMTH WRONG
-    qDebug() << this->isComboModeActive() << filterByCombo;
-    //if ( this->isComboModeActive() && !filterByCombo )
-    //    emit this->comboModeDisabled();
-
     // make sure to store this variable
     this->m_comboMode = filterByCombo;
     this->m_currentCombo = comboId;

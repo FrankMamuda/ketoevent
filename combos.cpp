@@ -34,7 +34,6 @@ Combos::Combos() : ui( new Ui::Combos ) {
     this->ui->setupUi( this );
     this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
-    this->connect( MainWindow::instance(), SIGNAL( comboModeDisabled()), this, SLOT( on_teamCombo_currentIndexChanged( int )));
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/combos" ));
@@ -53,7 +52,6 @@ Combos::Combos() : ui( new Ui::Combos ) {
  */
 Combos::~Combos() {
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
-    this->disconnect( MainWindow::instance(), SIGNAL( comboModeDisabled()));
 
     delete this->ui;
 }
@@ -62,14 +60,11 @@ Combos::~Combos() {
  * @brief Combos::on_teamCombo_currentIndexChanged
  * @param index
  */
-void Combos::on_teamCombo_currentIndexChanged( int ) {
-    qDebug() << "changed";
-
-    ComboModel::instance()->reset( MainWindow::instance()->currentTeamId());
+void Combos::on_teamCombo_currentIndexChanged( int index ) {
+    ComboModel::instance()->reset( Team::instance()->id( index ));
     this->ui->view->reset();
     this->ui->combosEdit->setText( QString::number( ComboModel::instance()->combos ));
-    this->ui->pointsEdit->setText( QString::number( ComboModel::instance()->points ));
-}
+    this->ui->pointsEdit->setText( QString::number( ComboModel::instance()->points ));}
 
 /**
  * @brief Combos::showEvent
@@ -80,5 +75,9 @@ void Combos::showEvent( QShowEvent *event ) {
 
     // set current team
     const int currentTeamRow = Team::instance()->row( MainWindow::instance()->currentTeamId());
+
+    // reset model on every show just to be safe
     this->ui->teamCombo->setCurrentIndex( currentTeamRow );
+    this->on_teamCombo_currentIndexChanged( currentTeamRow );
 }
+

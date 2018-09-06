@@ -44,6 +44,9 @@ public:
 protected:
     void showEvent( QShowEvent *event );
 
+public slots:
+    void reset();
+
 private slots:
     void on_teamCombo_currentIndexChanged( int index );
 

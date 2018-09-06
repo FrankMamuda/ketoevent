@@ -59,9 +59,6 @@ public slots:
     void setCurrentTeam( const Id &id );
     void setTaskFilter( bool filterByCombo = false, Id comboId = static_cast<Id>( -1 ));
 
-signals:
-    void comboModeDisabled();
-
 private slots:
     void on_actionTasks_triggered();
     void on_actionRankings_triggered();

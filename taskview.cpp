@@ -80,8 +80,6 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             // FIXME: if invalid, add a new one (not combined)
                             // FIXME: quit if no combos selected
                             // FIXME: disallow single log combo
-                            // FIXME: something wrong with refresh in Combos dialog
-                            // FIXME: rare -1 value warning in combo dialog
                             // TODO: better sorting of combos (logged first)
                             // TODO: restore position in list after filtering
                             Id id = static_cast<Id>( delegate->combos[index] );
