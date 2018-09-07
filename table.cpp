@@ -80,7 +80,8 @@ bool Table::select() {
     this->map.clear();
     if ( !this->primaryField().isNull()) {
         for ( y = 0; y < this->count(); y++ )
-            this->map[static_cast<Id>( this->value( y, this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
+            this->map[static_cast<Id>( this->record( y ).value( this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
+            //this->map[static_cast<Id>( this->value( y, this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
     }
 
     return result;
@@ -97,7 +98,8 @@ QVariant Table::data( const QModelIndex &item, int role ) const {
         return QVariant();
 
     if ( role == IDRole || role == Qt::UserRole )
-        return this->hasPrimaryField() ? this->value( item.row(), this->primaryField()->id()).toInt() : -1;
+        return this->hasPrimaryField() ? this->record( item.row()).value( this->primaryField()->id()).toInt() : -1;
+        //return this->hasPrimaryField() ? this->value( item.row(), this->primaryField()->id()).toInt() : -1;
 
     return QSqlTableModel::data( item, role );
 }
@@ -262,4 +264,17 @@ bool Table::contains( const QSharedPointer<Field_> &field, const QVariant &value
             return true;
     }
     return false;
+}
+
+/**
+ * @brief operator <<
+ * @param debug
+ * @param id
+ * @return
+ */
+QDebug operator<<( QDebug debug, const Id &id ) {
+    QDebugStateSaver saver( debug );
+    debug.nospace() << "id:" << static_cast<int>( id );
+
+    return debug;
 }

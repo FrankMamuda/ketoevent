@@ -29,11 +29,13 @@
 // classes
 //
 class Field_;
+class QDebug;
 
 /**
  * @brief The Id enum strong-typed id
  */
 enum class Id : int { Invalid = -1 };
+QDebug operator<<( QDebug debug, const Id &id );
 
 /**
  * @brief The Table_ class

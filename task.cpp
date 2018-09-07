@@ -118,7 +118,7 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         }
     }
 
-    if ( role == Qt::DisplayRole || role == Qt::EditRole || role == Name )
+    if ( /*role == Qt::DisplayRole || role == Qt::EditRole*/  role == Name )
         return this->name( row );
 
     if ( role == Mult )
