@@ -53,7 +53,7 @@ public:
     Id currentTeamId() const;
     Id currentComboId() const { return this->m_currentCombo; }
     bool isComboModeActive() const { return this->m_comboMode; }
-    QModelIndex proxyIndex( const QModelIndex &index ) const { return this->filter->mapToSource( index ); }
+    QModelIndex proxyIndex( const QModelIndex &index ) const;
 
 public slots:
     void setCurrentTeam( const Id &id );

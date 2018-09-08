@@ -31,6 +31,7 @@
 // classes
 //
 class Model;
+enum class Id;
 
 /**
  * @brief The Delegate class
@@ -91,10 +92,10 @@ private:
     mutable QMap<QModelIndex, QRect> rectSizes;
     mutable QMap<QModelIndex, int> buttonSizes;
     mutable QMap<QModelIndex, int> values;
-    mutable QMap<QModelIndex, int> combos;
-    mutable QMap<int, int> relativeCombos;
-    mutable int lastComboId = 0;
-    mutable int m_value;
+    mutable QMap<QModelIndex, Id> combos;
+    mutable QMap<Id, int> relativeCombos;
+    mutable int lastRelativeCombo = 0;
+    mutable int m_value = 0;
 };
 
 /**

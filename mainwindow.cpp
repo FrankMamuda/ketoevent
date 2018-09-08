@@ -196,6 +196,20 @@ Id MainWindow::currentTeamId() const {
 }
 
 /**
+ * @brief MainWindow::proxyIndex
+ * @param index
+ * @return
+ */
+QModelIndex MainWindow::proxyIndex( const QModelIndex &index ) const {
+    if ( index.model() != this->filter ) {
+        qDebug() << "bad index" << index.row() << index.column();
+        return QModelIndex();
+    }
+
+    return this->filter->mapToSource( index );
+}
+
+/**
  * @brief MainWindow::setCurrentTeam
  * @param id
  */

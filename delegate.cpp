@@ -35,10 +35,10 @@
 void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     const Task::Types type = Task::instance()->type( this->proxy( index ).row());
     const QFont font = Task::instance()->data( this->proxy( index ), Qt::FontRole ).value<QFont>();
-    const int buttonSize = this->buttonSizes[index];
+    const int buttonSize = this->buttonSizes.isEmpty() ? 0 : this->buttonSizes[index];
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
-    const Id comboId = static_cast<Id>( this->combos[index] );
+    const Id comboId = this->combos.isEmpty() ? Id::Invalid : this->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
 
     // save state
@@ -48,11 +48,14 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // combo
     if ( comboId != Id::Invalid ) {
-        int id = static_cast<int>( comboId );
-        if ( !this->relativeCombos.contains( id ))
-            this->relativeCombos[id] = ++this->lastComboId;
+        if ( !this->relativeCombos.contains( comboId ))
+            this->relativeCombos[comboId] = ++this->lastRelativeCombo;
 
     }
+
+    // abort if no active combos are visible
+    if ( isComboActive && !this->combos.values().contains( MainWindow::instance()->currentComboId()))
+        MainWindow::instance()->setTaskFilter();
 
     // store rectSize
     this->rectSizes[index] = rect;
@@ -60,7 +63,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     // draw cross/equals lambda
     auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
-        const bool hasValue = this->values[index] > 0;
+        const bool hasValue = this->values.isEmpty() ? false : this->values[index] > 0;
         QRect small( rect.right() + Delegate::ButtonWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
         if ( type == Task::Types::Check || isComboActive )
@@ -116,7 +119,7 @@ QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex 
     size.setWidth( buttonSize );
     size.setHeight( Delegate::ItemHeight );
 
-    this->combos[index] = static_cast<int>( Task::instance()->comboId( this->proxy( index ).row()));
+    this->combos[index] = Task::instance()->comboId( this->proxy( index ).row());
     this->values[index] = Task::instance()->multiplier( this->proxy( index ).row());
 
     return size;
@@ -127,7 +130,7 @@ QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex 
  * @return
  */
 QList<Item> Delegate::getItems( const QModelIndex &index ) const {
-    const QRect rect( this->rectSizes[index] );
+    const QRect rect( this->rectSizes.isEmpty() ? QRect() : this->rectSizes[index] );
     QRect button( rect.right(), rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight );
     const Item multi( Item::Multi, button, this );
 
@@ -218,7 +221,7 @@ void Delegate::reset() {
     this->values.clear();
     this->combos.clear();
     this->relativeCombos.clear();
-    this->lastComboId = 0;
+    this->lastRelativeCombo = 0;
     this->m_value = 0;
 }
 
@@ -251,7 +254,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
  */
 void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
-    const int value = this->values[index];
+    const int value = this->values.isEmpty() ? 0 : this->values[index];
     editWidget->setValue( value );
     this->m_value = value;
 }
@@ -274,7 +277,7 @@ void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModel
  * @param option
  */
 void Delegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
-    editor->setGeometry( { this->rectSizes[index].right() + Delegate::ButtonWidth + Delegate::SmallWidth, option.rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight } );
+    editor->setGeometry( { this->rectSizes.isEmpty() ? 0 : this->rectSizes[index].right() + Delegate::ButtonWidth + Delegate::SmallWidth, option.rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight } );
 }
 
 /**

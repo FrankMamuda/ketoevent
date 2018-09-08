@@ -111,6 +111,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         if ( ids.first() != Id::Invalid )
                             Log::instance()->setComboId( Log::instance()->row( ids.first()), MainWindow::instance()->currentComboId());
                         //qDebug() << "ADD COMBO for" << Task::instance()->name( delegate->proxy( index ).row()) << "with comboId" << (int )MainWindow::instance()->currentComboId();
+
+                        // TODO: modify values inside model cache, not force a reset
+                        delegate->reset();
                     }
                         break;
 
@@ -118,6 +121,8 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->proxy( index ).row()), MainWindow::instance()->currentTeamId()));
                         if ( ids.first() != Id::Invalid )
                             Log::instance()->setComboId( Log::instance()->row( ids.first()), Id::Invalid );
+
+                        delegate->reset();
                         break;
                     }
                 }
