@@ -69,6 +69,7 @@ private slots:
     void on_teamCombo_currentIndexChanged( int index );
     void on_actionTeams_triggered();
     void on_actionAddQuick_triggered();
+    void on_actionEvents_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;

@@ -39,6 +39,8 @@
 #include "combos.h"
 #include "main.h"
 #include "teamedit.h"
+#include "eventedit.h"
+#include "eventtoolbar.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -291,6 +293,24 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
 
     // reset task filter
     this->setTaskFilter();
+}
+
+/**
+ * @brief MainWindow::on_actionEvents_triggered
+ */
+void MainWindow::on_actionEvents_triggered() {
+    EditorDialog *editor( EditorDialog::instance());
+
+    editor->show();
+    editor->container->clearSelection();
+    editor->container->setModel( Event::instance());
+    editor->container->setModelColumn( Event::Title );
+    editor->setToolBar( EventToolBar::instance());
+    editor->setWindowTitle( this->tr( "Event manager" ));
+    editor->setWindowIcon( QIcon( ":/icons/ketone" ));
+
+    EventToolBar::instance()->buttonTest();
+    EventToolBar::instance()->show();
 }
 
 /**

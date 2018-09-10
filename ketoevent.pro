@@ -48,7 +48,9 @@ SOURCES += \
     combos.cpp \
     combomodel.cpp \
     delegate.cpp \
-    item.cpp
+    item.cpp \
+    eventedit.cpp \
+    eventtoolbar.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -82,7 +84,9 @@ HEADERS += \
     combos.h \
     combomodel.h \
     delegate.h \
-    item.h
+    item.h \
+    eventedit.h \
+    eventtoolbar.h
 
 FORMS += \
         mainwindow.ui \
@@ -92,7 +96,8 @@ FORMS += \
     rankings.ui \
     settings.ui \
     console.ui \
-    combos.ui
+    combos.ui \
+    eventedit.ui
 
 RESOURCES += \
     resources.qrc

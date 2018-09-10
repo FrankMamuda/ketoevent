@@ -136,6 +136,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionEvents"/>
    <addaction name="actionTeams"/>
    <addaction name="actionTasks"/>
    <addaction name="actionRankings"/>
@@ -181,6 +182,9 @@
      <normaloff>:/icons/teams</normaloff>:/icons/teams</iconset>
    </property>
    <property name="text">
+    <string>Teams</string>
+   </property>
+   <property name="toolTip">
     <string>Teams</string>
    </property>
   </action>
@@ -266,6 +270,15 @@
    </property>
    <property name="text">
     <string>Done</string>
+   </property>
+  </action>
+  <action name="actionEvents">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/ketone</normaloff>:/icons/ketone</iconset>
+   </property>
+   <property name="text">
+    <string>Events</string>
    </property>
   </action>
  </widget>

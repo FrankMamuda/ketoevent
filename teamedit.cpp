@@ -75,7 +75,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
             return;
         }
 
-        // if everything is ok, add a new task
+        // if everything is ok, add a new team
         Id teamId = Id::Invalid;
         if ( !this->isEditing()) {
             teamId = Team::instance()->add( teamTitle,

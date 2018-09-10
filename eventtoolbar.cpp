@@ -20,54 +20,56 @@
 // includes
 //
 #include "editordialog.h"
-#include "team.h"
-#include "teamtoolbar.h"
-#include "teamedit.h"
+#include "event.h"
+#include "eventtoolbar.h"
+#include "eventedit.h"
 #include "main.h"
 #include <QDebug>
 #include <QMessageBox>
 
 /**
- * @brief TeamToolBar::TeamToolBar
+ * @brief EventToolBar::EventToolBar
+ * @param parent
  */
-TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
+EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
-    this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Team" ), [ this ]() {
+    this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Event" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Add Team" ));
-            TeamEdit::instance()->reset();
+            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Add Event" ));
+            EventEdit::instance()->reset();
         }
     } );
 
     // edit action
-    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
+    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Event" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team" ));
-            TeamEdit::instance()->reset( true );
+            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Edit Event" ));
+            EventEdit::instance()->reset( true );
         }
     } );
 
     // remove action
-    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Team" ), [ this ]() {
+    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Event" ), [ this ]() {
         const QModelIndex index( EditorDialog::instance()->container->currentIndex());
 
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Team::instance()->indexToRow( index );
+        const Row row = Event::instance()->indexToRow( index );
         if ( row == Row::Invalid )
             return;
 
-        const QString title( Team::instance()->title( row ));
-        const Id teamId = MainWindow::instance()->currentTeamId();
-        const Id removeId = Team::instance()->id( row );
+        const QString title( Event::instance()->title( row ));
+        const Id eventId = MainWindow::instance()->currentEventId();
+        const Id removeId = Event::instance()->id( row );
 
-        if ( QMessageBox::question( this, this->tr( "Remove team" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes )
-            Team::instance()->remove( row );
+        if ( QMessageBox::question( this, this->tr( "Remove event" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes )
+            Event::instance()->remove( row );
 
-        // restore teamId (model resets on remove apparently)
-        if ( teamId != removeId )
-            MainWindow::instance()->setCurrentTeam( teamId );
+        // restore eventId (model resets on remove apparently)
+        // TODO:
+        // if ( eventId != removeId )
+        //    MainWindow::instance()->setCurrentE( eventId );
     } );
 
     // button test (disconnected in ~EditorDialog)
@@ -79,13 +81,10 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
 }
 
 /**
- * @brief TeamToolBar::buttonTest
+ * @brief EventToolBar::buttonTest
  * @param index
  */
-void TeamToolBar::buttonTest( const QModelIndex &index ) {
+void EventToolBar::buttonTest( const QModelIndex &index ) {
     this->edit->setEnabled( index.isValid());
     this->remove->setEnabled( index.isValid());
 };
-
-
-

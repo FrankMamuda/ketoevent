@@ -5,3 +5,7 @@
 *.h~
 *.cpp~
 *.xcf
+Makefile*
+ui_*.cpp
+ui_*.h
+object_script.*
