@@ -121,6 +121,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
             return;
 
         const int teamRow = Team::instance()->row( teamId );
+        if ( teamRow < 0 || teamRow >= this->ui->teamCombo->count())
+            return;
 
         // check for valid time
         const QTime startTime = Event::instance()->startTime( Event::instance()->row( eventId ));
@@ -178,6 +180,15 @@ MainWindow::~MainWindow() {
  * @return
  */
 Id MainWindow::currentEventId() const {
+    const int index = this->ui->eventCombo->currentIndex();
+
+    // abort if database has not been initialized
+    if ( !Database::instance()->hasInitialised())
+        return Id::Invalid;
+
+    if ( index == -1 )
+        return Id::Invalid;
+
     return Event::instance()->id( this->ui->eventCombo->currentIndex());
 }
 
@@ -186,13 +197,16 @@ Id MainWindow::currentEventId() const {
  * @return
  */
 Id MainWindow::currentTeamId() const {
+    const int index = this->ui->teamCombo->currentIndex();
+
+    // abort if database has not been initialized
     if ( !Database::instance()->hasInitialised())
         return Id::Invalid;
 
-    if ( this->ui->teamCombo->currentIndex() == -1 )
+    if ( index == -1 )
         return Id::Invalid;
 
-    return Team::instance()->id( this->ui->teamCombo->currentIndex());
+    return Team::instance()->id( index );
 }
 
 /**
@@ -202,7 +216,7 @@ Id MainWindow::currentTeamId() const {
  */
 QModelIndex MainWindow::proxyIndex( const QModelIndex &index ) const {
     if ( index.model() != this->filter ) {
-        qDebug() << "bad index" << index.row() << index.column();
+        qDebug() << "bad model index" << index.row() << index.column();
         return QModelIndex();
     }
 
@@ -214,8 +228,10 @@ QModelIndex MainWindow::proxyIndex( const QModelIndex &index ) const {
  * @param id
  */
 void MainWindow::setCurrentTeam( const Id &id ) {
-    const int row = Team::instance()->row( id );
+    if ( id == Id::Invalid )
+        return;
 
+    const int row = Team::instance()->row( id );
     if ( row < 0 || row >= this->ui->teamCombo->count())
         return;
 
@@ -227,9 +243,17 @@ void MainWindow::setCurrentTeam( const Id &id ) {
  * @param index
  */
 void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
+    // abort if database has not been initialized
     if ( !Database::instance()->hasInitialised())
         return;
 
+    // failsafe
+    if ( index < 0 ) {
+        Team::instance()->setFilter( "eventId=-1" );
+        return;
+    }
+
+    // filter tasks
     Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( index ))));
     this->setTaskFilter();
 }
@@ -239,25 +263,32 @@ void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
  * @param index
  */
 void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
+    // abort if database has not been initialized
     if ( !Database::instance()->hasInitialised())
         return;
 
+    // reset item delegate if any
     if ( this->ui->taskView->itemDelegate() != nullptr ) {
         Delegate *delegate( qobject_cast<Delegate*>( this->ui->taskView->itemDelegate()));
 
         if ( delegate != nullptr )
             delegate->reset();
+    } else {
+        return;
     }
 
+    // update view
     this->ui->taskView->viewport()->update();
     this->ui->taskView->setEnabled( index == -1 ? false : true );
 
+    // update time edit
     const Id teamId = this->currentTeamId();
     QTime time( QTime::currentTime());
-    if ( static_cast<int>( teamId ) != -1 )
+    if ( teamId != Id::Invalid )
         time = Team::instance()->finishTime( Team::instance()->row( teamId ));
     this->timeEdit->setTime( time );
 
+    // reset task filter
     this->setTaskFilter();
 }
 
@@ -329,18 +360,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
     this->m_currentCombo = comboId;
 
     // disable ui components
-    this->ui->actionTeams->setDisabled( filterByCombo );
-    this->ui->actionTasks->setDisabled( filterByCombo );
-    this->ui->actionRankings->setDisabled( filterByCombo );
-    this->ui->actionSettings->setDisabled( filterByCombo );
-    //this->ui->actionConsole->setDisabled( filterByCombo );
-    this->ui->actionCombos->setDisabled( filterByCombo );
-    this->ui->actionAddQuick->setDisabled( filterByCombo );
-    this->ui->actionLogTime->setDisabled( filterByCombo );
-    this->ui->actionCombine->setDisabled( filterByCombo );
-    this->ui->teamCombo->setDisabled( filterByCombo );
-    this->ui->eventCombo->setDisabled( filterByCombo );
-    this->timeEdit->setDisabled( filterByCombo );
+    this->setUiLock( filterByCombo );
 
     if ( filterByCombo )
         this->ui->toolBar->insertAction( this->ui->actionTeams, this->ui->actionDone );
@@ -370,6 +390,32 @@ void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
                                QString( ", %1 asc" )
                                /*4.1*/.arg( Task::instance()->fieldName( Task::Name )) :
                                "" ));
+}
+
+/**
+ * @brief MainWindow::setUiLock
+ * @param lock
+ */
+void MainWindow::setUiLock( bool lock ) {
+    const bool noTeams = !this->ui->teamCombo->count();
+    const bool noEvents = !this->ui->eventCombo->count();
+
+    if ( noEvents || noTeams )
+        lock = true;
+
+    this->ui->taskView->setDisabled( lock && !this->isComboModeActive());
+    this->ui->actionTeams->setDisabled( lock && noEvents );
+    this->ui->actionTasks->setDisabled( lock );
+    this->ui->actionRankings->setDisabled( lock );
+    this->ui->actionSettings->setDisabled( lock );
+    //this->ui->actionConsole->setDisabled( lock );
+    this->ui->actionCombos->setDisabled( lock );
+    this->ui->actionAddQuick->setDisabled( lock );
+    this->ui->actionLogTime->setDisabled( lock );
+    this->ui->actionCombine->setDisabled( lock );
+    this->ui->teamCombo->setDisabled( lock );
+    this->ui->eventCombo->setDisabled( lock );
+    this->timeEdit->setDisabled( lock );
 }
 
 /**

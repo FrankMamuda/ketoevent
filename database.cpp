@@ -99,7 +99,7 @@ Database::~Database() {
                 .arg( Task::instance()->fieldName( Task::ID ))
                 .arg( Task::instance()->tableName()));
 
-    if ( query.next()) {
+    while ( query.next()) {
         const int id = query.value( 0 ).toInt();
         qWarning( Database_::Debug ) << this->tr( "removing orphaned log with id - %1" ).arg( id );
         Log::instance()->remove( Log::instance()->row( static_cast<Id>( id )));

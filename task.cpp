@@ -118,21 +118,6 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         }
     }
 
-    if ( /*role == Qt::DisplayRole || role == Qt::EditRole*/  role == Name )
-        return this->name( row );
-
-    if ( role == Mult )
-        return this->multi( row );
-
-    if ( role == Type )
-        return static_cast<int>( this->type( row ));
-
-    if ( role == Style )
-        return static_cast<int>( this->style( row ));
-
-    if ( role == Qt::ToolTipRole )
-        return QVariant();
-
     return Table::data( index, role );
 }
 

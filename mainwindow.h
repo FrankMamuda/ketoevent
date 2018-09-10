@@ -58,6 +58,7 @@ public:
 public slots:
     void setCurrentTeam( const Id &id );
     void setTaskFilter( bool filterByCombo = false, Id comboId = static_cast<Id>( -1 ));
+    void setUiLock( bool lock = true );
 
 private slots:
     void on_actionTasks_triggered();
