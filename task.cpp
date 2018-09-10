@@ -71,7 +71,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
 
     // find highest order
     for ( y = 0; y < this->count(); y++ )
-        highest = qMax( highest, this->order( y ));
+        highest = qMax( highest, this->order( this->indexToRow( y )));
 
     // add a new team
     Table::add( QVariantList() <<
@@ -87,22 +87,13 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
 }
 
 /**
- * @brief Task::eventRow
- * @param row
- * @return
- */
-int Task::eventRow( int row ) const {
-    return Event::instance()->row( this->eventId( row ));
-}
-
-/**
  * @brief Task::data
  * @param idx
  * @param role
  * @return
  */
 QVariant Task::data( const QModelIndex &index, int role ) const {
-    const int row = index.row();
+    const Row row = this->indexToRow( index );
 
     if ( role == Qt::FontRole ) {
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
@@ -126,7 +117,7 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
  * @param row
  * @return
  */
-int Task::multiplier( int row ) const {
+int Task::multiplier( Row row ) const {
     return Log::instance()->multiplier( this->id( row ), MainWindow::instance()->currentTeamId());
 }
 
@@ -135,7 +126,7 @@ int Task::multiplier( int row ) const {
  * @param row
  * @return
  */
-Id Task::comboId( int row ) const {
+Id Task::comboId( Row row ) const {
     return Log::instance()->comboId( this->id( row ), MainWindow::instance()->currentTeamId());
 }
 
@@ -144,6 +135,6 @@ Id Task::comboId( int row ) const {
  * @param row
  * @param value
  */
-void Task::setMultiplier( int row, int value ) {
+void Task::setMultiplier( Row row, int value ) {
     Log::instance()->setMultiplier( value, this->id( row ), MainWindow::instance()->currentTeamId());
 }

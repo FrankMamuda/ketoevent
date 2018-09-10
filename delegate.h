@@ -32,6 +32,7 @@
 //
 class Model;
 enum class Id;
+enum class Row;
 
 /**
  * @brief The Delegate class
@@ -62,7 +63,8 @@ public:
     static QFont fontSizeForWidth( const QString &text, const QFont &baseFont, qreal width );
     int currentEditorValue() const;
 
-    QModelIndex proxy( const QModelIndex &index ) const;
+    QModelIndex sourceIndex( const QModelIndex &index ) const;
+    Row sourceRow( const QModelIndex &index ) const;
 
 public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );

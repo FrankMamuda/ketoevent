@@ -110,7 +110,10 @@ void Rankings::on_actionUpdate_triggered() {
     this->model->reset();
 
     // get event related variables
-    const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
+    const Row event = Event::instance()->row( MainWindow::instance()->currentEventId());
+    if ( event == Row::Invalid )
+        return;
+
     const QTime eventStartTime( Event::instance()->startTime( event ));
     const QTime eventFinishTime( Event::instance()->finishTime( event ));
     const QTime eventFinalTime( Event::instance()->finalTime( event ));
@@ -120,7 +123,12 @@ void Rankings::on_actionUpdate_triggered() {
     // but in reality there is not that much of a performance penalty
     // team method also avoids unnecessary complexity over calculation by logs
     for ( int team = 0; team < Team::instance()->count(); team++ ) {
-        TeamStatistics stats( Team::instance()->title( team ));
+        const Row teamRow = Team::instance()->indexToRow( team );
+
+        if ( teamRow == Row::Invalid )
+            continue;
+
+        TeamStatistics stats( Team::instance()->title( teamRow ));
         QMap<Id, int> combos;
         QList<Id> dup;
 
@@ -128,16 +136,25 @@ void Rankings::on_actionUpdate_triggered() {
         this->ui->progressBar->setValue( team );
 
         // go through logs
+        // FIXME: implement ++ and -- operators?
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
-            const int value = Log::instance()->multiplier( log );
+            const Row logRow = Log::instance()->indexToRow( log );
+            const int value = Log::instance()->multiplier( logRow );
+
+            if ( logRow == Row::Invalid )
+                continue;
 
             // abort on invalid log values or logs not related to the current team
-            if ( value <= 0 || team != Log::instance()->team( log ))
+            if ( value <= 0 || Team::instance()->id( teamRow ) != Log::instance()->teamId( logRow ))
                 continue;
 
             // get task related variables
-            const Id taskId = Log::instance()->taskId( log );
-            const int task = Task::instance()->row( taskId );
+            const Id taskId = Log::instance()->taskId( logRow );
+            const Row task = Task::instance()->row( taskId );
+
+            if ( task == Row::Invalid )
+                continue;
+
             const Task::Types type = Task::instance()->type( task );
 
             // test for duplicates
@@ -152,7 +169,7 @@ void Rankings::on_actionUpdate_triggered() {
             stats.points += Task::instance()->points( task ) * (( type == Task::Types::Multi ) ? value : 1 );
 
             // build combo map
-            const Id comboId = Log::instance()->comboId( log );
+            const Id comboId = Log::instance()->comboId( logRow );
             if ( !combos.contains( comboId ) && comboId > Id::Invalid )
                 combos[comboId] = 0;
 
@@ -178,8 +195,8 @@ void Rankings::on_actionUpdate_triggered() {
         }
 
         // calculate penalty points
-        const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
-        stats.time = eventStartTime.secsTo( Team::instance()->finishTime( team )) / 60 + 1;
+        const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( teamRow )) / 60 + 1;
+        stats.time = eventStartTime.secsTo( Team::instance()->finishTime( teamRow )) / 60 + 1;
         if ( overTime > 0 ) {
             stats.penalty = penaltyPoints * overTime;
             stats.points -= stats.penalty;
@@ -239,8 +256,7 @@ void Rankings::showEvent( QShowEvent *event ) {
     this->ui->tableView->resizeRowsToContents();
 
     // set current team
-    const int currentTeamRow = Team::instance()->row( MainWindow::instance()->currentTeamId());
-    this->ui->teamCombo->setCurrentIndex( currentTeamRow );
+    this->ui->teamCombo->setCurrentIndex( static_cast<int>( Team::instance()->row( MainWindow::instance()->currentTeamId())));
 }
 
 /**
@@ -253,7 +269,6 @@ void Rankings::on_actionExport_triggered() {
 #else
     const bool win32 = false;
 #endif
-
 
     // check for empty filenames
     if ( path.isEmpty())

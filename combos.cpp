@@ -61,7 +61,10 @@ Combos::~Combos() {
  * @param index
  */
 void Combos::on_teamCombo_currentIndexChanged( int index ) {
-    ComboModel::instance()->reset( Team::instance()->id( index ));
+    const Row row = Team::instance()->indexToRow( index );
+
+    ComboModel::instance()->reset( Team::instance()->id( row ));
+
     this->ui->view->reset();
     this->ui->combosEdit->setText( QString::number( ComboModel::instance()->combos ));
     this->ui->pointsEdit->setText( QString::number( ComboModel::instance()->points ));}
@@ -74,10 +77,9 @@ void Combos::showEvent( QShowEvent *event ) {
     ModalWindow::showEvent( event );
 
     // set current team
-    const int currentTeamRow = Team::instance()->row( MainWindow::instance()->currentTeamId());
+    const Row row = Team::instance()->row( MainWindow::instance()->currentTeamId());
 
     // reset model on every show just to be safe
-    this->ui->teamCombo->setCurrentIndex( currentTeamRow );
-    this->on_teamCombo_currentIndexChanged( currentTeamRow );
+    this->ui->teamCombo->setCurrentIndex( static_cast<int>( row ));
+    this->on_teamCombo_currentIndexChanged( static_cast<int>( row ));
 }
-

@@ -38,6 +38,7 @@
 //
 // GENERAL TODO LIST
 //
+//   - event dialog
 //   - implement working combos
 //   - implement imports (at least pure stats)
 //
@@ -79,6 +80,7 @@ int main( int argc, char *argv[] ) {
     qRegisterMetaType<Log::Fields>();
     qRegisterMetaType<Log::Roles>();
     qRegisterMetaType<Id>();
+    //qRegisterMetaType<Row>();
     qRegisterMetaType<RankingsModel::Columns>();
     qRegisterMetaType<Table::Roles>();
     qRegisterMetaType<Task::Fields>();

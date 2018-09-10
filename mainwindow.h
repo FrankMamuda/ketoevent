@@ -37,7 +37,6 @@ class MainWindow;
 // classes
 //
 enum class Id;
-Q_DECLARE_METATYPE( Id )
 
 /**
  * @brief The MainWindow class
@@ -53,7 +52,7 @@ public:
     Id currentTeamId() const;
     Id currentComboId() const { return this->m_currentCombo; }
     bool isComboModeActive() const { return this->m_comboMode; }
-    QModelIndex proxyIndex( const QModelIndex &index ) const;
+    QModelIndex sourceIndex( const QModelIndex &index ) const;
 
 public slots:
     void setCurrentTeam( const Id &id );

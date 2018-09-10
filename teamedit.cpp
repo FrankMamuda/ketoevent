@@ -33,10 +33,15 @@
  * @param parent
  */
 TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit ), m_edit( false ) {
-    const int event = Event::instance()->row( MainWindow::instance()->currentEventId());
+    const Row event = Event::instance()->row( MainWindow::instance()->currentEventId());
+
+    // set up ui
+    this->ui->setupUi( this );
+
+    if ( event == Row::Invalid )
+        return;
 
     // set up defaults
-    this->ui->setupUi( this );
     this->ui->membersInteger->setMinimum( Event::instance()->minMembers( event ));
     this->ui->membersInteger->setMaximum( Event::instance()->maxMembers( event ));
     this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
@@ -79,7 +84,11 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
                                    this->ui->reviewerEdit->text());
 
         } else {
-            const int team = EditorDialog::instance()->container->currentIndex().row();
+            const Row team = Team::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+
+            if ( team == Row::Invalid )
+                return;
+
             Team::instance()->setTitle( team, teamTitle );
             Team::instance()->setMembers( team, this->ui->membersInteger->value());
             Team::instance()->setFinishTime( team, this->ui->finishTime->time());
@@ -163,7 +172,10 @@ void TeamEdit::reset( bool edit ) {
         this->ui->membersInteger->setValue( EventTable::DefaultMembers );
         this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
     } else {
-        const int team = EditorDialog::instance()->container->currentIndex().row();
+        const Row team = Team::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+
+        if ( team == Row::Invalid )
+            return;
 
         this->ui->titleEdit->setText( Team::instance()->title( team ));
         this->ui->finishTime->setTime( Team::instance()->finishTime( team ));

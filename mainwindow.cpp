@@ -120,8 +120,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         if ( eventId == Id::Invalid )
             return;
 
-        const int teamRow = Team::instance()->row( teamId );
-        if ( teamRow < 0 || teamRow >= this->ui->teamCombo->count())
+        Row row = Team::instance()->row( teamId );
+        if ( row == Row::Invalid )
             return;
 
         // check for valid time
@@ -138,7 +138,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         }
 
         // set new time if anything changed
-        if ( Team::instance()->finishTime( teamRow ) != time )
+        if ( Team::instance()->finishTime( row ) != time )
             Team::instance()->setFinishTime( Team::instance()->row( this->currentTeamId()), time );
     } );
 
@@ -189,7 +189,7 @@ Id MainWindow::currentEventId() const {
     if ( index == -1 )
         return Id::Invalid;
 
-    return Event::instance()->id( this->ui->eventCombo->currentIndex());
+    return Event::instance()->id( Event::instance()->indexToRow( index ));
 }
 
 /**
@@ -206,15 +206,15 @@ Id MainWindow::currentTeamId() const {
     if ( index == -1 )
         return Id::Invalid;
 
-    return Team::instance()->id( index );
+    return Team::instance()->id( Team::instance()->indexToRow( index ));
 }
 
 /**
- * @brief MainWindow::proxyIndex
+ * @brief MainWindow::sourceIndex
  * @param index
  * @return
  */
-QModelIndex MainWindow::proxyIndex( const QModelIndex &index ) const {
+QModelIndex MainWindow::sourceIndex( const QModelIndex &index ) const {
     if ( index.model() != this->filter ) {
         qDebug() << "bad model index" << index.row() << index.column();
         return QModelIndex();
@@ -231,11 +231,11 @@ void MainWindow::setCurrentTeam( const Id &id ) {
     if ( id == Id::Invalid )
         return;
 
-    const int row = Team::instance()->row( id );
-    if ( row < 0 || row >= this->ui->teamCombo->count())
+    const Row row = Team::instance()->row( id );
+    if ( row == Row::Invalid )
         return;
 
-    this->ui->teamCombo->setCurrentIndex( row );
+    this->ui->teamCombo->setCurrentIndex( static_cast<int>( row ));
 }
 
 /**
@@ -248,13 +248,14 @@ void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
         return;
 
     // failsafe
-    if ( index < 0 ) {
+    const Row row = Event::instance()->indexToRow( index );
+    if ( row == Row::Invalid ) {
         Team::instance()->setFilter( "eventId=-1" );
         return;
     }
 
     // filter tasks
-    Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( index ))));
+    Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( row ))));
     this->setTaskFilter();
 }
 
@@ -371,7 +372,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
     Task::instance()->setFilter(
                 QString( "eventId=%1 %2"
                          "order by %3 %4" )
-                /*1*/.arg( static_cast<int>( Event::instance()->id( this->ui->eventCombo->currentIndex())))
+                /*1*/.arg( static_cast<int>( this->currentEventId()))
                 /*2*/ .arg( filterByCombo ?
                                 QString( "and %1 in ( select %2 from %3 where %4=%5 and ( %6=%7 or %6=-1 ) and %8>0 )" )
                                 /*2.1*/.arg( Task::instance()->fieldName( Task::ID ))

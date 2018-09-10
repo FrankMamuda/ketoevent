@@ -55,9 +55,13 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const QString name( Task::instance()->name( index.row()));
+        const Row row = Task::instance()->indexToRow( index );
+        if ( row == Row::Invalid )
+            return;
+
+        const QString name( Task::instance()->name( row ));
         if ( QMessageBox::question( this, this->tr( "Remove task" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( name )) == QMessageBox::Yes )
-            Task::instance()->remove( index.row());
+            Task::instance()->remove( row );
     } );
     this->remove->setEnabled( false );
 
@@ -72,7 +76,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         bool reindex = false;
         int y;
         for ( y = 0; y < Task::instance()->count(); y++ ) {
-            const int order = Task::instance()->order( y );
+            const int order = Task::instance()->order( Task::instance()->indexToRow( y ));
             if ( orderSet.contains( order )) {
                 if ( QMessageBox::question( this, this->tr( "Corrupted order" ),
                                             this->tr( "Tasks have corrupted order. Perform reindexing? This cannot be undone." )) == QMessageBox::Yes ) {
@@ -90,7 +94,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
             // get id list
             for ( int y = 0; y < Task::instance()->count(); y++ )
-                idList << Task::instance()->id( y );
+                idList << Task::instance()->id( Task::instance()->indexToRow( y ));
 
             // reorder tasks accordint to id list
             y = 0;
@@ -109,17 +113,17 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
             return;
 
         // use ids in lookup (QPersistentModel index should work too?)
-        const Id id0 = Task::instance()->id( index.row());
-        const Id id1 = Task::instance()->id( other.row());
-        const int order0 = Task::instance()->order( index.row());
-        const int order1 = Task::instance()->order( other.row());
+        const Id id0 = Task::instance()->id( Task::instance()->indexToRow( index ));
+        const Id id1 = Task::instance()->id( Task::instance()->indexToRow( other ));
+        const int order0 = Task::instance()->order( Task::instance()->indexToRow( index ));
+        const int order1 = Task::instance()->order( Task::instance()->indexToRow( other ));
 
         // swap order
         Task::instance()->setOrder( Task::instance()->row( id0 ), order1 );
         Task::instance()->setOrder( Task::instance()->row( id1 ), order0 );
 
         Task::instance()->select();
-        const QModelIndex current( container->model()->index( Task::instance()->row( id0 ), 0 ));
+        const QModelIndex current( container->model()->index( static_cast<int>( Task::instance()->row( id0 )), 0 ));
         container->setCurrentIndex( current );
         container->setFocus();
         this->buttonTest( current );

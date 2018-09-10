@@ -62,11 +62,3 @@ Id Team::add( const QString &title, int members, const QTime &finishTime, const 
                 static_cast<int>( MainWindow::instance()->currentEventId()));
 }
 
-/**
- * @brief Team::eventRow
- * @param id
- * @return
- */
-int Team::eventRow( int row ) const {
-    return Event::instance()->row( this->eventId( row ));
-}

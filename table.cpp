@@ -48,12 +48,12 @@ int Table::count() const {
  * @param fieldId
  * @return
  */
-QVariant Table::value( int row, int fieldId ) const {
+QVariant Table::value( Row row, int fieldId ) const {
     if ( !this->isValid())
         return -1;
 
-    const QModelIndex index( this->index( row, fieldId ));
-    if ( !index.isValid() || index.row() < 0 || index.row() >= this->count()) {
+    const QModelIndex index( this->index( static_cast<int>( row ), fieldId ));
+    if ( row == Row::Invalid || !index.isValid() || index.row() < 0 || index.row() >= this->count()) {
         qWarning( Database_::Debug ) << this->tr( "could not retrieve field \"%1\" value from table \"%2\"" )
                                         .arg( this->field( fieldId )->name())
                                         .arg( this->tableName()) << !index.isValid()
@@ -169,8 +169,9 @@ Id Table::add( const QVariantList &arguments ) {
         qCCritical( Database_::Debug ) << this->tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
 
     // insert empty row
-    const int row = this->count();
-    this->insertRow( row );
+    // NOTE: cannot use indexToRow
+    const Row row = static_cast<Row>( this->count());
+    this->insertRow( this->count());
 
     // prepare statement
     for ( y = 0; y < arguments.count(); y++ ) {
@@ -212,7 +213,7 @@ Id Table::add( const QVariantList &arguments ) {
     if ( this->hasPrimaryField()) {
         const int primaryFieldId = this->primaryField()->id();
         const Id id = static_cast<Id>( this->value( row, primaryFieldId ).toInt());
-        this->map[id] = QPersistentModelIndex( this->index( row, primaryFieldId ));
+        this->map[id] = QPersistentModelIndex( this->index( static_cast<int>( row ), primaryFieldId ));
         return id;
     }
 
@@ -223,14 +224,14 @@ Id Table::add( const QVariantList &arguments ) {
  * @brief Table::remove
  * @param row
  */
-void Table::remove( int row ) {
-    if ( !this->isValid())
+void Table::remove( Row row ) {
+    if ( !this->isValid() || row == Row::Invalid )
         return;
 
     if ( !this->primaryField().isNull())
-        this->map.remove( static_cast<Id>( this->record( row ).value( this->primaryField()->id()).toInt()));
+        this->map.remove( static_cast<Id>( this->record( static_cast<int>( row )).value( this->primaryField()->id()).toInt()));
 
-    this->removeRow( row );
+    this->removeRow( static_cast<int>( row ));
     this->select();
 }
 
@@ -239,11 +240,11 @@ void Table::remove( int row ) {
  * @param row
  * @param fieldId
  */
-void Table::setValue( int row, int fieldId, const QVariant &value ) {
-    if ( !this->isValid())
+void Table::setValue( Row row, int fieldId, const QVariant &value ) {
+    if ( !this->isValid() || row == Row::Invalid )
         return;
 
-    this->setData( this->index( row, fieldId ), value );
+    this->setData( this->index( static_cast<int>( row ), fieldId ), value );
     this->submit();
 }
 
@@ -260,7 +261,7 @@ bool Table::contains( const QSharedPointer<Field_> &field, const QVariant &value
         return false;
 
     for ( y = 0; y < this->count(); y++ ) {
-        if ( this->value( y, field->id()) == value )
+        if ( this->value( this->indexToRow( y ), field->id()) == value )
             return true;
     }
     return false;
@@ -278,3 +279,17 @@ QDebug operator<<( QDebug debug, const Id &id ) {
 
     return debug;
 }
+
+/**
+ * @brief operator <<
+ * @param debug
+ * @param row
+ * @return
+ */
+QDebug operator<<( QDebug debug, const Row &row ) {
+    QDebugStateSaver saver( debug );
+    debug.nospace() << "row:" << static_cast<int>( row );
+
+    return debug;
+}
+

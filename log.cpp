@@ -122,40 +122,6 @@ Id Log::comboId( const Id &taskId, const Id &teamId ) const {
 }
 
 /**
- * @brief Log::data
- * @param item
- * @param role
- * @return
- */
-QVariant Log::data( const QModelIndex &item, int role ) const {
-    if ( role == MultiRole )
-        return this->multiplier( item.row());
-
-    if ( role == TaskRole )
-        return this->task( item.row());
-
-    return Table::data( item, role );
-}
-
-/**
- * @brief Log::task
- * @param row
- * @return
- */
-int Log::task( int row ) const {
-    return Task::instance()->row( this->taskId( row ));
-}
-
-/**
- * @brief Log::team
- * @param row
- * @return
- */
-int Log::team( int row ) const {
-    return Team::instance()->row( this->teamId( row ));
-}
-
-/**
  * @brief Log::setMultiplier
  * @param taskId
  * @param teamId
@@ -169,17 +135,20 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
                                          .arg( static_cast<int>( teamId ));
 
     if ( list.first() != Id::Invalid ) {
-        const int row = this->row( list.first());
+        const Row row = this->row( list.first());
+
+        if ( row == Row::Invalid )
+            return;
 
         if ( multi <= 0 )
             Log::instance()->remove( row );
         else
             Log::instance()->setMultiplier( row, multi );
 
-        //if ( multi <= 0 )
-        //     qDebug() << "delete log at row" << row;
-        //else
-        //    qDebug() << "change log at row" << row;
+        if ( multi <= 0 )
+             qDebug() << "delete log at row" << row;
+        else
+            qDebug() << "change log at row" << row;
     } else {
         qDebug() << "new log";
         Log::instance()->add( taskId, teamId, multi );

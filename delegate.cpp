@@ -33,8 +33,8 @@
  * @param index
  */
 void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
-    const Task::Types type = Task::instance()->type( this->proxy( index ).row());
-    const QFont font = Task::instance()->data( this->proxy( index ), Qt::FontRole ).value<QFont>();
+    const Task::Types type = Task::instance()->type( this->sourceRow( index ));
+    const QFont font = Task::instance()->data( this->sourceIndex( index ), Qt::FontRole ).value<QFont>();
     const int buttonSize = this->buttonSizes.isEmpty() ? 0 : this->buttonSizes[index];
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
@@ -91,7 +91,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // set up font and draw task name
     painter->setFont( { option.font.family(), static_cast<int>( Delegate::ItemHeight * 0.4 ), font.weight(), font.italic() } );
-    painter->drawText( rect, QFontMetrics( painter->font()).elidedText( Task::instance()->name( this->proxy( index ).row()), Qt::ElideRight, rect.width()), { Qt::AlignLeft | Qt::AlignVCenter } );
+    painter->drawText( rect, QFontMetrics( painter->font()).elidedText( Task::instance()->name( this->sourceRow( index )), Qt::ElideRight, rect.width()), { Qt::AlignLeft | Qt::AlignVCenter } );
 
     // disable view
     if ( this->currentEditIndex() != QModelIndex() && !edit && !isComboActive ) {
@@ -112,15 +112,15 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
  */
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
-    const Task::Types type = Task::instance()->type( this->proxy( index ).row());
+    const Task::Types type = Task::instance()->type( this->sourceRow( index ));
     const int buttonSize = MainWindow::instance()->isComboModeActive() ? Delegate::ButtonWidth : (( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth );
 
     this->buttonSizes[index] = buttonSize;
     size.setWidth( buttonSize );
     size.setHeight( Delegate::ItemHeight );
 
-    this->combos[index] = Task::instance()->comboId( this->proxy( index ).row());
-    this->values[index] = Task::instance()->multiplier( this->proxy( index ).row());
+    this->combos[index] = Task::instance()->comboId( this->sourceRow( index ));
+    this->values[index] = Task::instance()->multiplier( this->sourceRow( index ));
 
     return size;
 }
@@ -137,7 +137,7 @@ QList<Item> Delegate::getItems( const QModelIndex &index ) const {
     if ( MainWindow::instance()->isComboModeActive())
         return QList<Item>() << multi;
 
-    return Task::instance()->type( this->proxy( index ).row()) == Task::Types::Multi ?
+    return Task::instance()->type( this->sourceRow( index )) == Task::Types::Multi ?
                 QList<Item>() << multi <<
                                  Item( Item::Numeric, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this ) <<
                                  Item( Item::Sum, button.translated(( Delegate::ButtonWidth + Delegate::SmallWidth ) * 2, 0 ), this )
@@ -238,7 +238,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
     this->currentEditWidget = edit;
 
     // set up widget
-    edit->setMaximum( Task::instance()->multi( this->proxy( index ).row()));
+    edit->setMaximum( Task::instance()->multi( this->sourceRow( index )));
     edit->setAlignment( Qt::AlignCenter );
     edit->setButtonSymbols( QAbstractSpinBox::NoButtons );
     edit->setStyleSheet( "QSpinBox { background-color: transparent; color: white; text-align: center; selection-background-color: transparent; } QSpinBox::up-button { width: 0px; } QSpinBox::down-button { width: 0px; }" );
@@ -268,7 +268,7 @@ void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const 
 void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
     editWidget->interpretText();
-    Task::instance()->setMultiplier( this->proxy( index ).row(), editWidget->value() );
+    Task::instance()->setMultiplier( this->sourceRow( index ), editWidget->value() );
 }
 
 /**
@@ -365,10 +365,28 @@ int Delegate::currentEditorValue() const {
 }
 
 /**
- * @brief Delegate::proxy
+ * @brief Delegate::sourceIndex
  * @param index
  * @return
  */
-QModelIndex Delegate::proxy( const QModelIndex &index ) const {
-   return MainWindow::instance()->proxyIndex( index );
+QModelIndex Delegate::sourceIndex( const QModelIndex &index ) const {
+    return MainWindow::instance()->sourceIndex( index );
+}
+
+/**
+ * @brief Delegate::proxyRow
+ * @param index
+ * @return
+ */
+Row Delegate::sourceRow( const QModelIndex &index ) const {
+    const QModelIndex sourceIndex( this->sourceIndex( index ));
+    const Table *table( qobject_cast<const Table*>( sourceIndex.model()));
+
+    if ( table == nullptr ) {
+        qDebug() << this->tr( "invalid model" );
+        return Row::Invalid;
+    }
+
+   //qDebug() << "valid" << reuest
+    return table->indexToRow( sourceIndex );
 }

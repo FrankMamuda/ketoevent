@@ -92,29 +92,29 @@ public:
     virtual ~Event() {}
 
     void add( const QString &title );
-    Id id( int row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    QString title( int row ) const { return this->value( row, Title ).toString(); }
-    int minMembers( int row ) const { return this->value( row, Min ).toInt(); }
-    int maxMembers( int row ) const { return this->value( row, Max ).toInt(); }
-    QTime startTime( int row ) const { return QTime::fromString( this->value( row, Start ).toString(), "hh:mm" ); }
-    QTime finishTime( int row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
-    QTime finalTime( int row ) const { return QTime::fromString( this->value( row, Final ).toString(), "hh:mm" ); }
-    int penalty( int row ) const { return this->value( row, Penalty ).toInt(); }
-    int comboOfTwo( int row ) const { return this->value( row, Combo2 ).toInt(); }
-    int comboOfThree( int row ) const { return this->value( row, Combo3 ).toInt(); }
-    int comboOfFourPlus( int row ) const { return this->value( row, Combo4 ).toInt(); }
+    Id id( Row row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    QString title( Row row ) const { return this->value( row, Title ).toString(); }
+    int minMembers( Row row ) const { return this->value( row, Min ).toInt(); }
+    int maxMembers( Row row ) const { return this->value( row, Max ).toInt(); }
+    QTime startTime( Row row ) const { return QTime::fromString( this->value( row, Start ).toString(), "hh:mm" ); }
+    QTime finishTime( Row row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
+    QTime finalTime( Row row ) const { return QTime::fromString( this->value( row, Final ).toString(), "hh:mm" ); }
+    int penalty( Row row ) const { return this->value( row, Penalty ).toInt(); }
+    int comboOfTwo( Row row ) const { return this->value( row, Combo2 ).toInt(); }
+    int comboOfThree( Row row ) const { return this->value( row, Combo3 ).toInt(); }
+    int comboOfFourPlus( Row row ) const { return this->value( row, Combo4 ).toInt(); }
 
 public slots:
-    void setTitle( int row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMinMembers( int row, int minMembers ) { this->setValue( row, Min, minMembers ); }
-    void setMaxMembers( int row, int maxMembers ) { this->setValue( row, Max, maxMembers ); }
-    void setStartTime( int row, const QTime &time ) { this->setValue( row, Start, time.toString( "hh:mm" )); }
-    void setFinishTime( int row, const QTime &time ) { this->setValue( row, Finish, time.toString( "hh:mm" )); }
-    void setFinalTime( int row, const QTime &time ) { this->setValue( row, Final, time.toString( "hh:mm" )); }
-    void setPenaltyPoints( int row, int points ) { this->setValue( row, Penalty, points ); }
-    void setComboOfTwo( int row, int points ) { this->setValue( row, Combo2, points ); }
-    void setComboOfThree( int row, int points ) { this->setValue( row, Combo3, points ); }
-    void setComboOfFourPlus( int row, int points ) { this->setValue( row, Combo4, points ); }
+    void setTitle( Row row, const QString &title ) { this->setValue( row, Title, title ); }
+    void setMinMembers( Row row, int minMembers ) { this->setValue( row, Min, minMembers ); }
+    void setMaxMembers( Row row, int maxMembers ) { this->setValue( row, Max, maxMembers ); }
+    void setStartTime( Row row, const QTime &time ) { this->setValue( row, Start, time.toString( "hh:mm" )); }
+    void setFinishTime( Row row, const QTime &time ) { this->setValue( row, Finish, time.toString( "hh:mm" )); }
+    void setFinalTime( Row row, const QTime &time ) { this->setValue( row, Final, time.toString( "hh:mm" )); }
+    void setPenaltyPoints( Row row, int points ) { this->setValue( row, Penalty, points ); }
+    void setComboOfTwo( Row row, int points ) { this->setValue( row, Combo2, points ); }
+    void setComboOfThree( Row row, int points ) { this->setValue( row, Combo3, points ); }
+    void setComboOfFourPlus( Row row, int points ) { this->setValue( row, Combo4, points ); }
 
 private:
     explicit Event();

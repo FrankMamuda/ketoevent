@@ -38,6 +38,12 @@ enum class Id : int { Invalid = -1 };
 QDebug operator<<( QDebug debug, const Id &id );
 
 /**
+ * @brief The Row enum strong-typed row
+ */
+enum class Row : int { Invalid = -1 };
+QDebug operator<<( QDebug debug, const Row &row );
+
+/**
  * @brief The Table_ class
  */
 class Table : public QSqlTableModel {
@@ -56,21 +62,23 @@ public:
     bool isValid() const { return this->m_valid; }
     bool hasPrimaryField() const { return this->m_hasPrimary; }
     int count() const;
-    QVariant value( int row, int fieldId ) const;
+    QVariant value( Row row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
     virtual bool select() override;
     QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
     virtual QVariant data( const QModelIndex &item, int role ) const override;
-    int row( const Id &id ) const { if ( this->map.contains( id )) return this->map[id].row(); return -1; }
+    Row row( const Id &id ) const { if ( this->map.contains( id )) return this->indexToRow( this->map[id].row()); return Row::Invalid; }
     virtual void setFilter( const QString &filter ) override;
     QString fieldName( int id ) const;
+    Row indexToRow( const int index ) const { if ( index < 0 || index >= this->count()) return Row::Invalid; return static_cast<Row>( index ); }
+    Row indexToRow( const QModelIndex &index ) const { if ( index.row() < 0 || index.row() >= this->count() || index.model() != this ) return Row::Invalid; return static_cast<Row>( index.row()); }
 
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }
     void addField( int id, const QString &fieldName = QString(), QVariant::Type type = QVariant::Invalid, const QString &format = QString( "text" ), bool unique = false, bool autoValue = false );
     Id add( const QVariantList &arguments );
-    void remove( int row );
-    void setValue( int row, int fieldId, const QVariant &value );
+    void remove( Row row );
+    void setValue( Row row, int fieldId, const QVariant &value );
 
 protected:
     QMap<int, QSharedPointer<Field_>> fields;
@@ -86,3 +94,5 @@ private:
 
 // declare enums
 Q_DECLARE_METATYPE( Table::Roles )
+Q_DECLARE_METATYPE( Id )
+Q_DECLARE_METATYPE( Row )
