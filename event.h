@@ -91,30 +91,35 @@ public:
     static Event *instance() { static Event *instance = new Event(); return instance; }
     virtual ~Event() {}
 
-    void add( const QString &title );
-    Id id( Row row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    QString title( Row row ) const { return this->value( row, Title ).toString(); }
-    int minMembers( Row row ) const { return this->value( row, Min ).toInt(); }
-    int maxMembers( Row row ) const { return this->value( row, Max ).toInt(); }
-    QTime startTime( Row row ) const { return QTime::fromString( this->value( row, Start ).toString(), "hh:mm" ); }
-    QTime finishTime( Row row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
-    QTime finalTime( Row row ) const { return QTime::fromString( this->value( row, Final ).toString(), "hh:mm" ); }
-    int penalty( Row row ) const { return this->value( row, Penalty ).toInt(); }
-    int comboOfTwo( Row row ) const { return this->value( row, Combo2 ).toInt(); }
-    int comboOfThree( Row row ) const { return this->value( row, Combo3 ).toInt(); }
-    int comboOfFourPlus( Row row ) const { return this->value( row, Combo4 ).toInt(); }
+    Row add( const QString &title, int minMembers = EventTable::DefaultMinMembers, int maxMembers = EventTable::DefaultMaxMembers,
+            const QTime &start = QTime::fromString( EventTable::DefaultStartTime, Database_::TimeFormat ),
+            const QTime &finish = QTime::fromString( EventTable::DefaultFinishTime, Database_::TimeFormat ),
+            const QTime &final  = QTime::fromString( EventTable::DefaultFinalTime, Database_::TimeFormat ),
+            int penalty = EventTable::DefaultPenaltyPoints,
+            int two = EventTable::DefaultComboOfTwo, int three = EventTable::DefaultComboOfThree, int fourPlus = EventTable::DefaultComboOfFourAndMore );
+    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
+    int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
+    QTime startTime( const Row &row ) const { return QTime::fromString( this->value( row, Start ).toString(), Database_::TimeFormat ); }
+    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    QTime finalTime( const Row &row ) const { return QTime::fromString( this->value( row, Final ).toString(), Database_::TimeFormat ); }
+    int penalty( const Row &row ) const { return this->value( row, Penalty ).toInt(); }
+    int comboOfTwo( const Row &row ) const { return this->value( row, Combo2 ).toInt(); }
+    int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
+    int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
 
 public slots:
-    void setTitle( Row row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMinMembers( Row row, int minMembers ) { this->setValue( row, Min, minMembers ); }
-    void setMaxMembers( Row row, int maxMembers ) { this->setValue( row, Max, maxMembers ); }
-    void setStartTime( Row row, const QTime &time ) { this->setValue( row, Start, time.toString( "hh:mm" )); }
-    void setFinishTime( Row row, const QTime &time ) { this->setValue( row, Finish, time.toString( "hh:mm" )); }
-    void setFinalTime( Row row, const QTime &time ) { this->setValue( row, Final, time.toString( "hh:mm" )); }
-    void setPenaltyPoints( Row row, int points ) { this->setValue( row, Penalty, points ); }
-    void setComboOfTwo( Row row, int points ) { this->setValue( row, Combo2, points ); }
-    void setComboOfThree( Row row, int points ) { this->setValue( row, Combo3, points ); }
-    void setComboOfFourPlus( Row row, int points ) { this->setValue( row, Combo4, points ); }
+    void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
+    void setMinMembers( const Row &row, int minMembers ) { this->setValue( row, Min, minMembers ); }
+    void setMaxMembers( const Row &row, int maxMembers ) { this->setValue( row, Max, maxMembers ); }
+    void setStartTime( const Row &row, const QTime &time ) { this->setValue( row, Start, time.toString( Database_::TimeFormat )); }
+    void setFinishTime( const Row &row, const QTime &time ) { this->setValue( row, Finish, time.toString( Database_::TimeFormat )); }
+    void setFinalTime( const Row &row, const QTime &time ) { this->setValue( row, Final, time.toString( Database_::TimeFormat )); }
+    void setPenaltyPoints( const Row &row, int points ) { this->setValue( row, Penalty, points ); }
+    void setComboOfTwo( const Row &row, int points ) { this->setValue( row, Combo2, points ); }
+    void setComboOfThree( const Row &row, int points ) { this->setValue( row, Combo3, points ); }
+    void setComboOfFourPlus( const Row &row, int points ) { this->setValue( row, Combo4, points ); }
 
 private:
     explicit Event();

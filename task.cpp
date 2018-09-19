@@ -25,6 +25,7 @@
 #include "event.h"
 #include "mainwindow.h"
 #include "log.h"
+#include "team.h"
 #include <QFont>
 
 //
@@ -66,15 +67,22 @@ Task::Task() : Table( TaskTable::Name ) {
  * @param style
  * @param description
  */
-void Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
+Row Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
     int y, highest = -1;
+
+    // failsafe
+    const Row event = MainWindow::instance()->currentEvent();
+    if ( event == Row::Invalid ) {
+        qDebug() << this->tr( "no active event, aborting" );
+        return Row::Invalid;
+    }
 
     // find highest order
     for ( y = 0; y < this->count(); y++ )
-        highest = qMax( highest, this->order( this->indexToRow( y )));
+        highest = qMax( highest, this->order( this->row( y )));
 
     // add a new team
-    Table::add( QVariantList() <<
+    return Table::add( QVariantList() <<
                 Database_::null <<
                 taskName <<
                 points <<
@@ -82,7 +90,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
                 static_cast<int>( style ) <<
                 static_cast<int>( type ) <<
                 highest + 1 <<
-                static_cast<int>( MainWindow::instance()->currentEventId()) <<
+                static_cast<int>( Event::instance()->id( event )) <<
                 description );
 }
 
@@ -93,7 +101,7 @@ void Task::add( const QString &taskName, int points, int multi, Task::Types type
  * @return
  */
 QVariant Task::data( const QModelIndex &index, int role ) const {
-    const Row row = this->indexToRow( index );
+    const Row row = this->row( index );
 
     if ( role == Qt::FontRole ) {
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
@@ -117,8 +125,11 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
  * @param row
  * @return
  */
-int Task::multiplier( Row row ) const {
-    return Log::instance()->multiplier( this->id( row ), MainWindow::instance()->currentTeamId());
+int Task::multiplier( const Row &row ) const {
+    bool ok;
+    QPair<Id, Id> ids( getIds( row, &ok ));
+
+    return ok ? Log::instance()->multiplier( ids.first, ids.second ) : 0;
 }
 
 /**
@@ -126,8 +137,40 @@ int Task::multiplier( Row row ) const {
  * @param row
  * @return
  */
-Id Task::comboId( Row row ) const {
-    return Log::instance()->comboId( this->id( row ), MainWindow::instance()->currentTeamId());
+Id Task::comboId( const Row &row ) const {
+    bool ok;
+    QPair<Id, Id> ids( getIds( row, &ok ));
+
+    return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
+}
+
+/**
+ * @brief Task::getIds
+ * @param row
+ * @param ok
+ * @return
+ */
+QPair<Id, Id> Task::getIds( const Row &row, bool *ok ) const {
+    QPair<Id, Id> out( Id::Invalid, Id::Invalid );
+    *ok = false;
+
+    if ( row == Row::Invalid )
+        return out;
+
+    const Row team = MainWindow::instance()->currentTeam();
+    if ( team == Row::Invalid )
+        return out;
+
+    out.second = Team::instance()->id( team );
+    if ( out.second == Id::Invalid )
+        return out;
+
+    out.first = this->id( row );
+    if ( out.first == Id::Invalid )
+        return out;
+
+    *ok = true;
+    return out;
 }
 
 /**
@@ -135,6 +178,10 @@ Id Task::comboId( Row row ) const {
  * @param row
  * @param value
  */
-void Task::setMultiplier( Row row, int value ) {
-    Log::instance()->setMultiplier( value, this->id( row ), MainWindow::instance()->currentTeamId());
+void Task::setMultiplier( const Row &row, int value ) {
+    bool ok;
+    QPair<Id, Id> ids( getIds( row, &ok ));
+
+    if ( ok )
+        Log::instance()->setMultiplier( value, ids.first, ids.second );
 }

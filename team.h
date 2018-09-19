@@ -62,19 +62,19 @@ public:
     static Team *instance() { static Team *instance( new Team()); return instance; }
     virtual ~Team() = default;
 
-    Id id( Row row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Id add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
-    QString title( Row row ) const { return this->value( row, Title ).toString(); }
-    int members( Row row ) const { return this->value( row, Members ).toInt(); }
-    QTime finishTime( Row row ) const { return QTime::fromString( this->value( row, Finish ).toString(), "hh:mm" ); }
-    QString reviewer( Row row ) const { return this->value( row, Reviewer ).toString(); }
-    Id eventId( Row row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
+    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
+    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
+    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
 
 public slots:
-    void setTitle( Row row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMembers( Row row, int members ) { this->setValue( row, Members, members ); }
-    void setFinishTime( Row row, const QTime &time ) { this->setValue( row, Finish, time.toString( "hh:mm" )); }
-    void setReviewer( Row row, const QString &name ) { this->setValue( row, Reviewer, name ); }
+    void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
+    void setMembers( const Row &row, int members ) { this->setValue( row, Members, members ); }
+    void setFinishTime( const Row &row, const QTime &time ) { this->setValue( row, Finish, time.toString( Database_::TimeFormat )); }
+    void setReviewer( const Row &row, const QString &name ) { this->setValue( row, Reviewer, name ); }
 
 private:
     explicit Team();
@@ -82,4 +82,3 @@ private:
 
 // declare enums
 Q_DECLARE_METATYPE( Team::Fields )
-

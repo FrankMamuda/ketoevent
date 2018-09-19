@@ -32,6 +32,17 @@ class Field_;
 class QDebug;
 
 /**
+ * namespace Database
+ */
+namespace Database_ {
+#ifdef Q_CC_MSVC
+static constexpr const char *TimeFormat = "hh:mm";
+#else
+static constexpr const char __attribute__((unused)) *TimeFormat = "hh:mm";
+#endif
+}
+
+/**
  * @brief The Id enum strong-typed id
  */
 enum class Id : int { Invalid = -1 };
@@ -62,27 +73,27 @@ public:
     bool isValid() const { return this->m_valid; }
     bool hasPrimaryField() const { return this->m_hasPrimary; }
     int count() const;
-    QVariant value( Row row, int fieldId ) const;
+    QVariant value( const Row &row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
     virtual bool select() override;
     QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
-    virtual QVariant data( const QModelIndex &item, int role ) const override;
-    Row row( const Id &id ) const { if ( this->map.contains( id )) return this->indexToRow( this->map[id].row()); return Row::Invalid; }
+    virtual QVariant data( const QModelIndex &index, int role ) const override;
     virtual void setFilter( const QString &filter ) override;
     QString fieldName( int id ) const;
-    Row indexToRow( const int index ) const { if ( index < 0 || index >= this->count()) return Row::Invalid; return static_cast<Row>( index ); }
-    Row indexToRow( const QModelIndex &index ) const { if ( index.row() < 0 || index.row() >= this->count() || index.model() != this ) return Row::Invalid; return static_cast<Row>( index.row()); }
+    Row row( const int index ) const { if ( index < 0 || index >= this->count()) return Row::Invalid; return static_cast<Row>( index ); }
+    Row row( const QModelIndex &index ) const { if ( index.row() < 0 || index.row() >= this->count() || index.model() != this ) return Row::Invalid; return static_cast<Row>( index.row()); }
+    QModelIndex find( const Id &id ) const;
+    Row row( const Id &id ) const;
 
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }
     void addField( int id, const QString &fieldName = QString(), QVariant::Type type = QVariant::Invalid, const QString &format = QString( "text" ), bool unique = false, bool autoValue = false );
-    Id add( const QVariantList &arguments );
-    void remove( Row row );
-    void setValue( Row row, int fieldId, const QVariant &value );
+    Row add( const QVariantList &arguments );
+    void remove( const Row &row );
+    void setValue( const Row &row, int fieldId, const QVariant &value );
 
 protected:
     QMap<int, QSharedPointer<Field_>> fields;
-    QMap<Id, QPersistentModelIndex> map;
     QSharedPointer<Field_> field( int id ) const;
     bool contains( const QSharedPointer<Field_> &field, const QVariant &value ) const;
 

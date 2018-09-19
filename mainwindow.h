@@ -37,6 +37,7 @@ class MainWindow;
 // classes
 //
 enum class Id;
+enum class Row;
 
 /**
  * @brief The MainWindow class
@@ -48,16 +49,16 @@ class MainWindow final : public QMainWindow {
 public:
     virtual ~MainWindow();
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
-    Id currentEventId() const;
-    Id currentTeamId() const;
+    Row currentEvent() const;
+    Row currentTeam() const;
     Id currentComboId() const { return this->m_currentCombo; }
     bool isComboModeActive() const { return this->m_comboMode; }
-    QModelIndex sourceIndex( const QModelIndex &index ) const;
 
 public slots:
-    void setCurrentTeam( const Id &id );
+    void setCurrentTeam( const Row &row );
+    void setCurrentEvent( const Row &row );
     void setTaskFilter( bool filterByCombo = false, Id comboId = static_cast<Id>( -1 ));
-    void setUiLock( bool lock = true );
+    void setLock();
 
 private slots:
     void on_actionTasks_triggered();
@@ -78,7 +79,6 @@ private:
     explicit MainWindow( QWidget *parent = nullptr );
     Ui::MainWindow *ui;
     QCompleter completer;
-    QSortFilterProxyModel *filter;
     QWidget *spacer;
     QWidget *quickSpacerLeft;
     QWidget *quickSpacerRight;

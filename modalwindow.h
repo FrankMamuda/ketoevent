@@ -45,15 +45,20 @@ protected:
      * @brief hideEvent
      * @param event
      */
-    void hideEvent( QHideEvent *event ) override { MainWindow::instance()->setEnabled( true ); QMainWindow::hideEvent( event ); }
+    void hideEvent( QHideEvent *event ) override {
+        MainWindow::instance()->setEnabled( true );
+        // relock ui elements if required
+        MainWindow::instance()->setLock();
+        QMainWindow::hideEvent( event );
+    }
 
     /**
      * @brief MainWindow::keyPressEvent
      * @param event
      */
     void keyPressEvent( QKeyEvent *event ) override {
-    if ( event->key() == Qt::Key_Escape )
-        this->hide();
+        if ( event->key() == Qt::Key_Escape )
+            this->hide();
 
         QMainWindow::keyPressEvent( event );
     }

@@ -24,6 +24,7 @@
 #include "task.h"
 #include "mainwindow.h"
 #include "log.h"
+#include "team.h"
 #include <QDebug>
 #include <QSqlQuery>
 
@@ -54,6 +55,28 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
             for ( y = 0; y < this->model()->rowCount(); y++ ) {
                 const QModelIndex index( this->model()->index( y, Task::instance()->Name ));
 
+                // comboId lambda
+                auto setComboId = [index, delegate]( const Id &id ) {
+                    const Row task = delegate->row( index );
+                    const Row team = MainWindow::instance()->currentTeam();
+
+                    if ( task == Row::Invalid || team == Row::Invalid )
+                        return;
+
+                    const Id taskId = Task::instance()->id( task );
+                    const Id teamId = Team::instance()->id( team );
+
+                    const Id logId = Log::instance()->id( taskId, teamId );
+                    if ( logId == Id::Invalid )
+                        return;
+
+                    const Row log = Log::instance()->row( logId );
+                    if ( log == Row::Invalid )
+                        return;
+
+                    Log::instance()->setComboId( log, id );
+                };
+
                 if ( this->visualRect( index ).contains( event->pos())) {
                     delegate->setMousePos( event->pos());
                     Item::Actions action = delegate->action( index );
@@ -62,7 +85,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Set:
-                        Task::instance()->setMultiplier( delegate->sourceRow( index ), true );
+                        Task::instance()->setMultiplier( delegate->row( index ), true );
                         break;
 
                     case Item::Edit:
@@ -70,14 +93,13 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Remove:
-                        Task::instance()->setMultiplier( delegate->sourceRow( index ), false );
+                        Task::instance()->setMultiplier( delegate->row( index ), false );
                         break;
 
                     case Item::Combine:
                         if ( MainWindow::instance()->isComboModeActive())
                             MainWindow::instance()->setTaskFilter();
                         else {
-                            // FIXME: if invalid, add a new one (not combined)
                             // FIXME: quit if no combos selected
                             // FIXME: disallow single log combo
                             // TODO: better sorting of combos (logged first)
@@ -85,18 +107,15 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             Id id = static_cast<Id>( delegate->combos[index] );
                             if ( id == Id::Invalid ) {
                                 QSqlQuery query;
-                                query.exec( "select max( comboId ) from logs" );
-                                if ( query.next()) {
-                                    id = static_cast<Id>( query.value( 0 ).toInt() + 1 );
-                                } else {
-                                    id = static_cast<Id>( 0 );
-                                }
+                                query.exec( QString( "select max( %1 ) from %2" )
+                                            .arg( Log::instance()->fieldName( Log::Combo ))
+                                            .arg( Log::instance()->tableName()));
+
+                                id = query.next() ? static_cast<Id>( query.value( 0 ).toInt() + 1 ) : static_cast<Id>( 0 );
                             }
 
-                            const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->sourceRow( index )), MainWindow::instance()->currentTeamId()));
-                            if ( ids.first() != Id::Invalid )
-                                Log::instance()->setComboId( Log::instance()->row( ids.first()), id );
-
+                            qDebug() << "COMBINE";
+                            setComboId( id );
                             MainWindow::instance()->setTaskFilter( true, id );
                         }
                         break;
@@ -106,23 +125,12 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::AddCombo:
-                    {
-                        const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->sourceRow( index )), MainWindow::instance()->currentTeamId()));
-                        if ( ids.first() != Id::Invalid )
-                            Log::instance()->setComboId( Log::instance()->row( ids.first()), MainWindow::instance()->currentComboId());
-                        //qDebug() << "ADD COMBO for" << Task::instance()->name( delegate->proxy( index ).row()) << "with comboId" << (int )MainWindow::instance()->currentComboId();
-
-                        // TODO: modify values inside model cache, not force a reset
-                        //delegate->reset();
-                    }
+                        qDebug() << "ADD COMBO";
+                        setComboId( MainWindow::instance()->currentComboId());
                         break;
 
                     case Item::RemoveCombo:
-                        const QList<Id> ids( Log::instance()->ids( Task::instance()->id( delegate->sourceRow( index )), MainWindow::instance()->currentTeamId()));
-                        if ( ids.first() != Id::Invalid )
-                            Log::instance()->setComboId( Log::instance()->row( ids.first()), Id::Invalid );
-
-                        //delegate->reset();
+                        setComboId( Id::Invalid );
                         break;
                     }
                 }
@@ -146,3 +154,4 @@ void TaskView::leaveEvent( QEvent *event ) {
 
     QListView::leaveEvent( event );
 }
+

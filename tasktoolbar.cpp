@@ -55,7 +55,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Task::instance()->indexToRow( index );
+        const Row row = Task::instance()->row( index );
         if ( row == Row::Invalid )
             return;
 
@@ -76,7 +76,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         bool reindex = false;
         int y;
         for ( y = 0; y < Task::instance()->count(); y++ ) {
-            const int order = Task::instance()->order( Task::instance()->indexToRow( y ));
+            const int order = Task::instance()->order( Task::instance()->row( y ));
             if ( orderSet.contains( order )) {
                 if ( QMessageBox::question( this, this->tr( "Corrupted order" ),
                                             this->tr( "Tasks have corrupted order. Perform reindexing? This cannot be undone." )) == QMessageBox::Yes ) {
@@ -94,7 +94,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
             // get id list
             for ( int y = 0; y < Task::instance()->count(); y++ )
-                idList << Task::instance()->id( Task::instance()->indexToRow( y ));
+                idList << Task::instance()->id( Task::instance()->row( y ));
 
             // reorder tasks accordint to id list
             y = 0;
@@ -113,10 +113,10 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
             return;
 
         // use ids in lookup (QPersistentModel index should work too?)
-        const Id id0 = Task::instance()->id( Task::instance()->indexToRow( index ));
-        const Id id1 = Task::instance()->id( Task::instance()->indexToRow( other ));
-        const int order0 = Task::instance()->order( Task::instance()->indexToRow( index ));
-        const int order1 = Task::instance()->order( Task::instance()->indexToRow( other ));
+        const Id id0 = Task::instance()->id( Task::instance()->row( index ));
+        const Id id1 = Task::instance()->id( Task::instance()->row( other ));
+        const int order0 = Task::instance()->order( Task::instance()->row( index ));
+        const int order1 = Task::instance()->order( Task::instance()->row( other ));
 
         // swap order
         Task::instance()->setOrder( Task::instance()->row( id0 ), order1 );

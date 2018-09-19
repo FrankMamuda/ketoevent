@@ -33,13 +33,18 @@
  * @param index
  */
 void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
-    const Task::Types type = Task::instance()->type( this->sourceRow( index ));
-    const QFont font = Task::instance()->data( this->sourceIndex( index ), Qt::FontRole ).value<QFont>();
+    const Task::Types type = Task::instance()->type( this->row( index ));
+    const QFont font = Task::instance()->data( index, Qt::FontRole ).value<QFont>();
     const int buttonSize = this->buttonSizes.isEmpty() ? 0 : this->buttonSizes[index];
     const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
     const Id comboId = this->combos.isEmpty() ? Id::Invalid : this->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
+    const bool isEventActive = MainWindow::instance()->currentEvent() != Row::Invalid;
+    const bool isTeamActive = MainWindow::instance()->currentTeam() != Row::Invalid;
+
+    if ( !isTeamActive )
+        return;
 
     // save state
     painter->save();
@@ -61,12 +66,12 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     this->rectSizes[index] = rect;
 
     // draw cross/equals lambda
-    auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive ]() {
+    auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive, isEventActive, isTeamActive ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
         const bool hasValue = this->values.isEmpty() ? false : this->values[index] > 0;
         QRect small( rect.right() + Delegate::ButtonWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
-        if ( type == Task::Types::Check || isComboActive )
+        if ( type == Task::Types::Check || isComboActive || !isEventActive || !isTeamActive )
             return;
 
         if (( hasValue && !isSelected ) || ( !hasValue && isSelected )) {
@@ -76,7 +81,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     };
 
     // draw items
-    if ( this->currentEditIndex() == QModelIndex() || edit || isComboActive ) {
+    if (( this->currentEditIndex() == QModelIndex() || edit || isComboActive ) && isEventActive && isTeamActive ) {
         if ( edit || ( isComboActive && comboId != Id::Invalid )) {
             QColor highlight( option.palette.highlight().color());
             highlight.setAlpha( 128 );
@@ -91,7 +96,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // set up font and draw task name
     painter->setFont( { option.font.family(), static_cast<int>( Delegate::ItemHeight * 0.4 ), font.weight(), font.italic() } );
-    painter->drawText( rect, QFontMetrics( painter->font()).elidedText( Task::instance()->name( this->sourceRow( index )), Qt::ElideRight, rect.width()), { Qt::AlignLeft | Qt::AlignVCenter } );
+    painter->drawText( rect, QFontMetrics( painter->font()).elidedText( Task::instance()->name( this->row( index )), Qt::ElideRight, rect.width()), { Qt::AlignLeft | Qt::AlignVCenter } );
 
     // disable view
     if ( this->currentEditIndex() != QModelIndex() && !edit && !isComboActive ) {
@@ -112,15 +117,18 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
  */
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
-    const Task::Types type = Task::instance()->type( this->sourceRow( index ));
+    const Task::Types type = Task::instance()->type( this->row( index ));
     const int buttonSize = MainWindow::instance()->isComboModeActive() ? Delegate::ButtonWidth : (( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth );
+    const bool isTeamActive = MainWindow::instance()->currentTeam() != Row::Invalid;
 
     this->buttonSizes[index] = buttonSize;
     size.setWidth( buttonSize );
     size.setHeight( Delegate::ItemHeight );
 
-    this->combos[index] = Task::instance()->comboId( this->sourceRow( index ));
-    this->values[index] = Task::instance()->multiplier( this->sourceRow( index ));
+    if ( isTeamActive ) {
+        this->combos[index] = Task::instance()->comboId( this->row( index ));
+        this->values[index] = Task::instance()->multiplier( this->row( index ));
+    }
 
     return size;
 }
@@ -137,7 +145,7 @@ QList<Item> Delegate::getItems( const QModelIndex &index ) const {
     if ( MainWindow::instance()->isComboModeActive())
         return QList<Item>() << multi;
 
-    return Task::instance()->type( this->sourceRow( index )) == Task::Types::Multi ?
+    return Task::instance()->type( this->row( index )) == Task::Types::Multi ?
                 QList<Item>() << multi <<
                                  Item( Item::Numeric, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this ) <<
                                  Item( Item::Sum, button.translated(( Delegate::ButtonWidth + Delegate::SmallWidth ) * 2, 0 ), this )
@@ -201,7 +209,9 @@ void Delegate::setMousePos( const QPoint &pos, bool outside ) {
     }
 
     if ( !found ) {
-        this->view()->update( this->currentIndex());
+        if ( this->currentIndex().isValid() && this->view() != nullptr )
+            this->view()->update( this->currentIndex());
+
         this->m_currentIndex = QModelIndex();
     }
 }
@@ -238,7 +248,7 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
     this->currentEditWidget = edit;
 
     // set up widget
-    edit->setMaximum( Task::instance()->multi( this->sourceRow( index )));
+    edit->setMaximum( Task::instance()->multi( this->row( index )));
     edit->setAlignment( Qt::AlignCenter );
     edit->setButtonSymbols( QAbstractSpinBox::NoButtons );
     edit->setStyleSheet( "QSpinBox { background-color: transparent; color: white; text-align: center; selection-background-color: transparent; } QSpinBox::up-button { width: 0px; } QSpinBox::down-button { width: 0px; }" );
@@ -268,7 +278,7 @@ void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const 
 void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
     editWidget->interpretText();
-    Task::instance()->setMultiplier( this->sourceRow( index ), editWidget->value() );
+    Task::instance()->setMultiplier( this->row( index ), editWidget->value() );
 }
 
 /**
@@ -365,28 +375,17 @@ int Delegate::currentEditorValue() const {
 }
 
 /**
- * @brief Delegate::sourceIndex
- * @param index
- * @return
- */
-QModelIndex Delegate::sourceIndex( const QModelIndex &index ) const {
-    return MainWindow::instance()->sourceIndex( index );
-}
-
-/**
  * @brief Delegate::proxyRow
  * @param index
  * @return
  */
-Row Delegate::sourceRow( const QModelIndex &index ) const {
-    const QModelIndex sourceIndex( this->sourceIndex( index ));
-    const Table *table( qobject_cast<const Table*>( sourceIndex.model()));
+Row Delegate::row( const QModelIndex &index ) const {
+    const Table *table( qobject_cast<const Table*>( index.model()));
 
     if ( table == nullptr ) {
-        qDebug() << this->tr( "invalid model" );
+        qDebug() << this->tr( "invalid model" ) << index.model()->objectName();
         return Row::Invalid;
     }
 
-   //qDebug() << "valid" << reuest
-    return table->indexToRow( sourceIndex );
+    return table->row( index );
 }

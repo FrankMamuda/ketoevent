@@ -59,46 +59,24 @@ void Log::add( const Id &taskId, const Id &teamId, int multiplier, const Id &com
 }
 
 /**
- * @brief Log::ids
- * @param taskId
- * @param teamId
- * @return
- */
-QList<Id> Log::ids( const Id &taskId, const Id &teamId ) const {
-    QSqlQuery query;
-    QList<Id> list;
-    query.exec( QString( "select id from %1 where taskId = %2 and teamId = %3" )
-                .arg( this->tableName())
-                .arg( static_cast<int>( taskId ))
-                .arg( static_cast<int>( teamId )));
-
-    if ( query.next())
-        list << static_cast<Id>( query.value( 0 ).toInt());
-
-    if ( list.isEmpty())
-        list << Id::Invalid;
-
-    return list;
-}
-
-/**
  * @brief Log::multiplier
  * @param taskId
  * @param teamId
  * @return
  */
 int Log::multiplier( const Id &taskId, const Id &teamId ) const {
-    const QList<Id> list( this->ids( taskId, teamId ));
+    QSqlQuery query;
+    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+                .arg( this->fieldName( Log::Multi ))
+                .arg( this->fieldName( Log::Task ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( this->tableName())
+                .arg( this->fieldName( Log::Task ))
+                .arg( static_cast<int>( taskId ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( static_cast<int>( teamId )));
 
-    if ( list.count() > 1 )
-         qWarning( Database_::Debug ) << this->tr( "multiple log entries for taskId=%1, teamId=%1" )
-                                         .arg( static_cast<int>( taskId ))
-                                         .arg( static_cast<int>( teamId ));
-
-    if ( list.first() != Id::Invalid )
-        return this->multiplier( this->row( list.first()));
-
-    return 0;
+    return query.next() ? query.value( 0 ).toInt() : 0;
 }
 
 /**
@@ -108,17 +86,39 @@ int Log::multiplier( const Id &taskId, const Id &teamId ) const {
  * @return
  */
 Id Log::comboId( const Id &taskId, const Id &teamId ) const {
-    const QList<Id> list( this->ids( taskId, teamId ));
+    QSqlQuery query;
+    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+                .arg( this->fieldName( Log::Combo ))
+                .arg( this->fieldName( Log::Task ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( this->tableName())
+                .arg( this->fieldName( Log::Task ))
+                .arg( static_cast<int>( taskId ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( static_cast<int>( teamId )));
 
-    if ( list.count() > 1 )
-         qWarning( Database_::Debug ) << this->tr( "multiple log entries for taskId=%1, teamId=%1" )
-                                         .arg( static_cast<int>( taskId ))
-                                         .arg( static_cast<int>( teamId ));
+    return query.next() ? static_cast<Id>( query.value( 0 ).toInt()) : Id::Invalid;
+}
 
-    if ( list.first() != Id::Invalid )
-        return this->comboId( this->row( list.first()));
+/**
+ * @brief Log::id
+ * @param taskId
+ * @param teamId
+ * @return
+ */
+Id Log::id( const Id &taskId, const Id &teamId ) const {
+    QSqlQuery query;
+    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+                .arg( this->fieldName( Log::ID ))
+                .arg( this->fieldName( Log::Task ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( this->tableName())
+                .arg( this->fieldName( Log::Task ))
+                .arg( static_cast<int>( taskId ))
+                .arg( this->fieldName( Log::Team ))
+                .arg( static_cast<int>( teamId )));
 
-    return Id::Invalid;
+    return query.next() ? static_cast<Id>( query.value( 0 ).toInt()) : Id::Invalid;
 }
 
 /**
@@ -127,16 +127,10 @@ Id Log::comboId( const Id &taskId, const Id &teamId ) const {
  * @param teamId
  */
 void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
-    const QList<Id> list( this->ids( taskId, teamId ));
+    const Id logId = this->id( taskId, teamId );
 
-    if ( list.count() > 1 )
-         qWarning( Database_::Debug ) << this->tr( "multiple log entries for taskId=%1, teamId=%1" )
-                                         .arg( static_cast<int>( taskId ))
-                                         .arg( static_cast<int>( teamId ));
-
-    if ( list.first() != Id::Invalid ) {
-        const Row row = this->row( list.first());
-
+    if ( logId != Id::Invalid ) {
+        const Row row = this->row( logId );
         if ( row == Row::Invalid )
             return;
 
@@ -146,7 +140,7 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
             Log::instance()->setMultiplier( row, multi );
 
         if ( multi <= 0 )
-             qDebug() << "delete log at row" << row;
+            qDebug() << "delete log at row" << row;
         else
             qDebug() << "change log at row" << row;
     } else {

@@ -51,14 +51,20 @@ Team::Team() : Table( TeamTable::Name ) {
  * @param reviewer
  * @return
  */
-Id Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
+Row Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
+    // failsafe
+    const Row event = MainWindow::instance()->currentEvent();
+    if ( event == Row::Invalid ) {
+        qDebug() << this->tr( "no active event, aborting" );
+        return Row::Invalid;
+    }
+
     return Table::add( QVariantList() <<
                 Database_::null <<
                 title <<
                 members <<
-                finishTime.toString( "hh:mm" ) <<
+                finishTime.toString( Database_::TimeFormat ) <<
                 0 <<
                 reviewer <<
-                static_cast<int>( MainWindow::instance()->currentEventId()));
+                static_cast<int>( Event::instance()->id( event )));
 }
-

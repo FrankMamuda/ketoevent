@@ -56,40 +56,42 @@ void ComboModel::reset( const Id &id ) {
     this->colours.clear();
 
     // build comboId/taskName map and taskName/colour map
-    for ( int y = 0; y < Log::instance()->count(); y++ ) {
-        const Row log = Log::instance()->indexToRow( y );
-        if ( log == Row::Invalid )
-            return;
+    if ( id != Id::Invalid ) {
+        for ( int y = 0; y < Log::instance()->count(); y++ ) {
+            const Row log = Log::instance()->row( y );
+            if ( log == Row::Invalid )
+                return;
 
-        if ( Log::instance()->teamId( log ) == id ) {
-            const Id comboId = Log::instance()->comboId( log );
-            const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( log ))));
+            if ( Log::instance()->teamId( log ) == id ) {
+                const Id comboId = Log::instance()->comboId( log );
+                const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( log ))));
 
-            if ( comboId > Id::Invalid ) {
-                this->map.insertMulti( comboId, taskName );
-                this->colours[taskName] = ComboModel::colourForId( static_cast<int>( comboId ));
+                if ( comboId > Id::Invalid ) {
+                    this->map.insertMulti( comboId, taskName );
+                    this->colours[taskName] = ComboModel::colourForId( static_cast<int>( comboId ));
+                }
             }
         }
-    }
 
-    // build display list
-    this->combos = this->map.uniqueKeys().count();
-    this->points = 0;
-    foreach ( const Id &comboId, this->map.uniqueKeys()) {
-        const QStringList taskNames( this->map.values( comboId ));
-        const int count = taskNames.count();
+        // build display list
+        this->combos = this->map.uniqueKeys().count();
+        this->points = 0;
+        foreach ( const Id &comboId, this->map.uniqueKeys()) {
+            const QStringList taskNames( this->map.values( comboId ));
+            const int count = taskNames.count();
 
-        if ( count == 2 )
-            this->points += EventTable::DefaultComboOfTwo;
+            if ( count == 2 )
+                this->points += EventTable::DefaultComboOfTwo;
 
-        if ( count == 3 )
-            this->points += EventTable::DefaultComboOfThree;
+            if ( count == 3 )
+                this->points += EventTable::DefaultComboOfThree;
 
-        if ( count >= 4 )
-            this->points += EventTable::DefaultComboOfFourAndMore;
+            if ( count >= 4 )
+                this->points += EventTable::DefaultComboOfFourAndMore;
 
-        foreach ( const QString &taskName, taskNames )
-            list << taskName;
+            foreach ( const QString &taskName, taskNames )
+                list << taskName;
+        }
     }
 
     // set string list

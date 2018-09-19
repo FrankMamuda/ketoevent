@@ -54,20 +54,19 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Team::instance()->indexToRow( index );
+        const Row row = Team::instance()->row( index );
         if ( row == Row::Invalid )
             return;
 
         const QString title( Team::instance()->title( row ));
-        const Id teamId = MainWindow::instance()->currentTeamId();
-        const Id removeId = Team::instance()->id( row );
+        const Row team = MainWindow::instance()->currentTeam();
 
         if ( QMessageBox::question( this, this->tr( "Remove team" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes )
             Team::instance()->remove( row );
 
         // restore teamId (model resets on remove apparently)
-        if ( teamId != removeId )
-            MainWindow::instance()->setCurrentTeam( teamId );
+        if ( team != row )
+            MainWindow::instance()->setCurrentTeam( team );
     } );
 
     // button test (disconnected in ~EditorDialog)

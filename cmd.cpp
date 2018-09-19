@@ -27,6 +27,7 @@
 #include "team.h"
 #include "task.h"
 #include "log.h"
+#include "database.h"
 #include <QSqlQuery>
 #include <QDebug>
 
@@ -36,6 +37,7 @@
  */
 Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
+    constexpr const char *testEventName( "Test" );
 
     // add common commands
     this->add( "cmd_list", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "list all available commands" ));
@@ -44,6 +46,90 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     this->add( "cv_set", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); } ), this->tr( "set console variable value" ));
     this->add( "db_info", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); } ), this->tr( "display database information" ));
     this->add( "help", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "same as cmd_list" ));
+
+    // setting up test environment
+    this->add( "test_setup", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList &args ) {
+        int y, k;
+        int numTeams = 5, numTasks = 10;
+
+        // custom args
+        if ( args.count() == 2 ) {
+            numTeams = args.at( 0 ).toInt();
+            numTasks = args.at( 1 ).toInt();
+        }
+
+        // add event
+        const Row event = Event::instance()->add( testEventName );
+        if ( event == Row::Invalid )
+            return;
+
+        // set current event, so that new teams are added to it
+        MainWindow::instance()->setCurrentEvent( event );
+
+        // add tasks
+        for ( y = 0; y < numTasks; y++ )
+            Task::instance()->add( "Task " + QString::number( y ), rand() % 20 + 1, rand() % 5 + 1, static_cast<Task::Types>( rand() % 2 ), static_cast<Task::Styles>( rand() % 3 ), "" );
+
+        // add teams
+        for ( y = 0; y < numTeams; y++ ) {
+            Row team = Team::instance()->add( "Team " + QString::number( y ), rand() % EventTable::DefaultMaxMembers + 1, QTime(), "Test" );
+            if ( team == Row::Invalid )
+                continue;
+
+            // add logs
+            for ( k = 0; k < numTasks; k++ ) {
+                const Row row = Task::instance()->row( k );
+                if ( row == Row::Invalid )
+                    continue;
+
+                const int value = rand() % (( Task::instance()->type( row ) == Task::Types::Check ) ? 2 : Task::instance()->multi( row ) + 1 );
+                if ( !value )
+                    continue;
+
+                Log::instance()->add( Task::instance()->id( row ), Team::instance()->id( team ), Task::instance()->type( row ) == Task::Types::Check ? true : value );
+            }
+        }
+
+        // relock ui elements if required
+        MainWindow::instance()->setLock();
+    } ), this->tr( "add a demo event with teams, tasks and logs" ));
+
+    // clear test environment
+    this->add( "test_clear", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
+        int y;
+
+        // remove all events
+        for ( y = 0; y < Event::instance()->count(); y++ ) {
+            const Row row = Event::instance()->row( y );
+            if ( row == Row::Invalid )
+                continue;
+
+
+            if ( !QString::compare( Event::instance()->title( row ), testEventName )) {
+                 Event::instance()->remove( row );
+                 break;
+            }
+        }
+
+        // clean up orphans
+        Database::instance()->removeOrphanedEntries();
+        MainWindow::instance()->setLock();
+    } ), this->tr( "clear demo event" ));
+
+    // obliterate all entries within database
+    this->add( "test_delete_db", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
+        QSqlQuery query;
+        query.exec( QString( "delete from %1" ).arg( Event::instance()->tableName()));
+        query.exec( QString( "delete from %1" ).arg( Log::instance()->tableName()));
+        query.exec( QString( "delete from %1" ).arg( Team::instance()->tableName()));
+        query.exec( QString( "delete from %1" ).arg( Task::instance()->tableName()));
+
+        Event::instance()->select();
+        Log::instance()->select();
+        Team::instance()->select();
+        Task::instance()->select();
+        MainWindow::instance()->setLock();
+    } ), this->tr( "obliterate all entries within database " ));
 
     // add to garbage man
     this->setObjectName( "Cmd" );
@@ -168,28 +254,36 @@ void Cmd::dbInfo() {
     int events = 0, teams = 0, tasks = 0, logs = 0;
     QSqlQuery query;
 
-    // print out memory contents
+    // get memory contents
     qInfo() << QString( "Current: teams - %1, tasks - %2, logs - %3" )
                    .arg( Team::instance()->count())
                    .arg( Task::instance()->count())
                    .arg( Log::instance()->count());
 
-    // print out actual databse contents
-    query = QSqlQuery( "select count(*) from events" );
+    // get actual databse contents
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Event::instance()->tableName()));
     if ( query.next())
         events = query.value( 0 ).toInt();
-    query = QSqlQuery( "select count(*) from teams" );
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Team::instance()->tableName()));
     if ( query.next())
         teams = query.value( 0 ).toInt();
-    query = QSqlQuery( "select count(*) from tasks" );
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Task::instance()->tableName()));
     if ( query.next())
         tasks = query.value( 0 ).toInt();
-    query = QSqlQuery( "select count(*) from logs" );
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Log::instance()->tableName()));
     if ( query.next())
         logs = query.value( 0 ).toInt();
 
-    qInfo() << QString( "Database: events - %1, teams - %2, tasks - %3, logs - %4" )
-                   .arg( events ).arg( teams ).arg( tasks ).arg( logs );
+    // print out
+    qInfo() << QString( "Database: events - %1 (%2), teams - %3(%4), tasks - %5(%6), logs - %7(%8)" )
+                   .arg( events )
+               .arg( Event::instance()->count())
+               .arg( teams )
+               .arg( Team::instance()->count())
+               .arg( tasks )
+               .arg( Task::instance()->count())
+               .arg( logs )
+               .arg( Log::instance()->count());
 }
 
 /**

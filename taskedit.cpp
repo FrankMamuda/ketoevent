@@ -84,7 +84,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
                                    static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()),
                                    this->ui->descEdit->text());
         } else {
-            const Row task = Task::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+            const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
             if ( task == Row::Invalid )
                 return;
@@ -206,7 +206,7 @@ void TaskEdit::reset( bool edit ) {
         this->ui->styleCombo->setCurrentIndex( 0 );
         this->ui->descEdit->clear();
     } else {
-        const Row task = Task::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+        const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
         if ( task == Row::Invalid )
             return;

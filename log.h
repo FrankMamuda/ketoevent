@@ -52,11 +52,6 @@ public:
         Count
     };
 
-    enum Roles {
-        MultiRole = Table::IDRole + 1,
-        TaskRole
-    };
-
     /**
      * @brief instance
      * @return
@@ -65,22 +60,21 @@ public:
     virtual ~Log() {}
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
-    Id id( Row row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    QList<Id> ids( const Id &taskId, const Id &teamId ) const;
-    Id id( const Id &taskId, const Id &teamId ) const { return this->ids( taskId, teamId ).first(); }
-    int multiplier( Row row ) const { return this->value( row, Multi ).toInt(); }
+    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Id id( const Id &taskId, const Id &teamId ) const;
+    int multiplier( const Row &row ) const { return this->value( row, Multi ).toInt(); }
     int multiplier( const Id &taskId, const Id &teamId ) const;
-    Id taskId( Row row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
-    Id teamId( Row row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
-    Id comboId( Row row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
+    Id taskId( const Row &row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
+    Id teamId( const Row &row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
+    Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
     Id comboId( const Id &taskId, const Id &teamId ) const;
 
 public slots:
-    void setMultiplier( Row row, int multi ) { this->setValue( row, Multi, multi ); }
+    void setMultiplier( const Row &row, int multi ) { this->setValue( row, Multi, multi ); }
     void setMultiplier( int multi, const Id &taskId, const Id &teamId );
-    void setTaskId( Row row, const Id &id ) { this->setValue( row, Task, static_cast<int>( id )); }
-    void setTeamId( Row row, const Id &id ) { this->setValue( row, Team, static_cast<int>( id )); }
-    void setComboId( Row row, const Id &id ) { this->setValue( row, Combo, static_cast<int>( id )); }
+    void setTaskId( const Row &row, const Id &id ) { this->setValue( row, Task, static_cast<int>( id )); }
+    void setTeamId( const Row &row, const Id &id ) { this->setValue( row, Team, static_cast<int>( id )); }
+    void setComboId( const Row &row, const Id &id ) { this->setValue( row, Combo, static_cast<int>( id )); }
 
 private:
     explicit Log();
@@ -88,4 +82,3 @@ private:
 
 // declare enums
 Q_DECLARE_METATYPE( Log::Fields )
-Q_DECLARE_METATYPE( Log::Roles )

@@ -79,29 +79,30 @@ public:
     static Task *instance() { static Task *instance( new Task()); return instance; }
     virtual ~Task() {}
 
-    Id id( Row row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    void add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
-    QString name( Row row ) const { return this->value( row, Name ).toString(); }
-    int points( Row row ) const { return this->value( row, Points ).toInt(); }
-    int multi( Row row ) const { return this->value( row, Mult ).toInt(); }
-    Styles style( Row row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
-    Types type( Row row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
-    int order( Row row ) const { return this->value( row, Order ).toInt(); }
-    QString description( Row row ) const { return this->value( row, Desc ).toString(); }
-    Id eventId( Row row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
+    QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
+    int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
+    int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
+    Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
+    Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
+    int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
+    QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
+    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
-    int multiplier( Row row ) const;
-    Id comboId( Row row ) const;
+    int multiplier( const Row &row ) const;
+    Id comboId( const Row &row ) const;
+    QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
 
 public slots:
-    void setName( Row row, const QString &name ) { this->setValue( row, Name, name ); }
-    void setPoints( Row row, int points ) { this->setValue( row, Points, points ); }
-    void setMulti( Row row, int points ) { this->setValue( row, Mult, points ); }
-    void setStyle( Row row, Styles style ) { this->setValue( row, Style, static_cast<int>( style )); }
-    void setType( Row row, Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
-    void setOrder( Row row, int position ) { this->setValue( row, Order, position ); }
-    void setDescription( Row row, const QString &description ) { this->setValue( row, Desc, description ); }
-    void setMultiplier( Row row, int value );
+    void setName( const Row &row, const QString &name ) { this->setValue( row, Name, name ); }
+    void setPoints( const Row &row, int points ) { this->setValue( row, Points, points ); }
+    void setMulti( const Row &row, int points ) { this->setValue( row, Mult, points ); }
+    void setStyle( const Row &row, Styles style ) { this->setValue( row, Style, static_cast<int>( style )); }
+    void setType( const Row &row, Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
+    void setOrder( const Row &row, int position ) { this->setValue( row, Order, position ); }
+    void setDescription( const Row &row, const QString &description ) { this->setValue( row, Desc, description ); }
+    void setMultiplier( const Row &row, int value );
 
 private:
     explicit Task();

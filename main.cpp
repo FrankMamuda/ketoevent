@@ -38,9 +38,10 @@
 //
 // GENERAL TODO LIST
 //
-//   - event dialog
 //   - implement working combos
 //   - implement imports (at least pure stats)
+//   - scripted states (combos would be scripted, not hardcoded)
+//   - task descriptions in task view
 //
 
 // default message handler
@@ -78,7 +79,6 @@ int main( int argc, char *argv[] ) {
     qRegisterMetaType<Item::Types>();
     qRegisterMetaType<Event::Fields>();
     qRegisterMetaType<Log::Fields>();
-    qRegisterMetaType<Log::Roles>();
     qRegisterMetaType<Id>();
     //qRegisterMetaType<Row>();
     qRegisterMetaType<RankingsModel::Columns>();

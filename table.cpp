@@ -24,6 +24,7 @@
 #include "database.h"
 #include "field.h"
 #include <QDebug>
+#include <QSqlQuery>
 
 /**
  * @brief Table_::Table_
@@ -48,7 +49,7 @@ int Table::count() const {
  * @param fieldId
  * @return
  */
-QVariant Table::value( Row row, int fieldId ) const {
+QVariant Table::value( const Row &row, int fieldId ) const {
     if ( !this->isValid())
         return -1;
 
@@ -69,39 +70,43 @@ QVariant Table::value( Row row, int fieldId ) const {
  * @return
  */
 bool Table::select() {
-    int y;
     const bool result = QSqlTableModel::select();
 
     // fetch more
     while ( this->canFetchMore())
         this->fetchMore();
 
-    // build id to row map
-    this->map.clear();
-    if ( !this->primaryField().isNull()) {
-        for ( y = 0; y < this->count(); y++ )
-            this->map[static_cast<Id>( this->record( y ).value( this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
-            //this->map[static_cast<Id>( this->value( y, this->primaryField()->id()).toInt())] = QPersistentModelIndex( this->index( y, this->primaryField()->id()));
-    }
-
     return result;
 }
 
 /**
+ * @brief Table::find
+ * @param id
+ * @return
+ */
+Row Table::row( const Id &id ) const {
+    const QModelIndexList list( this->match( this->index( 0, 0 ), IDRole, static_cast<int>( id ), 1, Qt::MatchExactly ));
+    return this->row( list.isEmpty() ? QModelIndex() : list.first());
+}
+
+/**
  * @brief Table::data
- * @param item
+ * @param index
  * @param role
  * @return
  */
-QVariant Table::data( const QModelIndex &item, int role ) const {
+QVariant Table::data( const QModelIndex &index, int role ) const {
     if ( !Database::instance()->hasInitialised())
         return QVariant();
 
-    if ( role == IDRole || role == Qt::UserRole )
-        return this->hasPrimaryField() ? this->record( item.row()).value( this->primaryField()->id()).toInt() : -1;
-        //return this->hasPrimaryField() ? this->value( item.row(), this->primaryField()->id()).toInt() : -1;
+    if ( role == IDRole || role == Qt::UserRole ) {
+        if ( !index.isValid())
+            return static_cast<int>( Id::Invalid );
 
-    return QSqlTableModel::data( item, role );
+        return this->hasPrimaryField() ? this->value( static_cast<Row>( index.row()), this->primaryField()->id()).toInt() : -1;
+    }
+
+    return QSqlTableModel::data( index, role );
 }
 
 /**
@@ -159,19 +164,23 @@ void Table::addField( int id, const QString &fieldName, QVariant::Type type, con
  * @brief Table::add
  * @param name
  */
-Id Table::add( const QVariantList &arguments ) {
+Row Table::add( const QVariantList &arguments ) {
     int y;
 
     if ( !this->isValid())
-        return Id::Invalid;
+        return Row::Invalid;
 
     if ( this->fields.count() != arguments.count())
         qCCritical( Database_::Debug ) << this->tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
 
     // insert empty row
-    // NOTE: cannot use indexToRow
-    const Row row = static_cast<Row>( this->count());
-    this->insertRow( this->count());
+    const int row = this->count();
+    this->beginInsertRows( QModelIndex(), this->count(), this->count());
+    if ( !this->insertRow( this->count())) {
+        qDebug() << this->tr( "cannot insert row into table \"%1\"" ).arg( this->tableName());
+        this->endInsertRows();
+        return Row::Invalid;
+    }
 
     // prepare statement
     for ( y = 0; y < arguments.count(); y++ ) {
@@ -186,7 +195,8 @@ Id Table::add( const QVariantList &arguments ) {
         if ( field->type() != argument.type()) {
             qCCritical( Database_::Debug ) << this->tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.type()).arg( y ).arg( field->format()).arg( field->type());
             this->revert();
-            return Id::Invalid;
+            this->endInsertRows();
+            return Row::Invalid;
         }
 
         // check for unique fields
@@ -196,43 +206,37 @@ Id Table::add( const QVariantList &arguments ) {
                         << this->tr( "table already has a unique field \"%1\" with value - \"%2\", aborting addition" )
                            .arg( field->name()).arg( argument.toString());
                 this->revert();
-                return Id::Invalid;
+                this->endInsertRows();
+                return Row::Invalid;
             }
         }
 
         // set data if field is not primary
         if ( !field->isPrimary())
-            this->setData( this->index( this->count() - 1, y ), argument );
+            this->setData( this->index( row, y ), argument );
         else
             this->m_hasPrimary = true;
     }
 
     this->submit();
-
-    // add to id/row map
-    if ( this->hasPrimaryField()) {
-        const int primaryFieldId = this->primaryField()->id();
-        const Id id = static_cast<Id>( this->value( row, primaryFieldId ).toInt());
-        this->map[id] = QPersistentModelIndex( this->index( static_cast<int>( row ), primaryFieldId ));
-        return id;
-    }
-
-    return Id::Invalid;
+    this->endInsertRows();
+    this->select();
+    return this->row( row );
 }
 
 /**
  * @brief Table::remove
  * @param row
  */
-void Table::remove( Row row ) {
+void Table::remove( const Row &row ) {
     if ( !this->isValid() || row == Row::Invalid )
         return;
 
-    if ( !this->primaryField().isNull())
-        this->map.remove( static_cast<Id>( this->record( static_cast<int>( row )).value( this->primaryField()->id()).toInt()));
-
+    this->beginRemoveRows( QModelIndex(), static_cast<int>( row ), static_cast<int>( row ));
     this->removeRow( static_cast<int>( row ));
+    this->submit();
     this->select();
+    this->endRemoveRows();
 }
 
 /**
@@ -240,7 +244,7 @@ void Table::remove( Row row ) {
  * @param row
  * @param fieldId
  */
-void Table::setValue( Row row, int fieldId, const QVariant &value ) {
+void Table::setValue( const Row &row, int fieldId, const QVariant &value ) {
     if ( !this->isValid() || row == Row::Invalid )
         return;
 
@@ -261,7 +265,7 @@ bool Table::contains( const QSharedPointer<Field_> &field, const QVariant &value
         return false;
 
     for ( y = 0; y < this->count(); y++ ) {
-        if ( this->value( this->indexToRow( y ), field->id()) == value )
+        if ( this->value( this->row( y ), field->id()) == value )
             return true;
     }
     return false;

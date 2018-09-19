@@ -52,21 +52,21 @@ Event::Event() : Table( EventTable::Name ) {
  * @brief Event::add
  * @param title
  */
-void Event::add( const QString &title ) {
-    Table::add( QVariantList() <<
+Row Event::add( const QString &title, int minMembers, int maxMembers,
+                 const QTime &start, const QTime &finish, const QTime &final,
+                 int penalty, int two, int three, int fourPlus ) {
+    return Table::add( QVariantList() <<
                 Database_::null <<
                 Version <<
                 title <<
-                DefaultMinMembers <<
-                DefaultMaxMembers <<
-                DefaultStartTime <<
-                DefaultFinishTime <<
-                DefaultFinalTime <<
-                DefaultPenaltyPoints <<
-                DefaultComboOfTwo <<
-                DefaultComboOfThree <<
-                DefaultComboOfFourAndMore <<
+                minMembers <<
+                maxMembers <<
+                start.toString( Database_::TimeFormat ) <<
+                finish.toString (Database_::TimeFormat ) <<
+                final.toString( Database_::TimeFormat ) <<
+                penalty <<
+                two <<
+                three <<
+                fourPlus <<
                 0 );
 }
-
-

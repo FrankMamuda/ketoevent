@@ -24,6 +24,7 @@
 #include "eventtoolbar.h"
 #include "eventedit.h"
 #include "main.h"
+#include "database.h"
 #include <QDebug>
 #include <QMessageBox>
 
@@ -55,21 +56,21 @@ EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Event::instance()->indexToRow( index );
+        const Row row = Event::instance()->row( index );
         if ( row == Row::Invalid )
             return;
 
         const QString title( Event::instance()->title( row ));
-        const Id eventId = MainWindow::instance()->currentEventId();
-        const Id removeId = Event::instance()->id( row );
+        const Row event = MainWindow::instance()->currentEvent();
 
-        if ( QMessageBox::question( this, this->tr( "Remove event" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes )
+        if ( QMessageBox::question( this, this->tr( "Remove event" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes ) {
             Event::instance()->remove( row );
+            Database::instance()->removeOrphanedEntries();
+        }
 
         // restore eventId (model resets on remove apparently)
-        // TODO:
-        // if ( eventId != removeId )
-        //    MainWindow::instance()->setCurrentE( eventId );
+        if ( event != row )
+            MainWindow::instance()->setCurrentEvent( event );
     } );
 
     // button test (disconnected in ~EditorDialog)

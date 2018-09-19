@@ -102,7 +102,7 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
             if ( !Rankings::instance()->isDisplayingCurrentTeam()) {
                 return Rankings::instance()->list.at( index.row()).title;
             } else {
-                const Row team = Team::instance()->indexToRow( Rankings::instance()->ui->teamCombo->currentIndex());
+                const Row team = Team::instance()->row( Rankings::instance()->ui->teamCombo->currentIndex());
                 if ( team == Row::Invalid )
                     return QVariant();
 

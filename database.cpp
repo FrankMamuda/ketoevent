@@ -33,6 +33,7 @@
 #include "log.h"
 #include "team.h"
 #include "task.h"
+#include "event.h"
 
 /**
  * @brief Database::Database
@@ -82,15 +83,29 @@ Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false 
 }
 
 /**
- * @brief Database::~Database
+ * @brief Database::removeOrphanedEntries
  */
-Database::~Database() {
-    QString connectionName;
-    bool open = false;
-
-    // clean up orphans
+void Database::removeOrphanedEntries() {
     QSqlQuery query;
-    query.exec( QString( "select * from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
+
+    // remove orphaned tasks
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+                .arg( Task::instance()->tableName())
+                .arg( Task::instance()->fieldName( Task::Event ))
+                .arg( Event::instance()->fieldName( Event::ID ))
+                .arg( Event::instance()->tableName()));
+    Task::instance()->select();
+
+    // remove orphaned teams
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+                .arg( Team::instance()->tableName())
+                .arg( Team::instance()->fieldName( Team::Event ))
+                .arg( Event::instance()->fieldName( Event::ID ))
+                .arg( Event::instance()->tableName()));
+    Team::instance()->select();
+
+    // remove orphaned logs
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
                 .arg( Log::instance()->tableName())
                 .arg( Log::instance()->fieldName( Log::Team ))
                 .arg( Team::instance()->fieldName( Team::ID ))
@@ -98,12 +113,18 @@ Database::~Database() {
                 .arg( Log::instance()->fieldName( Log::Task ))
                 .arg( Task::instance()->fieldName( Task::ID ))
                 .arg( Task::instance()->tableName()));
+    Log::instance()->select();
+}
 
-    while ( query.next()) {
-        const int id = query.value( 0 ).toInt();
-        qWarning( Database_::Debug ) << this->tr( "removing orphaned log with id - %1" ).arg( id );
-        Log::instance()->remove( Log::instance()->row( static_cast<Id>( id )));
-    }
+/**
+ * @brief Database::~Database
+ */
+Database::~Database() {
+    QString connectionName;
+    bool open = false;
+
+    // remove orphans
+    this->removeOrphanedEntries();
 
     // announce
     qCInfo( Database_::Debug ) << this->tr( "unloading database" );

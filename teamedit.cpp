@@ -33,7 +33,7 @@
  * @param parent
  */
 TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit ), m_edit( false ) {
-    const Row event = Event::instance()->row( MainWindow::instance()->currentEventId());
+    const Row event = MainWindow::instance()->currentEvent();
 
     // set up ui
     this->ui->setupUi( this );
@@ -76,15 +76,15 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         }
 
         // if everything is ok, add a new team
-        Id teamId = Id::Invalid;
+        Row team = Row::Invalid;
         if ( !this->isEditing()) {
-            teamId = Team::instance()->add( teamTitle,
+            team = Team::instance()->add( teamTitle,
                                    this->ui->membersInteger->value(),
                                    this->ui->finishTime->time(),
                                    this->ui->reviewerEdit->text());
 
         } else {
-            const Row team = Team::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+            const Row team = Team::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
             if ( team == Row::Invalid )
                 return;
@@ -95,16 +95,15 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
             Team::instance()->setReviewer( team, this->ui->reviewerEdit->text());
         }
 
+        if ( team != Row::Invalid )
+            MainWindow::instance()->setCurrentTeam( team );
+
         // close dock
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
-        else {
-            if ( teamId != Id::Invalid )
-                MainWindow::instance()->setCurrentTeam( teamId );
-
+        else
             this->close();
-        }
-    });
+    } );
 
     // shortcut from title to members
     this->connect( this->ui->titleEdit, &QLineEdit::returnPressed, [ this, emptyTitle ]() {
@@ -172,7 +171,7 @@ void TeamEdit::reset( bool edit ) {
         this->ui->membersInteger->setValue( EventTable::DefaultMembers );
         this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
     } else {
-        const Row team = Team::instance()->indexToRow( EditorDialog::instance()->container->currentIndex().row());
+        const Row team = Team::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
         if ( team == Row::Invalid )
             return;

@@ -46,8 +46,8 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const bool edit = ( this->delegate->currentEditIndex() == index );
     const bool hover = edit ? false : this->rect.contains( this->delegate->mousePos());
     const int value = this->delegate->values.isEmpty() ? 0 : this->delegate->values[index];
-    const int points = Task::instance()->points( this->delegate->sourceRow( index ));
-    const Task::Types type = Task::instance()->type( this->delegate->sourceRow( index ));
+    const int points = Task::instance()->points( this->delegate->row( index ));
+    const Task::Types type = Task::instance()->type( this->delegate->row( index ));
     const int isSelected = edit ? false : ( index == this->delegate->currentIndex());
     const bool hasValue = edit ? true : value > 0;
     const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];
@@ -195,7 +195,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 Item::Actions Item::action( const QModelIndex &index ) const {
     // retrieve model values
     const bool edit = ( this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
-    const Task::Types type = Task::instance()->type( this->delegate->sourceRow( index ));
+    const Task::Types type = Task::instance()->type( this->delegate->row( index ));
     const bool hasValue = this->delegate->values.isEmpty() ? false : this->delegate->values[index] > 0;
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
     const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];

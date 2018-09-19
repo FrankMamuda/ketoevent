@@ -60,6 +60,9 @@ public:
     void add( Table *table );
     bool hasInitialised() const { return this->m_initialised; }
 
+public slots:
+    void removeOrphanedEntries();
+
 private:
     explicit Database( QObject *parent = nullptr );
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
