@@ -59,6 +59,11 @@ public:
         Count
     };
 
+    enum ExtendedFields {
+        ComboID = Count,
+        Multi
+    };
+
     enum class Types {
         NoType = -1,
         Check,
@@ -77,7 +82,7 @@ public:
      * @return
      */
     static Task *instance() { static Task *instance( new Task()); return instance; }
-    virtual ~Task() {}
+    virtual ~Task() { this->setInitialised( false ); }
 
     Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
@@ -94,6 +99,8 @@ public:
     Id comboId( const Row &row ) const;
     QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
 
+    bool hasInitialised() const { return this->m_initialised; }
+
 public slots:
     void setName( const Row &row, const QString &name ) { this->setValue( row, Name, name ); }
     void setPoints( const Row &row, int points ) { this->setValue( row, Points, points ); }
@@ -104,10 +111,16 @@ public slots:
     void setDescription( const Row &row, const QString &description ) { this->setValue( row, Desc, description ); }
     void setMultiplier( const Row &row, int value );
 
+    void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
+
+protected:
+    QString selectStatement() const override;
+
 private:
     explicit Task();
     QMap<Types,QString> types;
     QMap<Styles,QString> styles;
+    bool m_initialised;
 };
 
 // declare enums

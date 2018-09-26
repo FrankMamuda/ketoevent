@@ -68,7 +68,7 @@ public:
         IDRole = Qt::UserRole
     };
 
-    Table( const QString &tableName = QString());
+    Table( const QString &tableName = QString()) { this->setTable( tableName ); }
     virtual ~Table() { this->setValid( false ); this->clear(); }
     bool isValid() const { return this->m_valid; }
     bool hasPrimaryField() const { return this->m_hasPrimary; }
@@ -98,8 +98,8 @@ protected:
     bool contains( const QSharedPointer<Field_> &field, const QVariant &value ) const;
 
 private:
-    bool m_valid;
-    bool m_hasPrimary;
+    bool m_valid = false;
+    bool m_hasPrimary = false;
     QSharedPointer<Field_> m_primaryField;
 };
 

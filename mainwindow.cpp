@@ -82,6 +82,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->ui->findEdit->setCompleter( &this->completer );
     this->completer.setCompletionColumn( Task::Name );
     this->completer.setCaseSensitivity( Qt::CaseInsensitive );
+    this->completer.setFilterMode( Qt::MatchContains );
     this->connect( this->ui->findEdit, &QLineEdit::textChanged, [ this ]( const QString & ) {
         this->setTaskFilter( this->isComboModeActive(), this->currentComboId());
         this->setLock();
@@ -355,9 +356,11 @@ void MainWindow::on_actionTasks_triggered() {
 }
 
 /**
- * @brief MainWindow::setTaskFilter
+ * @brief MainWindow::setTaskFilter SQL-heavy task filter
+ * @param filterByCombo
+ * @param comboId
  */
-void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
+void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     const bool sort = Variable::instance()->isEnabled( "sortByType" );
     const Id eventId = this->currentEvent() == Row::Invalid ? Id::Invalid : Event::instance()->id( this->currentEvent());
     const Id teamId = this->currentTeam() == Row::Invalid ? Id::Invalid : Team::instance()->id( this->currentTeam());
@@ -370,36 +373,64 @@ void MainWindow::setTaskFilter( bool filterByCombo, Id comboId ) {
     // disable ui components
     this->setLock();
 
+    // add/remove done action
     if ( filterByCombo )
         this->ui->toolBar->insertAction( this->ui->actionEvents, this->ui->actionDone );
     else
         this->ui->toolBar->removeAction( this->ui->actionDone );
 
-    // NOTE: THIS!
-    Task::instance()->setFilter(
-                QString( Task::instance()->fieldName( Task::Event ) +
-                         "=%1 %2" +
-                         ( find.isEmpty() ? "" : QString( "and %1 like '%2%' " ).arg( Task::instance()->fieldName( Task::Name )).arg( find )) +
-                         "order by %3 %4" )
-                /*1*/.arg( static_cast<int>( eventId ))
-                /*2*/ .arg( filterByCombo ?
-                                QString( "and %1 in ( select %2 from %3 where %4=%5 and ( %6=%7 or %6=-1 ) and %8>0 ) " )
-                                /*2.1*/.arg( Task::instance()->fieldName( Task::ID ))
-                                /*2.2*/.arg( Log::instance()->fieldName( Log::Task ))
-                                /*2.3*/.arg( Log::instance()->tableName())
-                                /*2.4*/.arg( Log::instance()->fieldName( Log::Team ))
-                                /*2.5*/.arg( static_cast<int>( teamId ))
-                                /*2.6*/.arg( Log::instance()->fieldName( Log::Combo ))
-                                /*2.7*/.arg( static_cast<int>( comboId ))
-                                /*2.8*/.arg( Log::instance()->fieldName( Log::Multi )) :
-                                "" )
-                /*3*/.arg( sort ?
-                               Task::instance()->fieldName( Task::Type ) :
-                               Task::instance()->fieldName( Task::Order ))
-                /*4*/.arg( sort ?
-                               QString( ", %1 asc" )
-                               /*4.1*/.arg( Task::instance()->fieldName( Task::Name )) :
-                               "" ));
+    // selects tasks from current event
+    const QString eventFilter( QString( "%1=%2" )
+                               .arg( Task::instance()->fieldName( Task::Event ))
+                               .arg( static_cast<int>( eventId )));
+
+    // selects matching tasks from quick search
+    const QString findFilter( find.isEmpty() ?
+                                  "" :
+                                  QString( "AND %1 LIKE '%%2%'" )
+                                  .arg( Task::instance()->fieldName( Task::Name ))
+                                  .arg( find ));
+
+    // selects tasks for combo mode
+    const QString comboFilter( filterByCombo ?
+                                   QString( "and %1.%2 in "
+                                            "( SELECT %3 FROM %4 WHERE %5=%6 AND ( %7=%8 OR %7=-1 ) AND %9>0 )" )
+                                   .arg( Task::instance()->tableName())
+                                   .arg( Task::instance()->fieldName( Task::ID ))
+                                   .arg( Log::instance()->fieldName( Log::Task ))
+                                   .arg( Log::instance()->tableName())
+                                   .arg( Log::instance()->fieldName( Log::Team ))
+                                   .arg( static_cast<int>( teamId ))
+                                   .arg( Log::instance()->fieldName( Log::Combo ))
+                                   .arg( static_cast<int>( comboId ))
+                                   .arg( Log::instance()->fieldName( Log::Multi )) :
+                                   "" );
+
+    // orders tasks according to settings
+    const QString orderFilter(
+                filterByCombo ? QString( "ORDER BY %1 DESC" ).arg( Log::instance()->fieldName( Log::Fields::Combo ))
+                              :
+                QString( "ORDER BY %1 %2" )
+                                   .arg( sort ?
+                                             Task::instance()->fieldName( Task::Type ) :
+                                             Task::instance()->fieldName( Task::Order ))
+                                   .arg( sort ?
+                                             QString( ", %1 ASC" )
+                                             .arg( Task::instance()->fieldName( Task::Name )) :
+                                             "" ));
+
+
+    // put all filters together
+    const QString filter(
+                QString( "%1 %2 %3 %4" )
+                .arg( eventFilter )
+                .arg( comboFilter )
+                .arg( findFilter )
+                .arg( orderFilter ));
+
+    // set filter
+    Task::instance()->setFilter( filter );
+
 
     //if ( this->isComboModeActive() && Task::instance()->count() <= 1 )
     //    this->setTaskFilter();

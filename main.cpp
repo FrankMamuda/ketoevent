@@ -42,6 +42,8 @@
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
 //   - task descriptions in task view
+// FIXME:
+//   - is Task selectStatement called to often?
 //
 
 // default message handler
@@ -116,12 +118,18 @@ int main( int argc, char *argv[] ) {
 
     // show main window
     MainWindow::instance()->show();
+    Task::instance()->setInitialised();
+
+    // reset tasks after task table initialization
+    MainWindow::instance()->setTaskFilter();
 
     // initialize console
     Main::Console = Console::instance();
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
+        Task::instance()->setInitialised( false );
+
         delete Console::instance();
         Main::Console = nullptr;
 

@@ -57,7 +57,7 @@ public:
 public slots:
     void setCurrentTeam( const Row &row );
     void setCurrentEvent( const Row &row );
-    void setTaskFilter( bool filterByCombo = false, Id comboId = static_cast<Id>( -1 ));
+    void setTaskFilter( bool filterByCombo = false, const Id &comboId = static_cast<Id>( -1 ));
     void setLock();
 
 private slots:

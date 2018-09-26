@@ -52,7 +52,7 @@ Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false 
             qFatal( QT_TR_NOOP_UTF8( "could not create database path" ));
     }
 
-    // failafe
+    // failsafe
     if ( !file.exists()) {
         file.open( QFile::WriteOnly );
         file.close();

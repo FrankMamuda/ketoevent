@@ -27,15 +27,6 @@
 #include <QSqlQuery>
 
 /**
- * @brief Table_::Table_
- * @param name
- * @param map
- */
-Table::Table( const QString &name ) : m_valid( false ), m_hasPrimary( false ) {
-    this->setTable( name );
-}
-
-/**
  * @brief Table::count
  * @return
  */

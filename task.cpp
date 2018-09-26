@@ -142,6 +142,9 @@ Id Task::comboId( const Row &row ) const {
     QPair<Id, Id> ids( getIds( row, &ok ));
 
     return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
+
+    // TODO: replace with a value from extended (LOG) table
+    //return static_cast<Id>( this->value( row, ComboID ).toInt());
 }
 
 /**
@@ -184,4 +187,72 @@ void Task::setMultiplier( const Row &row, int value ) {
 
     if ( ok )
         Log::instance()->setMultiplier( value, ids.first, ids.second );
+}
+
+/**
+ * @brief Task::selectStatement
+ * @return
+ */
+QString Task::selectStatement() const {
+    int y;
+    QString statement;
+
+    // return default statment if database has not been initialized
+    if ( !Database::instance()->hasInitialised() || !this->hasInitialised())
+        return Table::selectStatement();
+
+    // validate team row
+    const Row team = MainWindow::instance()->currentTeam();
+    if ( team == Row::Invalid )
+        return statement;
+
+    // validate team id
+    const Id teamId = Team::instance()->id( team );
+    if ( teamId == Id::Invalid )
+        return statement;
+
+    // get table name from LOGS
+    const QString logs( Log::instance()->tableName());
+    if ( logs.isEmpty())
+        return statement;
+
+    // we are making a different statement to include logs
+    statement = QString( "SELECT" );
+
+    // add fields from TASK table
+    for ( y = 0; y < Task::Fields::Count; y++ ) {
+        const QString field( this->fieldName( y ));
+        if ( field.isEmpty())
+            return "";
+
+        statement.append( QString( " %1.%2," ).arg( this->tableName()).arg( field ));
+    }
+
+    // append fields from LOG table
+    statement.append( QString( " %1.%2," ).arg( logs ).arg( Log::instance()->fieldName( Log::Fields::Multi )));
+    statement.append( QString( " %1.%2" ).arg( logs ).arg( Log::instance()->fieldName( Log::Fields::Combo )));
+
+    // append table name
+    statement.append( QString( " FROM %1" ).arg( this->tableName()));
+
+    // append JOIN statement from LOGS table
+    statement.append( QString( " LEFT JOIN %1 ON %1.%2=%3.%4 AND %1.%5=%6" )
+                      .arg( logs )
+                      .arg( Log::instance()->fieldName( Log::Fields::Task ))
+                      .arg( this->tableName())
+                      .arg( this->fieldName( ID ))
+                      .arg( Log::instance()->fieldName( Log::Fields::Team ))
+                      .arg( static_cast<int>( teamId )));
+
+    // append filter if any
+    if ( !this->filter().isEmpty())
+        statement.append( QString( " WHERE %1" ).arg( this->filter()));
+
+    // remove trailing whitespace
+    statement = statement.simplified();
+
+    // DEBUG:
+    //qDebug() << statement;
+
+    return statement;
 }
