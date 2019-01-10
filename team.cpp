@@ -25,6 +25,8 @@
 #include "event.h"
 #include "mainwindow.h"
 
+#include <QSqlQuery>
+
 //
 // namespaces
 //
@@ -66,5 +68,20 @@ Row Team::add( const QString &title, int members, const QTime &finishTime, const
                 finishTime.toString( Database_::TimeFormat ) <<
                 0 <<
                 reviewer <<
-                static_cast<int>( Event::instance()->id( event )));
+                       static_cast<int>( Event::instance()->id( event )));
+}
+
+/**
+ * @brief Team::removeOrphanedEntries
+ */
+void Team::removeOrphanedEntries() {
+    QSqlQuery query;
+
+    // remove orphaned teams
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+                .arg( this->tableName())
+                .arg( this->fieldName( Event ))
+                .arg( Event::instance()->fieldName( Event::ID ))
+                .arg( Event::instance()->tableName()));
+    this->select();
 }

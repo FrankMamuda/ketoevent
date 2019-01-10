@@ -19,8 +19,6 @@
 //
 // includes
 //
-#include "main.h"
-#include "team.h"
 #include "variable.h"
 #include "widget.h"
 #include <QCheckBox>
@@ -115,6 +113,9 @@ QString Variable::bind( const QString &key, QObject *object ) {
  * @param object
  */
 void Variable::unbind( const QString &key, QObject *object ) {
+    if ( this->slotList.contains( key ))
+        this->slotList.remove( key );
+
     if ( this->boundVariables.contains( key )) {
         QList<Widget*> widgetList( this->boundVariables.values( key ));
 

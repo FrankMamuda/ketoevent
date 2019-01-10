@@ -19,6 +19,7 @@
 //
 // includes
 //
+#include <QSqlError>
 #include <QSqlQuery>
 #include "log.h"
 #include "field.h"
@@ -98,6 +99,70 @@ Id Log::comboId( const Id &taskId, const Id &teamId ) const {
                 .arg( static_cast<int>( teamId )));
 
     return query.next() ? static_cast<Id>( query.value( 0 ).toInt()) : Id::Invalid;
+}
+
+/**
+ * @brief Log::removeOrphanedEntries
+ */
+void Log::removeOrphanedEntries() {
+    QSqlQuery query;
+
+    // remove orphaned logs
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
+                .arg( this->tableName())
+                .arg( this->fieldName( Team ))
+                .arg( Team::instance()->fieldName( Team::ID ))
+                .arg( Team::instance()->tableName())
+                .arg( this->fieldName( Task ))
+                .arg( Task::instance()->fieldName( Task::ID ))
+                .arg( Task::instance()->tableName()));
+
+    // delete duplicate logs
+    for ( int y = 0; y < Team::instance()->count(); y++ ) {
+        const int teamId = static_cast<int>( Team::instance()->id( Team::instance()->row( y )));
+        QList<int> idList;
+
+        // find duplicate log entries:
+        //   (multiple instances of same taskId & teamId)
+        query.exec( QString( "SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2  HAVING COUNT(*) > 1" )
+                    .arg( this->fieldName( Task ))
+                    .arg( this->fieldName( Team ))
+                    .arg( this->tableName())
+                    .arg( teamId ));
+
+        while ( query.next()) {
+            const int count = query.value( 2 ).toInt();
+            const int team = query.value( 1 ).toInt();
+            const int task = query.value( 0 ).toInt();
+
+            // announce the total amount of duplicate logs
+            qDebug() << "found" << count
+                     << "duplicate logs from team" << Team::instance()->title( Team::instance()->row( static_cast<Id>( team )))
+                     << "for task" << Task::instance()->name( Task::instance()->row( static_cast<Id>( task )));
+
+            // store ids
+            idList << task;
+        }
+
+        // announce deletion
+        if ( idList.count())
+            qDebug() << "performing deletion of" << idList.count() << "duplicate log combinations";
+
+        // delete actual logs
+        foreach ( const int &id, idList ) {
+            QSqlQuery query;
+
+            query.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
+                        .arg( this->tableName())
+                        .arg( this->fieldName( Team ))
+                        .arg( teamId )
+                        .arg( this->fieldName( Task ))
+                        .arg( id ));
+        }
+    }
+
+    // select the updated table
+    Log::instance()->select();
 }
 
 /**

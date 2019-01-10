@@ -69,6 +69,7 @@ public:
     QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
     QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
     Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    void removeOrphanedEntries() override;
 
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }

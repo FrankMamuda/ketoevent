@@ -136,7 +136,7 @@ void Rankings::on_actionUpdate_triggered() {
         this->ui->progressBar->setValue( team );
 
         // go through logs
-        // FIXME: implement ++ and -- operators?
+        // TODO: implement ++ and -- operators?
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
             const Row logRow = Log::instance()->row( log );
             const int value = Log::instance()->multiplier( logRow );
@@ -226,15 +226,18 @@ void Rankings::on_actionUpdate_triggered() {
     // calculate rank
     // NOTE: a really dumb way to do it
     QMap<int,int> map;
+
     int y = 0;
     foreach ( const TeamStatistics &stats, this->list ) {
         map.insertMulti( stats.points, y );
         y++;
     }
-    QList<int>points = map.uniqueKeys();
+
+    QList<int>points( map.uniqueKeys());
     std::sort( points.begin(), points.end(), std::greater<int>());
     y = 1;
-    foreach ( const int p, points ) {
+
+    foreach ( const int p, qAsConst( points )) {
         foreach ( int index, map.values( p )) {
             TeamStatistics stats = this->list.at( index );
             stats.rank = y;

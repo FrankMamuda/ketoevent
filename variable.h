@@ -24,7 +24,6 @@
 #include <QMap>
 #include <QString>
 #include <QMetaMethod>
-#include <QSignalMapper>
 #include <QLoggingCategory>
 #include <QWidget>
 #include "variableentry.h"

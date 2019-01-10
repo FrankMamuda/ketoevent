@@ -86,34 +86,8 @@ Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false 
  * @brief Database::removeOrphanedEntries
  */
 void Database::removeOrphanedEntries() {
-    QSqlQuery query;
-
-    // remove orphaned tasks
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
-                .arg( Task::instance()->tableName())
-                .arg( Task::instance()->fieldName( Task::Event ))
-                .arg( Event::instance()->fieldName( Event::ID ))
-                .arg( Event::instance()->tableName()));
-    Task::instance()->select();
-
-    // remove orphaned teams
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
-                .arg( Team::instance()->tableName())
-                .arg( Team::instance()->fieldName( Team::Event ))
-                .arg( Event::instance()->fieldName( Event::ID ))
-                .arg( Event::instance()->tableName()));
-    Team::instance()->select();
-
-    // remove orphaned logs
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
-                .arg( Log::instance()->tableName())
-                .arg( Log::instance()->fieldName( Log::Team ))
-                .arg( Team::instance()->fieldName( Team::ID ))
-                .arg( Team::instance()->tableName())
-                .arg( Log::instance()->fieldName( Log::Task ))
-                .arg( Task::instance()->fieldName( Task::ID ))
-                .arg( Task::instance()->tableName()));
-    Log::instance()->select();
+    foreach ( Table *table, this->tables )
+        table->removeOrphanedEntries();
 }
 
 /**
@@ -134,6 +108,9 @@ Database::~Database() {
     Variable::instance()->unbind( "eventId" );
     Variable::instance()->unbind( "teamId" );
     qCInfo( Database_::Debug ) << this->tr( "clearing tables" );
+    foreach ( Table *table, this->tables )
+        table->clear();
+
     qDeleteAll( this->tables );
 
     // according to Qt5 documentation, this must be out of scope
@@ -142,6 +119,8 @@ Database::~Database() {
         if ( database.isOpen()) {
             open = true;
             connectionName = database.connectionName();
+
+            qCInfo( Database_::Debug ) << this->tr( "closing database" );
             database.close();
         }
     }
@@ -157,7 +136,7 @@ Database::~Database() {
  */
 void Database::add( Table *table ) {
     QSqlDatabase database( QSqlDatabase::database());
-    QStringList tables( database.tables());
+    const QStringList tables( database.tables());
     QString statement;
     QSqlQuery query;
     bool found = false;
@@ -172,7 +151,7 @@ void Database::add( Table *table ) {
     // validate schema
     foreach ( const QString &tableName, tables ) {
         if ( !QString::compare( table->tableName(), tableName )) {
-            foreach ( const Field &field, table->fields ) {
+            foreach ( const Field &field, qAsConst( table->fields )) {
                 if ( !database.record( table->tableName()).contains( field->name())) {
                     qCCritical( Database_::Debug ) << this->tr( "database field mismatch" );
                     return;
@@ -182,15 +161,12 @@ void Database::add( Table *table ) {
         }
     }
 
-    // table has been verified and is marked as valid
-    if ( found ) {
-        table->setValid();
-    } else {
+    if ( !found ) {
         // announce
         qCInfo( Database_::Debug ) << this->tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
 
         // prepare statement
-        foreach ( const Field &field, table->fields ) {
+        foreach ( const Field &field, qAsConst( table->fields )) {
             statement.append( QString( "%1 %2" ).arg( field->name()).arg( field->format()));
 
             if ( QString::compare( field->name(), table->fields.last()->name()))
@@ -200,6 +176,9 @@ void Database::add( Table *table ) {
         if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName()).arg( statement )))
             qCCritical( Database_::Debug ) << this->tr( "could not create table - \"%1\", reason - \"%2\"" ).arg( table->tableName()).arg( query.lastError().text());
     }
+
+    // table has been verified and is marked as valid
+    table->setValid();
 
     // create table model
     table->setTable( table->tableName());

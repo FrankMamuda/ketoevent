@@ -109,6 +109,8 @@ public:
     int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
     int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
 
+    void removeOrphanedEntries() override {};
+
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
     void setMinMembers( const Row &row, int minMembers ) { this->setValue( row, Min, minMembers ); }

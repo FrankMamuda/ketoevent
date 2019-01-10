@@ -21,7 +21,6 @@
 //
 // includes
 //
-#include "table.h"
 #include <QAction>
 #include <QCheckBox>
 #include <QWidget>
@@ -29,6 +28,7 @@
 #include <QTimeEdit>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QToolButton>
 #include <QLoggingCategory>
 
 /**
@@ -55,6 +55,7 @@ public:
     enum class Types {
         NoType = -1,
         CheckBox,
+        ToolButton,
         Action,
         LineEdit,
         TimeEdit,
@@ -83,6 +84,9 @@ public:
         if ( !QString::compare( widget->metaObject()->className(), "QCheckBox" )) {
             this->connection = this->connect( qobject_cast<QCheckBox*>( widget ), SIGNAL( stateChanged( int )), this, SLOT( valueChanged()));
             this->m_type = Types::CheckBox;
+        } else if ( !QString::compare( widget->metaObject()->className(), "QToolButton" )) {
+            this->connection = this->connect( qobject_cast<QToolButton*>( widget ), SIGNAL( toggled( bool )), this, SLOT( valueChanged()));
+            this->m_type = Types::ToolButton;
         } else if ( !QString::compare( widget->metaObject()->className(), "QAction" )) {
             this->connection = this->connect( qobject_cast<QAction*>( widget ), SIGNAL( triggered( bool )), this, SLOT( valueChanged()));
             this->m_type = Types::Action;
@@ -118,6 +122,9 @@ public:
 
         switch ( this->type()) {
         case Types::CheckBox:
+            return qobject_cast<QCheckBox*>( this->widget )->isChecked();
+
+        case Types::ToolButton:
             return qobject_cast<QCheckBox*>( this->widget )->isChecked();
 
         case Types::Action:
@@ -159,6 +166,10 @@ public slots:
         switch ( this->type()) {
         case Types::CheckBox:
             qobject_cast<QCheckBox*>( this->widget )->setChecked( static_cast<bool>( value.toInt()));
+            break;
+
+        case Types::ToolButton:
+            qobject_cast<QToolButton*>( this->widget )->setChecked( static_cast<bool>( value.toInt()));
             break;
 
         case Types::Action:

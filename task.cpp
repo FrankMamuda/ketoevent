@@ -27,6 +27,7 @@
 #include "log.h"
 #include "team.h"
 #include <QFont>
+#include <QSqlQuery>
 
 //
 // namespaces
@@ -177,6 +178,21 @@ QPair<Id, Id> Task::getIds( const Row &row, bool *ok ) const {
 }
 
 /**
+ * @brief Task::removeOrphanedEntries
+ */
+void Task::removeOrphanedEntries() {
+    QSqlQuery query;
+
+    // remove orphaned tasks
+    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+                .arg( this->tableName())
+                .arg( this->fieldName( Event ))
+                .arg( Event::instance()->fieldName( Event::ID ))
+                .arg( Event::instance()->tableName()));
+    this->select();
+}
+
+/**
  * @brief Task::setMultiplier
  * @param row
  * @param value
@@ -235,14 +251,20 @@ QString Task::selectStatement() const {
     // append table name
     statement.append( QString( " FROM %1" ).arg( this->tableName()));
 
+    // FROM table statement
+    const QString leftTable( QString( "( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1" )
+                             .arg( logs )
+                             .arg( Log::instance()->fieldName( Log::Fields::Team ))
+                             .arg( static_cast<int>( teamId ))
+                             .arg( Log::instance()->fieldName( Log::Fields::Task )));
+
     // append JOIN statement from LOGS table
-    statement.append( QString( " LEFT JOIN %1 ON %1.%2=%3.%4 AND %1.%5=%6" )
+    statement.append( QString( " LEFT JOIN %1 ON %2.%3=%4.%5" )
+                      .arg( leftTable )
                       .arg( logs )
                       .arg( Log::instance()->fieldName( Log::Fields::Task ))
                       .arg( this->tableName())
-                      .arg( this->fieldName( ID ))
-                      .arg( Log::instance()->fieldName( Log::Fields::Team ))
-                      .arg( static_cast<int>( teamId )));
+                      .arg( this->fieldName( ID )));
 
     // append filter if any
     if ( !this->filter().isEmpty())

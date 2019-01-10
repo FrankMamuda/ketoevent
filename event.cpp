@@ -68,5 +68,5 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
                 two <<
                 three <<
                 fourPlus <<
-                0 );
+                       0 );
 }

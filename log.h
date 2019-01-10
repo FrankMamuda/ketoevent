@@ -69,6 +69,8 @@ public:
     Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
     Id comboId( const Id &taskId, const Id &teamId ) const;
 
+    void removeOrphanedEntries() override;
+
 public slots:
     void setMultiplier( const Row &row, int multi ) { this->setValue( row, Multi, multi ); }
     void setMultiplier( int multi, const Id &taskId, const Id &teamId );

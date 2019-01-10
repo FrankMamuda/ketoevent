@@ -36,10 +36,8 @@
  * @param object
  */
 void XMLTools::read() {
-    QString path;
     QDomDocument document;
-    QDomNode node;
-    QDir configDir( QDir::homePath() + "/" + Main::Path );
+    const QDir configDir( QDir::homePath() + "/" + Main::Path );
 
 #ifdef QT_DEBUG
     // announce
@@ -50,21 +48,20 @@ void XMLTools::read() {
         configDir.mkpath( configDir.absolutePath());
 
     // set path
-    path = configDir.absolutePath() + "/" + XMLTools_::ConfigFile;
+    const QString path( configDir.absolutePath() + "/" + XMLTools_::ConfigFile );
 
     // load xml file
     QFile xmlFile( path );
-
     if ( !xmlFile.exists() || !xmlFile.open( QFile::ReadOnly | QFile::Text )) {
         qCCritical( XMLTools_::Debug ) << this->tr( "no configuration file found" );
         return;
     }
 
     document.setContent( &xmlFile );
-    node = document.documentElement().firstChild();
+    QDomNode node( document.documentElement().firstChild());
 
     while ( !node.isNull()) {
-        QDomElement element( node.toElement());
+        const QDomElement element( node.toElement());
 
         if ( !element.isNull()) {
             if ( !QString::compare( element.tagName(), "variable" )) {
@@ -85,7 +82,7 @@ void XMLTools::read() {
                     Variable::instance()->setValue( key, value, true );
             }
         }
-        node = node.nextSibling();
+        node = qAsConst( node ).nextSibling();
     }
 
     document.clear();
@@ -97,8 +94,8 @@ void XMLTools::read() {
  * @param mode
  */
 void XMLTools::write() {
-    QString path, savedData, newData;
-    QDir configDir( QDir::homePath() + "/" + Main::Path );
+    QString savedData, newData;
+    const QDir configDir( QDir::homePath() + "/" + Main::Path );
 
 #ifdef QT_DEBUG
     // announce
@@ -109,7 +106,7 @@ void XMLTools::write() {
         configDir.mkpath( configDir.absolutePath());
 
     // set path
-    path = configDir.absolutePath() + "/" + XMLTools_::ConfigFile;
+    const QString path( configDir.absolutePath() + "/" + XMLTools_::ConfigFile );
 
     // read xml file and create buffer
     QFile xmlFile( path );
@@ -124,7 +121,7 @@ void XMLTools::write() {
     stream.writeAttribute( "version", "3" );
 
     // switch mode
-    foreach ( const QSharedPointer<Var> &var, Variable::instance()->list ) {
+    foreach ( const QSharedPointer<Var> &var, qAsConst( Variable::instance()->list )) {
         if ( var->key().isEmpty() || var->flags() & Var::Flag::NoSave )
             continue;
 
