@@ -46,6 +46,7 @@ public:
      */
     explicit Description( Task *task = 0, QWidget *parent = 0 ) : QDialog( parent ), ui( new Ui::Description ) {
         this->ui->setupUi( this );
+        this->setWindowFlags( this->windowFlags() | Qt::Tool );
 
         if ( task == nullptr || this->parent() == nullptr )
             return;
@@ -60,6 +61,12 @@ public:
     ~Description() {
         delete this->ui;
     }
+
+/*protected:
+    void showEvent( QShowEvent *event ) override {
+        this->adjustSize();
+        QDialog::showEvent( event );
+    }*/
 
 private:
     Ui::Description *ui;

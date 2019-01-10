@@ -70,6 +70,7 @@ bool Main::initialise( QObject *parent ) {
     Variable::instance()->add( "misc/sortTasks", true );
     Variable::instance()->add( "misc/hilightLogged", false );
     Variable::instance()->add( "currentEvent", -1, ( Var::Hidden | Var::ReadOnly ));
+    Variable::instance()->add( "currentTeam", -1, ( Var::Hidden | Var::ReadOnly ));
     Variable::instance()->add( "reviewerName", "" );
     Variable::instance()->add( "system/consoleHistory", "", Var::Hidden );
     Variable::instance()->add( "rankings/current", true, Var::Hidden );

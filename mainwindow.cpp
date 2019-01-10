@@ -489,6 +489,7 @@ void MainWindow::on_findTaskEdit_returnPressed() {
 void MainWindow::on_actionEvents_triggered() {
     // store last event id
     this->setLastEventId( Variable::instance()->integer( "currentEvent" ));
+    Variable::instance()->setInteger( "currentTeam", this->ui->comboTeams->currentIndex());
 
     // show dialog
     this->eventDialog->show();
@@ -505,6 +506,7 @@ void MainWindow::eventDialogClosed( int signal ) {
     newEventId = Variable::instance()->integer( "currentEvent" );
 
     if ( signal == Dialog::Accepted ) {
+
         // compare these two
         if ( newEventId != this->lastEventId()) {
             this->fillTasks();
@@ -515,7 +517,10 @@ void MainWindow::eventDialogClosed( int signal ) {
     } else {
         EventManager::instance()->setActive( Event::forId( this->lastEventId()));
         this->fillTasks();
+        this->ui->comboTeams->setCurrentIndex( Variable::instance()->integer( "currentTeam" ));
     }
+
+    this->ui->comboTeams->setModel( Main::instance()->teamModel );
 }
 
 /**
