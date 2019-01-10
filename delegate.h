@@ -42,6 +42,7 @@ class Delegate : public QStyledItemDelegate {
     friend class Item;
     friend class EditWidget;
     friend class TaskView;
+    friend class MainWindow;
 
 public:
     explicit Delegate( QWidget *parent = nullptr ) : QStyledItemDelegate( parent ) {}

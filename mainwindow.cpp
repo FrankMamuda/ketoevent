@@ -28,6 +28,7 @@
 #include "log.h"
 #include "delegate.h"
 #include <QDebug>
+#include <QSqlQuery>
 #include "editordialog.h"
 #include "tasktoolbar.h"
 #include "teamtoolbar.h"
@@ -104,6 +105,34 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
     // done button
     this->connect( this->ui->actionDone, &QAction::triggered, [ this ]() {
+        // here's what we do (MIND that at this point we see the filtered list):
+        //   1) we get a list of all comboIds currently visible, such as
+        //      task1   -1
+        //      task2   13
+        //      task3   -1
+        //   2) here is what we do next:
+        //      a) there are MULTIPLE tasks (as in >1) with valid comboId (not -1) - ALL OK
+        //      b) there are NO tasks with valid comboId - ALL OK
+        //      c) there is A SINGLE task with a valid comboId (all other's are set to -1):
+        //         a single task log CANNOT have a comboId, therefore we must reset it to -1
+        //         which is done via simple query
+        //
+        QList<Id> idList( qobject_cast<Delegate*>( this->ui->taskView->itemDelegate())->combos.values());
+        idList.removeAll( Id::Invalid );
+        qDebug() << ( idList.count() <= 1 ? "bad list" : "okay list" ) << idList.count();
+
+        // do a simple query
+        if ( idList.count() == 1 ) {
+            QSqlQuery query;
+            query.exec( QString( "UPDATE %1 SET %2=-1 WHERE comboId=%3" )
+                        .arg( Log::instance()->tableName())
+                        .arg( Log::instance()->fieldName( Log::Combo ))
+                        .arg( static_cast<int>( idList.first())));
+
+            // must perform SELECT!
+            Log::instance()->select();
+        }
+
         this->setTaskFilter();
     } );
 
@@ -430,6 +459,9 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
 
     // set filter
     Task::instance()->setFilter( filter );
+
+    //qDebug() << filter;
+
 
 
     //if ( this->isComboModeActive() && Task::instance()->count() <= 1 )

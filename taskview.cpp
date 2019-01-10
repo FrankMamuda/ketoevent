@@ -97,9 +97,12 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Combine:
-                        if ( MainWindow::instance()->isComboModeActive())
+                        if ( MainWindow::instance()->isComboModeActive()) {
                             MainWindow::instance()->setTaskFilter();
-                        else {
+                            delegate->reset();
+                        } else {
+                            //delegate->reset();
+
                             // FIXME: quit if no combos selected
                             // FIXME: disallow single log combo
                             // TODO: better sorting of combos (logged first)
@@ -115,7 +118,26 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             }
 
                             qDebug() << "COMBINE";
+
+                            QSqlQuery query;
+                            int count = 0;
+                            query.exec( QString( "select COUNT(*) from logs where logs.value>0 and ( comboId=%1 or comboId=-1) and logs.teamId=%2" )
+                                        .arg( static_cast<int>( id ))
+                                        .arg( static_cast<int>( Team::instance()->id( MainWindow::instance()->currentTeam()))));
+                            if ( query.next())
+                                count = query.value( 0 ).toInt();
+
+                            qDebug() << "found" << count;
+
+                            // disallow combination if only one valid task is available
+                            if ( count <= 1 )
+                                return;
+
                             setComboId( id );
+
+                            // required to reset id list accessed by "done" action
+                            delegate->reset();
+                            qDebug() << "set id" << id;
                             MainWindow::instance()->setTaskFilter( true, id );
                         }
                         break;

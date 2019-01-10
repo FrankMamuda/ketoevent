@@ -38,7 +38,7 @@
 //
 // GENERAL TODO LIST
 //
-//   - implement working combos
+//   - implement working combos (sort of done, needs testing)
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
 //   - task descriptions in task view

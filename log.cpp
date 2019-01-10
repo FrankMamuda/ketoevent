@@ -107,6 +107,8 @@ Id Log::comboId( const Id &taskId, const Id &teamId ) const {
 void Log::removeOrphanedEntries() {
     QSqlQuery query;
 
+    // TODO: tr!
+
     // remove orphaned logs
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
                 .arg( this->tableName())
@@ -120,11 +122,10 @@ void Log::removeOrphanedEntries() {
     // delete duplicate logs
     for ( int y = 0; y < Team::instance()->count(); y++ ) {
         const int teamId = static_cast<int>( Team::instance()->id( Team::instance()->row( y )));
-        QList<int> idList;
 
         // find duplicate log entries:
         //   (multiple instances of same taskId & teamId)
-        query.exec( QString( "SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2  HAVING COUNT(*) > 1" )
+        query.exec( QString( "SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2 HAVING COUNT(*) > 1" )
                     .arg( this->fieldName( Task ))
                     .arg( this->fieldName( Team ))
                     .arg( this->tableName())
@@ -134,30 +135,38 @@ void Log::removeOrphanedEntries() {
             const int count = query.value( 2 ).toInt();
             const int team = query.value( 1 ).toInt();
             const int task = query.value( 0 ).toInt();
+            QSqlQuery subQuery;
 
             // announce the total amount of duplicate logs
-            qDebug() << "found" << count
+            qDebug() << "performing deletion of" << count
                      << "duplicate logs from team" << Team::instance()->title( Team::instance()->row( static_cast<Id>( team )))
                      << "for task" << Task::instance()->name( Task::instance()->row( static_cast<Id>( task )));
 
-            // store ids
-            idList << task;
+            // delete actual logs
+            subQuery.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
+                           .arg( this->tableName())
+                           .arg( this->fieldName( Team ))
+                           .arg( teamId )
+                           .arg( this->fieldName( Task ))
+                           .arg( task ));
         }
+    }
 
-        // announce deletion
-        if ( idList.count())
-            qDebug() << "performing deletion of" << idList.count() << "duplicate log combinations";
+    // removing orphaned combos here
+    {
+        query.exec( QString( "SELECT %1, COUNT(*) FROM %2 WHERE %1>-1 GROUP BY %1 HAVING COUNT(*) = 1" )
+                    .arg( this->fieldName( Combo ))
+                    .arg( this->tableName()));
 
-        // delete actual logs
-        foreach ( const int &id, idList ) {
-            QSqlQuery query;
+        while ( query.next()) {
+            QSqlQuery subQuery;
 
-            query.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
-                        .arg( this->tableName())
-                        .arg( this->fieldName( Team ))
-                        .arg( teamId )
-                        .arg( this->fieldName( Task ))
-                        .arg( id ));
+            const int combo = query.value( 0 ).toInt();
+            qDebug() << "clearing an orphaned combo with id" << combo;
+            subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE comboId=%3" )
+                           .arg( Log::instance()->tableName())
+                           .arg( Log::instance()->fieldName( Log::Combo ))
+                           .arg( combo ));
         }
     }
 

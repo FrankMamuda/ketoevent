@@ -26,6 +26,8 @@
 #include "mainwindow.h"
 #include "task.h"
 
+// select * from logs where logs.value>0 and ( comboId=1 or comboId=-1)
+
 /**
  * @brief Delegate::paint
  * @param painter
