@@ -89,6 +89,7 @@ private:
     static const QPixmap Combine() { static QPixmap p( ":/icons/combine" ); return p; }
     static const QPixmap Cross()  { static QPixmap p( ":/icons/cross" ); return p; }
     static const QPixmap Equals() { static QPixmap p( ":/icons/equals" ); return p; }
+    static const QPixmap Desc()   { static QPixmap p( ":/icons/description" ); return p; }
 
     // button sizes
     mutable QMap<QModelIndex, QRect> rectSizes;

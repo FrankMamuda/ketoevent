@@ -25,17 +25,18 @@
 #include "task.h"
 
 // initialize colours
-const QColor Item::Green   = { 57, 174, 57, 196 };
-const QColor Item::LtGreen = lighter( Green );
-const QColor Item::Blue    = { 0, 174, 255, 196 };
-const QColor Item::LtBlue  = lighter( Blue );
-const QColor Item::Gray    = { 64, 64, 64, 196 };
-const QColor Item::LtGray  = lighter( Gray );
-const QColor Item::Black   = { 0, 0, 0, 196 };
-const QColor Item::LtBlack = { 0, 0, 0, 128 };
-const QColor Item::Red     = { 190, 0, 0, 196 };
-const QColor Item::LtRed   = lighter( Red );
-
+const QColor Item::Green    = { 57, 174, 57, 196 };
+const QColor Item::LtGreen  = lighter( Green );
+const QColor Item::Blue     = { 0, 174, 255, 196 };
+const QColor Item::LtBlue   = lighter( Blue );
+const QColor Item::Gray     = { 64, 64, 64, 196 };
+const QColor Item::LtGray   = lighter( Gray );
+const QColor Item::Black    = { 0, 0, 0, 196 };
+const QColor Item::LtBlack  = { 0, 0, 0, 128 };
+const QColor Item::Red      = { 190, 0, 0, 196 };
+const QColor Item::LtRed    = lighter( Red );
+const QColor Item::Yellow   = { 190, 190, 0, 196 };
+const QColor Item::LtYellow = lighter( Yellow );
 /**
  * @brief Item::paint
  * @param painter
@@ -52,6 +53,8 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const bool hasValue = edit ? true : value > 0;
     const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
+    const bool hasDescription = !Task::instance()->description( this->delegate->row( index )).isEmpty();
+
 
     // don't draw anything in edit mode
     if ( isEditorActive && !edit )
@@ -178,6 +181,15 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 
         break;
 
+    case Info:
+        if ( !hasDescription || !isSelected )
+            break;
+
+        drawEllipse( hover ? Yellow : LtYellow );
+        painter->drawPixmap( this->rect, Delegate::Desc());
+        break;
+
+
     case Editor:
         drawEllipse( Red );
         break;
@@ -230,6 +242,7 @@ Item::Actions Item::action( const QModelIndex &index ) const {
 
         return hasValue ? Remove : NoAction;
 
+    case Info:
     case Editor:
         break;
     }

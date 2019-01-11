@@ -32,5 +32,6 @@
         <file alias="removeLog">icons/removeLog.png</file>
         <file alias="check">icons/check.png</file>
         <file alias="number">icons/number.png</file>
+        <file alias="description">icons/description.png</file>
     </qresource>
 </RCC>

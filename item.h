@@ -41,7 +41,8 @@ public:
         Numeric,
         Multi,
         Sum,
-        Editor
+        Editor,
+        Info
     };
 
     /**
@@ -92,6 +93,8 @@ private:
     static const QColor LtBlack;
     static const QColor Red;
     static const QColor LtRed;
+    static const QColor Yellow;
+    static const QColor LtYellow;
 };
 
 // declare enums

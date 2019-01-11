@@ -71,7 +71,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive, isEventActive, isTeamActive ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
         const bool hasValue = this->values.isEmpty() ? false : this->values[index] > 0;
-        QRect small( rect.right() + Delegate::ButtonWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
+        QRect small( rect.right() + Delegate::ButtonWidth * 2 + Delegate::SmallWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
         if ( type == Task::Types::Check || isComboActive || !isEventActive || !isTeamActive )
             return;
@@ -120,7 +120,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const {
     QSize size( QStyledItemDelegate::sizeHint( option, index ));
     const Task::Types type = Task::instance()->type( this->row( index ));
-    const int buttonSize = MainWindow::instance()->isComboModeActive() ? Delegate::ButtonWidth : (( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 : Delegate::ButtonWidth * 2 + Delegate::SmallWidth );
+    const int buttonSize = MainWindow::instance()->isComboModeActive() ? Delegate::ButtonWidth : (( type == Task::Types::Multi ) ? Delegate::ButtonWidth * 4 + Delegate::SmallWidth * 3 : Delegate::ButtonWidth * 3 + Delegate::SmallWidth * 2 );
     const bool isTeamActive = MainWindow::instance()->currentTeam() != Row::Invalid;
 
     this->buttonSizes[index] = buttonSize;
@@ -142,19 +142,22 @@ QSize Delegate::sizeHint( const QStyleOptionViewItem &option, const QModelIndex 
 QList<Item> Delegate::getItems( const QModelIndex &index ) const {
     const QRect rect( this->rectSizes.isEmpty() ? QRect() : this->rectSizes[index] );
     QRect button( rect.right(), rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight );
-    const Item multi( Item::Multi, button, this );
+    const Item info( Item::Info, button, this );
+    const Item multi( Item::Multi, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this );
 
     if ( MainWindow::instance()->isComboModeActive())
         return QList<Item>() << multi;
 
     return Task::instance()->type( this->row( index )) == Task::Types::Multi ?
-                QList<Item>() << multi <<
-                                 Item( Item::Numeric, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this ) <<
-                                 Item( Item::Sum, button.translated(( Delegate::ButtonWidth + Delegate::SmallWidth ) * 2, 0 ), this )
+                QList<Item>() << info <<
+                                 multi <<
+                                 Item( Item::Numeric, button.translated( Delegate::ButtonWidth * 2 + Delegate::SmallWidth * 2, 0 ), this ) <<
+                                 Item( Item::Sum, button.translated(( Delegate::ButtonWidth + Delegate::SmallWidth ) * 3, 0 ), this )
                                  :
                                  QList<Item>() <<
+                                 info <<
                                  multi <<
-                                 Item( Item::Checkable, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this );
+                                 Item( Item::Checkable, button.translated( Delegate::ButtonWidth * 2 + Delegate::SmallWidth * 2, 0 ), this );
 }
 
 /**
@@ -289,7 +292,7 @@ void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModel
  * @param option
  */
 void Delegate::updateEditorGeometry( QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
-    editor->setGeometry( { this->rectSizes.isEmpty() ? 0 : this->rectSizes[index].right() + Delegate::ButtonWidth + Delegate::SmallWidth, option.rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight } );
+    editor->setGeometry( { this->rectSizes.isEmpty() ? 0 : this->rectSizes[index].right() + Delegate::ButtonWidth * 2 + Delegate::SmallWidth * 2, option.rect.top(), Delegate::ButtonWidth, Delegate::ItemHeight } );
 }
 
 /**
