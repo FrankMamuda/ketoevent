@@ -41,6 +41,10 @@
 //   - implement working combos (sort of done, needs testing)
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
+//   - database file selection
+//   - backups
+//   - self tests
+//   - ideally info button would align itself to the left
 // NOTE:
 //   - is Task selectStatement called to often?
 //

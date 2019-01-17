@@ -31,7 +31,7 @@
  */
 class Popup : public QDialog {
 public:
-    explicit Popup( QWidget *widget = nullptr );
+    explicit Popup( QWidget *widget = nullptr, const QString &text = QString(), const int timeout = 5000 );
     ~Popup() { delete this->shadow; delete this->layout; }
 
 public slots:

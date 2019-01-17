@@ -30,7 +30,7 @@
  * @brief Popup::Popup3
  * @param parent
  */
-Popup::Popup( QWidget *parent ) : QDialog( parent ),
+Popup::Popup( QWidget *parent, const QString &text, const int timeout ) : QDialog( parent ),
     shadow( new QGraphicsDropShadowEffect( this )),
     layout( new QHBoxLayout()),
     label( new QLabel( this )) {
@@ -39,7 +39,7 @@ Popup::Popup( QWidget *parent ) : QDialog( parent ),
     this->setAutoFillBackground( false );
     this->setWindowFlags( Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint );
     this->setAttribute( Qt::WA_TranslucentBackground, true );
-    this->setAttribute( Qt::WA_DeleteOnClose, true );
+    //this->setAttribute( Qt::WA_DeleteOnClose, true );
     this->setWindowModality( Qt::ApplicationModal );
     this->setModal( true );
 
@@ -51,7 +51,7 @@ Popup::Popup( QWidget *parent ) : QDialog( parent ),
     // setup label
     const int o0 = this->shadowBlurRadius - this->shadowOffset;
     const int o1 = this->shadowBlurRadius + this->shadowOffset;
-    this->label->setText( "AAAAA dadahdjad ahdsjad dadadadd\n asnasajsas\n hbdahda \n dahjdan\nuhfjuahda" );
+    this->setText( text );
     this->label->setStyleSheet( QString( "QLabel {"
                           "padding-top: %1px;"
                           "padding-left: %2px;"
@@ -70,6 +70,10 @@ Popup::Popup( QWidget *parent ) : QDialog( parent ),
 
     // setup popup shape
     this->setupShape();
+
+    // setup options
+    this->setTimeOut( timeout );
+    this->pointAt( QCursor::pos());
 }
 
 /**
@@ -122,9 +126,8 @@ void Popup::setTimeOut( const int msec ) {
     if ( msec < 100 || msec > 60000 )
         return;
 
-    QTimer::singleShot( msec, [ this ]() {
-        this->close();
-    } );
+    // close when timer runs out
+    QTimer::singleShot( msec, this, SLOT( close()));
 }
 
 /**
@@ -156,8 +159,8 @@ void Popup::mousePressEvent( QMouseEvent *event ) {
  * @param event
  */
 void Popup::mouseReleaseEvent( QMouseEvent *event ) {
+    event->accept();
+
     if ( !this->poly.containsPoint( event->pos(), Qt::OddEvenFill ))
         this->close();
-
-    event->accept();
 }

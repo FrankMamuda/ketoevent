@@ -100,14 +100,12 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                     case Item::InfoPopup:
                     {
-                        if ( Task::instance()->description( Task::instance()->row( index )).isEmpty())
+                        const QString desc( Task::instance()->description( Task::instance()->row( index )));
+                        if ( desc.isEmpty())
                             break;
 
-                        Popup *p( new Popup( MainWindow::instance()));
-                        p->pointAt( QCursor::pos() );
-                        p->setText( Task::instance()->description( Task::instance()->row( index )));
-                        p->show();
-                        p->setTimeOut();
+                        // FIXME: fast click on popup sometimes results in segfault
+                        Popup( MainWindow::instance(), desc ).exec();
                     }
                         break;
 
