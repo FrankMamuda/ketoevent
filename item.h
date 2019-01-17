@@ -56,7 +56,8 @@ public:
         Combine,
         SetNumeric,
         AddCombo,
-        RemoveCombo
+        RemoveCombo,
+        InfoPopup
     };
 
     /**

@@ -53,11 +53,14 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
     painter->setRenderHint( QPainter::TextAntialiasing, true );
 
+    // draw alternating row colours
+    if ( index.row() & 1 )
+        painter->fillRect( option.rect, QColor::fromRgb( 0, 0, 0, 16 ));
+
     // combo
     if ( comboId != Id::Invalid ) {
         if ( !this->relativeCombos.contains( comboId ))
             this->relativeCombos[comboId] = ++this->lastRelativeCombo;
-
     }
 
     // abort if no active combos are visible
@@ -146,7 +149,7 @@ QList<Item> Delegate::getItems( const QModelIndex &index ) const {
     const Item multi( Item::Multi, button.translated( Delegate::ButtonWidth + Delegate::SmallWidth, 0 ), this );
 
     if ( MainWindow::instance()->isComboModeActive())
-        return QList<Item>() << multi;
+        return QList<Item>() << Item( Item::Multi, button, this );
 
     return Task::instance()->type( this->row( index )) == Task::Types::Multi ?
                 QList<Item>() << info <<

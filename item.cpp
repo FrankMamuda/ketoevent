@@ -243,6 +243,8 @@ Item::Actions Item::action( const QModelIndex &index ) const {
         return hasValue ? Remove : NoAction;
 
     case Info:
+        return InfoPopup;
+
     case Editor:
         break;
     }

@@ -41,8 +41,7 @@
 //   - implement working combos (sort of done, needs testing)
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
-//   - task descriptions in task view
-// FIXME:
+// NOTE:
 //   - is Task selectStatement called to often?
 //
 
@@ -82,7 +81,7 @@ int main( int argc, char *argv[] ) {
     qRegisterMetaType<Event::Fields>();
     qRegisterMetaType<Log::Fields>();
     qRegisterMetaType<Id>();
-    //qRegisterMetaType<Row>();
+    qRegisterMetaType<Row>();
     qRegisterMetaType<RankingsModel::Columns>();
     qRegisterMetaType<Table::Roles>();
     qRegisterMetaType<Task::Fields>();

@@ -50,7 +50,8 @@ SOURCES += \
     delegate.cpp \
     item.cpp \
     eventedit.cpp \
-    eventtoolbar.cpp
+    eventtoolbar.cpp \
+    popup.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -86,7 +87,8 @@ HEADERS += \
     delegate.h \
     item.h \
     eventedit.h \
-    eventtoolbar.h
+    eventtoolbar.h \
+    popup.h
 
 FORMS += \
         mainwindow.ui \

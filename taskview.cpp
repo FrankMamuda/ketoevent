@@ -25,6 +25,7 @@
 #include "mainwindow.h"
 #include "log.h"
 #include "team.h"
+#include "popup.h"
 #include <QDebug>
 #include <QSqlQuery>
 
@@ -96,15 +97,25 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         Task::instance()->setMultiplier( delegate->row( index ), false );
                         break;
 
+
+                    case Item::InfoPopup:
+                    {
+                        if ( Task::instance()->description( Task::instance()->row( index )).isEmpty())
+                            break;
+
+                        Popup *p( new Popup( MainWindow::instance()));
+                        p->pointAt( QCursor::pos() );
+                        p->setText( Task::instance()->description( Task::instance()->row( index )));
+                        p->show();
+                        p->setTimeOut();
+                    }
+                        break;
+
                     case Item::Combine:
                         if ( MainWindow::instance()->isComboModeActive()) {
                             MainWindow::instance()->setTaskFilter();
                             delegate->reset();
                         } else {
-                            //delegate->reset();
-
-                            // FIXME: quit if no combos selected
-                            // FIXME: disallow single log combo
                             // TODO: better sorting of combos (logged first)
                             // TODO: restore position in list after filtering
                             Id id = static_cast<Id>( delegate->combos[index] );
