@@ -481,7 +481,7 @@ void MainWindow::setLock() {
     // lock common ui elements
     this->ui->actionTasks->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionRankings->setDisabled( comboMode || noEvents || noTeams );
-    this->ui->actionSettings->setDisabled( comboMode || noEvents || noTeams );
+    //this->ui->actionSettings->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionCombos->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionAddQuick->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionLogTime->setDisabled( comboMode || noEvents || noTeams );

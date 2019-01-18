@@ -73,5 +73,5 @@ private:
      * @return
      */
     QMap<QString, Table*> tables;
-    bool m_initialised;
+    bool m_initialised = false;
 };

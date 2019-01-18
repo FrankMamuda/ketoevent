@@ -57,7 +57,7 @@ public:
      * @return
      */
     static Log *instance() { static Log *instance( new Log()); return instance; }
-    virtual ~Log() {}
+    virtual ~Log() override {}
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
     Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }

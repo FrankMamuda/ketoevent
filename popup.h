@@ -30,9 +30,11 @@
  * @brief The Popup class
  */
 class Popup : public QDialog {
+    Q_OBJECT
+
 public:
     explicit Popup( QWidget *widget = nullptr, const QString &text = QString(), const int timeout = 5000 );
-    ~Popup() { delete this->shadow; delete this->layout; }
+    ~Popup() override { delete this->shadow; delete this->layout; }
 
 public slots:
     void setText( const QString &text );

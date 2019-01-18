@@ -31,13 +31,21 @@
 #include <QSqlQuery>
 #include <QDebug>
 
+// fixes msvc compile issues
+#ifdef Q_CC_MSVC
+static constexpr const char *testEventName( "Test" );
+#endif
+
 /**
  * @brief Cmd::Cmd
  * @param parent
  */
 Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
+    // disable for now on MSVC
+#ifndef Q_CC_MSVC
     constexpr const char *testEventName( "Test" );
+#endif
 
     // add common commands
     this->add( "cmd_list", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "list all available commands" ));

@@ -82,7 +82,7 @@ public:
      * @return
      */
     static Task *instance() { static Task *instance( new Task()); return instance; }
-    virtual ~Task() { this->setInitialised( false ); }
+    virtual ~Task() override { this->setInitialised( false ); }
 
     Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
@@ -122,7 +122,7 @@ private:
     explicit Task();
     QMap<Types,QString> types;
     QMap<Styles,QString> styles;
-    bool m_initialised;
+    bool m_initialised = false;
 };
 
 // declare enums

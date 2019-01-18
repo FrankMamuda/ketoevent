@@ -70,13 +70,13 @@ bool Database::testPath( const QString &path ) {
  * @brief Database::Database
  * @param parent
  */
-Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false ) {
+Database::Database( QObject *parent ) : QObject( parent ) {
     QSqlDatabase database( QSqlDatabase::database());
 
     if ( !testPath( Variable::instance()->string( "databasePath" ))) {
         Variable::instance()->setString( "databasePath", QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" + "database.db" );
 
-        if ( this->testPath( Variable::instance()->string( "databasePath" )))
+        if ( !this->testPath( Variable::instance()->string( "databasePath" )))
             qFatal( QT_TR_NOOP_UTF8( "could not create database path" ));
     }
 

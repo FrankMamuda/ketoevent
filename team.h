@@ -60,7 +60,7 @@ public:
      * @return
      */
     static Team *instance() { static Team *instance( new Team()); return instance; }
-    virtual ~Team() = default;
+    virtual ~Team() override = default;
 
     Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());

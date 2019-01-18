@@ -89,7 +89,7 @@ public:
      * @return
      */
     static Event *instance() { static Event *instance = new Event(); return instance; }
-    virtual ~Event() {}
+    virtual ~Event() override {}
 
     Row add( const QString &title, int minMembers = EventTable::DefaultMinMembers, int maxMembers = EventTable::DefaultMaxMembers,
             const QTime &start = QTime::fromString( EventTable::DefaultStartTime, Database_::TimeFormat ),
@@ -109,7 +109,7 @@ public:
     int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
     int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
 
-    void removeOrphanedEntries() override {};
+    void removeOrphanedEntries() override {}
 
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
