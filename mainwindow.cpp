@@ -436,8 +436,9 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                                    "" );
 
     // orders tasks according to settings
+    // TODO: merge both "ORDER BY %1 %2 %3" ) where %1 orders by combo if active
     const QString orderFilter(
-                filterByCombo ? QString( "ORDER BY %1 DESC" ).arg( Log::instance()->fieldName( Log::Fields::Combo ))
+                filterByCombo ? QString( "ORDER BY %1 DESC, %2 ASC" ).arg( Log::instance()->fieldName( Log::Fields::Combo )).arg( Task::instance()->fieldName( Task::Name ))
                               :
                 QString( "ORDER BY %1 %2" )
                                    .arg( sort ?

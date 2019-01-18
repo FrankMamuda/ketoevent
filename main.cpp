@@ -44,6 +44,12 @@
 //   - backups
 //   - self tests
 //   - ideally info button would align itself to the left
+//   - search doesnt work in combo mode (exits combo mode)
+//   - combo mode jumps to end
+//   - non-international sorting
+//   - wrong sort order in combo mode
+//   - new combo should not start with 1
+//   - clear orphaned logs/combos on recalc?
 // NOTE:
 //   - is Task selectStatement called to often?
 //
