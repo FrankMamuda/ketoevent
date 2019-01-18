@@ -36,23 +36,52 @@
 #include "event.h"
 
 /**
+ * @brief Database::testPath
+ * @param path
+ * @return
+ */
+bool Database::testPath( const QString &path ) {
+    const QDir dir( QFileInfo( path ).absoluteDir());
+
+    // reject empty paths
+    if ( path.isEmpty()) {
+        qCDebug( Database_::Debug ) << this->tr( "empty database path" );
+        return false;
+    }
+
+    // only accept absolute paths
+    if ( !dir.isAbsolute()) {
+        qCDebug( Database_::Debug ) << this->tr( "relative or invalid database path \"%1\"" ).arg( path );
+        return false;
+    }
+
+    if ( !dir.exists()) {
+        qCDebug( Database_::Debug ) << this->tr( "making non-existant database path \"%1\"" ).arg( dir.absolutePath());
+        dir.mkpath( dir.absolutePath());
+
+        if ( !dir.exists())
+            return false;
+    }
+
+    return true;
+}
+
+/**
  * @brief Database::Database
  * @param parent
  */
 Database::Database( QObject *parent ) : QObject( parent ), m_initialised( false ) {
-    QDir path( QDir::homePath() + "/" + Main::Path );
-    QFile file( path.absolutePath() + "/" + "database.db" );
     QSqlDatabase database( QSqlDatabase::database());
 
-    if ( !path.exists()) {
-        qCDebug( Database_::Debug ) << this->tr( "making non-existant database path \"%1\"" ).arg( path.absolutePath());
-        path.mkpath( path.absolutePath());
+    if ( !testPath( Variable::instance()->string( "databasePath" ))) {
+        Variable::instance()->setString( "databasePath", QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" + "database.db" );
 
-        if ( !path.exists())
+        if ( this->testPath( Variable::instance()->string( "databasePath" )))
             qFatal( QT_TR_NOOP_UTF8( "could not create database path" ));
     }
 
     // failsafe
+    QFile file( Variable::instance()->string( "databasePath" ));
     if ( !file.exists()) {
         file.open( QFile::WriteOnly );
         file.close();

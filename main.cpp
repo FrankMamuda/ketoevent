@@ -41,7 +41,6 @@
 //   - implement working combos (sort of done, needs testing)
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
-//   - database file selection
 //   - backups
 //   - self tests
 //   - ideally info button would align itself to the left
@@ -103,11 +102,12 @@ int main( int argc, char *argv[] ) {
 
     // set variable defaults
     Variable::instance()->add( "reviewerName", "" );
-    Variable::instance()->add( "eventId", -1 );
-    Variable::instance()->add( "teamId", -1 );
+    Variable::instance()->add( "eventId", -1, Var::Flag::Hidden );
+    Variable::instance()->add( "teamId", -1, Var::Flag::Hidden );
     Variable::instance()->add( "rankingsCurrent", true );
     Variable::instance()->add( "sortByType", true );
-    Variable::instance()->add( "system/consoleHistory", "" );
+    Variable::instance()->add( "system/consoleHistory", "", Var::Flag::Hidden );
+    Variable::instance()->add( "databasePath", "", Var::Flag::Hidden );
 
     // read configuration
     XMLTools::instance()->read();

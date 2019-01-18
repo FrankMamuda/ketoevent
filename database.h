@@ -65,6 +65,7 @@ public slots:
 
 private:
     explicit Database( QObject *parent = nullptr );
+    bool testPath( const QString &path );
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
 
     /**

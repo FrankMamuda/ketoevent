@@ -23,6 +23,8 @@
 #include "settings.h"
 #include "ui_settings.h"
 #include "variable.h"
+#include <QFileDialog>
+#include <QMessageBox>
 
 /**
  * @brief Settings::Settings
@@ -36,6 +38,32 @@ Settings::Settings() : ui( new Ui::Settings ) {
     this->variables << Variable::instance()->bind( "sortByType", this->ui->sortByTypeCheck );
 
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
+
+    // handle database path
+    this->connect( this->ui->pathButton, &QPushButton::clicked, [ this ]() {
+        const QString fileName( QFileDialog::getOpenFileName
+                                ( this, this->tr( "Open database" ),
+                                  QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath(),
+                                  this->tr( "Database (*.db *.sqlite)" )));
+
+        if ( fileName.isEmpty()) {
+            QMessageBox::warning( this,
+                                  this->tr( "Settings" ),
+                                  this->tr( "Invalid database selection" ),
+                                  QMessageBox::Close );
+            return;
+        }
+
+        QMessageBox::warning( this,
+                              this->tr( "Settings" ),
+                              this->tr( "Application will be restarted" ),
+                              QMessageBox::Ok );
+        Variable::instance()->setString( "databasePath", fileName );
+        QApplication::quit();
+    } );
+
+    // bind database path to edit
+    Variable::instance()->bind( "databasePath", this->ui->pathEdit );
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/overflow" ));
