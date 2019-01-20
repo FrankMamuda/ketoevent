@@ -414,11 +414,18 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                                .arg( static_cast<int>( eventId )));
 
     // selects matching tasks from quick search
+    const QString comboFind( !filterByCombo ? "" :
+                                              QString( "OR %1=%2" )
+                                              .arg( Log::instance()->fieldName( Log::Fields::Combo ))
+                                              .arg( static_cast<int>( comboId ))
+                                              );
     const QString findFilter( find.isEmpty() ?
                                   "" :
-                                  QString( "AND %1 LIKE '%%2%'" )
+                                  QString( "AND %1 LIKE '%%2%' %3 " )
                                   .arg( Task::instance()->fieldName( Task::Name ))
-                                  .arg( find ));
+                                  .arg( find )
+                                  .arg( comboFind ))
+            ;
 
     // selects tasks for combo mode
     const QString comboFilter( filterByCombo ?
@@ -436,19 +443,19 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                                    "" );
 
     // orders tasks according to settings
-    // TODO: merge both "ORDER BY %1 %2 %3" ) where %1 orders by combo if active
+    const QString comboOrder( QString( "%1 DESC," ).arg( Log::instance()->fieldName( Log::Fields::Combo )));
     const QString orderFilter(
-                filterByCombo ? QString( "ORDER BY %1 DESC, %2 ASC" ).arg( Log::instance()->fieldName( Log::Fields::Combo )).arg( Task::instance()->fieldName( Task::Name ))
-                              :
-                QString( "ORDER BY %1 %2" )
-                                   .arg( sort ?
-                                             Task::instance()->fieldName( Task::Type ) :
-                                             Task::instance()->fieldName( Task::Order ))
-                                   .arg( sort ?
-                                             QString( ", %1 ASC" )
-                                             .arg( Task::instance()->fieldName( Task::Name )) :
-                                             "" ));
-
+                QString( "ORDER BY %1 %2 %3" )
+                .arg( !filterByCombo ?
+                          "" :
+                          comboOrder )
+                .arg( sort ?
+                          Task::instance()->fieldName( Task::Type ) :
+                          Task::instance()->fieldName( Task::Order ))
+                .arg( sort ?
+                          QString( ", %1 COLLATE NOCASE ASC" )
+                          .arg( Task::instance()->fieldName( Task::Name )) :
+                          "" ));
 
     // put all filters together
     const QString filter(
@@ -460,13 +467,6 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
 
     // set filter
     Task::instance()->setFilter( filter );
-
-    //qDebug() << filter;
-
-
-
-    //if ( this->isComboModeActive() && Task::instance()->count() <= 1 )
-    //    this->setTaskFilter();
 }
 
 /**
