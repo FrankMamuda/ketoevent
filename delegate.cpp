@@ -57,6 +57,22 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     if ( index.row() & 1 )
         painter->fillRect( option.rect, QColor::fromRgb( 0, 0, 0, 16 ));
 
+    if ( option.state & QStyle::State_MouseOver ) {
+        painter->save();
+        painter->setBrush( Qt::transparent );
+
+        QColor colour( option.palette.highlight().color());
+        colour.setAlpha( 128 );
+
+        QPen pen( colour );
+        pen.setWidth( 2 );
+        pen.setStyle( Qt::DashLine );
+
+        painter->setPen( pen );
+        painter->drawRoundedRect( QRect( option.rect.x() + 1, option.rect.y() + 1, option.rect.width() - 2, option.rect.height() - 2 ), 8, 8 );
+        painter->restore();
+    }
+
     // combo
     if ( comboId != Id::Invalid ) {
         if ( !this->relativeCombos.contains( comboId ))
