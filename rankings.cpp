@@ -29,6 +29,7 @@
 #include "rankingsmodel.h"
 #include "variable.h"
 #include "main.h"
+#include "database.h"
 #include <QFileDialog>
 #include <QTextStream>
 #include <QThread>
@@ -86,6 +87,9 @@ bool Rankings::isDisplayingCurrentTeam() const {
  * @brief Rankings::on_actionUpdate_triggered
  */
 void Rankings::on_actionUpdate_triggered() {
+    // remove junk to make sure it does not affect results
+    Database::instance()->removeOrphanedEntries();
+
     // set up and show progress bar
     this->ui->progressBar->setRange( 0, Team::instance()->count());
     this->ui->progressBar->setValue( 0 );
@@ -136,7 +140,6 @@ void Rankings::on_actionUpdate_triggered() {
         this->ui->progressBar->setValue( team );
 
         // go through logs
-        // TODO: implement ++ and -- operators?
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
             const Row logRow = Log::instance()->row( log );
             const int value = Log::instance()->multiplier( logRow );

@@ -25,6 +25,10 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QApplication>
+#include <QSqlDriver>
+#ifdef SQLITE_LIB
+#include <sqlite3.h>
+#endif
 #include "database.h"
 #include "table.h"
 #include "field.h"
@@ -34,6 +38,7 @@
 #include "team.h"
 #include "task.h"
 #include "event.h"
+#include <QtSql>
 
 /**
  * @brief Database::testPath
@@ -107,9 +112,16 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     if ( !database.open())
         qFatal( QT_TR_NOOP_UTF8( "could not load database" ));
 
+#ifdef SQLITE_LIB
+    QVariant handle( database.driver()->handle());
+    sqlite3 *handler = *static_cast<sqlite3 **>( handle.data());
+    //sqlite3_create_collation
+#endif
+
     // done
     this->setInitialised();
 }
+
 
 /**
  * @brief Database::removeOrphanedEntries
@@ -117,6 +129,22 @@ Database::Database( QObject *parent ) : QObject( parent ) {
 void Database::removeOrphanedEntries() {
     foreach ( Table *table, this->tables )
         table->removeOrphanedEntries();
+}
+
+/**
+ * @brief Database::incrementCounter
+ */
+void Database::incrementCounter() {
+    if ( Variable::instance()->isDisabled( "backup/enabled" ))
+        return;
+
+    // increment value
+    this->m_counter++;
+
+    if ( this->count() >= Variable::instance()->integer( "backup/changes" )) {
+        this->resetCounter();
+        this->writeBackup();
+    }
 }
 
 /**
@@ -217,4 +245,36 @@ void Database::add( Table *table ) {
         qCCritical( Database_::Debug ) << this->tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
         table->setValid( false );
     }
+}
+
+/**
+ * @brief Database::writeBackup
+ */
+void Database::writeBackup() {
+    const QFileInfo info( Variable::instance()->string( "databasePath" ));
+    const QDir dir( info.absolutePath() + + "/backups/" );
+
+    if ( !dir.exists()) {
+        dir.mkpath( dir.absolutePath());
+        qCDebug( Database_::Debug ) << this->tr( "making non-existant database backup path \"%1\"" ).arg( dir.absolutePath());
+
+        if ( !dir.exists())
+            qFatal( QT_TR_NOOP_UTF8( "could not create database backup path" ));
+    }
+
+    // backup database filename
+    const QString backup( QString( "%1/%2_%3.db" )
+                    .arg( dir.absolutePath())
+                    .arg( info.fileName().remove( ".db" ))
+                    .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+
+    // announce
+    qCDebug( Database_::Debug ) << this->tr( "performing backup to \"%1\"" ).arg( backup );
+
+    // perform a simple copy
+    QFile::copy( Variable::instance()->string( "databasePath" ),
+                 QString( "%1/%2_%3.db" )
+                 .arg( dir.absolutePath())
+                 .arg( info.fileName().remove( ".db" ))
+                 .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }

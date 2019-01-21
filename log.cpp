@@ -107,8 +107,6 @@ Id Log::comboId( const Id &taskId, const Id &teamId ) const {
 void Log::removeOrphanedEntries() {
     QSqlQuery query;
 
-    // TODO: tr!
-
     // remove orphaned logs
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
                 .arg( this->tableName())
@@ -138,9 +136,10 @@ void Log::removeOrphanedEntries() {
             QSqlQuery subQuery;
 
             // announce the total amount of duplicate logs
-            qDebug() << "performing deletion of" << count
-                     << "duplicate logs from team" << Team::instance()->title( Team::instance()->row( static_cast<Id>( team )))
-                     << "for task" << Task::instance()->name( Task::instance()->row( static_cast<Id>( task )));
+            qCDebug( Database_::Debug ) << this->tr( "performing deletion of %1 duplicate logs from team %2 for task %3" )
+                                           .arg( count )
+                                           .arg( Team::instance()->title( Team::instance()->row( static_cast<Id>( team ))))
+                                           .arg( Task::instance()->name( Task::instance()->row( static_cast<Id>( task ))));
 
             // delete actual logs
             subQuery.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
@@ -162,7 +161,7 @@ void Log::removeOrphanedEntries() {
             QSqlQuery subQuery;
 
             const int combo = query.value( 0 ).toInt();
-            qDebug() << "clearing an orphaned combo with id" << combo;
+            qCDebug( Database_::Debug ) << this->tr( "clearing an orphaned combo with id:%1" ).arg( combo );
             subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE comboId=%3" )
                            .arg( Log::instance()->tableName())
                            .arg( Log::instance()->fieldName( Log::Combo ))

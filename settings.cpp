@@ -64,6 +64,8 @@ Settings::Settings() : ui( new Ui::Settings ) {
 
     // bind database path to edit
     Variable::instance()->bind( "databasePath", this->ui->pathEdit );
+    Variable::instance()->bind( "backup/enabled", this->ui->backupCheck );
+    Variable::instance()->bind( "backup/changes", this->ui->backupValue );
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/overflow" ));

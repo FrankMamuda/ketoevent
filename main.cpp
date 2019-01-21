@@ -40,14 +40,11 @@
 //
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
-//   - backups
 //   - self tests
 //   - ideally info button would align itself to the left
-//   - combo mode jumps to end
 //   - non-international sorting
 //   - new combo should not start with 1
-//   - clear orphaned logs/combos on recalc?
-// NOTE:
+// NOTEs:
 //   - is Task selectStatement called to often?
 //
 
@@ -98,7 +95,11 @@ int main( int argc, char *argv[] ) {
     qRegisterMetaType<Widget::Types>();
 
     // set console output pattern
+#ifdef QT_DEBUG
     qSetMessagePattern( "%{if-category}%{category}: %{endif}%{function}: %{message}" );
+#else
+    qSetMessagePattern( "%{if-category}%{category}: %{endif}%{message}" );
+#endif
 
     // log to file in non-qtcreator environment
     qInstallMessageHandler( messageFilter );
@@ -111,6 +112,8 @@ int main( int argc, char *argv[] ) {
     Variable::instance()->add( "sortByType", true );
     Variable::instance()->add( "system/consoleHistory", "", Var::Flag::Hidden );
     Variable::instance()->add( "databasePath", "", Var::Flag::Hidden );
+    Variable::instance()->add( "backup/enabled", false );
+    Variable::instance()->add( "backup/changes", 25 );
 
     // read configuration
     XMLTools::instance()->read();

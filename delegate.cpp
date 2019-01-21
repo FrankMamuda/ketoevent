@@ -38,7 +38,8 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     const Task::Types type = Task::instance()->type( this->row( index ));
     const QFont font = Task::instance()->data( index, Qt::FontRole ).value<QFont>();
     const int buttonSize = this->buttonSizes.isEmpty() ? 0 : this->buttonSizes[index];
-    const QRect rect( option.rect.left(), option.rect.top(), option.rect.width() - buttonSize, Delegate::ItemHeight );
+    const int margin = 4;
+    const QRect rect( option.rect.left() + margin, option.rect.top(), option.rect.width() - buttonSize - margin, Delegate::ItemHeight );
     const bool edit = this->currentEditIndex() == index;
     const Id comboId = this->combos.isEmpty() ? Id::Invalid : this->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
@@ -61,15 +62,10 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
         painter->save();
         painter->setBrush( Qt::transparent );
 
-        QColor colour( option.palette.highlight().color());
-        colour.setAlpha( 128 );
+        const int g = qGray( option.palette.highlight().color().rgb());
 
-        QPen pen( colour );
-        pen.setWidth( 2 );
-        pen.setStyle( Qt::DashLine );
-
-        painter->setPen( pen );
-        painter->drawRoundedRect( QRect( option.rect.x() + 1, option.rect.y() + 1, option.rect.width() - 2, option.rect.height() - 2 ), 8, 8 );
+        painter->setPen( { QColor::fromRgb( g, g, g, 192 ), 2, Qt::DashLine } );
+        painter->drawRoundedRect( QRect( option.rect.x() + 1, option.rect.y() + 1, option.rect.width() - 2, option.rect.height() - 2 ), 10, 10 );
         painter->restore();
     }
 

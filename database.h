@@ -59,9 +59,15 @@ public:
     ~Database();
     void add( Table *table );
     bool hasInitialised() const { return this->m_initialised; }
+    int count() const { return this->m_counter; }
 
 public slots:
     void removeOrphanedEntries();
+    void incrementCounter();
+
+private slots:
+    void writeBackup();
+    void resetCounter() { this->m_counter = 0; }
 
 private:
     explicit Database( QObject *parent = nullptr );
@@ -74,4 +80,5 @@ private:
      */
     QMap<QString, Table*> tables;
     bool m_initialised = false;
+    int m_counter = 0;
 };

@@ -26,6 +26,7 @@
 #include "log.h"
 #include "team.h"
 #include "popup.h"
+#include "database.h"
 #include <QDebug>
 #include <QSqlQuery>
 
@@ -76,6 +77,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         return;
 
                     Log::instance()->setComboId( log, id );
+
+                    // increment counter
+                    Database::instance()->incrementCounter();
                 };
 
                 if ( this->visualRect( index ).contains( event->pos())) {
@@ -87,6 +91,10 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                     case Item::Set:
                         Task::instance()->setMultiplier( delegate->row( index ), true );
+
+                        // increment counter
+                        Database::instance()->incrementCounter();
+
                         break;
 
                     case Item::Edit:
@@ -95,6 +103,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                     case Item::Remove:
                         Task::instance()->setMultiplier( delegate->row( index ), false );
+
+                        // increment counter
+                        Database::instance()->incrementCounter();
                         break;
 
 
@@ -104,7 +115,6 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         if ( desc.isEmpty())
                             break;
 
-                        // FIXME: fast click on popup sometimes results in segfault
                         Popup( MainWindow::instance(), desc ).exec();
                     }
                         break;
@@ -114,7 +124,6 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             MainWindow::instance()->setTaskFilter();
                             delegate->reset();
                         } else {
-                            // TODO: better sorting of combos (logged first)
                             // TODO: restore position in list after filtering
                             Id id = static_cast<Id>( delegate->combos[index] );
                             if ( id == Id::Invalid ) {
@@ -153,6 +162,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                     case Item::SetNumeric:
                         this->edit( index );
+
+                        // increment counter
+                        Database::instance()->incrementCounter();
                         break;
 
                     case Item::AddCombo:

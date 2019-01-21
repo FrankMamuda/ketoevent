@@ -6,37 +6,41 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>147</height>
+    <width>248</width>
+    <height>155</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Database:</string>
-      </property>
-     </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Database:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="pathEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="pathButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="4" column="0" colspan="3">
-     <widget class="QPushButton" name="closeButton">
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="pathEdit">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" colspan="3">
+    <item>
      <layout class="QHBoxLayout" name="reviewerLayout">
       <item>
        <widget class="QLabel" name="reviewerPixmap">
@@ -66,27 +70,41 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="0" colspan="3">
+    <item>
      <widget class="QCheckBox" name="sortByTypeCheck">
       <property name="text">
        <string>Sort tasks by type</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="2">
-     <widget class="QToolButton" name="pathButton">
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
+    <item>
+     <layout class="QHBoxLayout" name="backupLayout">
+      <item>
+       <widget class="QCheckBox" name="backupCheck">
+        <property name="text">
+         <string>Perform backups every</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="backupValue">
+        <property name="suffix">
+         <string> changes</string>
+        </property>
+        <property name="minimum">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0">
-     <widget class="QCheckBox" name="checkBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
+    <item>
+     <widget class="QPushButton" name="closeButton">
       <property name="text">
-       <string>Perform backups</string>
+       <string>Close</string>
       </property>
      </widget>
     </item>

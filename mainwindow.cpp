@@ -467,6 +467,9 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
 
     // set filter
     Task::instance()->setFilter( filter );
+
+    // scroll to the beginning
+    this->ui->taskView->scrollToTop();
 }
 
 /**

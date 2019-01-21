@@ -144,7 +144,7 @@ Id Task::comboId( const Row &row ) const {
 
     return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
 
-    // TODO: replace with a value from extended (LOG) table
+    // NOTE: could replace with a value from extended (LOG) table (could increase performance marginally)
     //return static_cast<Id>( this->value( row, ComboID ).toInt());
 }
 
