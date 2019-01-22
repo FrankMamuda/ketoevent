@@ -43,6 +43,7 @@
 //   - self tests
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1
+//   - about dialog
 // NOTEs:
 //   - is Task selectStatement called to often?
 //

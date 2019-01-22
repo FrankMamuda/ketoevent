@@ -71,6 +71,7 @@ private slots:
     void on_actionTeams_triggered();
     void on_actionAddQuick_triggered();
     void on_actionEvents_triggered();
+    void on_actionAbout_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;

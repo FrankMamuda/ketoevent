@@ -142,6 +142,7 @@
    <addaction name="actionRankings"/>
    <addaction name="actionConsole"/>
    <addaction name="actionCombos"/>
+   <addaction name="actionAbout"/>
    <addaction name="actionSettings"/>
   </widget>
   <widget class="QToolBar" name="quickBar">
@@ -266,6 +267,15 @@
    </property>
    <property name="text">
     <string>Events</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/info</normaloff>:/icons/info</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

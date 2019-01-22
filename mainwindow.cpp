@@ -42,6 +42,7 @@
 #include "teamedit.h"
 #include "eventedit.h"
 #include "eventtoolbar.h"
+#include "about.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -73,7 +74,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
     // insert spacer
     this->spacer->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
-    this->ui->toolBar->insertWidget( this->ui->actionSettings, spacer );
+    this->ui->toolBar->insertWidget( this->ui->actionAbout, spacer );
 
     // bind for sorting updates
     Variable::instance()->bind( "sortByType", this, SLOT( setTaskFilter()));
@@ -553,3 +554,7 @@ void MainWindow::on_actionConsole_triggered() { Console::instance()->show(); }
  */
 void MainWindow::on_actionCombos_triggered() { Combos::instance()->show(); }
 
+/**
+ * @brief MainWindow::on_actionAbout_triggered
+ */
+void MainWindow::on_actionAbout_triggered() { About( this ).exec(); }

@@ -50,7 +50,8 @@ SOURCES += \
     item.cpp \
     eventedit.cpp \
     eventtoolbar.cpp \
-    popup.cpp
+    popup.cpp \
+    about.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -87,7 +88,8 @@ HEADERS += \
     item.h \
     eventedit.h \
     eventtoolbar.h \
-    popup.h
+    popup.h \
+    about.h
 
 FORMS += \
         mainwindow.ui \
@@ -98,14 +100,15 @@ FORMS += \
     settings.ui \
     console.ui \
     combos.ui \
-    eventedit.ui
+    eventedit.ui \
+    about.ui
 
 RESOURCES += \
     resources.qrc
 
 win32:RC_FILE = icon.rc
 
-CONFIG += sqlite_custom
+# CONFIG += sqlite_custom
 
 sqlite_custom {
 SOURCES += sqlite/sqlite3.c
