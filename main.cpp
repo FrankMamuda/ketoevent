@@ -42,7 +42,6 @@
 //   - scripted states (combos would be scripted, not hardcoded)
 //   - self tests
 //   - ideally info button would align itself to the left
-//   - non-international sorting
 //   - new combo should not start with 1
 // NOTEs:
 //   - is Task selectStatement called to often?

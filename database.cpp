@@ -25,10 +25,6 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QApplication>
-#include <QSqlDriver>
-#ifdef SQLITE_LIB
-#include <sqlite3.h>
-#endif
 #include "database.h"
 #include "table.h"
 #include "field.h"
@@ -38,7 +34,10 @@
 #include "team.h"
 #include "task.h"
 #include "event.h"
-#include <QtSql>
+#ifdef SQLITE_CUSTOM
+#include <QSqlDriver>
+#include "sqlite/sqlite3.h"
+#endif
 
 /**
  * @brief Database::testPath
@@ -112,16 +111,34 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     if ( !database.open())
         qFatal( QT_TR_NOOP_UTF8( "could not load database" ));
 
-#ifdef SQLITE_LIB
+    // load sql library
+#ifdef SQLITE_CUSTOM
     QVariant handle( database.driver()->handle());
-    sqlite3 *handler = *static_cast<sqlite3 **>( handle.data());
-    //sqlite3_create_collation
+    if ( handle.isValid() && !QString::compare( handle.typeName(), "sqlite3*" )) {
+        sqlite3 *libSqlite3 = *static_cast<sqlite3 **>( handle.data());
+
+        if ( libSqlite3 != nullptr && database.isOpen() && database.isValid()) {
+            // initialize sqlite
+            qCWarning( Database_::Debug ) << this->tr( "initializing custom sqlite lib" );
+            sqlite3_initialize();
+
+            // localeCompare lambda
+            auto localeCompare = []( void *, int l0, const void* d0, int l1, const void* d1 ) {
+                return QString::localeAwareCompare(
+                            QString::fromRawData( reinterpret_cast<const QChar*>( d0 ), l0 / static_cast<int>( sizeof( QChar ))),
+                            QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar ))));
+            };
+
+            // initialize
+            if ( sqlite3_create_collation( libSqlite3, "localeCompare", SQLITE_UTF16, 0, localeCompare ) != SQLITE_OK )
+                qCWarning( Database_::Debug ) << this->tr( "could not add locale aware string collation" );
+        }
+    }
 #endif
 
     // done
     this->setInitialised();
 }
-
 
 /**
  * @brief Database::removeOrphanedEntries
@@ -185,6 +202,11 @@ Database::~Database() {
     // only now we can sever the connection completely
     if ( open )
         QSqlDatabase::removeDatabase( connectionName );
+
+#ifdef SQLITE_CUSTOM
+    // shutdown
+    sqlite3_shutdown();
+#endif
 }
 
 /**
@@ -264,9 +286,9 @@ void Database::writeBackup() {
 
     // backup database filename
     const QString backup( QString( "%1/%2_%3.db" )
-                    .arg( dir.absolutePath())
-                    .arg( info.fileName().remove( ".db" ))
-                    .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                          .arg( dir.absolutePath())
+                          .arg( info.fileName().remove( ".db" ))
+                          .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 
     // announce
     qCDebug( Database_::Debug ) << this->tr( "performing backup to \"%1\"" ).arg( backup );

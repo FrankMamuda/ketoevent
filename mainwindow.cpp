@@ -453,7 +453,11 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                           Task::instance()->fieldName( Task::Type ) :
                           Task::instance()->fieldName( Task::Order ))
                 .arg( sort ?
+#ifdef SQLITE_CUSTOM
+                          QString( ", %1 COLLATE localeCompare ASC" )
+#else
                           QString( ", %1 COLLATE NOCASE ASC" )
+#endif
                           .arg( Task::instance()->fieldName( Task::Name )) :
                           "" ));
 

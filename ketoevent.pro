@@ -104,3 +104,12 @@ RESOURCES += \
     resources.qrc
 
 win32:RC_FILE = icon.rc
+
+CONFIG += sqlite_custom
+
+sqlite_custom {
+SOURCES += sqlite/sqlite3.c
+HEADERS += sqlite/sqlite3.h
+DEFINES += SQLITE_CUSTOM
+}
+

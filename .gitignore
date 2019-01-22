@@ -9,3 +9,4 @@ Makefile*
 ui_*.cpp
 ui_*.h
 object_script.*
+sqlite/
