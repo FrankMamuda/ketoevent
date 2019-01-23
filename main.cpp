@@ -21,6 +21,7 @@
 //
 #include "mainwindow.h"
 #include <QApplication>
+#include <QTranslator>
 #include "database.h"
 #include "event.h"
 #include "task.h"
@@ -103,6 +104,16 @@ int main( int argc, char *argv[] ) {
 
     // log to file in non-qtcreator environment
     qInstallMessageHandler( messageFilter );
+
+    // i18n
+    QTranslator translator;
+#ifndef FORCE_LV_LOCALE
+    const QString locale( QLocale::system().name());
+#else
+    const QString locale( "lv_LV" );
+#endif
+    translator.load( ":/i18n/ketoevent_" + locale );
+    a.installTranslator( &translator );
 
     // set variable defaults
     Variable::instance()->add( "reviewerName", "" );

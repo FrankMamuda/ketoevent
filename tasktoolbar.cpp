@@ -35,7 +35,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
     this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Add Task" ));
+            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Add Task " ));
             TaskEdit::instance()->reset();
         }
     } );
@@ -43,7 +43,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // edit action
     this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task" ));
+            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task " ));
             TaskEdit::instance()->reset( true );
         }
     } );

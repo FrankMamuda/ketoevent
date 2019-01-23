@@ -34,7 +34,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
     this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Add Team" ));
+            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Add Team " ));
             TeamEdit::instance()->reset();
         }
     } );
@@ -42,7 +42,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     // edit action
     this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team" ));
+            EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team " ));
             TeamEdit::instance()->reset( true );
         }
     } );

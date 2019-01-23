@@ -49,11 +49,11 @@ Task::Task() : Table( TaskTable::Name ) {
     this->addField( Desc,   "description", QVariant::String, "varchar( 512 )" );
 
     // map types and styles
-    this->types[Types::Check]     = QT_TR_NOOP_UTF8( "Check" );
-    this->types[Types::Multi]     = QT_TR_NOOP_UTF8( "Multi" );
-    this->styles[Styles::Regular] = QT_TR_NOOP_UTF8( "Regular" );
-    this->styles[Styles::Bold]    = QT_TR_NOOP_UTF8( "Bold" );
-    this->styles[Styles::Italic]  = QT_TR_NOOP_UTF8( "Italic" );
+    this->types[Types::Check]     = QObject::tr( "Check" );
+    this->types[Types::Multi]     = QObject::tr( "Multi" );
+    this->styles[Styles::Regular] = QObject::tr( "Regular" );
+    this->styles[Styles::Bold]    = QObject::tr( "Bold" );
+    this->styles[Styles::Italic]  = QObject::tr( "Italic" );
 
     // sort by order
     this->setSort( Task::Order, Qt::AscendingOrder );

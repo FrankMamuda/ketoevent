@@ -36,7 +36,7 @@ EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
     this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Event" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Add Event" ));
+            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Add Event " ));
             EventEdit::instance()->reset();
         }
     } );
@@ -44,7 +44,7 @@ EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
     // edit action
     this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Event" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Edit Event" ));
+            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Edit Event " ));
             EventEdit::instance()->reset( true );
         }
     } );

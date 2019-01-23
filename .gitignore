@@ -10,3 +10,5 @@ ui_*.cpp
 ui_*.h
 object_script.*
 sqlite/
+i18n/*.qm
+*.qrc~

@@ -34,4 +34,7 @@
         <file alias="number">icons/number.png</file>
         <file alias="description">icons/description.png</file>
     </qresource>
+    <qresource prefix="/i18n">
+        <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
+    </qresource>
 </RCC>
