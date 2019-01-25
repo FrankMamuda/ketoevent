@@ -30,9 +30,11 @@
 #include "variable.h"
 #include "main.h"
 #include "database.h"
+#include "log.h"
 #include <QFileDialog>
+#include <QSqlQuery>
 #include <QTextStream>
-#include <QThread>
+#include <QtMath>
 
 /**
  * @brief Rankings::Rankings
@@ -87,8 +89,10 @@ bool Rankings::isDisplayingCurrentTeam() const {
  * @brief Rankings::on_actionUpdate_triggered
  */
 void Rankings::on_actionUpdate_triggered() {
+    int totalLogged = 0;
+
     // remove junk to make sure it does not affect results
-    Database::instance()->removeOrphanedEntries();
+    Log::instance()->removeOrphanedEntries();
 
     // set up and show progress bar
     this->ui->progressBar->setRange( 0, Team::instance()->count());
@@ -211,6 +215,7 @@ void Rankings::on_actionUpdate_triggered() {
 
         // add team stats to list
         this->list << stats;
+        totalLogged += stats.points;
     }
 
     // update model
@@ -248,6 +253,52 @@ void Rankings::on_actionUpdate_triggered() {
         }
         y++;
     }
+
+    // total teams
+    this->ui->totalTeamsEdit->setText( QString::number( Team::instance()->count()));
+
+    // total members
+    int members = 0;
+    for ( int y = 0; y < Team::instance()->count(); y++ )
+        members += Team::instance()->members( Team::instance()->row( y ));
+    this->ui->totalMembersEdit->setText( QString::number( members ));
+
+    // total logged points
+    this->ui->totalLoggedEdit->setText( QString::number( totalLogged ));
+
+    // total tasks
+    this->ui->totalTasksEdit->setText( QString::number( Task::instance()->count()));
+
+    // total points
+    int totalPoints = 0;
+    for ( int y = 0; y < Task::instance()->count(); y++ ) {
+        const Row row = Task::instance()->row( y );
+        const Task::Types type = Task::instance()->type( row );
+
+        totalPoints += ( Task::instance()->points( row ) * ( type == Task::Types::Multi ? Task::instance()->multi( row ) : 1 ));
+    }
+    int comboPoints = static_cast<int>( qFloor( static_cast<qreal>( Task::instance()->count()) / 4 )) * Event::instance()->comboOfFourPlus( MainWindow::instance()->currentEvent());
+    switch ( Task::instance()->count() % 4 ) {
+    case 3:
+        comboPoints += Event::instance()->comboOfThree( MainWindow::instance()->currentEvent());
+        break;
+
+    case 2:
+        comboPoints += Event::instance()->comboOfTwo( MainWindow::instance()->currentEvent());
+        break;
+    }
+    this->ui->totalPointsEdit->setText( this->tr( "%1 (%2+%3)" ).arg( totalPoints + comboPoints ).arg( totalPoints ).arg( comboPoints ));
+
+    // # of tasks completed
+    int numTasksCompleted = 0;
+    QSqlQuery query;
+    query.exec( QString( "SELECT COUNT(*) from %1 WHERE %2>0 GROUP BY %3" )
+                .arg( Log::instance()->tableName())
+                .arg( Log::instance()->fieldName( Log::Multi ))
+                .arg( Log::instance()->fieldName( Log::Task )));
+    while ( query.next())
+        numTasksCompleted += query.value( 0 ).toInt();
+    this->ui->completedEdit->setText( QString::number( numTasksCompleted ));
 }
 
 /**

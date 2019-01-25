@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
-    <normaloff>:/icons/ketone</normaloff>:/icons/ketone</iconset>
+    <normaloff>:/icons/ketone_large</normaloff>:/icons/ketone_large</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">

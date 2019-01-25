@@ -16,9 +16,9 @@
    id="svg8"
    sodipodi:docname="ketone.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   inkscape:export-filename="C:\Private\Devel\ketoevent\icons\ketone.png"
-   inkscape:export-xdpi="144.00002"
-   inkscape:export-ydpi="144.00002">
+   inkscape:export-filename="C:\Private\Devel\ketoevent\icons\ketone_large.png"
+   inkscape:export-xdpi="1536.0001"
+   inkscape:export-ydpi="1536.0001">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="32"
-     inkscape:cx="5.4447742"
+     inkscape:cx="0.1166492"
      inkscape:cy="7.5540019"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>

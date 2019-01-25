@@ -37,16 +37,13 @@
 #include "widget.h"
 
 //
-// GENERAL TODO LIST
+// GENERAL TODO/FIXME LIST
 //
 //   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
-//   - self tests
+//   - more self tests
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1
-//   - about dialog
-// NOTEs:
-//   - is Task selectStatement called to often?
 //
 
 // default message handler
