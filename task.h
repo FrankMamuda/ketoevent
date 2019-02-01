@@ -39,6 +39,7 @@ class Task final : public Table {
     Q_ENUMS( Fields )
     Q_ENUMS( Types )
     Q_ENUMS( Styles )
+    Q_ENUMS( DataRoles )
     friend class Log;
     friend class TaskEdit;
 
@@ -61,7 +62,10 @@ public:
 
     enum ExtendedFields {
         ComboID = Count,
-        Multi
+        Multi,
+
+        // count
+        ExtendedCount
     };
 
     enum class Types {
@@ -102,6 +106,8 @@ public:
     bool hasInitialised() const { return this->m_initialised; }
 
     void removeOrphanedEntries() override;
+
+    int columnCount( const QModelIndex & = QModelIndex()) const override { return ExtendedCount; }
 
 public slots:
     void setName( const Row &row, const QString &name ) { this->setValue( row, Name, name ); }

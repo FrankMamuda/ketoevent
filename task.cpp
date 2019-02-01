@@ -84,15 +84,15 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
 
     // add a new team
     return Table::add( QVariantList() <<
-                Database_::null <<
-                taskName <<
-                points <<
-                multi <<
-                static_cast<int>( style ) <<
-                static_cast<int>( type ) <<
-                highest + 1 <<
-                static_cast<int>( Event::instance()->id( event )) <<
-                description );
+                       Database_::null <<
+                       taskName <<
+                       points <<
+                       multi <<
+                       static_cast<int>( style ) <<
+                       static_cast<int>( type ) <<
+                       highest + 1 <<
+                       static_cast<int>( Event::instance()->id( event )) <<
+                       description );
 }
 
 /**
@@ -118,6 +118,21 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         }
     }
 
+#ifdef QT_DEBUG
+    if ( role == Qt::DisplayRole ) {
+        const Row row = this->row( index.row());
+        const bool isMulti = this->type( row ) == Task::Types::Multi;
+
+        return QString( "%1 (%2%3)")
+                .arg( this->name( row ))
+                .arg( isMulti ? this->tr( "M" ) : this->tr( "R" ))
+                .arg( isMulti ? QString( ", %1x%2" )
+                                .arg( this->points( row ))
+                                .arg( this->multi( row )) :
+                                QString( ", %1" ).arg( this->points( row )));
+    }
+#endif
+
     return Table::data( index, role );
 }
 
@@ -128,7 +143,7 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
  */
 int Task::multiplier( const Row &row ) const {
     bool ok;
-    QPair<Id, Id> ids( getIds( row, &ok ));
+    const QPair<Id, Id> ids( getIds( row, &ok ));
 
     return ok ? Log::instance()->multiplier( ids.first, ids.second ) : 0;
 }
@@ -140,7 +155,7 @@ int Task::multiplier( const Row &row ) const {
  */
 Id Task::comboId( const Row &row ) const {
     bool ok;
-    QPair<Id, Id> ids( getIds( row, &ok ));
+    const QPair<Id, Id> ids( getIds( row, &ok ));
 
     return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
 

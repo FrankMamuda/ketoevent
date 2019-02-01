@@ -26,6 +26,7 @@
 #include "tasktoolbar.h"
 #include "variable.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QMessageBox>
 
 /**
@@ -140,6 +141,67 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         move( false );
     } );
     moveDown->setEnabled( false );
+
+    // export action
+    this->addAction( QIcon( ":/icons/export" ), this->tr( "Export tasks" ), [ this ]() {
+        QString path( QFileDialog::getSaveFileName( this, this->tr( "Export tasks to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+    #ifdef Q_OS_WIN
+        const bool win32 = true;
+    #else
+        const bool win32 = false;
+    #endif
+
+        // check for empty filenames
+        if ( path.isEmpty())
+            return;
+
+        // add extension
+        if ( !path.endsWith( ".csv" ))
+            path.append( ".csv" );
+
+        // create file
+        QFile csv( path );
+
+        if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
+            QTextStream out( &csv );
+            out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
+            out << this->tr( "Task name;Description;Type;Style;Multi;Points" ).append( win32 ? "\r" : "\n" );
+
+            for ( int y = 0; y < Task::instance()->count(); y++ ) {
+                const Row row = Task::instance()->row( y );
+                if ( row == Row::Invalid )
+                    break;
+
+                QString style;
+                switch ( Task::instance()->style( row )) {
+                case Task::Styles::Regular:
+                    style = this->tr( "Simple" );
+                    break;
+
+                case Task::Styles::Bold:
+                    style = this->tr( "Difficult" );
+                    break;
+
+                case Task::Styles::Italic:
+                    style = this->tr( "Other" );
+                    break;
+
+                case Task::Styles::NoStyle:
+                    break;
+                }
+
+                out << QString( "%1;%2;%3;%4;%5;%6%7" )
+                       .arg( Task::instance()->name( row ))
+                       .arg( Task::instance()->description( row ))
+                       .arg( Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ))
+                       .arg( style )
+                       .arg( Task::instance()->multi( row ))
+                       .arg( Task::instance()->points( row ))
+                       .arg( win32 ? "\r" : "\n" );
+            }
+        }
+        csv.close();
+    } );
 
     // button test (disconnected in ~EditorDialog)
     this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
