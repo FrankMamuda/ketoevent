@@ -446,12 +446,12 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     // orders tasks according to settings
     const QString comboOrder( QString( "%1 DESC," ).arg( Log::instance()->fieldName( Log::Fields::Combo )));
     const QString orderFilter(
-                QString( "ORDER BY %1 %2 %3" )
+                QString( "ORDER BY %1 %2 ASC %3" )
                 .arg( !filterByCombo ?
                           "" :
                           comboOrder )
                 .arg( sort ?
-                          Task::instance()->fieldName( Task::Type ) :
+                          Task::instance()->fieldName( Task::Style ) :
                           Task::instance()->fieldName( Task::Order ))
                 .arg( sort ?
 #ifdef SQLITE_CUSTOM
@@ -469,6 +469,8 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                 .arg( comboFilter )
                 .arg( findFilter )
                 .arg( orderFilter ));
+
+    //qDebug() << filter;
 
     // set filter
     Task::instance()->setFilter( filter );

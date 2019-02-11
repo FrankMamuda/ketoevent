@@ -14,29 +14,35 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Ketoevent&lt;/span&gt;&lt;/p&gt;
+&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/icons/logo_small&quot; /&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td style=&quot; vertical-align:middle;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Ketoevent&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Developer&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;: Cikliskais Triketons&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Thanks to&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;: Loved ones, ketones and beer&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Project hosted on GitHub:&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; FrankMamuda/ketoevent&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Additional comments&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;: 246766&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Ketoevent is distributed under the following license:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:8pt;&quot;&gt;    Copyright (C) 2013-2019 Factory #12&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;You should have received a copy of the GNU General Public License along with this library. If not, see http://www.gnu.org/licenses/. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Developer&lt;/span&gt;: Cikliskais Triketons&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Thanks to&lt;/span&gt;: Loved ones, ketones and beer&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Project hosted on GitHub&lt;/span&gt;: FrankMamuda/ketoevent&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Additional comments&lt;/span&gt;: 246766&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ketoevent is distributed under the following licens&lt;/span&gt;e:&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Copyright (C) 2013-2019 Factory #12&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You should have received a copy of the GNU General Public License along with this library. If not, see http://www.gnu.org/licenses/.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../about.ui" line="48"/>
+        <location filename="../about.ui" line="54"/>
         <source>About Qt</source>
         <translation>Par Qt</translation>
     </message>
     <message>
-        <location filename="../about.ui" line="59"/>
+        <location filename="../about.ui" line="65"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
@@ -462,8 +468,7 @@ Izvēlies citu nosaukumu</translation>
     <message>
         <location filename="../eventtoolbar.cpp" line="37"/>
         <source>Add Event</source>
-        <translation>Pievienot
-pasākumu</translation>
+        <translation>Pievienot</translation>
     </message>
     <message>
         <location filename="../eventtoolbar.cpp" line="39"/>
@@ -473,8 +478,7 @@ pasākumu</translation>
     <message>
         <location filename="../eventtoolbar.cpp" line="45"/>
         <source>Edit Event</source>
-        <translation>Rediģēt
-pasākumu</translation>
+        <translation>Rediģēt</translation>
     </message>
     <message>
         <location filename="../eventtoolbar.cpp" line="47"/>
@@ -484,8 +488,7 @@ pasākumu</translation>
     <message>
         <location filename="../eventtoolbar.cpp" line="53"/>
         <source>Remove Event</source>
-        <translation>Dzēst
-pasākumu</translation>
+        <translation>Dzēst</translation>
     </message>
     <message>
         <location filename="../eventtoolbar.cpp" line="66"/>
@@ -681,44 +684,77 @@ uzdevumi</translation>
         <translation>Rezultāti</translation>
     </message>
     <message>
-        <location filename="../rankings.ui" line="70"/>
+        <location filename="../rankings.ui" line="85"/>
+        <source>Total tasks completed</source>
+        <translation>Ieskaitītie uzdevumi</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="92"/>
+        <source>Maximum points</source>
+        <translation>Maksimālums punktu</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="99"/>
+        <source>Total tasks</source>
+        <translation>Uzdevumi</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="106"/>
+        <source>Total teams</source>
+        <translation>Komandas</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="113"/>
+        <source>Total logged points</source>
+        <translation>Punktu kopskaits</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="120"/>
+        <source>Total participiants</source>
+        <translation>Dalībnieku kopskaits</translation>
+    </message>
+    <message>
+        <location filename="../rankings.ui" line="164"/>
         <source>Close</source>
         <translation>Aizvērt</translation>
     </message>
     <message>
-        <location filename="../rankings.ui" line="78"/>
+        <location filename="../rankings.ui" line="172"/>
         <source>toolBar</source>
         <translation>rīkJosla</translation>
     </message>
     <message>
-        <location filename="../rankings.ui" line="111"/>
+        <location filename="../rankings.ui" line="205"/>
         <source>Update</source>
         <translation>Pārrēķināt</translation>
     </message>
     <message>
-        <location filename="../rankings.ui" line="120"/>
+        <location filename="../rankings.ui" line="214"/>
         <source>Export</source>
         <translation>Eksportēt</translation>
     </message>
     <message>
-        <location filename="../rankings.ui" line="132"/>
+        <location filename="../rankings.ui" line="226"/>
         <source>Current team</source>
-        <translation>Rādīt tikai
-aktīvo
-komandu</translation>
+        <translation>Slēpt rezultātus</translation>
     </message>
     <message>
-        <location filename="../rankings.cpp" line="272"/>
+        <location filename="../rankings.cpp" line="290"/>
+        <source>%1 (%2+%3)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../rankings.cpp" line="323"/>
         <source>Export statistics to CSV format</source>
         <translation>Eksportēt pasākuma rezulātus CSV formātā</translation>
     </message>
     <message>
-        <location filename="../rankings.cpp" line="272"/>
+        <location filename="../rankings.cpp" line="323"/>
         <source>CSV file (*.csv)</source>
         <translation>CSV fails (*.csv)</translation>
     </message>
     <message>
-        <location filename="../rankings.cpp" line="293"/>
+        <location filename="../rankings.cpp" line="344"/>
         <source>Team name;Tasks;Combos;Time;Penalty points;Total points</source>
         <translation>Nosaukums;Uzdevumi;Kombinācijas;Laiks;Soda punkti;Punkti</translation>
     </message>
@@ -768,9 +804,8 @@ uzdevumi</translation>
         <translation>Uzstādījumi</translation>
     </message>
     <message>
-        <location filename="../settings.ui" line="23"/>
         <source>Database:</source>
-        <translation>Datubāze:</translation>
+        <translation type="vanished">Datubāze:</translation>
     </message>
     <message>
         <location filename="../settings.ui" line="37"/>
@@ -783,9 +818,18 @@ uzdevumi</translation>
         <translation>Šeit raksti savu vārdu</translation>
     </message>
     <message>
-        <location filename="../settings.ui" line="76"/>
         <source>Sort tasks by type</source>
-        <translation>Atlasīt uzdevumus pēc tipa</translation>
+        <translation type="vanished">Atlasīt uzdevumus pēc tipa</translation>
+    </message>
+    <message>
+        <location filename="../settings.ui" line="23"/>
+        <source>Database path</source>
+        <translation>Datubāze</translation>
+    </message>
+    <message>
+        <location filename="../settings.ui" line="76"/>
+        <source>Sort tasks by style</source>
+        <translation>Šķirot uzdevumus pēc veida</translation>
     </message>
     <message>
         <location filename="../settings.ui" line="85"/>
@@ -878,6 +922,16 @@ uzdevumi</translation>
         <source>no active event, aborting</source>
         <translation>nav aktīva pasākuma, pievienošana tiek acelta</translation>
     </message>
+    <message>
+        <location filename="../task.cpp" line="128"/>
+        <source>M</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../task.cpp" line="128"/>
+        <source>R</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>TaskEdit</name>
@@ -924,7 +978,7 @@ uzdevumi</translation>
     <message>
         <location filename="../taskedit.ui" line="137"/>
         <source>Style</source>
-        <translation>Izskats</translation>
+        <translation>Izskats (veids)</translation>
     </message>
     <message>
         <location filename="../taskedit.ui" line="144"/>
@@ -977,62 +1031,104 @@ Izvēlies citu nosaukumu</translation>
 <context>
     <name>TaskToolBar</name>
     <message>
-        <location filename="../tasktoolbar.cpp" line="36"/>
+        <location filename="../tasktoolbar.cpp" line="37"/>
         <source>Add Task</source>
-        <translation>Pievienot
-uzdevumu</translation>
+        <translation>Pievienot</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="38"/>
+        <location filename="../tasktoolbar.cpp" line="39"/>
         <source>Add Task </source>
         <translation>Pievienot uzdevumu</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="44"/>
+        <location filename="../tasktoolbar.cpp" line="45"/>
         <source>Edit Task</source>
-        <translation>Rediģēt
-uzdevumu</translation>
+        <translation>Rediģēt</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="46"/>
+        <location filename="../tasktoolbar.cpp" line="47"/>
         <source>Edit Task </source>
         <translation>Rediģēt uzdevumu</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="52"/>
+        <location filename="../tasktoolbar.cpp" line="53"/>
         <source>Remove Task</source>
-        <translation>Dzēst
-uzdevumu</translation>
+        <translation>Dzēst</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="63"/>
+        <location filename="../tasktoolbar.cpp" line="64"/>
         <source>Remove task</source>
         <translation>Uzdevuma dzēšana</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="63"/>
+        <location filename="../tasktoolbar.cpp" line="64"/>
         <source>Do you really want to remove &quot;%1&quot;?</source>
         <translation>Vai tiešām vēlies dzēst &quot;%1&quot; uzdevumu?</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="81"/>
+        <location filename="../tasktoolbar.cpp" line="82"/>
         <source>Corrupted order</source>
         <translation>Uzdevumu secība nojukusi</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="82"/>
+        <location filename="../tasktoolbar.cpp" line="83"/>
         <source>Tasks have corrupted order. Perform reindexing? This cannot be undone.</source>
         <translation>Uzdevumu secība ir nojukusi. Vai veikt uzdevumu pārindeksāciju? Šī darbība ir neatgriezeniska.</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="133"/>
+        <location filename="../tasktoolbar.cpp" line="134"/>
         <source>Move up</source>
         <translation>Augšup</translation>
     </message>
     <message>
-        <location filename="../tasktoolbar.cpp" line="139"/>
+        <location filename="../tasktoolbar.cpp" line="140"/>
         <source>Move down</source>
         <translation>Lejup</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="146"/>
+        <source>Export tasks</source>
+        <translation>Eksportēt</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="147"/>
+        <source>Export tasks to CSV format</source>
+        <translation>Eksportēt uzdevumus CSV formātā</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="147"/>
+        <source>CSV file (*.csv)</source>
+        <translation>CSV fails (*.csv)</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="168"/>
+        <source>Task name;Description;Type;Style;Multi;Points</source>
+        <translation>Nosaukums;Apraksts;Tips;Veids;Multi;Punkti</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="178"/>
+        <source>Simple</source>
+        <translation>Parastais</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="182"/>
+        <source>Difficult</source>
+        <translation>Sarežģītais</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="186"/>
+        <source>Other</source>
+        <translation>Cits</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="196"/>
+        <source>Multi</source>
+        <translation>Multi</translation>
+    </message>
+    <message>
+        <location filename="../tasktoolbar.cpp" line="196"/>
+        <source>Regular</source>
+        <translation>Normāls</translation>
     </message>
 </context>
 <context>
@@ -1128,8 +1224,7 @@ Izvēlies citu nosaukumu</translation>
     <message>
         <location filename="../teamtoolbar.cpp" line="35"/>
         <source>Add Team</source>
-        <translation>Pievienot
-komandu</translation>
+        <translation>Pievienot</translation>
     </message>
     <message>
         <location filename="../teamtoolbar.cpp" line="37"/>
@@ -1139,8 +1234,7 @@ komandu</translation>
     <message>
         <location filename="../teamtoolbar.cpp" line="43"/>
         <source>Edit Team</source>
-        <translation>Rediģēt
-komandu</translation>
+        <translation>Rediģēt</translation>
     </message>
     <message>
         <location filename="../teamtoolbar.cpp" line="45"/>
@@ -1150,8 +1244,7 @@ komandu</translation>
     <message>
         <location filename="../teamtoolbar.cpp" line="51"/>
         <source>Remove Team</source>
-        <translation>Dzēst
-komandu</translation>
+        <translation>Dzēst</translation>
     </message>
     <message>
         <location filename="../teamtoolbar.cpp" line="64"/>

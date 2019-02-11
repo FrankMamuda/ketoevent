@@ -73,7 +73,7 @@
     <item>
      <widget class="QCheckBox" name="sortByTypeCheck">
       <property name="text">
-       <string>Sort tasks by type</string>
+       <string>Sort tasks by style</string>
       </property>
      </widget>
     </item>

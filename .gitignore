@@ -12,3 +12,4 @@ object_script.*
 sqlite/
 i18n/*.qm
 *.qrc~
+*.autosave
