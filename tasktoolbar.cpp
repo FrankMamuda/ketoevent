@@ -191,11 +191,11 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                 }
 
                 out << QString( "%1;%2;%3;%4;%5;%6%7" )
-                       .arg( Task::instance()->name( row ))
-                       .arg( Task::instance()->description( row ))
+                       .arg( Task::instance()->name( row ).replace( ";", " |" ))
+                       .arg( Task::instance()->description( row ).replace( ";", "  |" ))
                        .arg( Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ))
                        .arg( style )
-                       .arg( Task::instance()->multi( row ))
+                       .arg( Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "" )
                        .arg( Task::instance()->points( row ))
                        .arg( win32 ? "\r" : "\n" );
             }
