@@ -135,7 +135,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                                 id = query.next() ? static_cast<Id>( query.value( 0 ).toInt() + 1 ) : static_cast<Id>( 0 );
                             }
 
-                            qDebug() << "COMBINE";
+#ifdef QT_DEBUG
+                            qCDebug( Database_::Debug ) << "combine";
+#endif
 
                             QSqlQuery query;
                             int count = 0;
@@ -145,7 +147,9 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             if ( query.next())
                                 count = query.value( 0 ).toInt();
 
-                            qDebug() << "found" << count;
+#ifdef QT_DEBUG
+                            qCDebug( Database_::Debug ) << "found" << count;
+#endif
 
                             // disallow combination if only one valid task is available
                             if ( count <= 1 )
@@ -155,7 +159,11 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                             // required to reset id list accessed by "done" action
                             delegate->reset();
-                            qDebug() << "set id" << id;
+
+#ifdef QT_DEBUG
+                            qCDebug( Database_::Debug ) << "set id" << id;
+#endif
+
                             MainWindow::instance()->setTaskFilter( true, id );
                         }
                         break;
@@ -168,7 +176,10 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::AddCombo:
-                        qDebug() << "ADD COMBO";
+#ifdef QT_DEBUG
+                        qCDebug( Database_::Debug ) << "add combo";
+#endif
+
                         setComboId( MainWindow::instance()->currentComboId());
                         break;
 

@@ -120,12 +120,15 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         //
         QList<Id> idList( qobject_cast<Delegate*>( this->ui->taskView->itemDelegate())->combos.values());
         idList.removeAll( Id::Invalid );
-        qDebug() << ( idList.count() <= 1 ? "bad list" : "okay list" ) << idList.count();
+
+#ifdef QT_DEBUG
+        qCDebug( Database_::Debug ) << ( idList.count() <= 1 ? "bad list" : "okay list" ) << idList.count();
+#endif
 
         // do a simple query
         if ( idList.count() == 1 ) {
             QSqlQuery query;
-            query.exec( QString( "UPDATE %1 SET %2=-1 WHERE comboId=%3" )
+            query.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
                         .arg( Log::instance()->tableName())
                         .arg( Log::instance()->fieldName( Log::Combo ))
                         .arg( static_cast<int>( idList.first())));

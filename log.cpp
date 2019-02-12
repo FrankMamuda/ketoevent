@@ -162,7 +162,7 @@ void Log::removeOrphanedEntries() {
 
             const int combo = query.value( 0 ).toInt();
             qCDebug( Database_::Debug ) << this->tr( "clearing an orphaned combo with id:%1" ).arg( combo );
-            subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE comboId=%3" )
+            subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
                            .arg( Log::instance()->tableName())
                            .arg( Log::instance()->fieldName( Log::Combo ))
                            .arg( combo ));
@@ -212,12 +212,13 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
         else
             Log::instance()->setMultiplier( row, multi );
 
-        if ( multi <= 0 )
-            qDebug() << "delete log at row" << row;
-        else
-            qDebug() << "change log at row" << row;
+#ifdef QT_DEBUG
+        qCDebug( Database_::Debug ) << ( multi <= 0 ? "delete" : "change" ) << "log at row" << row;
+#endif
     } else {
-        qDebug() << "new log";
+#ifdef QT_DEBUG
+        qCDebug( Database_::Debug ) << "new log";
+#endif
         Log::instance()->add( taskId, teamId, multi );
     }
 }

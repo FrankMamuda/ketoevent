@@ -590,8 +590,7 @@ Izvēlies citu nosaukumu</translation>
     <message>
         <location filename="../mainwindow.ui" line="278"/>
         <source>About</source>
-        <translation>Par
-programmu</translation>
+        <translation>Par</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="342"/>
