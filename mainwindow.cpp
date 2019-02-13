@@ -575,13 +575,17 @@ void MainWindow::on_actionAbout_triggered() { About( this ).exec(); }
 void MainWindow::on_actionExport_logs_triggered() {
     QSqlQuery query;
 
+    const Row team = this->currentTeam();
+    if ( team == Row::Invalid )
+        return;
+
     //qDebug() << Team::instance()
     query.exec( QString( "select * from %1 where %2=%3" )
                 .arg( Log::instance()->tableName())
                 .arg( Log::instance()->fieldName( Log::Team ))
-                .arg( static_cast<int>( Team::instance()->id( this->currentTeam()))));
+                .arg( static_cast<int>( Team::instance()->id( team ))));
 
-    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath() + "/" + Team::instance()->title( team ) + ".csv", this->tr( "CSV file (*.csv)" )));
 #ifdef Q_OS_WIN
     const bool win32 = true;
 #else
