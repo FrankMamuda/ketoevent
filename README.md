@@ -1,5 +1,6 @@
 ### About
 Scavenger hunt event logger.
 
-### Warning
-This is the ALTERNATE branch. It is incomplete and experimental. Refer to the MASTER branch for the stable app. 
+### Note
+This is the ALTERNATE branch, MASTER branch is as of now OBSOLETE.\
+Currently optimized for [Ketonu Kauss 6](https://coord.info/GC82AAQ).
