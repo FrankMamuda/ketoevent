@@ -28,6 +28,7 @@
 #include "log.h"
 #include "delegate.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QSqlQuery>
 #include "editordialog.h"
 #include "tasktoolbar.h"
@@ -179,6 +180,10 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
     // add to garbage man
     GarbageMan::instance()->add( this );
+
+#ifndef QT_DEBUG
+    this->ui->quickBar->removeAction( this->ui->actionExport_logs );
+#endif
 
     // lock/unlock ui elements
     this->setLock();
@@ -457,11 +462,11 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                           Task::instance()->fieldName( Task::Style ) :
                           Task::instance()->fieldName( Task::Order ))
                 .arg( sort ?
-#ifdef SQLITE_CUSTOM
+                      #ifdef SQLITE_CUSTOM
                           QString( ", %1 COLLATE localeCompare ASC" )
-#else
+                      #else
                           QString( ", %1 COLLATE NOCASE ASC" )
-#endif
+                      #endif
                           .arg( Task::instance()->fieldName( Task::Name )) :
                           "" ));
 
@@ -563,3 +568,57 @@ void MainWindow::on_actionCombos_triggered() { Combos::instance()->show(); }
  * @brief MainWindow::on_actionAbout_triggered
  */
 void MainWindow::on_actionAbout_triggered() { About( this ).exec(); }
+
+/**
+ * @brief MainWindow::on_actionExport_logs_triggered
+ */
+void MainWindow::on_actionExport_logs_triggered() {
+    QSqlQuery query;
+
+    //qDebug() << Team::instance()
+    query.exec( QString( "select * from %1 where %2=%3" )
+                .arg( Log::instance()->tableName())
+                .arg( Log::instance()->fieldName( Log::Team ))
+                .arg( static_cast<int>( Team::instance()->id( this->currentTeam()))));
+
+    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+#ifdef Q_OS_WIN
+    const bool win32 = true;
+#else
+    const bool win32 = false;
+#endif
+
+    // check for empty filenames
+    if ( path.isEmpty())
+        return;
+
+    // add extension
+    if ( !path.endsWith( ".csv" ))
+        path.append( ".csv" );
+
+    // create file
+    QFile csv( path );
+    if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
+        QTextStream out( &csv );
+        out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
+        out << this->tr( "Name;Style;Points" ).append( win32 ? "\r" : "\n" );
+
+        while ( query.next()) {
+            const Id id = static_cast<Id>( query.value( Log::Task ).toInt());
+            if ( id == Id::Invalid )
+                continue;
+
+            const Row row = Task::instance()->row( id );
+            if ( row == Row::Invalid )
+                continue;
+
+            out << QString( "%1;%2;%3%4" )
+                   .arg( Task::instance()->name( row ))
+                   .arg( static_cast<int>( Task::instance()->style( row )))
+                   .arg( query.value( Log::Multi ).toInt())
+                   .arg( win32 ? "\r" : "\n" );
+
+        }
+    }
+    csv.close();
+}
