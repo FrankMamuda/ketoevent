@@ -39,7 +39,6 @@
 //
 // GENERAL TODO/FIXME LIST
 //
-//   - implement imports (at least pure stats)
 //   - scripted states (combos would be scripted, not hardcoded)
 //   - more self tests
 //   - ideally info button would align itself to the left

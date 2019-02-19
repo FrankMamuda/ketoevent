@@ -21,6 +21,7 @@
 //
 // includes
 //
+#include <QFileInfo>
 #include <QLoggingCategory>
 #include <QSharedPointer>
 #include <QSqlTableModel>
@@ -64,6 +65,7 @@ public:
 public slots:
     void removeOrphanedEntries();
     void incrementCounter();
+    void attach( const QFileInfo &info );
 
 private slots:
     void writeBackup();

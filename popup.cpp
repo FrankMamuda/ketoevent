@@ -27,7 +27,7 @@
 #include <QTimer>
 
 /**
- * @brief Popup::Popup3
+ * @brief Popup::Popup
  * @param parent
  */
 Popup::Popup( QWidget *parent, const QString &text, const int timeout ) : QDialog( parent ),
@@ -77,7 +77,7 @@ Popup::Popup( QWidget *parent, const QString &text, const int timeout ) : QDialo
 }
 
 /**
- * @brief Popup3::setupShape
+ * @brief Popup::setupShape
  */
 void Popup::setupShape() {
     const int o0 = this->shadowBlurRadius - this->shadowOffset;
@@ -87,12 +87,16 @@ void Popup::setupShape() {
     const int h = this->height();
 
     // setup polygon
-    this->arrowHead = QPoint( o0 + 40,  0  + o0 );
+    // NOTE: a popup of a maxmimzed window will most likely be drawn off screen, so reverse the arrow location
+    // NOTE: not implemented properly yet (disabled)
+    const bool inverse = false;//this->parentWidget() == nullptr ? false : this->parentWidget()->isMaximized();
+
+    this->arrowHead = inverse ? QPoint( w - 40 - o1,  0  + o0 ) : QPoint( o0 + 40,  0  + o0 );
     this->poly = QPolygon( QVector<QPoint>() <<
                            QPoint( o0,       20 + o0 ) << // UL
-                           QPoint( o0 + 20,  20 + o0 ) << // arrow base L
+                           QPoint( inverse ? w - 60 - o1 : o0 + 20,  20 + o0 ) << // arrow base L
                            arrowHead <<                   // arrow head
-                           QPoint( o0 + 60,  20 + o0 ) << // arrow base R
+                           QPoint( inverse ?  w - 20 - o1 : o0 + 60,  20 + o0 ) << // arrow base R
                            QPoint( w - o1,   20 + o0 ) << // UR
                            QPoint( w - o1,   h - o1 ) <<  // LR
                            QPoint( o0,       h - o1 ));   // LL
@@ -114,6 +118,10 @@ void Popup::setText( const QString &text ) {
  * @param point
  */
 void Popup::pointAt( const QPoint &point ) {
+    // NOTE: not implemented properly yet (disabled)
+    const bool inverse = false;// = this->parentWidget() == nullptr ? false : this->parentWidget()->isMaximized();
+    Q_UNUSED( inverse )
+
     const QPoint pos( point.x() - this->arrowHead.x(), point.y() - this->arrowHead.y());
     this->move( pos );
 }

@@ -26,6 +26,7 @@
 #include "main.h"
 #include "database.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QMessageBox>
 
 /**
@@ -71,6 +72,17 @@ EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
         // restore eventId (model resets on remove apparently)
         if ( event != row )
             MainWindow::instance()->setCurrentEvent( event );
+    } );
+
+    // import action
+    this->addAction( QIcon( ":/icons/export" ), this->tr( "Import logs" ), [ this ]() {
+        const QFileInfo info( QFileDialog::getOpenFileName( this, this->tr( "Import logs from database" ), QDir::homePath() + "/" + "database.db", this->tr( "Database (*.db)" )));
+        if ( !info.exists())
+            return;
+
+        if ( QMessageBox::question( this, this->tr( "Import event" ), this->tr( "Do you really want to import logs and teams from \"%1\"?" ).arg( info.fileName())) == QMessageBox::Yes ) {
+            Database::instance()->attach( info );
+        }
     } );
 
     // button test (disconnected in ~EditorDialog)

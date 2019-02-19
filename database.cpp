@@ -37,6 +37,7 @@
 #ifdef SQLITE_CUSTOM
 #include <QSqlDriver>
 #include "sqlite/sqlite3.h"
+#include "mainwindow.h"
 #endif
 
 /**
@@ -299,4 +300,146 @@ void Database::writeBackup() {
                  .arg( dir.absolutePath())
                  .arg( info.fileName().remove( ".db" ))
                  .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+}
+
+/**
+ * @brief Database::attach
+ * @param path
+ */
+void Database::attach( const QFileInfo &info ) {
+    // get current event if any
+    const Row row = MainWindow::instance()->currentEvent();
+    if ( row == Row::Invalid )
+        return;
+
+    // get current event name
+    const QString currentTitle( Event::instance()->title( row ));
+
+    // check if database exists
+    if ( !info.exists()) {
+        qCDebug( Database_::Debug ) << this->tr( "database \"%1\" does not exist" ).arg( info.fileName());
+        return;
+    }
+
+    // attach a foreign database
+    QSqlQuery query;
+    if ( !query.exec( QString( "attach '%1' as merge" ).arg( info.absoluteFilePath()))) {
+        qCritical( Database_::Debug ) << this->tr( "could not attach database, reason - \"%1\"" ).arg( query.lastError().text());
+        return;
+    }
+
+    // check if tasks match in both tables
+    // TODO: also check API
+    if ( !query.exec( QString( "select not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )" ).arg( Task::instance()->tableName()))) {
+        qCritical( Database_::Debug ) << this->tr( "could not compare task tables" );
+        return;
+    } else {
+        bool result = false;
+        if ( query.next())
+            result = query.value( 0 ).toBool();
+
+        // abort in case of mismatch
+        if ( !result ) {
+            qCritical( Database_::Debug ) << this->tr( "task table mismatch" );
+            return;
+        }
+    }
+
+    // find a matching event in the foreign database
+    bool found = false;
+    Id eventId = Id::Invalid;
+    if ( query.exec( QString( "select * from merge.%1" ).arg( Event::instance()->tableName()))) {
+        while ( query.next()) {
+            const QString title( query.record().value( Event::Title ).toString());
+            eventId = static_cast<Id>( query.record().value( Event::ID ).toInt());
+
+            if ( eventId != Id::Invalid && !QString::compare( title, currentTitle )) {
+                found = true;
+                break;
+            }
+        }
+    }
+
+    // abort if a matching event is not found
+    if ( !found ) {
+        qCritical( Database_::Debug ) << this->tr( "could not find matching event" );
+        return;
+    }
+
+    // highest id lambda
+    auto getHiId = []( const QString &table, const QString &fieldName ) {
+        QSqlQuery query;
+
+        query.exec( QString( "select max( %1 ) from %2" ).arg( fieldName ).arg( table ));
+        if ( query.next())
+            return query.value( 0 ).toInt();
+
+        return static_cast<int>( Id::Invalid );
+    };
+
+    // get highest combo id from current database
+    int comboHiId = getHiId( Log::instance()->tableName(),  Log::instance()->fieldName( Log::Combo ));
+    int teams = 0, logs = 0;
+
+    // find unique teams that are not in the current event
+    if ( query.exec( QString( "select * from merge.%1 where %2 not in ( select %2 from %1 )" )
+                     .arg( Team::instance()->tableName())
+                     .arg( Team::instance()->fieldName( Team::Title )))) {
+
+        // go through the team list
+        while ( query.next()) {
+            const QString title( query.record().value( Team::Title ).toString());
+            const Id teamId = static_cast<Id>( query.record().value( Team::ID ).toInt());
+            const int members = query.record().value( Team::Members ).toInt();
+            const QTime finish( QTime::fromString( query.record().value( Team::Finish ).toString(), Database_::TimeFormat ));
+            const QString reviewer( query.record().value( Team::Reviewer ).toString());
+
+            if ( teamId == Id::Invalid )
+                continue;
+
+            // add a new team
+            const Row row = Team::instance()->add( title, members, finish, reviewer );
+            if ( row == Row::Invalid )
+                return;
+
+            const Id newTeamId = Team::instance()->id( row );
+            if ( newTeamId == Id::Invalid )
+                return;
+
+            // find logs that belong to the current team
+            QSqlQuery subQuery;
+            QMap<Id, Id> comboIdRemap;
+            if ( subQuery.exec( QString( "select * from merge.%1 where %2=%3" )
+                                .arg( Log::instance()->tableName())
+                                .arg( Log::instance()->fieldName( Log::Team ))
+                                .arg( static_cast<int>( teamId )))) {
+
+                // go through the log list
+                while ( subQuery.next()) {
+                    const Id taskId = static_cast<Id>( subQuery.record().value( Log::Task ).toInt());
+                    const int multi = subQuery.record().value( Log::Multi ).toInt();
+                    const Id comboId = static_cast<Id>( subQuery.record().value( Log::Combo ).toInt());
+
+                    // remap comboIds
+                    if ( !comboIdRemap.contains( comboId ))
+                        comboIdRemap[comboId] = comboId == Id::Invalid ? Id::Invalid : static_cast<Id>( comboHiId++ );
+
+                    // add logs
+                    Log::instance()->add( taskId, newTeamId, multi, comboIdRemap[comboId] );
+                    logs++;
+                }
+            }
+
+            teams++;
+        }
+    } else {
+        qCritical( Database_::Debug ) << this->tr( "could not perform team query" );
+        return;
+    }
+
+    // report
+    qCDebug( Database_::Debug ) << this->tr( "imported %1 teams and %2 logs" ).arg( teams ).arg( logs );
+
+    // detach database
+    query.exec( "detach merge" );
 }
