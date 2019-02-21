@@ -39,6 +39,13 @@ public:
         Combos,
         Combined,
         Penalty,
+
+#ifdef KK6_SPECIAL
+        Regular,
+        Special0,
+        Special1,
+#endif
+
         Points,
 
         // do not remove

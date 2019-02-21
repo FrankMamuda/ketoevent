@@ -43,22 +43,20 @@ class Rankings;
 class TeamStatistics final {
 public:
     explicit TeamStatistics( const QString &n = QString()) :
-        title( n ),
-        completedTasks( 0 ),
-        combos( 0 ),
-        comboTasks( 0 ),
-        points( 0 ),
-        penalty( 0 ),
-        time( 0 ),
-        rank( 0 ) {}
+        title( n ) {}
     QString title;
-    int completedTasks;
-    int combos;
-    int comboTasks;
-    int points;
-    int penalty;
-    int time;
-    int rank;
+    int completedTasks = 0;
+    int combos = 0;
+    int comboTasks = 0;
+    int points = 0;
+    int penalty = 0;
+    int time = 0;
+#ifdef KK6_SPECIAL
+    // NOTE: hardcoded
+    int specialPoints0 = 0;
+    int specialPoints1 = 0;
+#endif
+    int rank = 0;
 };
 
 /**

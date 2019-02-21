@@ -52,6 +52,17 @@ QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, in
             if ( section == Penalty )
                 return QObject::tr( "Penalty" );
 
+#ifdef KK6_SPECIAL
+            if ( section == Regular )
+                return QObject::tr( "Regular" );
+
+            if ( section == Special0 )
+                return QObject::tr( "FTF" );
+
+            if ( section == Special1 )
+                return QObject::tr( "Special" );
+
+#endif
             if ( section == Points )
                 return QObject::tr( "Points" );
         }
@@ -124,6 +135,19 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
 
         if ( index.column() == Penalty )
             return Rankings::instance()->list.at( index.row()).penalty;
+
+#ifdef KK6_SPECIAL
+        if ( index.column() == Regular )
+            return Rankings::instance()->list.at( index.row()).points -
+                   Rankings::instance()->list.at( index.row()).specialPoints0 -
+                   Rankings::instance()->list.at( index.row()).specialPoints1;
+
+        if ( index.column() == Special0 )
+            return Rankings::instance()->list.at( index.row()).specialPoints0;
+
+        if ( index.column() == Special1 )
+            return Rankings::instance()->list.at( index.row()).specialPoints1;
+#endif
 
         if ( index.column() == Points )
             return Rankings::instance()->list.at( index.row()).points;

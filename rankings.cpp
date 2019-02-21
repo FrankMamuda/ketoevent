@@ -184,6 +184,16 @@ void Rankings::on_actionUpdate_triggered() {
                 combos[comboId] = combos[comboId] + 1;
                 stats.comboTasks += 1;
             }
+
+#ifdef KK6_SPECIAL
+            // NOTE: hardcoded
+            // special event-related points
+            const QString taskName( Task::instance()->name( task ));
+            if ( !QString::compare( taskName, "Papilduzdevums" ))
+                stats.specialPoints1 = value;
+            else if ( !QString::compare( taskName, "FTF" ))
+                stats.specialPoints0 = value;
+#endif
         }
 
         // store combo count
