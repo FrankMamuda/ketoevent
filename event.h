@@ -79,6 +79,7 @@ public:
         Combo3,
         Combo4,
         Lock,
+        Script,
 
         // count
         Count
@@ -97,17 +98,18 @@ public:
             const QTime &final  = QTime::fromString( EventTable::DefaultFinalTime, Database_::TimeFormat ),
             int penalty = EventTable::DefaultPenaltyPoints,
             int two = EventTable::DefaultComboOfTwo, int three = EventTable::DefaultComboOfThree, int fourPlus = EventTable::DefaultComboOfFourAndMore );
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
-    int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
-    QTime startTime( const Row &row ) const { return QTime::fromString( this->value( row, Start ).toString(), Database_::TimeFormat ); }
-    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
-    QTime finalTime( const Row &row ) const { return QTime::fromString( this->value( row, Final ).toString(), Database_::TimeFormat ); }
-    int penalty( const Row &row ) const { return this->value( row, Penalty ).toInt(); }
-    int comboOfTwo( const Row &row ) const { return this->value( row, Combo2 ).toInt(); }
-    int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
-    int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
+    Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Q_INVOKABLE QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    Q_INVOKABLE int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
+    Q_INVOKABLE int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
+    Q_INVOKABLE QTime startTime( const Row &row ) const { return QTime::fromString( this->value( row, Start ).toString(), Database_::TimeFormat ); }
+    Q_INVOKABLE QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    Q_INVOKABLE QTime finalTime( const Row &row ) const { return QTime::fromString( this->value( row, Final ).toString(), Database_::TimeFormat ); }
+    Q_INVOKABLE int penalty( const Row &row ) const { return this->value( row, Penalty ).toInt(); }
+    Q_INVOKABLE int comboOfTwo( const Row &row ) const { return this->value( row, Combo2 ).toInt(); }
+    Q_INVOKABLE int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
+    Q_INVOKABLE int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
+    QString script( const Row &row ) const;
 
     void removeOrphanedEntries() override {}
 

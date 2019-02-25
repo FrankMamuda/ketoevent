@@ -72,7 +72,7 @@ public:
     virtual ~Table() override { this->setValid( false ); this->clear(); }
     bool isValid() const { return this->m_valid; }
     bool hasPrimaryField() const { return this->m_hasPrimary; }
-    int count() const;
+    Q_INVOKABLE int count() const;
     QVariant value( const Row &row, int fieldId ) const;
     bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
     virtual bool select() override;
@@ -80,10 +80,10 @@ public:
     virtual QVariant data( const QModelIndex &index, int role ) const override;
     virtual void setFilter( const QString &filter ) override;
     QString fieldName( int id ) const;
-    Row row( const int index ) const { if ( index < 0 || index >= this->count()) return Row::Invalid; return static_cast<Row>( index ); }
+    Q_INVOKABLE Row row( const int index ) const { if ( index < 0 || index >= this->count()) return Row::Invalid; return static_cast<Row>( index ); }
     Row row( const QModelIndex &index ) const { if ( index.row() < 0 || index.row() >= this->count() || index.model() != this ) return Row::Invalid; return static_cast<Row>( index.row()); }
     QModelIndex find( const Id &id ) const;
-    Row row( const Id &id ) const;
+    Q_INVOKABLE Row row( const Id &id ) const;
 
 public slots:
     void setValid( bool valid = true ) { this->m_valid = valid; }

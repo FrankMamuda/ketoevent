@@ -173,6 +173,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionRunScript"/>
    <addaction name="actionAddQuick"/>
    <addaction name="actionLogTime"/>
    <addaction name="actionExport_logs"/>
@@ -286,6 +287,11 @@
    </property>
    <property name="text">
     <string>Export logs</string>
+   </property>
+  </action>
+  <action name="actionRunScript">
+   <property name="text">
+    <string>Run script</string>
    </property>
   </action>
  </widget>

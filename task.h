@@ -88,19 +88,19 @@ public:
     static Task *instance() { static Task *instance( new Task()); return instance; }
     virtual ~Task() override { this->setInitialised( false ); }
 
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
-    QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
-    int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
-    int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
-    Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
-    Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
-    int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
-    QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
-    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    Q_INVOKABLE QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
+    Q_INVOKABLE int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
+    Q_INVOKABLE int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
+    Q_INVOKABLE Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
+    Q_INVOKABLE Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
+    Q_INVOKABLE int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
+    Q_INVOKABLE QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
+    Q_INVOKABLE Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
-    int multiplier( const Row &row ) const;
-    Id comboId( const Row &row ) const;
+    Q_INVOKABLE int multiplier( const Row &row ) const;
+    Q_INVOKABLE Id comboId( const Row &row ) const;
     QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
 
     bool hasInitialised() const { return this->m_initialised; }

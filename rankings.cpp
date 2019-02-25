@@ -146,10 +146,11 @@ void Rankings::on_actionUpdate_triggered() {
         // go through logs
         for ( int log = 0; log < Log::instance()->count(); log++ ) {
             const Row logRow = Log::instance()->row( log );
-            const int value = Log::instance()->multiplier( logRow );
 
             if ( logRow == Row::Invalid )
                 continue;
+
+            const int value = Log::instance()->multiplier( logRow );
 
             // abort on invalid log values or logs not related to the current team
             if ( value <= 0 || Team::instance()->id( teamRow ) != Log::instance()->teamId( logRow ))

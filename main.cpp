@@ -40,6 +40,7 @@
 // GENERAL TODO/FIXME LIST
 //
 //   - scripted states (combos would be scripted, not hardcoded)
+//       working on it, so far experimental scripting has been implemented
 //   - more self tests
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1

@@ -112,6 +112,20 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
             this->close();
     } );
 
+    // edit script button
+    this->connect( this->ui->scriptButton, &QPushButton::clicked, [ this ]() {
+        // ideally page would look like this:
+        //
+        // Event title: ______________________
+        // Members (min): 1 <>
+        // Members (max): 2 <>
+        // ( Configure ) -> opens a list of all event variables (times, bonus points)
+        // ( Edit Script ) -> opens a javascript editor
+        //
+        // making title and member count the only hard coded variables, the rest
+        //   being imported from a script
+    } );
+
     // add to garbage man
     GarbageMan::instance()->add( this );
 }

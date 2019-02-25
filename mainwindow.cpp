@@ -44,6 +44,7 @@
 #include "eventedit.h"
 #include "eventtoolbar.h"
 #include "about.h"
+#include "script.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -183,6 +184,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
 #ifndef QT_DEBUG
     this->ui->quickBar->removeAction( this->ui->actionExport_logs );
+    this->ui->quickBar->removeAction( this->ui->actionRunScript );
 #endif
 
     // lock/unlock ui elements
@@ -625,4 +627,22 @@ void MainWindow::on_actionExport_logs_triggered() {
         }
     }
     csv.close();
+}
+
+/**
+ * @brief MainWindow::on_actionRunScript_triggered
+ */
+void MainWindow::on_actionRunScript_triggered() {
+    // check for valid event
+    const Row event = this->currentEvent();
+    if ( event == Row::Invalid )
+        return;
+
+    // evalute current event script
+    Script::instance()->evaluate( Event::instance()->script( event ));
+
+    // call entry function
+    QJSValue ret( Script::instance()->call( "main" ));
+    foreach ( const QVariant &var, ret.toVariant().toList())
+        qDebug() << var.toMap();
 }

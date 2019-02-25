@@ -62,13 +62,13 @@ public:
     static Team *instance() { static Team *instance( new Team()); return instance; }
     virtual ~Team() override = default;
 
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
-    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
-    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
-    QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
-    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    Q_INVOKABLE QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    Q_INVOKABLE int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
+    Q_INVOKABLE QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    Q_INVOKABLE QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
+    Q_INVOKABLE Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     void removeOrphanedEntries() override;
 
 public slots:

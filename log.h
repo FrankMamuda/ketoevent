@@ -62,12 +62,17 @@ public:
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
     Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Id id( const Id &taskId, const Id &teamId ) const;
-    int multiplier( const Row &row ) const { return this->value( row, Multi ).toInt(); }
-    int multiplier( const Id &taskId, const Id &teamId ) const;
-    Id taskId( const Row &row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
-    Id teamId( const Row &row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
-    Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
+    Q_INVOKABLE int multiplier( const Row &row ) const { return this->value( row, Multi ).toInt(); }
+    Q_INVOKABLE int multiplier( const Id &taskId, const Id &teamId ) const;
+    Q_INVOKABLE Id taskId( const Row &row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
+    Q_INVOKABLE Id teamId( const Row &row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
+    Q_INVOKABLE Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
     Id comboId( const Id &taskId, const Id &teamId ) const;
+
+    // special JS functions
+    //Q_INVOKABLE int taskIdJS( const Row &row ) const { return Table::castToInt( this->taskId( row )); }
+    //Q_INVOKABLE int teamIdJS( const Row &row ) const { return Table::castToInt( this->teamId( row )); }
+    //Q_INVOKABLE int comboIdJS( const Row &row ) const { return Table::castToInt( this->comboId( row )); }
 
     void removeOrphanedEntries() override;
 

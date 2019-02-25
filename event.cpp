@@ -22,6 +22,7 @@
 #include "event.h"
 #include "field.h"
 #include "database.h"
+#include "variable.h"
 
 //
 // namespaces
@@ -46,6 +47,12 @@ Event::Event() : Table( EventTable::Name ) {
     this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
     this->addField( Combo4,  "comboOfFourAndMore", QVariant::Int,    "integer" );
     this->addField( Lock,    "lock",               QVariant::Int,    "integer" );
+    this->addField( Script,  "script",             QVariant::String, "text" );
+
+    // TODO: we must break API
+    // for now only a script field is added
+    // in upcoming builds fields such as times, penalties, combos etc. will be removed
+    //   to be dynamically parsed from an event script
 }
 
 /**
@@ -70,3 +77,24 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
                 fourPlus <<
                        0 );
 }
+
+/**
+ * @brief Event::script
+ * @param row
+ * @return
+ */
+QString Event::script( const Row &row ) const {
+#ifdef QT_DEBUG
+    // TODO: must use script API
+
+    // read script file
+    QFile script( QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath() + "/script.js" );
+    if ( script.open( QIODevice::ReadOnly )) {
+        const QString buffer( script.readAll());
+        script.close();
+        return buffer;
+    }
+#endif
+    return this->value( row, Script ).toString();
+}
+

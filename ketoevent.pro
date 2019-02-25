@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql xml concurrent
+QT       += core gui sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -51,7 +51,8 @@ SOURCES += \
     eventedit.cpp \
     eventtoolbar.cpp \
     popup.cpp \
-    about.cpp
+    about.cpp \
+    script.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -89,7 +90,8 @@ HEADERS += \
     eventedit.h \
     eventtoolbar.h \
     popup.h \
-    about.h
+    about.h \
+    script.h
 
 FORMS += \
         mainwindow.ui \
@@ -122,3 +124,7 @@ TRANSLATIONS = i18n/ketoevent_lv_LV.ts
 
 # special stats for KK6
 DEFINES += KK6_SPECIAL
+
+# enable scripting
+QT += qml
+

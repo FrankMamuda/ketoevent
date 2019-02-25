@@ -72,8 +72,8 @@ private slots:
     void on_actionAddQuick_triggered();
     void on_actionEvents_triggered();
     void on_actionAbout_triggered();
-
     void on_actionExport_logs_triggered();
+    void on_actionRunScript_triggered();
 
 protected:
     void closeEvent( QCloseEvent *event ) override;
