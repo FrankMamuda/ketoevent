@@ -291,7 +291,7 @@
   </action>
   <action name="actionRunScript">
    <property name="text">
-    <string>Run script</string>
+    <string>TEST</string>
    </property>
   </action>
  </widget>

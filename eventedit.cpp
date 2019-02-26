@@ -25,6 +25,7 @@
 #include "eventedit.h"
 #include "ui_eventedit.h"
 #include "variable.h"
+#include "optionswidget.h"
 #include <QMessageBox>
 
 /**
@@ -38,6 +39,11 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
     // only visible in quick add
     this->setWindowTitle( this->tr( "Add event" ));
     this->setWindowIcon( QIcon( ":/icons/ketone" ));
+
+    this->addWidget( QStringList() << "bool" );
+    this->addWidget( QStringList() << "integer" );
+    this->addWidget( QStringList() << "time" );
+    this->addWidget( QStringList() << "string" );
 
     // empty event title check
     auto emptyTitle = [ this ]() {
@@ -114,6 +120,11 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
 
     // edit script button
     this->connect( this->ui->scriptButton, &QPushButton::clicked, [ this ]() {
+        //Options options( this );
+        //options.setAttribute( Qt::WA_DeleteOnClose, true );
+
+        //options.exec();
+
         // ideally page would look like this:
         //
         // Event title: ______________________
@@ -138,6 +149,10 @@ EventEdit::~EventEdit() {
     this->disconnect( this->ui->addButton, SIGNAL( clicked()));
     this->disconnect( this->ui->cancelButton, SIGNAL( clicked()));
     this->disconnect( this->ui->titleEdit, SIGNAL( returnPressed()));
+
+    // delete all widgets
+    // TODO: also delete items
+    qDeleteAll( this->widgets );
 
     // delete ui
     delete this->ui;
@@ -185,3 +200,33 @@ void EventEdit::reset( bool edit ) {
     this->ui->addButton->setAutoDefault( false );
 }
 
+/**
+ * @brief EventEdit::addWidget
+ * @param parms
+ */
+void EventEdit::addWidget( const QStringList &parms ) {
+    OptionsWidget *widget;
+
+    if ( parms.isEmpty())
+        return;
+
+    // parse values
+    const QString type( parms.at( 0 ));
+    if ( !QString::compare( type, "bool" ))
+        widget = new OptionsWidget( OptionsWidget::Bool, "Special mode", true, this );
+    else if ( !QString::compare( type, "string" ))
+        widget = new OptionsWidget( OptionsWidget::String, "Important string", "not really", this );
+    else if ( !QString::compare( type, "integer" ))
+        widget = new OptionsWidget( OptionsWidget::Integer, "Penalty points", 5, this );
+    else if ( !QString::compare( type, "time" ))
+        widget = new OptionsWidget( OptionsWidget::Time, "Finish time", QTime::fromString( "17:30", Database_::TimeFormat ), this );
+    else
+        return;
+
+    QListWidgetItem *item( new QListWidgetItem( this->ui->optionList ));
+    this->ui->optionList->setItemWidget( item, widget );
+    widget->show();
+    item->setSizeHint( widget->sizeHint());
+
+    this->widgets << widget;
+}

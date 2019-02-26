@@ -45,6 +45,7 @@
 #include "eventtoolbar.h"
 #include "about.h"
 #include "script.h"
+#include "optionswidget.h"
 
 /**
  * @brief MainWindow::MainWindow
@@ -634,7 +635,7 @@ void MainWindow::on_actionExport_logs_triggered() {
  */
 void MainWindow::on_actionRunScript_triggered() {
     // check for valid event
-    const Row event = this->currentEvent();
+    /*const Row event = this->currentEvent();
     if ( event == Row::Invalid )
         return;
 
@@ -645,5 +646,10 @@ void MainWindow::on_actionRunScript_triggered() {
     Script::instance()->call( "main" );
 
     // raise console, to show output
-    Console::instance()->show();
+    Console::instance()->show();*/
+    //Options options;
+    //options.exec();
+
+    //OptionsWidget *op( new OptionsWidget());
+    //op->show();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2019 Factory #12
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,35 +21,34 @@
 //
 // includes
 //
-#include <QWidget>
-#include "optionswidget.h"
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVariant>
 
 /**
- * @brief The Ui namespace
+ * @brief The OptionsWidget class
  */
-namespace Ui {
-class EventEdit;
-}
-
-/**
- * @brief The EventEdit class
- */
-class EventEdit final : public QWidget {
+class OptionsWidget : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY( EventEdit )
+    Q_ENUMS( Types )
+    Q_PROPERTY( Types type READ type )
 
 public:
-    static EventEdit *instance() { static EventEdit *instance = new EventEdit(); return instance; }
-    virtual ~EventEdit();
-    void reset( bool edit = false );
-    bool isEditing() const { return this->m_edit; }
+    enum Types {
+        NoType = 0,
+        Integer,
+        Time,
+        Bool,
+        String
+    };
 
-public slots:
-    void addWidget( const QStringList &parms = QStringList());
+    explicit OptionsWidget( const Types &type = Types::NoType, const QString &label = QString(), const QVariant &value = QVariant(), QWidget *parent = nullptr );
+    ~OptionsWidget();
+    Types type() const { return this->m_type; }
 
 private:
-    explicit EventEdit( QWidget *parent = nullptr );
-    Ui::EventEdit *ui;
-    bool m_edit;
-    QList<OptionsWidget*> widgets;
+    QHBoxLayout *optionsLayout = new QHBoxLayout();
+    QLabel *label = new QLabel();
+    QWidget *widget;
+    Types m_type;
 };

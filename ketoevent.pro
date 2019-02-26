@@ -52,7 +52,8 @@ SOURCES += \
     eventtoolbar.cpp \
     popup.cpp \
     about.cpp \
-    script.cpp
+    script.cpp \
+    optionswidget.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -91,7 +92,8 @@ HEADERS += \
     eventtoolbar.h \
     popup.h \
     about.h \
-    script.h
+    script.h \
+    optionswidget.h
 
 FORMS += \
         mainwindow.ui \

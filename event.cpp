@@ -73,7 +73,7 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
                        minMembers <<
                        maxMembers <<
                        start.toString( Database_::TimeFormat ) <<
-                       finish.toString (Database_::TimeFormat ) <<
+                       finish.toString( Database_::TimeFormat ) <<
                        final.toString( Database_::TimeFormat ) <<
                        penalty <<
                        two <<
