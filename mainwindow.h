@@ -49,8 +49,8 @@ class MainWindow final : public QMainWindow {
 public:
     virtual ~MainWindow();
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
-    Row currentEvent() const;
-    Row currentTeam() const;
+    Q_INVOKABLE Row currentEvent() const;
+    Q_INVOKABLE Row currentTeam() const;
     Id currentComboId() const { return this->m_currentCombo; }
     bool isComboModeActive() const { return this->m_comboMode; }
 

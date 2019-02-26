@@ -22,6 +22,7 @@
 // includes
 //
 #include <QJSEngine>
+#include <QTime>
 
 /**
  * @brief The EventTable namespace
@@ -45,6 +46,8 @@ public:
     static Script *instance() { static Script *instance = new Script(); return instance; }
     virtual ~Script() override {}
     QJSValue call( const QString &func, const QJSValueList &args = QJSValueList()) const;
+    Q_INVOKABLE QTime timeFromString( const QString &timeString ) const;
+    Q_INVOKABLE QTime currentTime() const;
 
 public slots:
     bool evaluate( const QString &script );

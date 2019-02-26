@@ -35,19 +35,23 @@ using namespace EventTable;
  */
 Event::Event() : Table( EventTable::Name ) {
     this->addField( ID,      "id",                 QVariant::UInt,   "integer primary key", true, true );
+    // NOTE: are we even checking api?
     this->addField( API,     "api",                QVariant::Int,    "integer" );
-    this->addField( Title,   "name",               QVariant::String, "varchar( 64 )",       true );
+    /* renameme */ this->addField( Title,   "name",               QVariant::String, "varchar( 64 )",       true );
     this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
     this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
-    this->addField( Start,   "startTime",          QVariant::String, "varchar( 5 )" );
-    this->addField( Finish,  "finishTime",         QVariant::String, "varchar( 5 )" );
-    this->addField( Final,   "finalTime",          QVariant::String, "varchar( 5 )" );
-    this->addField( Penalty, "penalty",            QVariant::Int,    "integer" );
-    this->addField( Combo2,  "comboOfTwo",         QVariant::Int,    "integer" );
-    this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
-    this->addField( Combo4,  "comboOfFourAndMore", QVariant::Int,    "integer" );
-    this->addField( Lock,    "lock",               QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Start,   "startTime",          QVariant::String, "varchar( 5 )" );
+    /* removeme */ this->addField( Finish,  "finishTime",         QVariant::String, "varchar( 5 )" );
+    /* removeme */ this->addField( Final,   "finalTime",          QVariant::String, "varchar( 5 )" );
+    /* removeme */ this->addField( Penalty, "penalty",            QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Combo2,  "comboOfTwo",         QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Combo4,  "comboOfFourAndMore", QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Lock,    "lock",               QVariant::Int,    "integer" );
     this->addField( Script,  "script",             QVariant::String, "text" );
+    /* addme this->addField( Parms, "parameters", QVariant::String, "text" );
+      this is supposed to hold values to be passed to the scripts
+    */
 
     // TODO: we must break API
     // for now only a script field is added
@@ -60,21 +64,21 @@ Event::Event() : Table( EventTable::Name ) {
  * @param title
  */
 Row Event::add( const QString &title, int minMembers, int maxMembers,
-                 const QTime &start, const QTime &finish, const QTime &final,
-                 int penalty, int two, int three, int fourPlus ) {
+                const QTime &start, const QTime &finish, const QTime &final,
+                int penalty, int two, int three, int fourPlus ) {
     return Table::add( QVariantList() <<
-                Database_::null <<
-                Version <<
-                title <<
-                minMembers <<
-                maxMembers <<
-                start.toString( Database_::TimeFormat ) <<
-                finish.toString (Database_::TimeFormat ) <<
-                final.toString( Database_::TimeFormat ) <<
-                penalty <<
-                two <<
-                three <<
-                fourPlus <<
+                       Database_::null <<
+                       Version <<
+                       title <<
+                       minMembers <<
+                       maxMembers <<
+                       start.toString( Database_::TimeFormat ) <<
+                       finish.toString (Database_::TimeFormat ) <<
+                       final.toString( Database_::TimeFormat ) <<
+                       penalty <<
+                       two <<
+                       three <<
+                       fourPlus <<
                        0 );
 }
 
@@ -88,12 +92,23 @@ QString Event::script( const Row &row ) const {
     // TODO: must use script API
 
     // read script file
-    QFile script( QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath() + "/script.js" );
-    if ( script.open( QIODevice::ReadOnly )) {
-        const QString buffer( script.readAll());
-        script.close();
-        return buffer;
-    }
+    auto loadScript = []( const QString &filename ) {
+        QFile script( filename );
+        if ( script.open( QIODevice::ReadOnly )) {
+            const QString buffer( script.readAll());
+            script.close();
+            return buffer;
+        }
+        return QString();
+    };
+
+    QString script( loadScript( QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath() + "/script.js" ));
+    if ( script.isEmpty())
+        loadScript( ":/scripts/default.js" );
+
+    if ( !script.isEmpty())
+        return script;
+
 #endif
     return this->value( row, Script ).toString();
 }

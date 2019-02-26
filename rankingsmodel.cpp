@@ -34,37 +34,14 @@
 QVariant RankingsModel::headerData( int section, Qt::Orientation orientation, int role ) const {
     if ( orientation == Qt::Horizontal ) {
         if ( role == Qt::DisplayRole ) {
-            if ( section == Rank )
-                return QObject::tr( "Rank" );
+            // TODO: calulate rank on script side
+            /*if ( section == Rank )
+                return QObject::tr( "Rank" );*/
 
-            if ( section == TeamTitle )
-                return QObject::tr( "Team\ntitle" );
+            if ( section >= this->columns.count())
+                return QVariant();
 
-            if ( section == Completed )
-                return QObject::tr( "Completed" );
-
-            if ( section == Combos )
-                return QObject::tr( "Combos" );
-
-            if ( section == Combined )
-                return QObject::tr( "Combined" );
-
-            if ( section == Penalty )
-                return QObject::tr( "Penalty" );
-
-#ifdef KK6_SPECIAL
-            if ( section == Regular )
-                return QObject::tr( "Regular" );
-
-            if ( section == Special0 )
-                return QObject::tr( "FTF" );
-
-            if ( section == Special1 )
-                return QObject::tr( "Special" );
-
-#endif
-            if ( section == Points )
-                return QObject::tr( "Points" );
+            return this->columns.at( section );
         }
     }
 
@@ -80,7 +57,7 @@ int RankingsModel::rowCount( const QModelIndex &parent ) const {
     if ( parent.isValid())
         return 0;
 
-    return Rankings::instance()->list.count();
+    return this->modelData.count();
 }
 
 /**
@@ -92,7 +69,7 @@ int RankingsModel::columnCount( const QModelIndex &parent ) const {
     if ( parent.isValid())
         return 0;
 
-    return ColumnCount;
+    return this->columns.count();
 }
 
 /**
@@ -101,11 +78,31 @@ int RankingsModel::columnCount( const QModelIndex &parent ) const {
  * @param role
  * @return
  */
+#include <QDebug>
 QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
     if ( !index.isValid())
         return QVariant();
 
     if ( role == Qt::DisplayRole ) {
+        if ( index.row() >= this->modelData.count()) {
+            qDebug() << "A" << index.row() << this->modelData.count();
+            return QVariant();
+        }
+
+        if ( index.column() >= this->modelData.at( index.row()).count()) {
+            qDebug() << "B" << index.column() << this->modelData.at( index.row()).count();
+            return QVariant();
+        }
+
+
+        //foreach ( const QVariantList &var, data )
+        //    foreach ( const QVariant &var2, var )
+        //        qDebug() << var2.toString();
+
+        // TODO: canConvert to int
+        return this->modelData.at( index.row()).at( index.column()).toString();
+
+#if 0
         if ( index.column() == Rank )
             return Rankings::instance()->list.at( index.row()).rank;
 
@@ -150,14 +147,15 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
 #endif
 
         if ( index.column() == Points )
-            return Rankings::instance()->list.at( index.row()).points;
+            return Rankings::instance()->list.at( index.row()).points;     
+#endif
     }
 
     if ( role == Qt::TextAlignmentRole )
         return Qt::AlignCenter;
 
-    if ( role == Qt::TextColorRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
-        return QColor( Qt::red );
+    //if ( role == Qt::TextColorRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
+    //    return QColor( Qt::red );
 
     return QVariant();
 }

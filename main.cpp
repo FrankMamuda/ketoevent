@@ -45,6 +45,7 @@
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1
 //   - task export
+//   - something wrong with time setter in MainWindow
 //
 
 // default message handler

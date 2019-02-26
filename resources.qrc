@@ -39,4 +39,7 @@
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
     </qresource>
+    <qresource prefix="/scripts">
+        <file alias="default.js">scripts/default.js</file>
+    </qresource>
 </RCC>

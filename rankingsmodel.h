@@ -58,6 +58,12 @@ public:
     int columnCount( const QModelIndex &parent = QModelIndex()) const override;
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
     void reset() { this->beginResetModel(); this->endResetModel(); }
+    void setupColumns( const QStringList &columns ) { this->columns = columns; }
+    void setupData( const QList<QVariantList> &data ) { this->modelData = data; }
+
+private:
+    QStringList columns;
+    QList<QVariantList> modelData;
 };
 
 // declare enums

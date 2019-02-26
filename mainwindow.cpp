@@ -642,7 +642,8 @@ void MainWindow::on_actionRunScript_triggered() {
     Script::instance()->evaluate( Event::instance()->script( event ));
 
     // call entry function
-    QJSValue ret( Script::instance()->call( "main" ));
-    foreach ( const QVariant &var, ret.toVariant().toList())
-        qDebug() << var.toMap();
+    Script::instance()->call( "main" );
+
+    // raise console, to show output
+    Console::instance()->show();
 }

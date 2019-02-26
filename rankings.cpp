@@ -31,6 +31,7 @@
 #include "main.h"
 #include "database.h"
 #include "log.h"
+#include "script.h"
 #include <QFileDialog>
 #include <QSqlQuery>
 #include <QTextStream>
@@ -113,15 +114,31 @@ void Rankings::on_actionUpdate_triggered() {
         this->ui->tableView->setSortingEnabled( true );
     }
 
-    // clear any leftover results
-    this->list.clear();
-    this->model->reset();
-
     // get event related variables
     const Row event = MainWindow::instance()->currentEvent();
     if ( event == Row::Invalid )
         return;
 
+    // evalute current event script
+    Script::instance()->evaluate( Event::instance()->script( event ));
+
+    // call column function
+    QStringList list;
+    foreach ( const QVariant &var, Script::instance()->call( "columns" ).toVariant().toList())
+        list << var.toString();
+
+    // call data function
+    QList<QVariantList> data;
+    foreach ( const QVariant &var, Script::instance()->call( "data" ).toVariant().toList())
+        data << var.toList();
+
+    // clear any leftover results
+    this->list.clear();
+    this->model->reset();
+    this->model->setupColumns( list );
+    this->model->setupData( data );
+
+#if 0
     const QTime eventStartTime( Event::instance()->startTime( event ));
     const QTime eventFinishTime( Event::instance()->finishTime( event ));
     const QTime eventFinalTime( Event::instance()->finalTime( event ));
@@ -228,6 +245,7 @@ void Rankings::on_actionUpdate_triggered() {
         this->list << stats;
         totalLogged += stats.points;
     }
+#endif
 
     // update model
     this->model->reset();
@@ -242,6 +260,7 @@ void Rankings::on_actionUpdate_triggered() {
     this->ui->tableView->resizeColumnsToContents();
     this->ui->tableView->resizeRowsToContents();
 
+#if 0
     // calculate rank
     // NOTE: a really dumb way to do it
     QMap<int,int> map;
@@ -309,7 +328,8 @@ void Rankings::on_actionUpdate_triggered() {
                 .arg( Log::instance()->fieldName( Log::Task )));
     while ( query.next())
         numTasksCompleted += query.value( 0 ).toInt();
-    this->ui->completedEdit->setText( QString::number( numTasksCompleted ));
+    this->ui->completedEdit->setText( QString::number( numTasksCompleted )); 
+#endif
 }
 
 /**

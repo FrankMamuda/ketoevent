@@ -21,6 +21,7 @@
 //
 #include "event.h"
 #include "log.h"
+#include "mainwindow.h"
 #include "script.h"
 #include "task.h"
 #include "team.h"
@@ -35,6 +36,8 @@ Script::Script() {
     this->engine.globalObject().setProperty( "Task",  this->engine.newQObject( Task::instance()));
     this->engine.globalObject().setProperty( "Event", this->engine.newQObject( Event::instance()));
     this->engine.globalObject().setProperty( "Log",   this->engine.newQObject( Log::instance()));
+    this->engine.globalObject().setProperty( "Main",  this->engine.newQObject( MainWindow::instance()));
+    this->engine.globalObject().setProperty( "JS",    this->engine.newQObject( this ));
 
     // enable console logging
     this->engine.installExtensions( QJSEngine::ConsoleExtension );
@@ -64,6 +67,23 @@ QJSValue Script::call(const QString &func, const QJSValueList &args) const {
 
     // call function
     return function.call( args );
+}
+
+/**
+ * @brief Script::timeFromString
+ * @param timeString
+ * @return
+ */
+QTime Script::timeFromString( const QString &timeString ) const {
+    return QTime::fromString( timeString, Database_::TimeFormat );
+}
+
+/**
+ * @brief Script::currentTime
+ * @return
+ */
+QTime Script::currentTime() const {
+    return QTime::currentTime();
 }
 
 /**
