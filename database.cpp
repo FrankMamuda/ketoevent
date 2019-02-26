@@ -34,10 +34,10 @@
 #include "team.h"
 #include "task.h"
 #include "event.h"
+#include "mainwindow.h"
 #ifdef SQLITE_CUSTOM
 #include <QSqlDriver>
 #include "sqlite/sqlite3.h"
-#include "mainwindow.h"
 #endif
 
 /**

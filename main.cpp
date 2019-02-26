@@ -46,6 +46,8 @@
 //   - new combo should not start with 1
 //   - task export
 //   - something wrong with time setter in MainWindow
+//   - cannot create an empty database (from settings)
+//   - arg count mismatch in Event:add (but it adds it anyway)
 //
 
 // default message handler

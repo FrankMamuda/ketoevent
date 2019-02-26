@@ -90,7 +90,7 @@ bool Rankings::isDisplayingCurrentTeam() const {
  * @brief Rankings::on_actionUpdate_triggered
  */
 void Rankings::on_actionUpdate_triggered() {
-    int totalLogged = 0;
+    //int totalLogged = 0;
 
     // remove junk to make sure it does not affect results
     Log::instance()->removeOrphanedEntries();
