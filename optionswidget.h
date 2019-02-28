@@ -39,7 +39,8 @@ public:
         Integer,
         Time,
         Bool,
-        String
+        String,
+        Double
     };
 
     explicit OptionsWidget( const Types &type = Types::NoType, const QString &label = QString(), const QVariant &value = QVariant(), QWidget *parent = nullptr );

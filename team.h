@@ -63,18 +63,17 @@ public:
     virtual ~Team() override = default;
 
     Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
+    Row add( const QString &title, const QString &reviewer = QString());
     Q_INVOKABLE QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    Q_INVOKABLE int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
-    Q_INVOKABLE QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+
+    /* TODO: removeme*/ Q_INVOKABLE QTime finishTime( const Row & ) const { return QTime(); }
+
     Q_INVOKABLE QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
     Q_INVOKABLE Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     void removeOrphanedEntries() override;
 
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMembers( const Row &row, int members ) { this->setValue( row, Members, members ); }
-    void setFinishTime( const Row &row, const QTime &time ) { this->setValue( row, Finish, time.toString( Database_::TimeFormat )); }
     void setReviewer( const Row &row, const QString &name ) { this->setValue( row, Reviewer, name ); }
 
 private:

@@ -93,19 +93,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         this->setLock();
     } );
 
-    // set up secondary toolBar
-    this->ui->quickBar->insertWidget( this->ui->actionLogTime, this->timeEdit );
-
     // position quickToolbar
     quickSpacerLeft->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     quickSpacerRight->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     this->ui->quickBar->insertWidget( this->ui->actionAddQuick, quickSpacerLeft );
     this->ui->quickBar->addWidget( quickSpacerRight );
-
-    // currentTime button
-    this->connect( this->ui->actionLogTime, &QAction::triggered, [ this ]() {
-        this->timeEdit->setTime( QTime::currentTime());
-    } );
 
     // done button
     this->connect( this->ui->actionDone, &QAction::triggered, [ this ]() {
@@ -143,38 +135,6 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         this->setTaskFilter();
     } );
 
-    // time updater
-    this->connect( this->timeEdit, &QTimeEdit::timeChanged, [ this ]( const QTime &time ) {
-        // check for valid event
-        const Row event = this->currentEvent();
-        if ( event == Row::Invalid )
-            return;
-
-        // check for valid team
-        const Row team = this->currentTeam();
-        if ( event == Row::Invalid )
-            return;
-
-        // check for valid time
-        const QTime startTime = Event::instance()->startTime( event );
-        const QTime finalTime = Event::instance()->finalTime( event );
-        const QTime teamTime = Team::instance()->finishTime( team );
-
-        if ( time > finalTime ) {
-            this->timeEdit->setTime( finalTime );
-            return;
-        }
-
-        if ( time < startTime ) {
-            this->timeEdit->setTime( startTime );
-            return;
-        }
-
-        // set new time if anything changed
-        if ( teamTime != time )
-            Team::instance()->setFinishTime( this->currentTeam(), time );
-    } );
-
     // clear button
     this->connect( this->ui->clearButton, &QToolButton::pressed, [ this ]() {
         this->ui->findEdit->clear();
@@ -202,7 +162,6 @@ MainWindow::~MainWindow() {
 
     // disconnect lambdas
     this->disconnect( this->ui->findEdit, SLOT( textChanged( QString )));
-    this->disconnect( this->ui->actionLogTime, SLOT( triggered( bool )));
     this->disconnect( this->timeEdit, SLOT( timeChanged( QTime )));
     this->disconnect( this->ui->clearButton, SLOT( pressed()));
     this->disconnect( this->ui->actionDone, SLOT( triggered( bool )));
@@ -506,7 +465,6 @@ void MainWindow::setLock() {
     //this->ui->actionSettings->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionCombos->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionAddQuick->setDisabled( comboMode || noEvents || noTeams );
-    this->ui->actionLogTime->setDisabled( comboMode || noEvents || noTeams );
     this->timeEdit->setDisabled( comboMode || noEvents || noTeams );
     this->ui->taskView->setDisabled( noEvents || noTeams || noTasks );
 
@@ -543,7 +501,6 @@ void MainWindow::on_actionAddQuick_triggered() {
     edit->setParent( nullptr );
     edit->reset( false );
     edit->show();
-    edit->setCurrentTime();
     edit->move( this->geometry().x() + this->geometry().width() / 2 - edit->geometry().width() / 2, this->geometry().y() + this->geometry().height() / 2 - edit->geometry().height() / 2 );
 }
 
@@ -634,22 +591,5 @@ void MainWindow::on_actionExport_logs_triggered() {
  * @brief MainWindow::on_actionRunScript_triggered
  */
 void MainWindow::on_actionRunScript_triggered() {
-    // check for valid event
-    /*const Row event = this->currentEvent();
-    if ( event == Row::Invalid )
-        return;
-
-    // evalute current event script
-    Script::instance()->evaluate( Event::instance()->script( event ));
-
-    // call entry function
-    Script::instance()->call( "main" );
-
-    // raise console, to show output
-    Console::instance()->show();*/
-    //Options options;
-    //options.exec();
-
-    //OptionsWidget *op( new OptionsWidget());
-    //op->show();
+    // do smth special for me
 }

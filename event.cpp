@@ -38,8 +38,8 @@ Event::Event() : Table( EventTable::Name ) {
     // NOTE: are we even checking api?
     this->addField( API,     "api",                QVariant::Int,    "integer" );
     /* renameme */ this->addField( Title,   "name",               QVariant::String, "varchar( 64 )",       true );
-    this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
-    this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
+    /* removeme */ this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
     /* removeme */ this->addField( Start,   "startTime",          QVariant::String, "varchar( 5 )" );
     /* removeme */ this->addField( Finish,  "finishTime",         QVariant::String, "varchar( 5 )" );
     /* removeme */ this->addField( Final,   "finalTime",          QVariant::String, "varchar( 5 )" );
@@ -63,23 +63,22 @@ Event::Event() : Table( EventTable::Name ) {
  * @brief Event::add
  * @param title
  */
-Row Event::add( const QString &title, int minMembers, int maxMembers,
-                const QTime &start, const QTime &finish, const QTime &final,
-                int penalty, int two, int three, int fourPlus ) {
+Row Event::add( const QString &title, const QString &script ) {
     return Table::add( QVariantList() <<
                        Database_::null <<
                        Version <<
                        title <<
-                       minMembers <<
-                       maxMembers <<
-                       start.toString( Database_::TimeFormat ) <<
-                       finish.toString( Database_::TimeFormat ) <<
-                       final.toString( Database_::TimeFormat ) <<
-                       penalty <<
-                       two <<
-                       three <<
-                       fourPlus <<
-                       0 );
+                       1 <<
+                       4 <<
+                       EventTable::DefaultStartTime <<
+                       EventTable::DefaultFinishTime <<
+                       EventTable::DefaultFinalTime <<
+                       EventTable::DefaultPenaltyPoints <<
+                       EventTable::DefaultComboOfTwo <<
+                       EventTable::DefaultComboOfThree <<
+                       EventTable::DefaultComboOfFourAndMore <<
+                       0 <<
+                       script );
 }
 
 /**
@@ -104,7 +103,7 @@ QString Event::script( const Row &row ) const {
 
     QString script( loadScript( QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath() + "/script.js" ));
     if ( script.isEmpty())
-        loadScript( ":/scripts/default.js" );
+        script = loadScript( ":/scripts/default.js" );
 
     if ( !script.isEmpty())
         return script;

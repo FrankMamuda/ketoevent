@@ -47,6 +47,13 @@ Task::Task() : Table( TaskTable::Name ) {
     this->addField( Order,  "parent",      QVariant::Int,    "integer" );
     this->addField( Event,  "eventId",     QVariant::Int,    "integer" );
     this->addField( Desc,   "description", QVariant::String, "varchar( 512 )" );
+    /* addme */ //this->addField( Tag,   "tag", QVariant::String, "varchar( 64 )" );
+    // tag will be used to flag special tasks in javascript, so that tags remain
+    // constant even if name or other attributes change
+    //
+    // this could be used for special tasks such as finish time
+    // tag also would allow special formatting from js side
+    //
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );

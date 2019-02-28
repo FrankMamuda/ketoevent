@@ -26,6 +26,7 @@
 #include "ui_eventedit.h"
 #include "variable.h"
 #include "optionswidget.h"
+#include "script.h"
 #include <QMessageBox>
 
 /**
@@ -40,10 +41,24 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
     this->setWindowTitle( this->tr( "Add event" ));
     this->setWindowIcon( QIcon( ":/icons/ketone" ));
 
-    this->addWidget( QStringList() << "bool" );
-    this->addWidget( QStringList() << "integer" );
-    this->addWidget( QStringList() << "time" );
-    this->addWidget( QStringList() << "string" );
+    /*this->addWidget( QStringList() << "bool" << "Important integer" << "true" );
+    this->addWidget( QStringList() << "integer" << "Big one" << "312" );
+    this->addWidget( QStringList() << "time" << "Is it time yet?" << "18:44" );
+    this->addWidget( QStringList() << "string" << "Bad string" << "I'm not bad" );
+    this->addWidget( QStringList() << "double" << "A double? Why?" << "1313.31" );*/
+
+    // get event related variables
+    const Row event = MainWindow::instance()->currentEvent();
+    if ( event == Row::Invalid )
+        return;
+
+    // evalute current event script
+    Script::instance()->evaluate( Event::instance()->script( event ));
+
+    // call column function
+    QStringList list;
+    foreach ( const QVariant &var, Script::instance()->call( "options" ).toVariant().toList())
+        this->addWidget( var.toString().split( ";" ));
 
     // empty event title check
     auto emptyTitle = [ this ]() {
@@ -72,16 +87,7 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
         // if everything is ok, add a new event
         Row event = Row::Invalid;
         if ( !this->isEditing()) {
-            event = Event::instance()->add( eventTitle,
-                                    this->ui->minInteger->value(),
-                                    this->ui->maxInteger->value(),
-                                    this->ui->startTime->time(),
-                                    this->ui->finishTime->time(),
-                                    this->ui->finalTime->time(),
-                                    this->ui->penaltyInteger->value(),
-                                    this->ui->twoInteger->value(),
-                                    this->ui->threeInteger->value(),
-                                    this->ui->fourPlusInteger->value());
+            event = Event::instance()->add( eventTitle, "" );
         } else {
             const Row event = Event::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
@@ -89,15 +95,6 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
                 return;
 
             Event::instance()->setTitle( event, eventTitle );
-            Event::instance()->setMinMembers( event, this->ui->minInteger->value());
-            Event::instance()->setMaxMembers( event, this->ui->maxInteger->value());
-            Event::instance()->setStartTime( event, this->ui->startTime->time());
-            Event::instance()->setFinishTime( event, this->ui->finishTime->time());
-            Event::instance()->setFinalTime( event, this->ui->finalTime->time());
-            Event::instance()->setPenaltyPoints( event, this->ui->penaltyInteger->value());
-            Event::instance()->setComboOfTwo( event, this->ui->twoInteger->value());
-            Event::instance()->setComboOfThree( event, this->ui->threeInteger->value());
-            Event::instance()->setComboOfFourPlus( event, this->ui->fourPlusInteger->value());
         }
 
         if ( event != Row::Invalid )
@@ -128,12 +125,13 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
         // ideally page would look like this:
         //
         // Event title: ______________________
-        // Members (min): 1 <>
-        // Members (max): 2 <>
-        // ( Configure ) -> opens a list of all event variables (times, bonus points)
+        // list of all event variables:
+        //   times,
+        //   bonus points
+        //   penalty
         // ( Edit Script ) -> opens a javascript editor
         //
-        // making title and member count the only hard coded variables, the rest
+        // making title the only hard coded variable, the rest
         //   being imported from a script
     } );
 
@@ -168,31 +166,13 @@ void EventEdit::reset( bool edit ) {
     if ( !this->isEditing()) {
         // reset ui components to default values
         this->ui->titleEdit->clear();
-        this->ui->minInteger->setValue( EventTable::DefaultMinMembers );
-        this->ui->maxInteger->setValue( EventTable::DefaultMaxMembers );
-        this->ui->startTime->setTime( QTime::fromString( EventTable::DefaultStartTime, Database_::TimeFormat ));
-        this->ui->finishTime->setTime( QTime::fromString( EventTable::DefaultFinishTime, Database_::TimeFormat ));
-        this->ui->finalTime->setTime( QTime::fromString( EventTable::DefaultFinalTime, Database_::TimeFormat ));
-        this->ui->penaltyInteger->setValue( EventTable::DefaultPenaltyPoints );
-        this->ui->twoInteger->setValue( EventTable::DefaultComboOfTwo );
-        this->ui->threeInteger->setValue( EventTable::DefaultComboOfThree );
-        this->ui->fourPlusInteger->setValue( EventTable::DefaultComboOfFourAndMore );
-    } else {
+   } else {
         const Row event = Event::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
         if ( event == Row::Invalid )
             return;
 
         this->ui->titleEdit->setText( Event::instance()->title( event ));
-        this->ui->minInteger->setValue( Event::instance()->minMembers( event ));
-        this->ui->maxInteger->setValue( Event::instance()->maxMembers( event ));
-        this->ui->startTime->setTime( Event::instance()->startTime( event ));
-        this->ui->finishTime->setTime( Event::instance()->finishTime( event ));
-        this->ui->finalTime->setTime( Event::instance()->finalTime( event ));
-        this->ui->penaltyInteger->setValue( Event::instance()->penalty( event ));
-        this->ui->twoInteger->setValue( Event::instance()->comboOfTwo( event ));
-        this->ui->threeInteger->setValue( Event::instance()->comboOfThree( event ));
-        this->ui->fourPlusInteger->setValue( Event::instance()->comboOfFourPlus( event ));
     }
 
     this->ui->titleEdit->setFocus();
@@ -205,24 +185,28 @@ void EventEdit::reset( bool edit ) {
  * @param parms
  */
 void EventEdit::addWidget( const QStringList &parms ) {
-    OptionsWidget *widget;
-
-    if ( parms.isEmpty())
+    if ( parms.count() < 3 )
         return;
 
     // parse values
-    const QString type( parms.at( 0 ));
-    if ( !QString::compare( type, "bool" ))
-        widget = new OptionsWidget( OptionsWidget::Bool, "Special mode", true, this );
-    else if ( !QString::compare( type, "string" ))
-        widget = new OptionsWidget( OptionsWidget::String, "Important string", "not really", this );
-    else if ( !QString::compare( type, "integer" ))
-        widget = new OptionsWidget( OptionsWidget::Integer, "Penalty points", 5, this );
-    else if ( !QString::compare( type, "time" ))
-        widget = new OptionsWidget( OptionsWidget::Time, "Finish time", QTime::fromString( "17:30", Database_::TimeFormat ), this );
+    OptionsWidget::Types type;
+    const QString label( parms.at( 1 ));
+    const QVariant value( QVariant( parms.at( 2 )));
+
+    if ( !QString::compare( parms.at( 0 ), "bool" ))
+        type = OptionsWidget::Bool;
+    else if ( !QString::compare( parms.at( 0 ), "string" ))
+        type = OptionsWidget::String;
+    else if ( !QString::compare( parms.at( 0 ), "integer" ))
+        type = OptionsWidget::Integer;
+    else if ( !QString::compare( parms.at( 0 ), "time" ))
+        type = OptionsWidget::Time;
+    else if ( !QString::compare( parms.at( 0 ), "double" ))
+        type = OptionsWidget::Double;
     else
         return;
 
+    OptionsWidget *widget( new OptionsWidget( type, label, value, this ));
     QListWidgetItem *item( new QListWidgetItem( this->ui->optionList ));
     this->ui->optionList->setItemWidget( item, widget );
     widget->show();

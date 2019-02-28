@@ -390,15 +390,13 @@ void Database::attach( const QFileInfo &info ) {
         while ( query.next()) {
             const QString title( query.record().value( Team::Title ).toString());
             const Id teamId = static_cast<Id>( query.record().value( Team::ID ).toInt());
-            const int members = query.record().value( Team::Members ).toInt();
-            const QTime finish( QTime::fromString( query.record().value( Team::Finish ).toString(), Database_::TimeFormat ));
             const QString reviewer( query.record().value( Team::Reviewer ).toString());
 
             if ( teamId == Id::Invalid )
                 continue;
 
             // add a new team
-            const Row row = Team::instance()->add( title, members, finish, reviewer );
+            const Row row = Team::instance()->add( title, reviewer );
             if ( row == Row::Invalid )
                 return;
 

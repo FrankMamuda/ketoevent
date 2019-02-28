@@ -35,6 +35,7 @@ OptionsWidget::OptionsWidget( const Types &type, const QString &label, const QVa
     case Integer:
     {
         QSpinBox *spinBox( new QSpinBox());
+        spinBox->setMaximum( std::numeric_limits<int>::max());
         spinBox->setValue( value.toInt());
         this->widget = qobject_cast<QWidget*>( spinBox );
     }
@@ -61,6 +62,15 @@ OptionsWidget::OptionsWidget( const Types &type, const QString &label, const QVa
         QCheckBox *checkBox( new QCheckBox());
         checkBox->setChecked( value.toBool());
         this->widget = qobject_cast<QWidget*>( checkBox );
+    }
+        break;
+
+    case Double:
+    {
+        QDoubleSpinBox *doubleBox( new QDoubleSpinBox());
+        doubleBox->setMaximum( std::numeric_limits<double>::max());
+        doubleBox->setValue( value.toDouble());
+        this->widget = qobject_cast<QWidget*>( doubleBox );
     }
         break;
 

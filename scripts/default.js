@@ -21,12 +21,11 @@ var EventParms = {
     ComboOfTwo:      1,
     ComboOfThree:    3,
     ComboOfFourPlus: 5,
-    StartTime:       JS.timeFromString( '11:00' ),
-    FinishTime:      JS.timeFromString( '17:00' ),
-    FinalTime:       JS.timeFromString( '17:30' ),
+    StartTime:       '11:00',
+    FinishTime:      '17:00',
+    FinalTime:       '17:30',
     Penalty:         5
 };
-
 
 /**
  * @brief Structure
@@ -209,8 +208,8 @@ function data() {
 
         // calculate penalty points
         var teamFinishTime =  Team.finishTime( team );
-        var overTime = ( EventParms.FinishTime - teamFinishTime ) / 60000 - 1;
-        teamStats.setTime( Math.max( 0, ( teamFinishTime - EventParms.StartTime ) / 60000 + 1 ));
+        var overTime = ( JS.timeFromString( EventParms.FinishTime ) - teamFinishTime ) / 60000 - 1;
+        teamStats.setTime( Math.max( 0, ( teamFinishTime - JS.timeFromString( EventParms.StartTime )) / 60000 + 1 ));
 
         if ( overTime < 0 ) {
             teamStats.setPenalty( EventParms.Penalty * Math.abs( overTime ));
@@ -218,7 +217,7 @@ function data() {
             teamStats.setPoints( Math.max( teamStats.points(), 0 ));
         }
 
-        if ( teamFinishTime - EventParms.FinalTime > 0 )
+        if ( teamFinishTime - JS.timeFromString( EventParms.FinalTime ) > 0 )
             teamStats.setPoints( 0 );
 
         // announce results
@@ -263,8 +262,19 @@ function columns() {
  * @brief options returns a list of configurable options
  */
 function options() {
-    // name, type, default value
-    return [ 'Combo of Two;int;1', 'Finish time;QTime;15:50' ];
+    // name, type, default value and TAG?
+    return [
+                'integer;Combo of Two;'   + EventParms.ComboOfTwo,
+                'integer;Combo of Three;' + EventParms.ComboOfThree,
+                'integer;Combo of Four+;' + EventParms.ComboOfFourPlus,
+                'time;Start time;'        + EventParms.StartTime,
+                'time;Finish time;'       + EventParms.FinishTime,
+                'time;Final time;'        + EventParms.FinalTime,
+                'integer;Penalty points;' + EventParms.Penalty,
+            ];
+
+    // data() function should be called with these parameters
+    // that are stored in sqlite database
 }
 
 // TODO: export formating such as font, colours, etc.

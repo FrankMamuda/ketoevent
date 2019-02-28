@@ -37,10 +37,10 @@ using namespace TeamTable;
  */
 Team::Team() : Table( TeamTable::Name ) {
     this->addField( ID,       "id",         QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Title,    "name",       QVariant::String, "varchar( 64 )",       true );
-    this->addField( Members,  "members",    QVariant::Int,    "integer" );
-    this->addField( Finish,   "finishTime", QVariant::String, "varchar( 5 )" );
-    this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
+    /* rename me*/ this->addField( Title,    "name",       QVariant::String, "varchar( 64 )",       true );
+    /* remove me*/ this->addField( Members,  "members",    QVariant::Int,    "integer" );
+    /* remove me*/ this->addField( Finish,   "finishTime", QVariant::String, "varchar( 5 )" );
+    /* remove me*/ this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
     this->addField( Reviewer, "reviewer",   QVariant::String, "varchar( 64 )" );
     this->addField( Event,    "eventId",    QVariant::Int,    "integer" );
 }
@@ -53,7 +53,7 @@ Team::Team() : Table( TeamTable::Name ) {
  * @param reviewer
  * @return
  */
-Row Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
+Row Team::add( const QString &title, const QString &reviewer ) {
     // failsafe
     const Row event = MainWindow::instance()->currentEvent();
     if ( event == Row::Invalid ) {
@@ -64,8 +64,8 @@ Row Team::add( const QString &title, int members, const QTime &finishTime, const
     return Table::add( QVariantList() <<
                 Database_::null <<
                 title <<
-                members <<
-                finishTime.toString( Database_::TimeFormat ) <<
+                2 <<
+                QString( "11:00" ) <<
                 0 <<
                 reviewer <<
                        static_cast<int>( Event::instance()->id( event )));

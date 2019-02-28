@@ -48,6 +48,10 @@
 //   - something wrong with time setter in MainWindow
 //   - cannot create an empty database (from settings)
 //   - arg count mismatch in Event:add (but it adds it anyway)
+//   - check if all singletons are garbage collected
+//   - check API version
+//   - fix translations such as konfiguracija tiek noSLasita
+//   - add translations in JS
 //
 
 // default message handler

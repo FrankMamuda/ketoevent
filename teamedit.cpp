@@ -41,12 +41,6 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     if ( event == Row::Invalid )
         return;
 
-    // set up defaults
-    this->ui->membersInteger->setMinimum( Event::instance()->minMembers( event ));
-    this->ui->membersInteger->setMaximum( Event::instance()->maxMembers( event ));
-    this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
-    this->ui->finishTime->setMaximumTime( Event::instance()->finalTime( event ));
-
     // only visible in quick add
     this->setWindowTitle( this->tr( "Add team" ));
     this->setWindowIcon( QIcon( ":/icons/teams" ));
@@ -78,10 +72,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         // if everything is ok, add a new team
         Row team = Row::Invalid;
         if ( !this->isEditing()) {
-            team = Team::instance()->add( teamTitle,
-                                   this->ui->membersInteger->value(),
-                                   this->ui->finishTime->time(),
-                                   this->ui->reviewerEdit->text());
+            team = Team::instance()->add( teamTitle, this->ui->reviewerEdit->text());
 
         } else {
             const Row team = Team::instance()->row( EditorDialog::instance()->container->currentIndex().row());
@@ -90,8 +81,6 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
                 return;
 
             Team::instance()->setTitle( team, teamTitle );
-            Team::instance()->setMembers( team, this->ui->membersInteger->value());
-            Team::instance()->setFinishTime( team, this->ui->finishTime->time());
             Team::instance()->setReviewer( team, this->ui->reviewerEdit->text());
         }
 
@@ -106,11 +95,9 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     } );
 
     // shortcut from title to members
-    this->connect( this->ui->titleEdit, &QLineEdit::returnPressed, [ this, emptyTitle ]() {
+    /*this->connect( this->ui->titleEdit, &QLineEdit::returnPressed, [ this, emptyTitle ]() {
         if ( emptyTitle())
             return;
-
-        this->ui->membersInteger->setFocus();
     } );
 
     // shortcut from members to time
@@ -123,7 +110,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
         this->ui->addButton->setFocus();
         this->ui->addButton->setDefault( true );
         this->ui->addButton->setAutoDefault( true );
-    } );
+    } );*/
 
     // cancel button just closes the dialog
     this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
@@ -131,11 +118,6 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
             EditorDialog::instance()->hideDock();
         else
             this->close();
-    } );
-
-    // connect time button
-    this->connect( this->ui->finishButton, &QToolButton::pressed, [ this ]() {
-        this->setCurrentTime();
     } );
 
     // add to garbage man
@@ -150,9 +132,6 @@ TeamEdit::~TeamEdit() {
     this->disconnect( this->ui->addButton, SIGNAL( clicked()));
     this->disconnect( this->ui->cancelButton, SIGNAL( clicked()));
     this->disconnect( this->ui->titleEdit, SIGNAL( returnPressed()));
-    this->disconnect( this->ui->membersInteger, SIGNAL( editingFinished()));
-    this->disconnect( this->ui->finishTime, SIGNAL( editingFinished()));
-    this->disconnect( this->ui->finishButton, SIGNAL( pressed()));
 
     // delete ui
     delete this->ui;
@@ -167,8 +146,6 @@ void TeamEdit::reset( bool edit ) {
     if ( !this->isEditing()) {
         // reset ui components to default values
         this->ui->titleEdit->clear();
-        this->ui->finishTime->setTime( this->ui->finishTime->minimumTime());
-        this->ui->membersInteger->setValue( EventTable::DefaultMembers );
         this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
     } else {
         const Row team = Team::instance()->row( EditorDialog::instance()->container->currentIndex().row());
@@ -177,19 +154,10 @@ void TeamEdit::reset( bool edit ) {
             return;
 
         this->ui->titleEdit->setText( Team::instance()->title( team ));
-        this->ui->finishTime->setTime( Team::instance()->finishTime( team ));
-        this->ui->membersInteger->setValue( Team::instance()->members( team ));
         this->ui->reviewerEdit->setText( Team::instance()->reviewer( team ));
     }
 
     this->ui->titleEdit->setFocus();
     this->ui->addButton->setDefault( false );
     this->ui->addButton->setAutoDefault( false );
-}
-
-/**
- * @brief TeamEdit::setCurrentTime
- */
-void TeamEdit::setCurrentTime() {
-    this->ui->finishTime->setTime( QTime::currentTime());
 }

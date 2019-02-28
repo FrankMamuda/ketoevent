@@ -80,7 +80,7 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
 
         // add teams
         for ( y = 0; y < numTeams; y++ ) {
-            Row team = Team::instance()->add( "Team " + QString::number( y ), rand() % EventTable::DefaultMaxMembers + 1, QTime(), "Test" );
+            Row team = Team::instance()->add( "Team " + QString::number( y ), "Test" );
             if ( team == Row::Invalid )
                 continue;
 

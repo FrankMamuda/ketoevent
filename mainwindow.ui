@@ -175,7 +175,6 @@
    </attribute>
    <addaction name="actionRunScript"/>
    <addaction name="actionAddQuick"/>
-   <addaction name="actionLogTime"/>
    <addaction name="actionExport_logs"/>
   </widget>
   <action name="actionTeams">
@@ -242,15 +241,6 @@
    </property>
    <property name="text">
     <string>Quickly add team</string>
-   </property>
-  </action>
-  <action name="actionLogTime">
-   <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/time</normaloff>:/icons/time</iconset>
-   </property>
-   <property name="text">
-    <string>Log current time</string>
    </property>
   </action>
   <action name="actionDone">
