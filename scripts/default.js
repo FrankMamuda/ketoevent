@@ -129,6 +129,7 @@ function data( options ) {
 
     // print options
     // TODO: use these!!!
+    // TODO: use default values if empty
     print( "Options:", options.split( ";" ))
 
     // go through team list

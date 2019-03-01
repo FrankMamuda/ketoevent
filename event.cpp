@@ -76,8 +76,12 @@ QString Event::script( const Row &row ) const {
     };
 
     QString script( loadScript( QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath() + "/script.js" ));
-    if ( script.isEmpty())
+    qDebug() << "load disk script" << script.length();
+
+    if ( script.isEmpty()) {
+        qDebug() << "load internal script";
         script = loadScript( ":/scripts/default.js" );
+    }
 
     if ( !script.isEmpty())
         return script;

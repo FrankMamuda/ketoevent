@@ -149,7 +149,10 @@ void EventEdit::reset( bool edit ) {
 
     if ( !this->isEditing()) {
         // reset ui components to default values
+        // NOTE: replace with a simple input dialog?
         this->ui->titleEdit->clear();
+        this->ui->eventGroup->hide();
+        this->ui->scriptButton->hide();
    } else {
         // get event related variables
         const Row event = Event::instance()->row( EditorDialog::instance()->container->currentIndex().row());

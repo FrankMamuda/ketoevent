@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
    <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="eventGroup">
      <property name="title">
       <string>Event variables</string>
      </property>
@@ -24,8 +24,6 @@
        <widget class="QListWidget" name="optionList"/>
       </item>
      </layout>
-     <zorder>optionList</zorder>
-     <zorder>optionList</zorder>
     </widget>
    </item>
    <item row="6" column="0">
