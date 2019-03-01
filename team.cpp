@@ -37,12 +37,9 @@ using namespace TeamTable;
  */
 Team::Team() : Table( TeamTable::Name ) {
     this->addField( ID,       "id",         QVariant::UInt,   "integer primary key", true, true );
-    /* rename me*/ this->addField( Title,    "name",       QVariant::String, "varchar( 64 )",       true );
-    /* remove me*/ this->addField( Members,  "members",    QVariant::Int,    "integer" );
-    /* remove me*/ this->addField( Finish,   "finishTime", QVariant::String, "varchar( 5 )" );
-    /* remove me*/ this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
-    this->addField( Reviewer, "reviewer",   QVariant::String, "varchar( 64 )" );
-    this->addField( Event,    "eventId",    QVariant::Int,    "integer" );
+    this->addField( Title,    "title",      QVariant::String, "text",                true       );
+    this->addField( Reviewer, "reviewer",   QVariant::String, "text"                            );
+    this->addField( Event,    "eventId",    QVariant::Int,    "integer"                         );
 }
 
 /**
@@ -62,12 +59,9 @@ Row Team::add( const QString &title, const QString &reviewer ) {
     }
 
     return Table::add( QVariantList() <<
-                Database_::null <<
-                title <<
-                2 <<
-                QString( "11:00" ) <<
-                0 <<
-                reviewer <<
+                       Database_::null <<
+                       title <<
+                       reviewer <<
                        static_cast<int>( Event::instance()->id( event )));
 }
 

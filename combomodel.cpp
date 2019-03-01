@@ -48,6 +48,8 @@ QVariant ComboModel::data( const QModelIndex &index, int role ) const {
  * @brief ComboModel::reset
  */
 void ComboModel::reset( const Id &id ) {
+    Q_UNUSED( id )
+#if 0
     QStringList list;
 
     // clear junk
@@ -96,5 +98,6 @@ void ComboModel::reset( const Id &id ) {
 
     // set string list
     this->setStringList( list );
-    this->endResetModel();
+    this->endResetModel(); 
+#endif
 }

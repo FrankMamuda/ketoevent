@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVariant>
+#include <QListWidget>
 
 /**
  * @brief The OptionsWidget class
@@ -46,10 +47,16 @@ public:
     explicit OptionsWidget( const Types &type = Types::NoType, const QString &label = QString(), const QVariant &value = QVariant(), QWidget *parent = nullptr );
     ~OptionsWidget();
     Types type() const { return this->m_type; }
+    static void add( const QStringList &options, QListWidget *container = nullptr );
+    QVariant value() const;
+
+public slots:
+    void setType( const Types &type = Types::NoType ) { this->m_type = type; }
 
 private:
     QHBoxLayout *optionsLayout = new QHBoxLayout();
     QLabel *label = new QLabel();
-    QWidget *widget;
-    Types m_type;
+    QWidget *widget = nullptr;
+    Types m_type = Types::NoType;
+    QListWidgetItem *item = nullptr;
 };

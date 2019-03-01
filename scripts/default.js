@@ -114,7 +114,7 @@ function main() {
 /**
  * @brief data
  */
-function data() {
+function data( options ) {
     // test if any events are active
     var event = Main.currentEvent();
     if ( event === -1 ) {
@@ -126,6 +126,10 @@ function data() {
 
     // stats list
     var stats = [];
+
+    // print options
+    // TODO: use these!!!
+    print( "Options:", options.split( ";" ))
 
     // go through team list
     for ( var team = 0; team < Team.count(); team++ ) {
@@ -207,6 +211,8 @@ function data() {
         }
 
         // calculate penalty points
+        /*
+          // TODO: use tags
         var teamFinishTime =  Team.finishTime( team );
         var overTime = ( JS.timeFromString( EventParms.FinishTime ) - teamFinishTime ) / 60000 - 1;
         teamStats.setTime( Math.max( 0, ( teamFinishTime - JS.timeFromString( EventParms.StartTime )) / 60000 + 1 ));
@@ -218,7 +224,7 @@ function data() {
         }
 
         if ( teamFinishTime - JS.timeFromString( EventParms.FinalTime ) > 0 )
-            teamStats.setPoints( 0 );
+            teamStats.setPoints( 0 );*/
 
         // announce results
         //print( teamStats.title(), "points:", teamStats.points(), "combos:",
@@ -262,19 +268,32 @@ function columns() {
  * @brief options returns a list of configurable options
  */
 function options() {
-    // name, type, default value and TAG?
+    // type, display name
     return [
-                'integer;Combo of Two;'   + EventParms.ComboOfTwo,
-                'integer;Combo of Three;' + EventParms.ComboOfThree,
-                'integer;Combo of Four+;' + EventParms.ComboOfFourPlus,
-                'time;Start time;'        + EventParms.StartTime,
-                'time;Finish time;'       + EventParms.FinishTime,
-                'time;Final time;'        + EventParms.FinalTime,
-                'integer;Penalty points;' + EventParms.Penalty,
+                'integer;Combo of Two',
+                'integer;Combo of Three',
+                'integer;Combo of Four+',
+                'time;Start time',
+                'time;Finish time',
+                'time;Final time',
+                'integer;Penalty points',
+            ];
+}
+
+/**
+ * @brief defaultValues returns a list default values for options
+ */
+function defaultValues() {
+    return [
+                EventParms.ComboOfTwo,
+                EventParms.ComboOfThree,
+                EventParms.ComboOfFourPlus,
+                EventParms.StartTime,
+                EventParms.FinishTime,
+                EventParms.FinalTime,
+                EventParms.Penalty,
             ];
 
-    // data() function should be called with these parameters
-    // that are stored in sqlite database
 }
 
 // TODO: export formating such as font, colours, etc.

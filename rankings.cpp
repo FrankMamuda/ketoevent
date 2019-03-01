@@ -129,7 +129,7 @@ void Rankings::on_actionUpdate_triggered() {
 
     // call data function
     QList<QVariantList> data;
-    foreach ( const QVariant &var, Script::instance()->call( "data" ).toVariant().toList())
+    foreach ( const QVariant &var, Script::instance()->call( "data", QJSValueList() << QJSValue( Event::instance()->options( event ))).toVariant().toList())
         data << var.toList();
 
     // clear any leftover results

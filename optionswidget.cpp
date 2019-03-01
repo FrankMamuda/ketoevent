@@ -25,6 +25,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QTimeEdit>
+#include <QDebug>
 
 /**
  * @brief OptionsWidget::OptionsWidget
@@ -91,4 +92,68 @@ OptionsWidget::~OptionsWidget() {
     delete this->label;
     delete this->widget;
     delete this->optionsLayout;
+}
+
+/**
+ * @brief EventEdit::addWidget
+ * @param parms
+ */
+void OptionsWidget::add( const QStringList &options, QListWidget *container ) {
+    if ( options.count() < 3 || container == nullptr )
+        return;
+
+    // parse values
+    Types type = OptionsWidget::NoType;
+    const QString label( options.at( 1 ));
+    const QVariant value( QVariant( options.at( 2 )));
+
+    if ( !QString::compare( options.at( 0 ), "bool" ))
+        type = OptionsWidget::Bool;
+    else if ( !QString::compare( options.at( 0 ), "string" ))
+        type = OptionsWidget::String;
+    else if ( !QString::compare( options.at( 0 ), "integer" ))
+        type = OptionsWidget::Integer;
+    else if ( !QString::compare( options.at( 0 ), "time" ))
+        type = OptionsWidget::Time;
+    else if ( !QString::compare( options.at( 0 ), "double" ))
+        type = OptionsWidget::Double;
+
+    // unsupported widget
+    if ( type == OptionsWidget::NoType )
+        return;
+
+    OptionsWidget *widget( new OptionsWidget( type, label, value, container ));
+    widget->item = new QListWidgetItem( container );
+    widget->item->setSizeHint( widget->sizeHint());
+    widget->setType( type );
+    container->setItemWidget( widget->item, widget );
+    widget->show();
+}
+
+/**
+ * @brief OptionsWidget::value
+ * @return
+ */
+QVariant OptionsWidget::value() const {
+    switch ( this->type()) {
+    case Integer:
+        return qobject_cast<QSpinBox*>( this->widget )->value();
+
+    case Time:
+        return qobject_cast<QTimeEdit*>( this->widget )->time().toString( Database_::TimeFormat );
+
+    case String:
+        return qobject_cast<QLineEdit*>( this->widget )->text();
+
+    case Bool:
+        return qobject_cast<QCheckBox*>( this->widget )->isChecked();
+
+    case Double:
+        return qobject_cast<QDoubleSpinBox*>( this->widget )->value();
+
+    case NoType:
+        break;
+    }
+
+    return QVariant();
 }

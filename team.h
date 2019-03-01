@@ -45,9 +45,6 @@ public:
         NoField = -1,
         ID,
         Title,
-        Members,
-        Finish,
-        Lock,
         Reviewer,
         Event,
 
@@ -65,9 +62,6 @@ public:
     Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &title, const QString &reviewer = QString());
     Q_INVOKABLE QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-
-    /* TODO: removeme*/ Q_INVOKABLE QTime finishTime( const Row & ) const { return QTime(); }
-
     Q_INVOKABLE QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
     Q_INVOKABLE Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     void removeOrphanedEntries() override;

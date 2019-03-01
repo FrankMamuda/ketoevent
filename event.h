@@ -30,27 +30,10 @@
 namespace EventTable {
 const static QString Name( "events" );
 #ifdef Q_CC_MSVC
-const static int Version = 9;
-const static int DefaultMinMembers = 1;
-const static int DefaultMembers = 2;
-const static int DefaultMaxMembers = 3;
-const static int DefaultComboOfTwo = 1;
-const static int DefaultComboOfThree = 3;
-const static int DefaultComboOfFourAndMore = 5;
-const static int DefaultPenaltyPoints = 5;
+const static int Version = 10;
 #else
-const static __attribute__((unused)) int Version = 9;
-const static __attribute__((unused)) int DefaultMinMembers = 1;
-const static __attribute__((unused)) int DefaultMembers = 2;
-const static __attribute__((unused)) int DefaultMaxMembers = 3;
-const static __attribute__((unused)) int DefaultComboOfTwo = 1;
-const static __attribute__((unused)) int DefaultComboOfThree = 3;
-const static __attribute__((unused)) int DefaultComboOfFourAndMore = 5;
-const static __attribute__((unused)) int DefaultPenaltyPoints = 5;
+const static __attribute__((unused)) int Version = 10;
 #endif
-const static QString DefaultStartTime( "10:00" );
-const static QString DefaultFinishTime( "15:00" );
-const static QString DefaultFinalTime( "15:30" );
 }
 
 /**
@@ -69,17 +52,8 @@ public:
         ID,
         API,
         Title,
-        Min,
-        Max,
-        Start,
-        Finish,
-        Final,
-        Penalty,
-        Combo2,
-        Combo3,
-        Combo4,
-        Lock,
         Script,
+        Options,
 
         // count
         Count
@@ -92,20 +66,18 @@ public:
     static Event *instance() { static Event *instance = new Event(); return instance; }
     virtual ~Event() override {}
 
-    Row add( const QString &title, const QString &script = QString());
+    Row add( const QString &title, const QString &script = QString(), const QString &options = QString());
     Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Q_INVOKABLE QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    Q_INVOKABLE int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
-    Q_INVOKABLE int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
     QString script( const Row &row ) const;
+    Q_INVOKABLE QString options( const Row &row ) const { return this->value( row, Options ).toString(); }
 
     void removeOrphanedEntries() override {}
 
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMinMembers( const Row &row, int minMembers ) { this->setValue( row, Min, minMembers ); }
-    void setMaxMembers( const Row &row, int maxMembers ) { this->setValue( row, Max, maxMembers ); }
     void setScript( const Row &row, const QString &script ) { this->setValue( row, Script, script ); }
+    void setOptions( const Row &row, const QString &options ) { this->setValue( row, Options, options ); }
 
 private:
     explicit Event();

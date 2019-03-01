@@ -41,25 +41,6 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
     this->setWindowTitle( this->tr( "Add event" ));
     this->setWindowIcon( QIcon( ":/icons/ketone" ));
 
-    /*this->addWidget( QStringList() << "bool" << "Important integer" << "true" );
-    this->addWidget( QStringList() << "integer" << "Big one" << "312" );
-    this->addWidget( QStringList() << "time" << "Is it time yet?" << "18:44" );
-    this->addWidget( QStringList() << "string" << "Bad string" << "I'm not bad" );
-    this->addWidget( QStringList() << "double" << "A double? Why?" << "1313.31" );*/
-
-    // get event related variables
-    const Row event = MainWindow::instance()->currentEvent();
-    if ( event == Row::Invalid )
-        return;
-
-    // evalute current event script
-    Script::instance()->evaluate( Event::instance()->script( event ));
-
-    // call column function
-    QStringList list;
-    foreach ( const QVariant &var, Script::instance()->call( "options" ).toVariant().toList())
-        this->addWidget( var.toString().split( ";" ));
-
     // empty event title check
     auto emptyTitle = [ this ]() {
         // warn upon empty event title
@@ -87,7 +68,7 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
         // if everything is ok, add a new event
         Row event = Row::Invalid;
         if ( !this->isEditing()) {
-            event = Event::instance()->add( eventTitle, "" );
+            event = Event::instance()->add( eventTitle, "", this->valueList());
         } else {
             const Row event = Event::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
@@ -95,6 +76,7 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
                 return;
 
             Event::instance()->setTitle( event, eventTitle );
+            Event::instance()->setOptions( event, this->valueList());
         }
 
         if ( event != Row::Invalid )
@@ -149,8 +131,7 @@ EventEdit::~EventEdit() {
     this->disconnect( this->ui->titleEdit, SIGNAL( returnPressed()));
 
     // delete all widgets
-    // TODO: also delete items
-    qDeleteAll( this->widgets );
+    this->ui->optionList->clear();
 
     // delete ui
     delete this->ui;
@@ -163,16 +144,45 @@ EventEdit::~EventEdit() {
 void EventEdit::reset( bool edit ) {
     this->m_edit = edit;
 
+    // TODO: do proper garbage collection
+    this->ui->optionList->clear();
+
     if ( !this->isEditing()) {
         // reset ui components to default values
         this->ui->titleEdit->clear();
    } else {
+        // get event related variables
         const Row event = Event::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
         if ( event == Row::Invalid )
             return;
 
         this->ui->titleEdit->setText( Event::instance()->title( event ));
+
+        // evalute current event script
+        Script::instance()->evaluate( Event::instance()->script( event ));
+
+        // get option values from database
+        QStringList values( Event::instance()->options( event ).split( ";" ));
+
+        // get default options from script
+        QStringList defaultValues;
+        foreach ( const QVariant &var, Script::instance()->call( "defaultValues" ).toVariant().toList())
+            defaultValues << var.toString();
+
+        // call column function
+        QStringList list;
+        QVariantList vars( Script::instance()->call( "options" ).toVariant().toList());
+        if ( defaultValues.count() != vars.count()) {
+            // TODO: context
+            qCritical() << "incompatible field/value count";
+            return;
+        }
+
+        for ( int y = 0; y < vars.count(); y++ ) {
+            const QString value(( values.count() == vars.count()) ? values.at( y ) : defaultValues.at( y ));
+            this->addWidget( vars.at( y ).toString().split( ";" ) << value );
+        }
     }
 
     this->ui->titleEdit->setFocus();
@@ -181,36 +191,43 @@ void EventEdit::reset( bool edit ) {
 }
 
 /**
+ * @brief EventEdit::optionCount
+ * @return
+ */
+int EventEdit::optionCount() const {
+    return this->ui->optionList->count();
+}
+
+/**
+ * @brief EventEdit::value
+ * @param index
+ * @return
+ */
+QVariant EventEdit::value( int index ) const {
+    if ( index < 0 || index >= this->optionCount())
+        return QVariant();
+
+    OptionsWidget *widget( qobject_cast<OptionsWidget*>( this->ui->optionList->itemWidget( this->ui->optionList->item( index ))));
+    return ( widget != nullptr ) ? widget->value() : QVariant();
+}
+
+/**
+ * @brief EventEdit::valueList
+ * @return
+ */
+QString EventEdit::valueList() const {
+    QStringList list;
+
+    for ( int y = 0; y < this->optionCount(); y++ )
+        list << this->value( y ).toString();
+
+    return list.join( ";" );
+}
+
+/**
  * @brief EventEdit::addWidget
  * @param parms
  */
 void EventEdit::addWidget( const QStringList &parms ) {
-    if ( parms.count() < 3 )
-        return;
-
-    // parse values
-    OptionsWidget::Types type;
-    const QString label( parms.at( 1 ));
-    const QVariant value( QVariant( parms.at( 2 )));
-
-    if ( !QString::compare( parms.at( 0 ), "bool" ))
-        type = OptionsWidget::Bool;
-    else if ( !QString::compare( parms.at( 0 ), "string" ))
-        type = OptionsWidget::String;
-    else if ( !QString::compare( parms.at( 0 ), "integer" ))
-        type = OptionsWidget::Integer;
-    else if ( !QString::compare( parms.at( 0 ), "time" ))
-        type = OptionsWidget::Time;
-    else if ( !QString::compare( parms.at( 0 ), "double" ))
-        type = OptionsWidget::Double;
-    else
-        return;
-
-    OptionsWidget *widget( new OptionsWidget( type, label, value, this ));
-    QListWidgetItem *item( new QListWidgetItem( this->ui->optionList ));
-    this->ui->optionList->setItemWidget( item, widget );
-    widget->show();
-    item->setSizeHint( widget->sizeHint());
-
-    this->widgets << widget;
+    OptionsWidget::add( parms, this->ui->optionList );
 }

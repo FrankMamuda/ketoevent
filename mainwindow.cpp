@@ -55,8 +55,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     ui( new Ui::MainWindow ),
     spacer( new QWidget()),
     quickSpacerLeft( new QWidget()),
-    quickSpacerRight( new QWidget()),
-    timeEdit( new QTimeEdit()) {
+    quickSpacerRight( new QWidget()) {
 
     // set up ui
     this->ui->setupUi( this );
@@ -162,12 +161,10 @@ MainWindow::~MainWindow() {
 
     // disconnect lambdas
     this->disconnect( this->ui->findEdit, SLOT( textChanged( QString )));
-    this->disconnect( this->timeEdit, SLOT( timeChanged( QTime )));
     this->disconnect( this->ui->clearButton, SLOT( pressed()));
     this->disconnect( this->ui->actionDone, SLOT( triggered( bool )));
 
     // delete ui elements
-    delete this->timeEdit;
     delete this->spacer;
     delete this->quickSpacerLeft;
     delete this->quickSpacerRight;
@@ -287,12 +284,8 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
 
         this->ui->actionEvents->setDisabled( false );
         this->ui->actionTeams->setDisabled( this->currentEvent() == Row::Invalid );
-        this->timeEdit->setTime( QTime());
         return;
     }
-
-    // update time edit
-    this->timeEdit->setTime( Team::instance()->finishTime( team ));
 
     // reset task filter
     this->setTaskFilter();
@@ -465,7 +458,6 @@ void MainWindow::setLock() {
     //this->ui->actionSettings->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionCombos->setDisabled( comboMode || noEvents || noTeams );
     this->ui->actionAddQuick->setDisabled( comboMode || noEvents || noTeams );
-    this->timeEdit->setDisabled( comboMode || noEvents || noTeams );
     this->ui->taskView->setDisabled( noEvents || noTeams || noTasks );
 
     // team disabler/enabler

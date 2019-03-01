@@ -85,7 +85,6 @@ private:
     QWidget *spacer;
     QWidget *quickSpacerLeft;
     QWidget *quickSpacerRight;
-    QTimeEdit *timeEdit;
     Id m_currentCombo = static_cast<Id>( -1 );
     bool m_comboMode = false;
 };

@@ -43,6 +43,9 @@ public:
     virtual ~EventEdit();
     void reset( bool edit = false );
     bool isEditing() const { return this->m_edit; }
+    int optionCount() const;
+    QVariant value( int index ) const;
+    QString valueList() const;
 
 public slots:
     void addWidget( const QStringList &parms = QStringList());
@@ -51,5 +54,4 @@ private:
     explicit EventEdit( QWidget *parent = nullptr );
     Ui::EventEdit *ui;
     bool m_edit;
-    QList<OptionsWidget*> widgets;
 };

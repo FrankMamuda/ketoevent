@@ -49,7 +49,7 @@ Script::Script() {
  * @param args
  * @return
  */
-QJSValue Script::call(const QString &func, const QJSValueList &args) const {
+QJSValue Script::call( const QString &func, const QJSValueList &args ) const {
     const QJSValue globalObject( this->engine.globalObject());
 
     // check if function object exists

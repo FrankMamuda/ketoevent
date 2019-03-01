@@ -34,51 +34,25 @@ using namespace EventTable;
  * @param parent
  */
 Event::Event() : Table( EventTable::Name ) {
-    this->addField( ID,      "id",                 QVariant::UInt,   "integer primary key", true, true );
     // NOTE: are we even checking api?
-    this->addField( API,     "api",                QVariant::Int,    "integer" );
-    /* renameme */ this->addField( Title,   "name",               QVariant::String, "varchar( 64 )",       true );
-    /* removeme */ this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Start,   "startTime",          QVariant::String, "varchar( 5 )" );
-    /* removeme */ this->addField( Finish,  "finishTime",         QVariant::String, "varchar( 5 )" );
-    /* removeme */ this->addField( Final,   "finalTime",          QVariant::String, "varchar( 5 )" );
-    /* removeme */ this->addField( Penalty, "penalty",            QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Combo2,  "comboOfTwo",         QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Combo4,  "comboOfFourAndMore", QVariant::Int,    "integer" );
-    /* removeme */ this->addField( Lock,    "lock",               QVariant::Int,    "integer" );
-    this->addField( Script,  "script",             QVariant::String, "text" );
-    /* addme this->addField( Parms, "parameters", QVariant::String, "text" );
-      this is supposed to hold values to be passed to the scripts
-    */
-
-    // TODO: we must break API
-    // for now only a script field is added
-    // in upcoming builds fields such as times, penalties, combos etc. will be removed
-    //   to be dynamically parsed from an event script
+    this->addField( ID,      "id",      QVariant::UInt,   "integer primary key", true, true );
+    this->addField( API,     "api",     QVariant::Int,    "integer"                         );
+    this->addField( Title,   "title",   QVariant::String, "text",                true       );
+    this->addField( Script,  "script",  QVariant::String, "text"                            );
+    this->addField( Options, "options", QVariant::String, "text"                            );
 }
 
 /**
  * @brief Event::add
  * @param title
  */
-Row Event::add( const QString &title, const QString &script ) {
+Row Event::add( const QString &title, const QString &script, const QString &options ) {
     return Table::add( QVariantList() <<
                        Database_::null <<
                        Version <<
                        title <<
-                       1 <<
-                       4 <<
-                       EventTable::DefaultStartTime <<
-                       EventTable::DefaultFinishTime <<
-                       EventTable::DefaultFinalTime <<
-                       EventTable::DefaultPenaltyPoints <<
-                       EventTable::DefaultComboOfTwo <<
-                       EventTable::DefaultComboOfThree <<
-                       EventTable::DefaultComboOfFourAndMore <<
-                       0 <<
-                       script );
+                       script <<
+                       options );
 }
 
 /**

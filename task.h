@@ -55,6 +55,7 @@ public:
         Order,
         Event,
         Desc,
+        Tag,
 
         // count
         Count

@@ -39,15 +39,15 @@ using namespace TaskTable;
  */
 Task::Task() : Table( TaskTable::Name ) {
     this->addField( ID,     "id",          QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Name,   "name",        QVariant::String, "varchar( 128 )",      true );
-    this->addField( Points, "points",      QVariant::Int,    "integer" );
-    this->addField( Mult,   "multi",       QVariant::Int,    "integer" );
-    this->addField( Style,  "style",       QVariant::Int,    "integer" );
-    this->addField( Type,   "type",        QVariant::Int,    "integer" );
-    this->addField( Order,  "parent",      QVariant::Int,    "integer" );
-    this->addField( Event,  "eventId",     QVariant::Int,    "integer" );
-    this->addField( Desc,   "description", QVariant::String, "varchar( 512 )" );
-    /* addme */ //this->addField( Tag,   "tag", QVariant::String, "varchar( 64 )" );
+    this->addField( Name,   "name",        QVariant::String, "text",                true       );
+    this->addField( Points, "points",      QVariant::Int,    "integer"                         );
+    this->addField( Mult,   "multi",       QVariant::Int,    "integer"                         );
+    this->addField( Style,  "style",       QVariant::Int,    "integer"                         );
+    this->addField( Type,   "type",        QVariant::Int,    "integer"                         );
+    this->addField( Order,  "parent",      QVariant::Int,    "integer"                         );
+    this->addField( Event,  "eventId",     QVariant::Int,    "integer"                         );
+    this->addField( Desc,   "description", QVariant::String, "text"                            );
+    this->addField( Tag,    "tag",         QVariant::String, "text"                            );
     // tag will be used to flag special tasks in javascript, so that tags remain
     // constant even if name or other attributes change
     //

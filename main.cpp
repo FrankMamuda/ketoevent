@@ -52,6 +52,7 @@
 //   - check API version
 //   - fix translations such as konfiguracija tiek noSLasita
 //   - add translations in JS
+//   - adding an event should not read vars from existing event script
 //
 
 // default message handler
