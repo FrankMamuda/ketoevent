@@ -90,7 +90,7 @@ public:
     virtual ~Task() override { this->setInitialised( false ); }
 
     Q_INVOKABLE Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
+    Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString(), const QString &tag = QString());
     Q_INVOKABLE QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
     Q_INVOKABLE int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
     Q_INVOKABLE int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }

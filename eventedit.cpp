@@ -98,7 +98,7 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
     } );
 
     // edit script button
-    this->connect( this->ui->scriptButton, &QPushButton::clicked, [ this ]() {
+    this->connect( this->ui->scriptButton, &QPushButton::clicked, []() {
         //Options options( this );
         //options.setAttribute( Qt::WA_DeleteOnClose, true );
 

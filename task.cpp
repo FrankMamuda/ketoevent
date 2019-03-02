@@ -75,7 +75,7 @@ Task::Task() : Table( TaskTable::Name ) {
  * @param style
  * @param description
  */
-Row Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
+Row Task::add(const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description, const QString &tag ) {
     int y, highest = -1;
 
     // failsafe
@@ -99,7 +99,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
                        static_cast<int>( type ) <<
                        highest + 1 <<
                        static_cast<int>( Event::instance()->id( event )) <<
-                       description );
+                       description << tag );
 }
 
 /**
