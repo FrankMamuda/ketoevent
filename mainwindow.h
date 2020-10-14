@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QCompleter>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
@@ -47,12 +48,16 @@ class MainWindow final : public QMainWindow {
     Q_DISABLE_COPY( MainWindow )
 
 public:
-    virtual ~MainWindow();
+    // disable move
+    MainWindow( MainWindow&& ) = delete;
+    MainWindow& operator=( MainWindow&& ) = delete;
+
+    ~MainWindow() override;
     static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
-    Row currentEvent() const;
-    Row currentTeam() const;
-    Id currentComboId() const { return this->m_currentCombo; }
-    bool isComboModeActive() const { return this->m_comboMode; }
+    [[nodiscard]] Row currentEvent() const;
+    [[nodiscard]] Row currentTeam() const;
+    [[nodiscard]] Id currentComboId() const { return this->m_currentCombo; }
+    [[nodiscard]] bool isComboModeActive() const { return this->m_comboMode; }
 
 public slots:
     void setCurrentTeam( const Row &row );
@@ -72,7 +77,6 @@ private slots:
     void on_actionAddQuick_triggered();
     void on_actionEvents_triggered();
     void on_actionAbout_triggered();
-
     void on_actionExport_logs_triggered();
 
 protected:

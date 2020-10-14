@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QSortFilterProxyModel>
 #include <QSpinBox>
 #include <QStyledItemDelegate>
@@ -39,21 +40,26 @@ enum class Row;
  */
 class Delegate : public QStyledItemDelegate {
     Q_OBJECT
+    Q_DISABLE_COPY( Delegate )
     friend class Item;
     friend class EditWidget;
     friend class TaskView;
     friend class MainWindow;
 
 public:
+    // disable move
+    Delegate( Delegate&& ) = delete;
+    Delegate& operator=( Delegate&& ) = delete;
+
     explicit Delegate( QWidget *parent = nullptr ) : QStyledItemDelegate( parent ) {}
     void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
-    QSize sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
-    QPoint mousePos() const { return this->m_pos; }
-    QModelIndex currentIndex() const { return this->m_currentIndex; }
-    QModelIndex currentEditIndex() const { return this->m_currentEditIndex; }
-    TaskView *view() const { return qobject_cast<TaskView *>( this->parent()); }
-    QList<Item> getItems( const QModelIndex &index ) const;
-    Item::Actions action( const QModelIndex &index ) const;
+    [[nodiscard]] QSize sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
+    [[nodiscard]] QPoint mousePos() const { return this->m_pos; }
+    [[nodiscard]] QModelIndex currentIndex() const { return this->m_currentIndex; }
+    [[nodiscard]] QModelIndex currentEditIndex() const { return this->m_currentEditIndex; }
+    [[nodiscard]] TaskView *view() const { return qobject_cast<TaskView *>( this->parent()); }
+    [[nodiscard]] QList<Item> getItems( const QModelIndex &index ) const;
+    [[nodiscard]] Item::Actions action( const QModelIndex &index ) const;
 
     QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
     void setEditorData( QWidget *editor, const QModelIndex &index ) const override;
@@ -62,9 +68,9 @@ public:
     void destroyEditor( QWidget *editor, const QModelIndex &index ) const override;
 
     static QFont fontSizeForWidth( const QString &text, const QFont &baseFont, qreal width );
-    int currentEditorValue() const;
+    [[nodiscard]] int currentEditorValue() const;
 
-    Row row( const QModelIndex &index ) const;
+    [[nodiscard]] Row row( const QModelIndex &index ) const;
 
 public slots:
     void setMousePos( const QPoint &pos = QPoint(), bool outside = false );

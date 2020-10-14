@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "rankings.h"
 #include "ui_rankings.h"
 #include "mainwindow.h"
@@ -200,7 +201,7 @@ void Rankings::on_actionUpdate_triggered() {
         stats.combos = combos.count();
 
         // calculate bonus points from combos
-        foreach ( const int count, combos ) {
+        for ( const int count : qAsConst( combos )) {
             if ( count == 2 )
                 stats.points += EventTable::DefaultComboOfTwo;
 
@@ -243,11 +244,11 @@ void Rankings::on_actionUpdate_triggered() {
 
     // calculate rank
     // NOTE: a really dumb way to do it
-    QMap<int,int> map;
+    QMultiMap<int,int> map;
 
     int y = 0;
-    foreach ( const TeamStatistics &stats, this->list ) {
-        map.insertMulti( stats.points, y );
+    for ( const TeamStatistics &stats : qAsConst( this->list )) {
+        map.insert( stats.points, y );
         y++;
     }
 
@@ -255,8 +256,9 @@ void Rankings::on_actionUpdate_triggered() {
     std::sort( points.begin(), points.end(), std::greater<int>());
     y = 1;
 
-    foreach ( const int p, qAsConst( points )) {
-        foreach ( int index, map.values( p )) {
+    for ( const int p : qAsConst( points )) {
+        QList<int> indices( map.values( p ));
+        for ( int index : indices ) {
             TeamStatistics stats = this->list.at( index );
             stats.rank = y;
             this->list.replace( index, stats );
@@ -303,9 +305,9 @@ void Rankings::on_actionUpdate_triggered() {
     int numTasksCompleted = 0;
     QSqlQuery query;
     query.exec( QString( "SELECT COUNT(*) from %1 WHERE %2>0 GROUP BY %3" )
-                .arg( Log::instance()->tableName())
-                .arg( Log::instance()->fieldName( Log::Multi ))
-                .arg( Log::instance()->fieldName( Log::Task )));
+                .arg( Log::instance()->tableName(),
+                      Log::instance()->fieldName( Log::Multi ),
+                      Log::instance()->fieldName( Log::Task )));
     while ( query.next())
         numTasksCompleted += query.value( 0 ).toInt();
     this->ui->completedEdit->setText( QString::number( numTasksCompleted ));
@@ -353,7 +355,7 @@ void Rankings::on_actionExport_triggered() {
         out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
         out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" ).append( win32 ? "\r" : "\n" );
 
-        foreach ( const TeamStatistics &team, this->list ) {
+        for ( const TeamStatistics &team : qAsConst( this->list )) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
                    .arg( team.title )
                    .arg( team.completedTasks )

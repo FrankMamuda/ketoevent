@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017-2018 Factory #12
+ * Copyright (C) 2019-2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "main.h"
 #include <QDir>
 #include <QLoggingCategory>
@@ -30,12 +31,9 @@
  * @brief The XML namespace
  */
 namespace XMLTools_ {
-#ifdef Q_CC_MSVC
-static constexpr const char *ConfigFile( "configuration.xml" );
-#else
-static constexpr const char __attribute__((unused)) *ConfigFile( "configuration.xml" );
-#endif
-const static QLoggingCategory Debug( "xml" );
+    [[maybe_unused]]
+    static constexpr const char *ConfigFile( "configuration.xml" );
+    const static QLoggingCategory Debug( "xml" );
 }
 
 /**
@@ -46,11 +44,26 @@ class XMLTools final : public QObject {
     Q_OBJECT
 
 public:
-    virtual ~XMLTools() = default;
-    static XMLTools *instance() { static XMLTools *instance( new XMLTools()); return instance; }
-    void write();
-    void read();
+    ~XMLTools() override = default;
+
+    /**
+     * @brief instance
+     * @return
+     */
+    static XMLTools *instance() {
+        static auto *instance( new XMLTools());
+        return instance;
+    }
+    static void write();
+    static void read();
 
 private:
-    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) { this->setObjectName( "XMLTools" ); GarbageMan::instance()->add( this ); }
+    /**
+     * @brief XMLTools
+     * @param parent
+     */
+    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) {
+        this->setObjectName( "XMLTools" );
+        GarbageMan::instance()->add( this );
+    }
 };

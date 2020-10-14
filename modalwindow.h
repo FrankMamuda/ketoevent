@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "mainwindow.h"
 #include <QKeyEvent>
 
@@ -32,7 +33,7 @@ class ModalWindow : public QMainWindow {
 
 public:
     explicit ModalWindow( QWidget *parent = nullptr ) : QMainWindow( parent ) { this->setWindowModality( Qt::ApplicationModal ); }
-    virtual ~ModalWindow() = default;
+    ~ModalWindow() override = default;
 
 protected:
     /**

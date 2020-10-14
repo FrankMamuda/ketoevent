@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QSharedPointer>
 #include <QtGlobal>
 
@@ -28,13 +29,8 @@
  * namespace Main
  */
 namespace Main {
-#ifdef Q_CC_MSVC
-static constexpr const char *Path = ".database2";
-static QObject *Console( nullptr );
-#else
-static constexpr const char __attribute__((unused)) *Path = ".database2";
-static QObject __attribute__((unused)) *Console( nullptr );
-#endif
+[[maybe_unused]] static constexpr const char *Path = ".database2";
+[[maybe_unused]] static QObject *Console( nullptr );
 }
 
 /**
@@ -64,7 +60,7 @@ public:
      */
     void clear() {
         std::reverse( this->garbage.begin(), this->garbage.end());
-        foreach ( QObject *object, this->garbage ) {
+        for ( QObject *object : qAsConst( this->garbage )) {
             if ( object != nullptr ) {
                 delete object;
                 object = nullptr;

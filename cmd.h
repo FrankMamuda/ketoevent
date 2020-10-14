@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "main.h"
 #include <QMap>
 #include <QObject>
@@ -40,6 +41,10 @@ class Cmd final : public QObject {
     Q_CLASSINFO( "description", "Command subsystem" )
 
 public:
+    // disable move
+    Cmd( Cmd&& ) = delete;
+    Cmd& operator=( Cmd&& ) = delete;
+
     void add( const QString &, function_t, const QString & = QString());
 
     /**
@@ -50,41 +55,41 @@ public:
         this->descriptionMap.remove( name );
     }
 
-    bool execute( const QString & );
+    [[nodiscard]] bool execute( const QString & );
 
     /**
      * @brief contains
      * @param name
      * @return
      */
-    bool contains( const QString &name ) const { return this->functionMap.contains( name ); }
+    [[nodiscard]] bool contains( const QString &name ) const { return this->functionMap.contains( name ); }
 
     /**
      * @brief keys
      * @return
      */
-    QStringList keys() const { return this->functionMap.keys(); }
+    [[nodiscard]] QStringList keys() const { return this->functionMap.keys(); }
 
     /**
      * @brief function
      * @param name
      * @return
      */
-    function_t function( const QString &name ) const { if ( this->contains( name )) return this->functionMap[name]; return nullptr; }
+    [[nodiscard]][[maybe_unused]] function_t function( const QString &name ) const { if ( this->contains( name )) return this->functionMap[name]; return nullptr; }
 
     /**
      * @brief description
      * @param name
      * @return
      */
-    QString description( const QString &name ) const { if ( this->contains( name )) return this->descriptionMap[name]; return QString(); }
+    [[nodiscard]] QString description( const QString &name ) const { if ( this->contains( name )) return this->descriptionMap[name]; return QString(); }
 
-    bool tokenize( const QString &string, QString &command, QStringList &arguments );
+    [[nodiscard]] static bool tokenize( const QString &string, QString &command, QStringList &arguments );
 
     /**
      * @brief Cmd::~Cmd
      */
-    virtual ~Cmd() { this->functionMap.clear(); this->descriptionMap.clear(); }
+    ~Cmd() override { this->functionMap.clear(); this->descriptionMap.clear(); }
 
     /**
      * @brief instance
@@ -93,7 +98,7 @@ public:
     static Cmd *instance() { static Cmd *instance( new Cmd()); /*GarbageMan::instance()->add( instance );*/ return instance; }
 
 private:
-    bool executeTokenized( const QString &, const QStringList & );
+    [[nodiscard]] bool executeTokenized( const QString &, const QStringList & );
 
     // constructor/destructor/instance
     explicit Cmd( QObject *parent = nullptr );
@@ -107,6 +112,6 @@ public slots:
     void list( const QString &, const QStringList & );
     void print( const QString &, const QStringList & );
     void cvarSet( const QString &, const QStringList & );
-    void dbInfo();
+    static void dbInfo();
     void listCvars();
 };

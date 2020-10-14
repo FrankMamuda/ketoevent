@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QPainter>
 
 //
@@ -66,10 +67,10 @@ public:
      * @param r
      * @param d
      */
-    Item( Types t, const QRect &r, const Delegate *d ) :  m_type( t ), rect( r ), delegate( d ) {}
+    explicit Item( Types t, const QRect &r, const Delegate *d ) :  m_type( t ), rect( r ), delegate( d ) {}
     void paint( QPainter *painter, const QModelIndex &index ) const;
-    Actions action( const QModelIndex &index ) const;
-    Types type() const { return this->m_type; }
+    [[nodiscard]] Actions action( const QModelIndex &index ) const;
+    [[nodiscard]] Types type() const { return this->m_type; }
 
 private:
     Types m_type;
@@ -81,7 +82,7 @@ private:
      * @param colour
      * @return
      */
-    static const QColor lighter( const QColor &colour ) { return QColor( colour.red(), colour.green(), colour.blue(), colour.alpha() / 2 ); }
+    [[nodiscard]] static const QColor lighter( const QColor &colour ) { return QColor( colour.red(), colour.green(), colour.blue(), colour.alpha() / 2 ); }
 
     // colours
     static const QColor Green;

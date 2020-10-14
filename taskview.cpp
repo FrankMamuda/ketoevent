@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "taskview.h"
 #include "delegate.h"
 #include "task.h"
@@ -129,8 +130,8 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             if ( id == Id::Invalid ) {
                                 QSqlQuery query;
                                 query.exec( QString( "select max( %1 ) from %2" )
-                                            .arg( Log::instance()->fieldName( Log::Combo ))
-                                            .arg( Log::instance()->tableName()));
+                                            .arg( Log::instance()->fieldName( Log::Combo ),
+                                                  Log::instance()->tableName()));
 
                                 id = query.next() ? static_cast<Id>( query.value( 0 ).toInt() + 1 ) : static_cast<Id>( 0 );
                             }

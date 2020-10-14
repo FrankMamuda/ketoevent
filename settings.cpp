@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "main.h"
 #include "settings.h"
 #include "ui_settings.h"
@@ -43,7 +44,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
     this->connect( this->ui->pathButton, &QPushButton::clicked, [ this ]() {
         const QString fileName( QFileDialog::getOpenFileName
                                 ( this, this->tr( "Open database" ),
-                                  QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath(),
+                                  QFileInfo( Variable::string( "databasePath" )).absolutePath(),
                                   this->tr( "Database (*.db *.sqlite)" ), nullptr, QFileDialog::DontConfirmOverwrite ));
 
         if ( fileName.isEmpty()) {
@@ -58,7 +59,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
                               this->tr( "Settings" ),
                               this->tr( "Application will be restarted" ),
                               QMessageBox::Ok );
-        Variable::instance()->setString( "databasePath", fileName );
+        Variable::setString( "databasePath", fileName );
         QApplication::quit();
     } );
 
@@ -79,7 +80,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
  */
 Settings::~Settings() {
     // unbind vars
-    foreach ( const QString &key, this->variables )
+    for ( const QString &key : qAsConst( this->variables ))
         Variable::instance()->unbind( key );
     this->variables.clear();
 

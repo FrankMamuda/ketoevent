@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "delegate.h"
 #include "item.h"
 #include "mainwindow.h"
@@ -87,7 +88,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 
     // set up painter
     painter->save();
-    painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
+    painter->setRenderHint( QPainter::Antialiasing, true );
     painter->setPen( Qt::NoPen );
 
     // draw buttons

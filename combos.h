@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "modalwindow.h"
 
 /**
@@ -38,8 +39,12 @@ class Combos final : public ModalWindow {
     Q_OBJECT
 
 public:
+    // disable move
+    Combos( Combos&& ) = delete;
+    Combos& operator=( Combos&& ) = delete;
+
     static Combos *instance() { static Combos *instance( new Combos()); return instance; }
-    ~Combos();
+    ~Combos() override;
 
 protected:
     void showEvent( QShowEvent *event );

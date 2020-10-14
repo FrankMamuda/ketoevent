@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +19,10 @@
 
 #pragma once
 
-//
-// includes
-//
-#include "table.h"
-
-/**
- * @brief The TaskTable namespace
+/*
+ * includes
  */
-namespace TaskTable {
-const static QString Name( "tasks" );
-}
+#include "table.h"
 
 /**
  * @brief The Task class
@@ -36,10 +30,6 @@ const static QString Name( "tasks" );
 class Task final : public Table {
     Q_OBJECT
     Q_DISABLE_COPY( Task )
-    Q_ENUMS( Fields )
-    Q_ENUMS( Types )
-    Q_ENUMS( Styles )
-    Q_ENUMS( DataRoles )
     friend class Log;
     friend class TaskEdit;
 
@@ -59,6 +49,7 @@ public:
         // count
         Count
     };
+    Q_ENUM( Fields )
 
     enum ExtendedFields {
         ComboID = Count,
@@ -67,12 +58,14 @@ public:
         // count
         ExtendedCount
     };
+    Q_ENUM( ExtendedFields )
 
     enum class Types {
         NoType = -1,
         Check,
         Multi
     };
+    Q_ENUM( Types )
 
     enum class Styles {
         NoStyle = -1,
@@ -80,45 +73,49 @@ public:
         Bold,
         Italic
     };
+    Q_ENUM( Styles )
+
+    // disable move
+    Task( Task&& ) = delete;
+    Task& operator=( Task&& ) = delete;
 
     /**
      * @brief instance
      * @return
      */
     static Task *instance() { static Task *instance( new Task()); return instance; }
-    virtual ~Task() override { this->setInitialised( false ); }
+    ~Task() override { this->setInitialised( false ); }
 
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
-    QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
-    int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
-    int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
-    Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
-    Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
-    int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
-    QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
-    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
-    QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
-    int multiplier( const Row &row ) const;
-    Id comboId( const Row &row ) const;
-    QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
+    [[nodiscard]] QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
+    [[nodiscard]] int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
+    [[nodiscard]] int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
+    [[nodiscard]] Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
+    [[nodiscard]] Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
+    [[nodiscard]] int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
+    [[nodiscard]] QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
+    [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    [[nodiscard]] QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
+    [[nodiscard]] int multiplier( const Row &row ) const;
+    [[nodiscard]] Id comboId( const Row &row ) const;
+    [[nodiscard]] QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
 
-    bool hasInitialised() const { return this->m_initialised; }
+    [[nodiscard]] bool hasInitialised() const { return this->m_initialised; }
 
     void removeOrphanedEntries() override;
 
-    int columnCount( const QModelIndex & = QModelIndex()) const override { return ExtendedCount; }
+    [[nodiscard]] int columnCount( const QModelIndex & = QModelIndex()) const override { return ExtendedCount; }
 
 public slots:
     void setName( const Row &row, const QString &name ) { this->setValue( row, Name, name ); }
     void setPoints( const Row &row, int points ) { this->setValue( row, Points, points ); }
     void setMulti( const Row &row, int points ) { this->setValue( row, Mult, points ); }
-    void setStyle( const Row &row, Styles style ) { this->setValue( row, Style, static_cast<int>( style )); }
-    void setType( const Row &row, Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
+    void setStyle( const Row &row, Task::Styles style ) { this->setValue( row, Style, static_cast<int>( style )); }
+    void setType( const Row &row, Task::Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
     void setOrder( const Row &row, int position ) { this->setValue( row, Order, position ); }
     void setDescription( const Row &row, const QString &description ) { this->setValue( row, Desc, description ); }
     void setMultiplier( const Row &row, int value );
-
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
 
 protected:

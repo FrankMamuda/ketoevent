@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "main.h"
 #include "table.h"
 #include <QRgb>
@@ -35,8 +36,12 @@ class ComboModel final : public QStringListModel {
     friend class Combos;
 
 public:
+    // disable move
+    ComboModel( ComboModel&& ) = delete;
+    ComboModel& operator=( ComboModel&& ) = delete;
+
     static ComboModel *instance() { static ComboModel *instance( new ComboModel()); return instance; }
-    virtual ~ComboModel() = default;
+    ~ComboModel() override = default;
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 
     /**
@@ -44,7 +49,7 @@ public:
      * @param id
      * @return
      */
-    static QRgb colourForId( int id ) {
+    [[nodiscard]] static QRgb colourForId( int id ) {
         if ( id < 0 )
             return ComboModel::colourList.at( 0 );
 
@@ -59,7 +64,7 @@ public slots:
 
 private:
     explicit ComboModel() : combos( 0 ), points( 0 ) { GarbageMan::instance()->add( this ); }
-    QMap<Id, QString> map;
+    QMultiMap<Id, QString> map;
     QMap<QString, QRgb> colours;
     static QList<QRgb> colourList;
     int combos;

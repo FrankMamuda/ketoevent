@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +19,10 @@
 
 #pragma once
 
-//
-// includes
-//
-#include "table.h"
-
-/**
- * @brief The LogTable namespace
+/*
+ * includes
  */
-namespace LogTable {
-const static QString Name( "logs" );
-}
+#include "table.h"
 
 /**
  * @brief The Log class
@@ -36,8 +30,6 @@ const static QString Name( "logs" );
 class Log final : public Table {
     Q_OBJECT
     Q_DISABLE_COPY( Log )
-    Q_ENUMS( Fields )
-    Q_ENUMS( Roles )
 
 public:
     enum Fields {
@@ -51,23 +43,28 @@ public:
         // count
         Count
     };
+    Q_ENUM( Fields )
 
     /**
      * @brief instance
      * @return
      */
     static Log *instance() { static Log *instance( new Log()); return instance; }
-    virtual ~Log() override {}
+    ~Log() override {}
+
+    // disable move
+    Log( Log&& ) = delete;
+    Log& operator=( Log&& ) = delete;
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Id id( const Id &taskId, const Id &teamId ) const;
-    int multiplier( const Row &row ) const { return this->value( row, Multi ).toInt(); }
-    int multiplier( const Id &taskId, const Id &teamId ) const;
-    Id taskId( const Row &row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
-    Id teamId( const Row &row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
-    Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
-    Id comboId( const Id &taskId, const Id &teamId ) const;
+    [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    [[nodiscard]] Id id( const Id &taskId, const Id &teamId ) const;
+    [[nodiscard]] int multiplier( const Row &row ) const { return this->value( row, Multi ).toInt(); }
+    [[nodiscard]] int multiplier( const Id &taskId, const Id &teamId ) const;
+    [[nodiscard]] Id taskId( const Row &row ) const { return static_cast<Id>( this->value( row, Task ).toInt()); }
+    [[nodiscard]] Id teamId( const Row &row ) const { return static_cast<Id>( this->value( row, Team ).toInt()); }
+    [[nodiscard]] Id comboId( const Row &row ) const { return static_cast<Id>( this->value( row, Combo ).toInt()); }
+    [[nodiscard]] Id comboId( const Id &taskId, const Id &teamId ) const;
 
     void removeOrphanedEntries() override;
 

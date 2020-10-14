@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "popup.h"
 #include <QPainter>
 #include <QDebug>
@@ -147,7 +148,7 @@ void Popup::paintEvent( QPaintEvent *event ) {
 
     // draw popup shape
     painter.setPen( Qt::transparent );
-    painter.setBrush( this->palette().color( QPalette::Background ));
+    painter.setBrush( this->palette().color( QPalette::Window ));
     painter.drawPolygon( this->poly, Qt::OddEvenFill );
 
     // draw label

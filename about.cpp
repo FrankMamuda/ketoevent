@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2019 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+/* includes
+*/
 #include <QMessageBox>
 #include "about.h"
 #include "ui_about.h"
@@ -29,8 +30,8 @@
  */
 About::About( QWidget *parent ) : QDialog( parent ), ui( new Ui::About ) {
     this->ui->setupUi( this );
-    this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
-    this->connect( this->ui->qtButton, &QPushButton::clicked, [ this ]() { QMessageBox::aboutQt( this ); } );
+    QPushButton::connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
+    QPushButton::connect( this->ui->qtButton, &QPushButton::clicked, [ this ]() { QMessageBox::aboutQt( this ); } );
 }
 
 /**

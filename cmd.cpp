@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "main.h"
 #include "cmd.h"
 #include "mainwindow.h"
@@ -181,12 +182,14 @@ void Cmd::print( const QString &name, const QStringList &args ) {
  * @param args filter
  */
 void Cmd::list( const QString &, const QStringList &args ) {
+    const QStringList keys( this->functionMap.keys());
+
     // announce
     if ( !args.isEmpty()) {
         int numFiltered = 0;
 
         // get total filtered count
-        foreach ( const QString &name, this->functionMap.keys()) {
+        for ( const QString &name : keys ) {
             if ( !args.isEmpty() && !name.startsWith( args.first()))
                 continue;
             numFiltered++;
@@ -200,7 +203,7 @@ void Cmd::list( const QString &, const QStringList &args ) {
         qInfo() <<  this->tr( "%1 available commands:" ).arg( this->functionMap.count());
     }
 
-    foreach ( const QString &name, this->functionMap.keys()) {
+    for ( const QString &name : keys ) {
         QString description;
 
         if ( !args.isEmpty() && !name.startsWith( args.first()))
@@ -215,17 +218,17 @@ void Cmd::list( const QString &, const QStringList &args ) {
  * @brief Cmd::listCvars lists all available console variables
  */
 void Cmd::listCvars() {
-    if ( !Variable::instance()->list.isEmpty())
-        qWarning() << this->tr( "%1 available console variables:" ).arg( Variable::instance()->list.count());
+    if ( !qAsConst( Variable::instance()->list ).isEmpty())
+        qWarning() << this->tr( "%1 available console variables:" ).arg( qAsConst( Variable::instance()->list).count());
 
-    foreach ( const QSharedPointer<Var> &entry, Variable::instance()->list ) {
+    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance()->list )) {
         if ( entry->flags() & Var::Flag::Hidden )
             continue;
 
         if ( QString::compare( entry->defaultValue().toString(), entry->value().toString(), Qt::CaseInsensitive ))
-            qInfo() << this->tr( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( entry->key()).arg( entry->value().toString()).arg( entry->defaultValue().toString());
+            qInfo() << this->tr( "  \"%1\" is \"%2\", default - \"%3\"" ).arg( entry->key(), entry->value().toString(), entry->defaultValue().toString());
         else
-            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key()).arg( entry->value().toString());
+            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key(), entry->value().toString());
     }
 }
 
@@ -250,8 +253,8 @@ void Cmd::cvarSet( const QString &name, const QStringList &args ) {
             return;
         }
 
-        qInfo() << this->tr( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 )).arg( entry->key());
-        Variable::instance()->setValue( entry->key(), args.at( 1 ));
+        qInfo() << this->tr( "setting \"%1\" to \"%2\"" ).arg( args.at( 1 ), entry->key());
+        Variable::setValue( entry->key(), args.at( 1 ));
     }
 }
 
@@ -368,10 +371,7 @@ bool Cmd::tokenize( const QString &string, QString &command, QStringList &args )
         pos += len;
     }
 
-    if ( command.isEmpty())
-        return false;
-
-    return true;
+    return !command.isEmpty();
 }
 
 /**
@@ -388,14 +388,11 @@ bool Cmd::execute( const QString &buffer ) {
     separated = buffer.split( QRegExp( ";|\\n" ));
 
     // parse separated command strings
-    foreach ( const QString &string, separated ) {
+    for ( const QString &string : qAsConst( separated )) {
         // tokenize & execute command
         if ( this->tokenize( string, command, arguments ))
             counter += this->executeTokenized( command, arguments );
     }
 
-    if ( counter )
-        return true;
-
-    return false;
+    return counter != 0;
 }

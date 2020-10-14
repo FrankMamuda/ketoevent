@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2017-2018 Factory #12
+ * Copyright (C) 2013-2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,35 +19,79 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QSharedPointer>
 #include <QVariant>
+#include <utility>
 
 /**
  * @brief The Var class
  */
 class Var final {
 public:
+    /**
+     * @brief The Flag enum
+     */
     enum class Flag {
-        NoFlags  = 0x0,
+        NoFlags = 0x0,
         ReadOnly = 0x1,
-        NoSave   = 0x2,
-        Hidden   = 0x4
+        NoSave = 0x2,
+        Hidden = 0x4
     };
     Q_DECLARE_FLAGS( Flags, Flag )
 
-    explicit Var( const QString &key = QString(), const QVariant &defaultValue = QVariant(), Flags flags = Flag::NoFlags ) : m_key( key ), m_value( defaultValue ), m_defaultValue( defaultValue ), m_flags( flags ) {}
+    /**
+     * @brief Var
+     * @param key
+     * @param defaultValue
+     * @param flags
+     */
+    explicit Var( QString key = QString(), const QVariant &defaultValue = QVariant(),
+                  Flags flags = Flag::NoFlags ) : m_key( std::move( key )), m_value( defaultValue ), m_defaultValue( defaultValue ),
+                                                  m_flags( flags ) {}
     virtual ~Var() = default;
-    QString key() const { return this->m_key; }
-    Flags flags() const { return this->m_flags; }
-    virtual QVariant value() const { return this->m_value; }
-    QVariant defaultValue() const { return this->m_defaultValue; }
+
+    /**
+     * @brief key
+     * @return
+     */
+    [[nodiscard]] QString key() const { return this->m_key; }
+
+    /**
+     * @brief flags
+     * @return
+     */
+    [[nodiscard]] Flags flags() const { return this->m_flags; }
+
+    /**
+     * @brief value
+     * @return
+     */
+    [[nodiscard]] virtual QVariant value() const { return this->m_value; }
+
+    /**
+     * @brief defaultValue
+     * @return
+     */
+    [[nodiscard]] QVariant defaultValue() const { return this->m_defaultValue; }
+
+    /**
+     * @brief setValue
+     * @param value
+     */
     virtual void setValue( const QVariant &value ) { m_value = value; }
-    Var& operator = ( const Var & ) = default;
-    Var( const Var& ) = default;
-    virtual QSharedPointer<Var> copy() const { return QSharedPointer<Var>( new Var( *this )); }
+
+    // copy op
+    Var &operator=( const Var & ) = default;
+    Var( const Var & ) = default;
+
+    /**
+     * @brief copy
+     * @return
+     */
+    [[nodiscard]] virtual QSharedPointer<Var> copy() const { return QSharedPointer<Var>( new Var( *this )); }
 
 private:
     QString m_key;

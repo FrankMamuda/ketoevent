@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "event.h"
 #include "field.h"
 #include "database.h"
@@ -32,7 +33,7 @@ using namespace EventTable;
  * @brief Event::Event
  * @param parent
  */
-Event::Event() : Table( EventTable::Name ) {
+Event::Event() : Table( "events" ) {
     this->addField( ID,      "id",                 QVariant::UInt,   "integer primary key", true, true );
     this->addField( API,     "api",                QVariant::Int,    "integer" );
     this->addField( Title,   "name",               QVariant::String, "text",       true );

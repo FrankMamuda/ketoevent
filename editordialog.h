@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "modalwindow.h"
 #include <QCloseEvent>
 #include <QDockWidget>
@@ -43,11 +44,15 @@ class EditorDialog final : public ModalWindow {
     Q_DISABLE_COPY( EditorDialog )
 
 public:
+    // disable move
+    EditorDialog( EditorDialog&& ) = delete;
+    EditorDialog& operator=( EditorDialog&& ) = delete;
+
     static EditorDialog *instance() { static EditorDialog *instance = new EditorDialog(); return instance; }
-    virtual ~EditorDialog();
+    ~EditorDialog() override;
     QListView *container;
     QDockWidget *dock;
-    bool isDockVisible() const;
+    [[nodiscard]] bool isDockVisible() const;
 
 public slots:
     void showDock( QWidget *contents = nullptr, const QString &title = QString());

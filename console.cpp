@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "cmd.h"
 #include "console.h"
 #include "ui_console.h"
@@ -37,7 +38,7 @@ Console::Console() : ui( new Ui::Console ) {
 
     // install event filter
     this->edit->installEventFilter( this );
-    this->edit->history = Variable::instance()->string( "system/consoleHistory" ).split( ";" );
+    this->edit->history = Variable::string( "system/consoleHistory" ).split( ";" );
 
     // set window icon
     this->setWindowIcon( QIcon( ":/icons/console" ));
@@ -50,7 +51,7 @@ Console::Console() : ui( new Ui::Console ) {
  * @brief Console::~Console
  */
 Console::~Console() {
-    Variable::instance()->setValue( "system/consoleHistory", this->edit->history.join( ";" ));
+    Variable::setValue( "system/consoleHistory", this->edit->history.join( ";" ));
     this->edit->removeEventFilter( this );
     delete this->ui;
 }
@@ -65,13 +66,14 @@ bool Console::completeCommand() {
     int y;
 
     // find matching commands
-    foreach ( const QString &name, Cmd::instance()->keys()) {
+    const QStringList keys( Cmd::instance()->keys());
+    for ( const QString &name : keys ) {
         if ( name.startsWith( this->edit->text()))
             matchedStrings << name;
     }
 
     // find matching cvars
-    foreach ( const QSharedPointer<Var> &entry, Variable::instance()->list ) {
+    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance()->list )) {
         if ( !QString::compare( entry->key(), "system/consoleHistory" ))
             continue;
 
@@ -104,7 +106,7 @@ bool Console::completeCommand() {
 
     // print out suggestions
     qInfo() << this->tr( "Available commands and cvars:" );
-    foreach ( const QString &str, matchedStrings ) {
+    for ( const QString &str : qAsConst( matchedStrings )) {
         // check commands
         if ( Cmd::instance()->keys().contains( str )) {
             QString description( Cmd::instance()->description( str ));

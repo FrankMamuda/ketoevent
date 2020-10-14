@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QAction>
 #include <QCheckBox>
 #include <QWidget>
@@ -48,7 +49,6 @@ class Variable;
  */
 class Widget final : public QObject {
     Q_OBJECT
-    Q_ENUMS( Types )
     friend class Variable;
 
 public:
@@ -62,6 +62,7 @@ public:
         SpinBox,
         ComboBox
     };
+    Q_ENUM( Types )
 
     /**
      * @brief type

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "task.h"
 #include "field.h"
 #include "database.h"
@@ -29,15 +30,10 @@
 #include <QFont>
 #include <QSqlQuery>
 
-//
-// namespaces
-//
-using namespace TaskTable;
-
 /**
  * @brief Task::Task
  */
-Task::Task() : Table( TaskTable::Name ) {
+Task::Task() : Table( "tasks" ) {
     this->addField( ID,     "id",          QVariant::UInt,   "integer primary key", true, true );
     this->addField( Name,   "name",        QVariant::String, "text",      true );
     this->addField( Points, "points",      QVariant::Int,    "integer" );
@@ -124,12 +120,9 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         const bool isMulti = this->type( row ) == Task::Types::Multi;
 
         return QString( "%1 (%2%3)")
-                .arg( this->name( row ))
-                .arg( isMulti ? this->tr( "M" ) : this->tr( "R" ))
-                .arg( isMulti ? QString( ", %1x%2" )
-                                .arg( this->points( row ))
-                                .arg( this->multi( row )) :
-                                QString( ", %1" ).arg( this->points( row )));
+                .arg( this->name( row ),
+                isMulti ? this->tr( "M" ) : this->tr( "R" ),
+                isMulti ? QString( ", %1x%2" ).arg( QString::number( this->points( row )), QString::number( this->multi( row ))) : QString( ", %1" ).arg( QString::number( this->points( row ))));
     }
 #endif
 
@@ -200,10 +193,10 @@ void Task::removeOrphanedEntries() {
 
     // remove orphaned tasks
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
-                .arg( this->tableName())
-                .arg( this->fieldName( Event ))
-                .arg( Event::instance()->fieldName( Event::ID ))
-                .arg( Event::instance()->tableName()));
+                .arg( this->tableName(),
+                      this->fieldName( Event ),
+                      Event::instance()->fieldName( Event::ID ),
+                      Event::instance()->tableName()));
     this->select();
 }
 
@@ -256,30 +249,30 @@ QString Task::selectStatement() const {
         if ( field.isEmpty())
             return "";
 
-        statement.append( QString( " %1.%2," ).arg( this->tableName()).arg( field ));
+        statement.append( QString( " %1.%2," ).arg( this->tableName(), field ));
     }
 
     // append fields from LOG table
-    statement.append( QString( " %1.%2," ).arg( logs ).arg( Log::instance()->fieldName( Log::Fields::Multi )));
-    statement.append( QString( " %1.%2" ).arg( logs ).arg( Log::instance()->fieldName( Log::Fields::Combo )));
+    statement.append( QString( " %1.%2," ).arg( logs, Log::instance()->fieldName( Log::Fields::Multi )));
+    statement.append( QString( " %1.%2" ).arg( logs, Log::instance()->fieldName( Log::Fields::Combo )));
 
     // append table name
     statement.append( QString( " FROM %1" ).arg( this->tableName()));
 
     // FROM table statement
     const QString leftTable( QString( "( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1" )
-                             .arg( logs )
-                             .arg( Log::instance()->fieldName( Log::Fields::Team ))
-                             .arg( static_cast<int>( teamId ))
-                             .arg( Log::instance()->fieldName( Log::Fields::Task )));
+                             .arg( logs,
+                                   Log::instance()->fieldName( Log::Fields::Team ),
+                                   QString::number( static_cast<int>( teamId )),
+                                   Log::instance()->fieldName( Log::Fields::Task )));
 
     // append JOIN statement from LOGS table
     statement.append( QString( " LEFT JOIN %1 ON %2.%3=%4.%5" )
-                      .arg( leftTable )
-                      .arg( logs )
-                      .arg( Log::instance()->fieldName( Log::Fields::Task ))
-                      .arg( this->tableName())
-                      .arg( this->fieldName( ID )));
+                      .arg( leftTable,
+                            logs,
+                            Log::instance()->fieldName( Log::Fields::Task ),
+                            this->tableName(),
+                            this->fieldName( ID )));
 
     // append filter if any
     if ( !this->filter().isEmpty())

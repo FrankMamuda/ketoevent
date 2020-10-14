@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "combomodel.h"
 #include "log.h"
 #include "mainwindow.h"
@@ -67,7 +68,7 @@ void ComboModel::reset( const Id &id ) {
                 const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( log ))));
 
                 if ( comboId > Id::Invalid ) {
-                    this->map.insertMulti( comboId, taskName );
+                    this->map.insert( comboId, taskName );
                     this->colours[taskName] = ComboModel::colourForId( static_cast<int>( comboId ));
                 }
             }
@@ -76,7 +77,8 @@ void ComboModel::reset( const Id &id ) {
         // build display list
         this->combos = this->map.uniqueKeys().count();
         this->points = 0;
-        foreach ( const Id &comboId, this->map.uniqueKeys()) {
+        const QList<Id>uniqueKeys( this->map.uniqueKeys());
+        for ( const Id &comboId : uniqueKeys ) {
             const QStringList taskNames( this->map.values( comboId ));
             const int count = taskNames.count();
 
@@ -89,7 +91,7 @@ void ComboModel::reset( const Id &id ) {
             if ( count >= 4 )
                 this->points += EventTable::DefaultComboOfFourAndMore;
 
-            foreach ( const QString &taskName, taskNames )
+            for ( const QString &taskName : taskNames )
                 list << taskName;
         }
     }

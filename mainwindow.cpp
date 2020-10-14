@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QInputDialog>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -130,9 +131,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         if ( idList.count() == 1 ) {
             QSqlQuery query;
             query.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
-                        .arg( Log::instance()->tableName())
-                        .arg( Log::instance()->fieldName( Log::Combo ))
-                        .arg( static_cast<int>( idList.first())));
+                        .arg( Log::instance()->tableName(),
+                              Log::instance()->fieldName( Log::Combo ),
+                              QString::number( static_cast<int>( idList.first()))));
 
             // must perform SELECT!
             Log::instance()->select();
@@ -399,7 +400,7 @@ void MainWindow::on_actionTasks_triggered() {
  * @param comboId
  */
 void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
-    const bool sort = Variable::instance()->isEnabled( "sortByType" );
+    const bool sort = Variable::isEnabled( "sortByType" );
     const Id eventId = this->currentEvent() == Row::Invalid ? Id::Invalid : Event::instance()->id( this->currentEvent());
     const Id teamId = this->currentTeam() == Row::Invalid ? Id::Invalid : Team::instance()->id( this->currentTeam());
     const QString find( this->ui->findEdit->text());
@@ -431,24 +432,23 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     const QString findFilter( find.isEmpty() ?
                                   "" :
                                   QString( "AND %1 LIKE '%%2%' %3 " )
-                                  .arg( Task::instance()->fieldName( Task::Name ))
-                                  .arg( find )
-                                  .arg( comboFind ))
-            ;
+                                  .arg( Task::instance()->fieldName( Task::Name ),
+                                        find,
+                                        comboFind ));
 
     // selects tasks for combo mode
     const QString comboFilter( filterByCombo ?
                                    QString( "and %1.%2 in "
                                             "( SELECT %3 FROM %4 WHERE %5=%6 AND ( %7=%8 OR %7=-1 ) AND %9>0 )" )
-                                   .arg( Task::instance()->tableName())
-                                   .arg( Task::instance()->fieldName( Task::ID ))
-                                   .arg( Log::instance()->fieldName( Log::Task ))
-                                   .arg( Log::instance()->tableName())
-                                   .arg( Log::instance()->fieldName( Log::Team ))
-                                   .arg( static_cast<int>( teamId ))
-                                   .arg( Log::instance()->fieldName( Log::Combo ))
-                                   .arg( static_cast<int>( comboId ))
-                                   .arg( Log::instance()->fieldName( Log::Multi )) :
+                                   .arg( Task::instance()->tableName(),
+                                         Task::instance()->fieldName( Task::ID ),
+                                         Log::instance()->fieldName( Log::Task ),
+                                         Log::instance()->tableName(),
+                                         Log::instance()->fieldName( Log::Team ),
+                                         QString::number( static_cast<int>( teamId )),
+                                         Log::instance()->fieldName( Log::Combo ),
+                                         QString::number( static_cast<int>( comboId )),
+                                         Log::instance()->fieldName( Log::Multi )) :
                                    "" );
 
     // orders tasks according to settings
@@ -473,10 +473,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     // put all filters together
     const QString filter(
                 QString( "%1 %2 %3 %4" )
-                .arg( eventFilter )
-                .arg( comboFilter )
-                .arg( findFilter )
-                .arg( orderFilter ));
+                .arg( eventFilter, comboFilter, findFilter, orderFilter ));
 
     //qDebug() << filter;
 
@@ -581,9 +578,9 @@ void MainWindow::on_actionExport_logs_triggered() {
 
     //qDebug() << Team::instance()
     query.exec( QString( "select * from %1 where %2=%3" )
-                .arg( Log::instance()->tableName())
-                .arg( Log::instance()->fieldName( Log::Team ))
-                .arg( static_cast<int>( Team::instance()->id( team ))));
+                .arg( Log::instance()->tableName(),
+                      Log::instance()->fieldName( Log::Team ),
+                      QString::number( static_cast<int>( Team::instance()->id( team )))));
 
     QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath() + "/" + Team::instance()->title( team ) + ".csv", this->tr( "CSV file (*.csv)" )));
 #ifdef Q_OS_WIN

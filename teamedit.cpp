@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "editordialog.h"
 #include "event.h"
 #include "main.h"
@@ -169,7 +170,7 @@ void TeamEdit::reset( bool edit ) {
         this->ui->titleEdit->clear();
         this->ui->finishTime->setTime( this->ui->finishTime->minimumTime());
         this->ui->membersInteger->setValue( EventTable::DefaultMembers );
-        this->ui->reviewerEdit->setText( Variable::instance()->string( "reviewerName" ));
+        this->ui->reviewerEdit->setText( Variable::string( "reviewerName" ));
     } else {
         const Row team = Team::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 

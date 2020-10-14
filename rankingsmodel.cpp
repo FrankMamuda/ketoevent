@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "rankingsmodel.h"
 #include "rankings.h"
 #include "team.h"
@@ -156,7 +157,7 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
     if ( role == Qt::TextAlignmentRole )
         return Qt::AlignCenter;
 
-    if ( role == Qt::TextColorRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
+    if ( role == Qt::ForegroundRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
         return QColor( Qt::red );
 
     return QVariant();

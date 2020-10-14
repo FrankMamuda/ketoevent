@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2013-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -50,8 +51,12 @@ class Console final : public QMainWindow {
     Q_DISABLE_COPY( Console )
 
 public:
+    // disable move
+    Console( Console&& ) = delete;
+    Console& operator=( Console&& ) = delete;
+
     static Console *instance() { static Console *instance( new Console()); return instance; }
-    virtual ~Console();
+    ~Console() override;
 
 public slots:
     void print( const QString &msg );
@@ -83,7 +88,7 @@ class HistoryEdit final : public QLineEdit {
 public:
     explicit HistoryEdit( QWidget *parent = nullptr ) : m_historyOffset( 0 ) { this->setParent( parent ); this->reset(); }
     virtual ~HistoryEdit() { this->history.clear(); }
-    int offset() const { return this->m_historyOffset; }
+    [[nodiscard]] int offset() const { return this->m_historyOffset; }
 
 public slots:
     void set( int offset = 0 ) { this->m_historyOffset = offset; }

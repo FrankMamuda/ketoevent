@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QWidget>
 
 /**
@@ -38,10 +39,14 @@ class EventEdit final : public QWidget {
     Q_DISABLE_COPY( EventEdit )
 
 public:
+    // disable move
+    EventEdit( EventEdit&& ) = delete;
+    EventEdit& operator=( EventEdit&& ) = delete;
+
     static EventEdit *instance() { static EventEdit *instance = new EventEdit(); return instance; }
-    virtual ~EventEdit();
+    ~EventEdit() override;
     void reset( bool edit = false );
-    bool isEditing() const { return this->m_edit; }
+    [[nodiscard]] bool isEditing() const { return this->m_edit; }
 
 private:
     explicit EventEdit( QWidget *parent = nullptr );

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "toolbar.h"
 #include <QModelIndex>
 
@@ -32,8 +33,12 @@ class TaskToolBar final : public ToolBar {
     Q_DISABLE_COPY( TaskToolBar )
 
 public:
+    // disable move
+    TaskToolBar( TaskToolBar&& ) = delete;
+    TaskToolBar& operator=( TaskToolBar&& ) = delete;
+
     static TaskToolBar *instance() { static TaskToolBar *instance = new TaskToolBar(); return instance; }
-    virtual ~TaskToolBar() = default;
+    ~TaskToolBar() override = default;
 
 public slots:
     void buttonTest (const QModelIndex &index = QModelIndex());

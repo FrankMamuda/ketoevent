@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +19,11 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QTime>
 #include "table.h"
-
-/**
- * @brief The TeamTable namespace
- */
-namespace TeamTable {
-const static QString Name( "teams" );
-}
 
 /**
  * @brief The Team class
@@ -37,7 +31,6 @@ const static QString Name( "teams" );
 class Team final : public Table {
     Q_OBJECT
     Q_DISABLE_COPY( Team )
-    Q_ENUMS( Fields )
     friend class Log;
 
 public:
@@ -54,21 +47,26 @@ public:
         // count
         Count
     };
+    Q_ENUM( Fields )
+
+    // disable move
+    Team( Team&& ) = delete;
+    Team& operator=( Team&& ) = delete;
 
     /**
      * @brief instance
      * @return
      */
     static Team *instance() { static Team *instance( new Team()); return instance; }
-    virtual ~Team() override = default;
+    ~Team() override = default;
 
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
     Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
-    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
-    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
-    QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
-    Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    [[nodiscard]] QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    [[nodiscard]] int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
+    [[nodiscard]] QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    [[nodiscard]] QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
+    [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     void removeOrphanedEntries() override;
 
 public slots:

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "toolbar.h"
 #include <QModelIndex>
 
@@ -32,8 +33,12 @@ class TeamToolBar final : public ToolBar {
     Q_DISABLE_COPY( TeamToolBar )
 
 public:
+    // disable move
+    TeamToolBar( TeamToolBar&& ) = delete;
+    TeamToolBar& operator=( TeamToolBar&& ) = delete;
+
     static TeamToolBar *instance() { static TeamToolBar *instance = new TeamToolBar(); return instance; }
-    virtual ~TeamToolBar() = default;
+    ~TeamToolBar() override = default;
 
 public slots:
     void buttonTest( const QModelIndex &index = QModelIndex());

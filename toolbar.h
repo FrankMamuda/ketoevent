@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QToolBar>
 
 /**
@@ -47,5 +48,5 @@ public:
         this->setIconSize( QSize( Ui::ToolBarIconSize, Ui::ToolBarIconSize ));
         this->setAllowedAreas( Qt::TopToolBarArea );
     }
-    virtual ~ToolBar() = default;
+    virtual ~ToolBar() override = default;
 };

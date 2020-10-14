@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QDebug>
 #include <QDir>
 #include <QSqlQuery>
@@ -72,38 +73,48 @@ bool Database::testPath( const QString &path ) {
 }
 
 /**
- * @brief Database::Database
- * @param parent
+ * @brief Database::Database initializes database
+ * @param parent any qobject parent
  */
 Database::Database( QObject *parent ) : QObject( parent ) {
     QSqlDatabase database( QSqlDatabase::database());
 
-    if ( !testPath( Variable::instance()->string( "databasePath" ))) {
-        Variable::instance()->setString( "databasePath", QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" + "database.db" );
+    // validate path
+    if ( !testPath( Variable::string( "databasePath" ))) {
+        Variable::setString( "databasePath",
+                                         QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" +
+                                         "database.db" );
 
-        if ( !this->testPath( Variable::instance()->string( "databasePath" )))
-            qFatal( QT_TR_NOOP_UTF8( "could not create database path" ));
+        if ( !this->testPath( Variable::string( "databasePath" )))
+            qFatal( QT_TR_NOOP_UTF8( "could not create database path" ) );
     }
 
     // failsafe
-    QFile file( Variable::instance()->string( "databasePath" ));
+    QFile file( Variable::string( "databasePath" ));
     if ( !file.exists()) {
-        file.open( QFile::WriteOnly );
-        file.close();
-        qCDebug( Database_::Debug ) << this->tr( "creating non-existant database" );
+        if ( QFile::copy( ":/initial/database.db", Variable::string( "databasePath" ))) {
+            qCDebug( Database_::Debug ) << Database::tr( "using built-in database" )
+                                        << Variable::string( "databasePath" );
+        } else {
+            // this should never happen, but just in case
+            file.open( QFile::WriteOnly );
+            file.close();
+            qCDebug( Database_::Debug ) << Database::tr( "creating non-existant database" )
+                                        << Variable::string( "databasePath" );
+        }
 
         if ( !file.exists())
-            qFatal( QT_TR_NOOP_UTF8( "unable to create database file" ));
+            qFatal( QT_TR_NOOP_UTF8( "unable to create database file" ) );
 
         file.setPermissions( QFileDevice::ReadOwner | QFileDevice::WriteOwner );
     }
 
     // announce
-    qCInfo( Database_::Debug ) << this->tr( "loading database" );
+    qCInfo( Database_::Debug ) << Database::tr( "loading database" );
 
     // failsafe
-    if ( !database.isDriverAvailable( "QSQLITE" ))
-        qFatal( QT_TR_NOOP_UTF8( "sqlite not present on the system" ));
+    if ( !QSqlDatabase::isDriverAvailable( "QSQLITE" ))
+        qFatal( QT_TR_NOOP_UTF8( "sqlite not present on the system" ) );
 
     // set sqlite driver
     database = QSqlDatabase::addDatabase( "QSQLITE" );
@@ -144,10 +155,10 @@ Database::Database( QObject *parent ) : QObject( parent ) {
 }
 
 /**
- * @brief Database::removeOrphanedEntries
+ * @brief Database::removeOrphanedEntries removes orphaned entries in database tables
  */
 void Database::removeOrphanedEntries() {
-    foreach ( Table *table, this->tables )
+    for ( Table *table : qAsConst( this->tables ))
         table->removeOrphanedEntries();
 }
 
@@ -155,13 +166,13 @@ void Database::removeOrphanedEntries() {
  * @brief Database::incrementCounter
  */
 void Database::incrementCounter() {
-    if ( Variable::instance()->isDisabled( "backup/enabled" ))
+    if ( Variable::isDisabled( "backup/enabled" ))
         return;
 
     // increment value
     this->m_counter++;
 
-    if ( this->count() >= Variable::instance()->integer( "backup/changes" )) {
+    if ( this->count() >= Variable::integer( "backup/changes" )) {
         this->resetCounter();
         this->writeBackup();
     }
@@ -184,10 +195,11 @@ Database::~Database() {
     // unbind variables
     Variable::instance()->unbind( "eventId" );
     Variable::instance()->unbind( "teamId" );
-    qCInfo( Database_::Debug ) << this->tr( "clearing tables" );
-    foreach ( Table *table, this->tables )
+    qCInfo( Database_::Debug ) << Database::tr( "clearing tables" );
+    for ( Table *table : qAsConst( this->tables ))
         table->clear();
 
+    // delete all tables
     qDeleteAll( this->tables );
 
     // according to Qt5 documentation, this must be out of scope
@@ -197,7 +209,7 @@ Database::~Database() {
             open = true;
             connectionName = database.connectionName();
 
-            qCInfo( Database_::Debug ) << this->tr( "closing database" );
+            qCInfo( Database_::Debug ) << Database::tr( "closing database" );
             database.close();
         }
     }
@@ -213,50 +225,92 @@ Database::~Database() {
 }
 
 /**
- * @brief Database::add
- * @param table
+ * @brief Database::add adds and validates Table instance to database
+ * @param table Table instance (QSqlTableModel)
  */
-void Database::add( Table *table ) {
+bool Database::add( Table *table ) {
     QSqlDatabase database( QSqlDatabase::database());
-    const QStringList tables( database.tables());
-    QString statement;
-    QSqlQuery query;
-    bool found = false;
+    const QStringList tableList( database.tables());
 
     // store table
     this->tables[table->tableName()] = table;
 
     // announce
-    if ( !tables.count())
-        qCInfo( Database_::Debug ) << this->tr( "creating an empty database" );
+    if ( !tableList.count())
+        qCInfo( Database_::Debug ) << Database::tr( "creating an empty database" );
 
     // validate schema
-    foreach ( const QString &tableName, tables ) {
+    bool found = false;
+    for ( const QString &tableName : tableList ) {
         if ( !QString::compare( table->tableName(), tableName )) {
-            foreach ( const Field &field, qAsConst( table->fields )) {
+            for ( const Field &field : qAsConst( table->fields )) {
+
                 if ( !database.record( table->tableName()).contains( field->name())) {
-                    qCCritical( Database_::Debug ) << this->tr( "database field mismatch" );
-                    return;
+                    qCCritical( Database_::Debug )
+                        << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field->name());
+                    return false;
+                }
+
+                // ignore unsigned ints for now
+                const QVariant::Type internalType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
+                const QVariant::Type databaseType = database.record( table->tableName()).field( field->id()).type();
+
+                if ( internalType != databaseType ) {
+                    qCCritical( Database_::Debug )
+                        << Database::tr( R"(database type mismatch in table "%1", field - "%2")" ).arg(
+                                tableName, field->name());
+                    return false;
                 }
             }
             found = true;
         }
     }
 
+    QString statement;
+    QSqlQuery query;
+
     if ( !found ) {
         // announce
-        qCInfo( Database_::Debug ) << this->tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
+        qCInfo( Database_::Debug ) << Database::tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
 
         // prepare statement
-        foreach ( const Field &field, qAsConst( table->fields )) {
-            statement.append( QString( "%1 %2" ).arg( field->name()).arg( field->format()));
+        for ( const Field &field : qAsConst( table->fields )) {
+            statement.append( QString( "%1 %2" ).arg( field->name(), field->format()));
+
+            if ( field->isUnique())
+                statement.append( " unique" );
 
             if ( QString::compare( field->name(), table->fields.last()->name()))
                 statement.append( ", " );
         }
 
-        if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName()).arg( statement )))
-            qCCritical( Database_::Debug ) << this->tr( "could not create table - \"%1\", reason - \"%2\"" ).arg( table->tableName()).arg( query.lastError().text());
+        // check for constraints
+        QString constraints;
+        const int tc = table->constraints.count();
+
+        if ( tc > 0 ) {
+            for ( int y = 0; y < table->constraints.count(); y++ ) {
+                constraints.append( "unique( " );
+
+                const int cc = table->constraints.at( y ).count();
+                for ( int k = 0; k < cc; k++ ) {
+                    const QSharedPointer<Field_> field( table->constraints.at( y ).at( k ));
+                    constraints.append( field->name());
+                    constraints.append( k == cc - 1 ? " )" : ", " );
+
+                }
+
+                if ( y < tc - 1 )
+                    constraints.append( ", " );
+            }
+
+            statement.append( ", " );
+            statement.append( constraints );
+        }
+
+        if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName(), statement )))
+            qCCritical( Database_::Debug )
+                << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
     }
 
     // table has been verified and is marked as valid
@@ -267,16 +321,19 @@ void Database::add( Table *table ) {
 
     // load data
     if ( !table->select()) {
-        qCCritical( Database_::Debug ) << this->tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
+        qCCritical( Database_::Debug )
+            << Database::tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
         table->setValid( false );
     }
+
+    return true;
 }
 
 /**
  * @brief Database::writeBackup
  */
 void Database::writeBackup() {
-    const QFileInfo info( Variable::instance()->string( "databasePath" ));
+    const QFileInfo info( Variable::string( "databasePath" ));
     const QDir dir( info.absolutePath() + + "/backups/" );
 
     if ( !dir.exists()) {
@@ -289,19 +346,19 @@ void Database::writeBackup() {
 
     // backup database filename
     const QString backup( QString( "%1/%2_%3.db" )
-                          .arg( dir.absolutePath())
-                          .arg( info.fileName().remove( ".db" ))
-                          .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                          .arg( dir.absolutePath(),
+                                info.fileName().remove( ".db" ),
+                                QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 
     // announce
     qCDebug( Database_::Debug ) << this->tr( "performing backup to \"%1\"" ).arg( backup );
 
     // perform a simple copy
-    QFile::copy( Variable::instance()->string( "databasePath" ),
+    QFile::copy( Variable::string( "databasePath" ),
                  QString( "%1/%2_%3.db" )
-                 .arg( dir.absolutePath())
-                 .arg( info.fileName().remove( ".db" ))
-                 .arg( QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
+                 .arg( dir.absolutePath(),
+                       info.fileName().remove( ".db" ),
+                       QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
 }
 
 /**
@@ -372,7 +429,7 @@ void Database::attach( const QFileInfo &info ) {
     auto getHiId = []( const QString &table, const QString &fieldName ) {
         QSqlQuery query;
 
-        query.exec( QString( "select max( %1 ) from %2" ).arg( fieldName ).arg( table ));
+        query.exec( QString( "select max( %1 ) from %2" ).arg( fieldName, table ));
         if ( query.next())
             return query.value( 0 ).toInt();
 
@@ -385,8 +442,8 @@ void Database::attach( const QFileInfo &info ) {
 
     // find unique teams that are not in the current event
     if ( query.exec( QString( "select * from merge.%1 where %2 not in ( select %2 from %1 )" )
-                     .arg( Team::instance()->tableName())
-                     .arg( Team::instance()->fieldName( Team::Title )))) {
+                     .arg( Team::instance()->tableName(),
+                           Team::instance()->fieldName( Team::Title )))) {
 
         // go through the team list
         while ( query.next()) {
@@ -412,9 +469,9 @@ void Database::attach( const QFileInfo &info ) {
             QSqlQuery subQuery;
             QMap<Id, Id> comboIdRemap;
             if ( subQuery.exec( QString( "select * from merge.%1 where %2=%3" )
-                                .arg( Log::instance()->tableName())
-                                .arg( Log::instance()->fieldName( Log::Team ))
-                                .arg( static_cast<int>( teamId )))) {
+                                .arg( Log::instance()->tableName(),
+                                      Log::instance()->fieldName( Log::Team ),
+                                      QString::number( static_cast<int>( teamId ))))) {
 
                 // go through the log list
                 while ( subQuery.next()) {

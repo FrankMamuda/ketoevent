@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "team.h"
 #include "field.h"
 #include "database.h"
@@ -27,15 +28,10 @@
 
 #include <QSqlQuery>
 
-//
-// namespaces
-//
-using namespace TeamTable;
-
 /**
  * @brief Team::Team
  */
-Team::Team() : Table( TeamTable::Name ) {
+Team::Team() : Table( "teams" ) {
     this->addField( ID,       "id",         QVariant::UInt,   "integer primary key", true, true );
     this->addField( Title,    "name",       QVariant::String, "text",       true );
     this->addField( Members,  "members",    QVariant::Int,    "integer" );
@@ -79,9 +75,9 @@ void Team::removeOrphanedEntries() {
 
     // remove orphaned teams
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
-                .arg( this->tableName())
-                .arg( this->fieldName( Event ))
-                .arg( Event::instance()->fieldName( Event::ID ))
-                .arg( Event::instance()->tableName()));
+                .arg( this->tableName(),
+                      this->fieldName( Event ),
+                      Event::instance()->fieldName( Event::ID ),
+                      Event::instance()->tableName()));
     this->select();
 }

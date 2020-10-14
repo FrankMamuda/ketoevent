@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "editordialog.h"
 #include "main.h"
 #include "task.h"
@@ -99,7 +100,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
             // reorder tasks accordint to id list
             y = 0;
-            foreach ( const Id id, idList ) {
+            for ( const Id id : qAsConst( idList )) {
                 Task::instance()->setOrder( Task::instance()->row( id ), y );
                 y++;
             }
@@ -191,13 +192,13 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                 }
 
                 out << QString( "%1;%2;%3;%4;%5;%6%7" )
-                       .arg( Task::instance()->name( row ).replace( ";", " |" ))
-                       .arg( Task::instance()->description( row ).replace( ";", "  |" ))
-                       .arg( Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ))
-                       .arg( style )
-                       .arg( Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "" )
-                       .arg( Task::instance()->points( row ))
-                       .arg( win32 ? "\r" : "\n" );
+                       .arg( Task::instance()->name( row ).replace( ";", " |" ),
+                             Task::instance()->description( row ).replace( ";", "  |" ),
+                             Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ),
+                             style,
+                             Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "",
+                             QString::number( Task::instance()->points( row )),
+                             win32 ? "\r" : "\n" );
             }
         }
         csv.close();
@@ -216,7 +217,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
  * @param index
  */
 void TaskToolBar::buttonTest( const QModelIndex &index ) {
-    if ( Variable::instance()->isEnabled( "sortByType" )) {
+    if ( Variable::isEnabled( "sortByType" )) {
         this->moveUp->setDisabled( true );
         this->moveDown->setDisabled( true );
     } else {

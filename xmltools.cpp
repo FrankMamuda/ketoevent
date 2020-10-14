@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013-2018 Factory #12
+ * Copyright (C) 2017-2018 Factory #12
+ * Copyright (C) 2019-2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QDebug>
 #include "xmltools.h"
 #include "variable.h"
@@ -41,7 +42,7 @@ void XMLTools::read() {
 
 #ifdef QT_DEBUG
     // announce
-    qCInfo( XMLTools_::Debug ) << this->tr( "reading configuration" );
+    qCInfo( XMLTools_::Debug ) << XMLTools::tr( "reading configuration" );
 #endif
 
     if ( !configDir.exists())
@@ -53,7 +54,7 @@ void XMLTools::read() {
     // load xml file
     QFile xmlFile( path );
     if ( !xmlFile.exists() || !xmlFile.open( QFile::ReadOnly | QFile::Text )) {
-        qCCritical( XMLTools_::Debug ) << this->tr( "no configuration file found" );
+        qCCritical( XMLTools_::Debug ) << XMLTools::tr( "no configuration file found" );
         return;
     }
 
@@ -74,12 +75,13 @@ void XMLTools::read() {
                     buffer.open( QIODevice::ReadOnly );
                     QDataStream in( &buffer );
                     in >> value;
+                    buffer.close();
                 } else {
                     value = element.attribute( "value" );
                 }
 
                 if ( Variable::instance()->contains( key ) && !key.isEmpty())
-                    Variable::instance()->setValue( key, value, true );
+                    Variable::setValue( key, value, true );
             }
         }
         node = qAsConst( node ).nextSibling();
@@ -94,12 +96,11 @@ void XMLTools::read() {
  * @param mode
  */
 void XMLTools::write() {
-    QString savedData, newData;
     const QDir configDir( QDir::homePath() + "/" + Main::Path );
 
 #ifdef QT_DEBUG
     // announce
-    qCInfo( XMLTools_::Debug ) << this->tr( "writing configuration" );
+    qCInfo( XMLTools_::Debug ) << XMLTools::tr( "writing configuration" );
 #endif
 
     if ( !configDir.exists())
@@ -121,7 +122,7 @@ void XMLTools::write() {
     stream.writeAttribute( "version", "3" );
 
     // switch mode
-    foreach ( const QSharedPointer<Var> &var, qAsConst( Variable::instance()->list )) {
+    for ( const QSharedPointer<Var> &var : qAsConst( Variable::instance()->list )) {
         if ( var->key().isEmpty() || var->flags() & Var::Flag::NoSave )
             continue;
 
@@ -130,7 +131,7 @@ void XMLTools::write() {
 
         if ( !var->value().canConvert<QString>()) {
             QByteArray array;
-            QBuffer buffer(&array);
+            QBuffer buffer( &array );
 
             buffer.open( QIODevice::WriteOnly );
             QDataStream out( &buffer );
@@ -154,22 +155,24 @@ void XMLTools::write() {
     xmlBuffer.close();
 
     // read existing config from file
+    QString savedData;
     if ( xmlFile.open( QFile::ReadOnly | QIODevice::Text )) {
         savedData = xmlFile.readAll();
         xmlFile.close();
     }
 
     // read new config from buffer
+    QString newData;
     if ( xmlBuffer.open( QFile::ReadOnly | QIODevice::Text )) {
         newData = xmlBuffer.readAll();
         xmlBuffer.close();
     }
 
     // compare data
-    if ( QString::compare( savedData, newData )) {
+    if ( QString::compare( qAsConst( savedData ), qAsConst( newData ))) {
         // write out as binary (not QIODevice::Text) to avoid CR line endings
         if ( !xmlFile.open( QFile::WriteOnly | QFile::Truncate )) {
-            qCCritical( XMLTools_::Debug ) << this->tr( "could not open configuration file \"%1\"" ).arg( path );
+            qCCritical( XMLTools_::Debug ) << XMLTools::tr( "could not open configuration file \"%1\"" ).arg( path );
             return;
         }
         xmlFile.write( newData.toUtf8().replace( "\r", "" ));

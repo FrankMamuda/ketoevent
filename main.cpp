@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +17,14 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "mainwindow.h"
 #include <QApplication>
+#include <QMessageBox>
+#include <QSharedMemory>
+#include <QDesktopWidget>
 #include <QTranslator>
 #include "database.h"
 #include "event.h"
@@ -39,7 +43,8 @@
 //
 // GENERAL TODO/FIXME LIST
 //
-//   - scripted states (combos would be scripted, not hardcoded)
+//   - scripted states (in a separate branch)
+//   - upon fresh start, tasks are unavailable unless a team is added
 //   - more self tests
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1
@@ -76,6 +81,25 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
 int main( int argc, char *argv[] ) {
     QApplication a( argc, argv );
 
+    // simple single instance implementation
+    // NOTE: this however will fail if app crashes during startup
+#ifndef QT_DEBUG
+    class SharedMemory : public QSharedMemory {
+    public:
+        SharedMemory( const QString &key, QObject *parent = nullptr ) : QSharedMemory( key, parent ) {}
+        ~SharedMemory() { if ( this->isAttached()) { this->detach(); } }
+
+        bool lock() {
+            if ( this->isAttached()) return false;
+            if ( this->attach( QSharedMemory::ReadOnly )) { this->detach(); return false; }
+            return this->create( sizeof( quint64 ));
+        }
+    };
+    QSharedPointer<SharedMemory> sharedMemory( new SharedMemory( "ketoevent_singleInstance", &a ));
+    if ( !sharedMemory->lock())
+        return 0;
+#endif
+
     // register metatypes
     qRegisterMetaType<Item::Actions>();
     qRegisterMetaType<Item::Types>();
@@ -109,29 +133,76 @@ int main( int argc, char *argv[] ) {
 #else
     const QString locale( "lv_LV" );
 #endif
+    QLocale::setDefault( locale );
     translator.load( ":/i18n/ketoevent_" + locale );
-    a.installTranslator( &translator );
+    QApplication::installTranslator( &translator );
 
     // set variable defaults
-    Variable::instance()->add( "reviewerName", "" );
-    Variable::instance()->add( "eventId", -1, Var::Flag::Hidden );
-    Variable::instance()->add( "teamId", -1, Var::Flag::Hidden );
-    Variable::instance()->add( "rankingsCurrent", true );
-    Variable::instance()->add( "sortByType", true );
-    Variable::instance()->add( "system/consoleHistory", "", Var::Flag::Hidden );
-    Variable::instance()->add( "databasePath", "", Var::Flag::Hidden );
-    Variable::instance()->add( "backup/enabled", false );
-    Variable::instance()->add( "backup/changes", 25 );
+    Variable::add( "reviewerName", "" );
+    Variable::add( "eventId", -1, Var::Flag::Hidden );
+    Variable::add( "teamId", -1, Var::Flag::Hidden );
+    Variable::add( "rankingsCurrent", true );
+    Variable::add( "sortByType", true );
+    Variable::add( "system/consoleHistory", "", Var::Flag::Hidden );
+    Variable::add( "databasePath", "", Var::Flag::Hidden );
+    Variable::add( "backup/enabled", false );
+    Variable::add( "backup/changes", 25 );
 
     // read configuration
-    XMLTools::instance()->read();
+    XMLTools::read();
+
+    // check for previous crashes
+    const QString apiFileName( QDir::currentPath() + "/badapi" );
+    if ( QFileInfo::exists( apiFileName )) {
+        const QFileInfo info( Variable::string( "databasePath" ));
+
+        // just change path
+        Variable::setString( "databasePath", info.absolutePath() + "/database_"
+                                                         + QDateTime::currentDateTime()
+                                                                 .toString( "yyyyMMdd_hhmmss" ) +
+                                                         ".db" );
+        // reset vars
+        Variable::reset( "eventId" );
+        Variable::reset( "teamId" );
+
+        // copy built-in demo version
+        //QFile::copy( ":/initial/database.db", Variable::string( "databasePath" ));
+        //QFile( Variable::string( "databasePath" )).setPermissions(
+        //        QFileDevice::ReadOwner | QFileDevice::WriteOwner );
+
+        QFile::remove( apiFileName );
+    }
+
 
     // initialize database and its tables
     Database::instance();
-    Database::instance()->add( Event::instance());
-    Database::instance()->add( Task::instance());
-    Database::instance()->add( Team::instance());
-    Database::instance()->add( Log::instance());
+    auto loadTables = []() {
+        bool success = true;
+
+        // initialize database and its tables
+        success &= Database::instance()->add( Event::instance());
+        success &= Database::instance()->add( Task::instance());
+        success &= Database::instance()->add( Team::instance());
+        success &= Database::instance()->add( Log::instance());
+
+        return success;
+    };
+
+    if ( !loadTables()) {
+        QMessageBox::critical( QApplication::desktop(),
+                               QObject::tr( "Internal error" ),
+                               QObject::tr( "Could not load database\n"
+                                            "New database will be created\n"
+                                            "Please restart the application" ),
+                               QMessageBox::Ok );
+
+        QFile badAPIFile( apiFileName );
+        if ( badAPIFile.open( QIODevice::WriteOnly ))
+            badAPIFile.close();
+
+        QApplication::quit();
+        return 0;
+    }
 
     // show main window
     MainWindow::instance()->show();
@@ -150,7 +221,7 @@ int main( int argc, char *argv[] ) {
         delete Console::instance();
         Main::Console = nullptr;
 
-        XMLTools::instance()->write();
+        XMLTools::write();
         GarbageMan::instance()->clear();
 
         delete GarbageMan::instance();
@@ -159,6 +230,7 @@ int main( int argc, char *argv[] ) {
             delete Database::instance();
 
         delete Variable::instance();
+        // FIXME: delete MainWindow::instance();
     } );
 
     return a.exec();

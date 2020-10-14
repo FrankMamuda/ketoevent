@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include <QTime>
 #include "table.h"
 
@@ -28,29 +29,17 @@
  * @brief The EventTable namespace
  */
 namespace EventTable {
-const static QString Name( "events" );
-#ifdef Q_CC_MSVC
-const static int Version = 9;
-const static int DefaultMinMembers = 1;
-const static int DefaultMembers = 2;
-const static int DefaultMaxMembers = 3;
-const static int DefaultComboOfTwo = 1;
-const static int DefaultComboOfThree = 3;
-const static int DefaultComboOfFourAndMore = 5;
-const static int DefaultPenaltyPoints = 5;
-#else
-const static __attribute__((unused)) int Version = 9;
-const static __attribute__((unused)) int DefaultMinMembers = 1;
-const static __attribute__((unused)) int DefaultMembers = 2;
-const static __attribute__((unused)) int DefaultMaxMembers = 3;
-const static __attribute__((unused)) int DefaultComboOfTwo = 1;
-const static __attribute__((unused)) int DefaultComboOfThree = 3;
-const static __attribute__((unused)) int DefaultComboOfFourAndMore = 5;
-const static __attribute__((unused)) int DefaultPenaltyPoints = 5;
-#endif
-const static QString DefaultStartTime( "10:00" );
-const static QString DefaultFinishTime( "15:00" );
-const static QString DefaultFinalTime( "15:30" );
+[[maybe_unused]] constexpr static int Version = 9;
+[[maybe_unused]] constexpr static int DefaultMinMembers = 1;
+[[maybe_unused]] constexpr static int DefaultMembers = 2;
+[[maybe_unused]] constexpr static int DefaultMaxMembers = 3;
+[[maybe_unused]] constexpr static int DefaultComboOfTwo = 1;
+[[maybe_unused]] constexpr static int DefaultComboOfThree = 3;
+[[maybe_unused]] constexpr static int DefaultComboOfFourAndMore = 5;
+[[maybe_unused]] constexpr static int DefaultPenaltyPoints = 5;
+[[maybe_unused]] constexpr static const char *DefaultStartTime = "10:00";
+[[maybe_unused]] constexpr static const char *DefaultFinishTime = "15:00";
+[[maybe_unused]] constexpr static const char *DefaultFinalTime = "15:30";
 }
 
 /**
@@ -58,7 +47,6 @@ const static QString DefaultFinalTime( "15:30" );
  */
 class Event final : public Table {
     Q_OBJECT
-    Q_ENUMS( Fields )
     Q_DISABLE_COPY( Event )
     friend class Task;
     friend class Team;
@@ -83,13 +71,18 @@ public:
         // count
         Count
     };
+    Q_ENUM( Fields )
+
+    // disable move
+    Event( Event&& ) = delete;
+    Event& operator=( Event&& ) = delete;
 
     /**
      * @brief instance
      * @return
      */
     static Event *instance() { static Event *instance = new Event(); return instance; }
-    virtual ~Event() override {}
+    ~Event() override {}
 
     Row add( const QString &title, int minMembers = EventTable::DefaultMinMembers, int maxMembers = EventTable::DefaultMaxMembers,
             const QTime &start = QTime::fromString( EventTable::DefaultStartTime, Database_::TimeFormat ),
@@ -97,17 +90,17 @@ public:
             const QTime &final  = QTime::fromString( EventTable::DefaultFinalTime, Database_::TimeFormat ),
             int penalty = EventTable::DefaultPenaltyPoints,
             int two = EventTable::DefaultComboOfTwo, int three = EventTable::DefaultComboOfThree, int fourPlus = EventTable::DefaultComboOfFourAndMore );
-    Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
-    int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
-    QTime startTime( const Row &row ) const { return QTime::fromString( this->value( row, Start ).toString(), Database_::TimeFormat ); }
-    QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
-    QTime finalTime( const Row &row ) const { return QTime::fromString( this->value( row, Final ).toString(), Database_::TimeFormat ); }
-    int penalty( const Row &row ) const { return this->value( row, Penalty ).toInt(); }
-    int comboOfTwo( const Row &row ) const { return this->value( row, Combo2 ).toInt(); }
-    int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
-    int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
+    [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
+    [[nodiscard]] QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
+    [[nodiscard]] int minMembers( const Row &row ) const { return this->value( row, Min ).toInt(); }
+    [[nodiscard]] int maxMembers( const Row &row ) const { return this->value( row, Max ).toInt(); }
+    [[nodiscard]] QTime startTime( const Row &row ) const { return QTime::fromString( this->value( row, Start ).toString(), Database_::TimeFormat ); }
+    [[nodiscard]] QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
+    [[nodiscard]] QTime finalTime( const Row &row ) const { return QTime::fromString( this->value( row, Final ).toString(), Database_::TimeFormat ); }
+    [[nodiscard]] int penalty( const Row &row ) const { return this->value( row, Penalty ).toInt(); }
+    [[nodiscard]] int comboOfTwo( const Row &row ) const { return this->value( row, Combo2 ).toInt(); }
+    [[nodiscard]] int comboOfThree( const Row &row ) const { return this->value( row, Combo3 ).toInt(); }
+    [[nodiscard]] int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
 
     void removeOrphanedEntries() override {}
 

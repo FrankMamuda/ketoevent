@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "toolbar.h"
 #include <QModelIndex>
 
@@ -33,7 +34,11 @@ class EventToolBar final : public ToolBar {
 
 public:
     static EventToolBar *instance() { static EventToolBar *instance = new EventToolBar(); return instance; }
-    virtual ~EventToolBar() = default;
+    ~EventToolBar() override = default;
+
+    // disable move
+    EventToolBar( EventToolBar&& ) = delete;
+    EventToolBar& operator=( EventToolBar&& ) = delete;
 
 public slots:
     void buttonTest( const QModelIndex &index = QModelIndex());

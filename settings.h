@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "modalwindow.h"
 
 /**
@@ -38,8 +39,12 @@ class Settings final : public ModalWindow {
     Q_OBJECT
 
 public:
+    // disable move
+    Settings( Settings&& ) = delete;
+    Settings& operator=( Settings&& ) = delete;
+
     static Settings *instance() { static Settings *instance( new Settings()); return instance; }
-    ~Settings();
+    ~Settings() override;
 
 private:
     explicit Settings();

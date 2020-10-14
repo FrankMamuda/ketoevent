@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  *
  */
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "delegate.h"
 #include <QSpinBox>
 #include <QDebug>
@@ -51,7 +52,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // save state
     painter->save();
-    painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
+    painter->setRenderHint( QPainter::Antialiasing, true );
     painter->setRenderHint( QPainter::TextAntialiasing, true );
 
     // draw alternating row colours
@@ -105,7 +106,8 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
             painter->fillRect( option.rect, highlight );
         }
 
-        foreach ( const Item &item, this->getItems( index ))
+        const QList<Item> items( this->getItems( index ));
+        for ( const Item &item : items )
             item.paint( painter, index );
 
         drawCrossEquals();
@@ -117,7 +119,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
 
     // disable view
     if ( this->currentEditIndex() != QModelIndex() && !edit && !isComboActive ) {
-        QColor foreground( option.palette.foreground().color());
+        QColor foreground( option.palette.windowText().color());
         foreground.setAlpha( 16 );
         painter->fillRect( option.rect, foreground );
     }
@@ -183,7 +185,8 @@ QList<Item> Delegate::getItems( const QModelIndex &index ) const {
 Item::Actions Delegate::action( const QModelIndex &index ) const {
     Item::Actions action = Item::NoAction;
 
-    foreach ( const Item &item, this->getItems( index )) {
+    const QList<Item> items( this->getItems( index ));
+    for ( const Item &item : items ) {
         action = item.action( index );
 
         if ( action != Item::NoAction )
@@ -361,7 +364,7 @@ QFont Delegate::fontSizeForWidth( const QString &text, const QFont &baseFont, qr
         if ( font.pointSize() < 4 )
             break;
 
-        if ( fm.width( text ) < static_cast<qreal>( width ) * 0.90 )
+        if ( fm.horizontalAdvance( text ) < static_cast<qreal>( width ) * 0.90 )
             break;
 
         font.setPointSizeF( font.pointSizeF() * 0.75 );

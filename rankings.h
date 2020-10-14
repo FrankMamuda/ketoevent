@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Factory #12
+ * Copyright (C) 2018-2019 Factory #12
+ * Copyright (C) 2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 
 #pragma once
 
-//
-// includes
-//
+/*
+ * includes
+ */
 #include "modalwindow.h"
 #include <QProgressDialog>
 #include <QSortFilterProxyModel>
@@ -68,9 +69,13 @@ class Rankings final : public ModalWindow {
     friend class RankingsModel;
 
 public:
+    // disable move
+    Rankings( Rankings&& ) = delete;
+    Rankings& operator=( Rankings&& ) = delete;
+
     static Rankings *instance() { static Rankings *instance( new Rankings()); return instance; }
-    virtual ~Rankings();
-    bool isDisplayingCurrentTeam() const;
+    ~Rankings() override;
+    [[nodiscard]] bool isDisplayingCurrentTeam() const;
 
 private slots:
     void on_actionUpdate_triggered();
