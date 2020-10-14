@@ -109,7 +109,7 @@ RESOURCES += \
 win32:RC_FILE = icon.rc
 
 # custom sqlite lib switch
-CONFIG += sqlite_custom
+# CONFIG += sqlite_custom
 sqlite_custom {
 SOURCES += sqlite/sqlite3.c
 HEADERS += sqlite/sqlite3.h
@@ -122,3 +122,27 @@ TRANSLATIONS = i18n/ketoevent_lv_LV.ts
 
 # special stats for KK6
 DEFINES += KK6_SPECIAL
+
+TRANSLATION_TARGET_DIR = $${_PRO_FILE_PWD_}/i18n/
+
+isEmpty(QMAKE_LUPDATE) {
+    win32:LANGUPD = $$[QT_INSTALL_BINS]\lupdate.exe
+    else:LANGUPD = $$[QT_INSTALL_BINS]/lupdate
+}
+
+isEmpty(QMAKE_LRELEASE) {
+    win32:LANGREL = $$[QT_INSTALL_BINS]\lrelease.exe
+    else:LANGREL = $$[QT_INSTALL_BINS]/lrelease
+}
+
+langupd.command = $$LANGUPD $$shell_path($$_PRO_FILE_) -ts $$_PRO_FILE_PWD_/$$TRANSLATIONS
+langrel.depends = langupd
+langrel.input = TRANSLATIONS
+langrel.output = $$TRANSLATION_TARGET_DIR/${QMAKE_FILE_BASE}.qm
+langrel.commands = $$LANGREL ${QMAKE_FILE_IN} -qm $$TRANSLATION_TARGET_DIR/${QMAKE_FILE_BASE}.qm
+langrel.CONFIG += no_link
+
+QMAKE_EXTRA_TARGETS += langupd
+QMAKE_EXTRA_COMPILERS += langrel
+PRE_TARGETDEPS += langupd compiler_langrel_make_all
+

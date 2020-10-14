@@ -35,12 +35,12 @@ using namespace EventTable;
 Event::Event() : Table( EventTable::Name ) {
     this->addField( ID,      "id",                 QVariant::UInt,   "integer primary key", true, true );
     this->addField( API,     "api",                QVariant::Int,    "integer" );
-    this->addField( Title,   "name",               QVariant::String, "varchar( 64 )",       true );
+    this->addField( Title,   "name",               QVariant::String, "text",       true );
     this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
     this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
-    this->addField( Start,   "startTime",          QVariant::String, "varchar( 5 )" );
-    this->addField( Finish,  "finishTime",         QVariant::String, "varchar( 5 )" );
-    this->addField( Final,   "finalTime",          QVariant::String, "varchar( 5 )" );
+    this->addField( Start,   "startTime",          QVariant::String, "text" );
+    this->addField( Finish,  "finishTime",         QVariant::String, "text" );
+    this->addField( Final,   "finalTime",          QVariant::String, "text" );
     this->addField( Penalty, "penalty",            QVariant::Int,    "integer" );
     this->addField( Combo2,  "comboOfTwo",         QVariant::Int,    "integer" );
     this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
@@ -62,7 +62,7 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
                 minMembers <<
                 maxMembers <<
                 start.toString( Database_::TimeFormat ) <<
-                finish.toString (Database_::TimeFormat ) <<
+                finish.toString( Database_::TimeFormat ) <<
                 final.toString( Database_::TimeFormat ) <<
                 penalty <<
                 two <<

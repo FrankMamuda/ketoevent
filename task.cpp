@@ -39,14 +39,14 @@ using namespace TaskTable;
  */
 Task::Task() : Table( TaskTable::Name ) {
     this->addField( ID,     "id",          QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Name,   "name",        QVariant::String, "varchar( 128 )",      true );
+    this->addField( Name,   "name",        QVariant::String, "text",      true );
     this->addField( Points, "points",      QVariant::Int,    "integer" );
     this->addField( Mult,   "multi",       QVariant::Int,    "integer" );
     this->addField( Style,  "style",       QVariant::Int,    "integer" );
     this->addField( Type,   "type",        QVariant::Int,    "integer" );
     this->addField( Order,  "parent",      QVariant::Int,    "integer" );
     this->addField( Event,  "eventId",     QVariant::Int,    "integer" );
-    this->addField( Desc,   "description", QVariant::String, "varchar( 512 )" );
+    this->addField( Desc,   "description", QVariant::String, "text" );
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );

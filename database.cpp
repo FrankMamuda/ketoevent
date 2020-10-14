@@ -37,31 +37,31 @@
 #ifdef SQLITE_CUSTOM
 #include <QSqlDriver>
 #include "sqlite/sqlite3.h"
-#include "mainwindow.h"
 #endif
+#include "mainwindow.h"
 
 /**
- * @brief Database::testPath
- * @param path
- * @return
+ * @brief Database::testPath checks if provided database path is valid and creates non-existent sub-directories
+ * @param path database path
+ * @return success
  */
 bool Database::testPath( const QString &path ) {
     const QDir dir( QFileInfo( path ).absoluteDir());
 
     // reject empty paths
     if ( path.isEmpty()) {
-        qCDebug( Database_::Debug ) << this->tr( "empty database path" );
+        qCDebug( Database_::Debug ) << Database::tr( "empty database path" );
         return false;
     }
 
     // only accept absolute paths
     if ( !dir.isAbsolute()) {
-        qCDebug( Database_::Debug ) << this->tr( "relative or invalid database path \"%1\"" ).arg( path );
+        qCDebug( Database_::Debug ) << Database::tr( "relative or invalid database path \"%1\"" ).arg( path );
         return false;
     }
 
     if ( !dir.exists()) {
-        qCDebug( Database_::Debug ) << this->tr( "making non-existant database path \"%1\"" ).arg( dir.absolutePath());
+        qCDebug( Database_::Debug ) << Database::tr( "making non-existant database path \"%1\"" ).arg( dir.absolutePath());
         dir.mkpath( dir.absolutePath());
 
         if ( !dir.exists())
@@ -94,6 +94,8 @@ Database::Database( QObject *parent ) : QObject( parent ) {
 
         if ( !file.exists())
             qFatal( QT_TR_NOOP_UTF8( "unable to create database file" ));
+
+        file.setPermissions( QFileDevice::ReadOwner | QFileDevice::WriteOwner );
     }
 
     // announce

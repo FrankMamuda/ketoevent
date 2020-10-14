@@ -37,11 +37,11 @@ using namespace TeamTable;
  */
 Team::Team() : Table( TeamTable::Name ) {
     this->addField( ID,       "id",         QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Title,    "name",       QVariant::String, "varchar( 64 )",       true );
+    this->addField( Title,    "name",       QVariant::String, "text",       true );
     this->addField( Members,  "members",    QVariant::Int,    "integer" );
-    this->addField( Finish,   "finishTime", QVariant::String, "varchar( 5 )" );
+    this->addField( Finish,   "finishTime", QVariant::String, "text" );
     this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
-    this->addField( Reviewer, "reviewer",   QVariant::String, "varchar( 64 )" );
+    this->addField( Reviewer, "reviewer",   QVariant::String, "text" );
     this->addField( Event,    "eventId",    QVariant::Int,    "integer" );
 }
 

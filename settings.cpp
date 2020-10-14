@@ -44,7 +44,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
         const QString fileName( QFileDialog::getOpenFileName
                                 ( this, this->tr( "Open database" ),
                                   QFileInfo( Variable::instance()->string( "databasePath" )).absolutePath(),
-                                  this->tr( "Database (*.db *.sqlite)" )));
+                                  this->tr( "Database (*.db *.sqlite)" ), nullptr, QFileDialog::DontConfirmOverwrite ));
 
         if ( fileName.isEmpty()) {
             QMessageBox::warning( this,
