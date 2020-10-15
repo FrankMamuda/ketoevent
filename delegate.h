@@ -88,14 +88,14 @@ private:
     static const int ItemHeight = 32;
 
     // pixmaps
-    static const QPixmap Check()  { static QPixmap p( ":/icons/check" ); return p; }
-    static const QPixmap Edit()   { static QPixmap p( ":/icons/editLog" ); return p; }
-    static const QPixmap Remove() { static QPixmap p( ":/icons/removeLog" ); return p; }
-    static const QPixmap Number() { static QPixmap p( ":/icons/number" ); return p; }
-    static const QPixmap Combine() { static QPixmap p( ":/icons/combine" ); return p; }
-    static const QPixmap Cross()  { static QPixmap p( ":/icons/cross" ); return p; }
-    static const QPixmap Equals() { static QPixmap p( ":/icons/equals" ); return p; }
-    static const QPixmap Desc()   { static QPixmap p( ":/icons/description" ); return p; }
+    static const QPixmap Check()  { static QPixmap p( QIcon::fromTheme( "check" ).pixmap( 32, 32 )); return p; }
+    static const QPixmap Edit()   { static QPixmap p( QIcon::fromTheme( "edit_log" ).pixmap( 32, 32 )); return p; }
+    static const QPixmap Remove() { static QPixmap p( QIcon::fromTheme( "remove_log" ).pixmap( 32, 32 )); return p; }
+    static const QPixmap Number() { static QPixmap p( QIcon::fromTheme( "number" ).pixmap( 32, 32 )); return p; }
+    static const QPixmap Combine() { static QPixmap p( QIcon::fromTheme( "combine" ).pixmap( 32, 32 )); return p; }
+    static const QPixmap Cross()  { static QPixmap p( QIcon::fromTheme( "cross" ).pixmap( 16, 32 )); return p; }
+    static const QPixmap Equals() { static QPixmap p( QIcon::fromTheme( "equals" ).pixmap( 16, 32 )); return p; }
+    static const QPixmap Desc()   { static QPixmap p( QIcon::fromTheme( "description" ).pixmap( 32, 32 )); return p; }
 
     // button sizes
     mutable QMap<QModelIndex, QRect> rectSizes;

@@ -32,9 +32,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="pixmap">
-         <pixmap resource="resources.qrc">:/icons/name</pixmap>
-        </property>
        </widget>
       </item>
       <item>
@@ -54,9 +51,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="resources.qrc">:/icons/teams</pixmap>
         </property>
        </widget>
       </item>
@@ -85,9 +79,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="pixmap">
-         <pixmap resource="resources.qrc">:/icons/find</pixmap>
-        </property>
        </widget>
       </item>
       <item>
@@ -99,8 +90,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="resources.qrc">
-          <normaloff>:/icons/clear</normaloff>:/icons/clear</iconset>
+         <iconset theme="clear">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -179,8 +170,8 @@
   </widget>
   <action name="actionTeams">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/teams</normaloff>:/icons/teams</iconset>
+    <iconset theme="teams">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Teams</string>
@@ -191,8 +182,8 @@
   </action>
   <action name="actionTasks">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/tasks</normaloff>:/icons/tasks</iconset>
+    <iconset theme="tasks">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Tasks</string>
@@ -200,8 +191,8 @@
   </action>
   <action name="actionRankings">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/rankings</normaloff>:/icons/rankings</iconset>
+    <iconset theme="rankings">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Rankings</string>
@@ -209,8 +200,8 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/overflow</normaloff>:/icons/overflow</iconset>
+    <iconset theme="overflow">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -218,8 +209,8 @@
   </action>
   <action name="actionConsole">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/console</normaloff>:/icons/console</iconset>
+    <iconset theme="console">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Console</string>
@@ -227,8 +218,8 @@
   </action>
   <action name="actionCombos">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/combos</normaloff>:/icons/combos</iconset>
+    <iconset theme="combos">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Combos</string>
@@ -236,8 +227,8 @@
   </action>
   <action name="actionAddQuick">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
+    <iconset theme="add">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Quickly add team</string>
@@ -245,8 +236,8 @@
   </action>
   <action name="actionLogTime">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/time</normaloff>:/icons/time</iconset>
+    <iconset theme="time">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Log current time</string>
@@ -254,8 +245,8 @@
   </action>
   <action name="actionDone">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/accept</normaloff>:/icons/accept</iconset>
+    <iconset theme="done">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Done</string>
@@ -263,8 +254,8 @@
   </action>
   <action name="actionEvents">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/ketone</normaloff>:/icons/ketone</iconset>
+    <iconset theme="ketone">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Events</string>
@@ -272,8 +263,8 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/info</normaloff>:/icons/info</iconset>
+    <iconset theme="info">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -281,8 +272,8 @@
   </action>
   <action name="actionExport_logs">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/export</normaloff>:/icons/export</iconset>
+    <iconset theme="export">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Export logs</string>

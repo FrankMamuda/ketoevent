@@ -22,6 +22,7 @@
  */
 #include "main.h"
 #include "settings.h"
+#include "theme.h"
 #include "ui_settings.h"
 #include "variable.h"
 #include <QFileDialog>
@@ -34,7 +35,23 @@
 Settings::Settings() : ui( new Ui::Settings ) {
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
-    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
+
+    // setup pixmaps
+    this->ui->reviewerPixmap->setPixmap( QIcon::fromTheme( "ketone" ).pixmap( 16, 16 ));
+
+
+
+    const QStringList themes( Theme::availableThemes().keys());
+    this->ui->themeCombo->clear();
+    for ( const QString &themeName : themes )
+        this->ui->themeCombo->addItem( themeName, themeName );
+
+    Settings::connect( this->ui->overrideCheck, &QCheckBox::toggled,
+                   [ this ]( bool checked ) { this->ui->themeCombo->setEnabled( checked ); } );
+
+    // bind variables
+    this->variables << Variable::instance()->bind( "overrideTheme", this->ui->overrideCheck );
+    this->variables << Variable::instance()->bind( "theme", this->ui->themeCombo );
     this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );
     this->variables << Variable::instance()->bind( "sortByType", this->ui->sortByTypeCheck );
 
@@ -67,9 +84,6 @@ Settings::Settings() : ui( new Ui::Settings ) {
     Variable::instance()->bind( "databasePath", this->ui->pathEdit );
     Variable::instance()->bind( "backup/enabled", this->ui->backupCheck );
     Variable::instance()->bind( "backup/changes", this->ui->backupValue );
-
-    // set window icon
-    this->setWindowIcon( QIcon( ":/icons/overflow" ));
 
     // add to garbage man
     GarbageMan::instance()->add( this );

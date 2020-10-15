@@ -33,16 +33,18 @@
 Combos::Combos() : ui( new Ui::Combos ) {
     this->setWindowModality( Qt::ApplicationModal );
     this->ui->setupUi( this );
-    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
-
-    // set window icon
-    this->setWindowIcon( QIcon( ":/icons/combos" ));
 
     // set up view
     this->ui->view->setModel( ComboModel::instance());
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
+
+    // set up pixmaps
+    this->ui->teamPixmap->setPixmap( QIcon::fromTheme( "teams" ).pixmap( 16, 16 ));
+    this->ui->comboPixmap->setPixmap( QIcon::fromTheme( "combos" ).pixmap( 16, 16 ));
+    this->ui->pointsPixmap->setPixmap( QIcon::fromTheme( "star" ).pixmap( 16, 16 ));
+
 
     // add to garbage man
     GarbageMan::instance()->add( this );

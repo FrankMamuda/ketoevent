@@ -37,6 +37,14 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
     // set up defaults
     this->ui->setupUi( this );
 
+    // setup pixmaps
+    this->ui->namePixmap->setPixmap( QIcon::fromTheme( "name" ).pixmap( 16, 16 ));
+    this->ui->multiPixmap->setPixmap( QIcon::fromTheme( "multi" ).pixmap( 16, 16 ));
+    this->ui->stylePixmap->setPixmap( QIcon::fromTheme( "style" ).pixmap( 16, 16 ));
+    this->ui->descPixmap->setPixmap( QIcon::fromTheme( "info" ).pixmap( 16, 16 ));
+    this->ui->typePixmap->setPixmap( QIcon::fromTheme( "type" ).pixmap( 16, 16 ));
+    this->ui->pointsPixmap->setPixmap( QIcon::fromTheme( "star" ).pixmap( 16, 16 ));
+
     // setup comboboxes
     this->connect<void( QComboBox::* )( int )>( this->ui->typeCombo, &QComboBox::activated, [ this ]( int index ) {
         const Task::Types type = static_cast<Task::Types>( index );

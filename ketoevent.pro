@@ -41,6 +41,7 @@ SOURCES += \
     teamedit.cpp \
     taskedit.cpp \
     rankings.cpp \
+    theme.cpp \
     variable.cpp \
     xmltools.cpp \
     settings.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
     editordialog.h \
     teamtoolbar.h \
     tasktoolbar.h \
+    theme.h \
     toolbar.h \
     dockwidget.h \
     teamedit.h \
@@ -107,6 +109,8 @@ FORMS += \
     about.ui
 
 RESOURCES += \
+    dark.qrc \
+    light.qrc \
     resources.qrc
 
 win32:RC_FILE = icon.rc

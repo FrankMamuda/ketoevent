@@ -27,9 +27,6 @@
        <property name="text">
         <string/>
        </property>
-       <property name="pixmap">
-        <pixmap resource="resources.qrc">:/icons/name</pixmap>
-       </property>
       </widget>
      </item>
      <item>
@@ -167,8 +164,8 @@
       <string>Add</string>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/accept</normaloff>:/icons/accept</iconset>
+      <iconset theme="accept">
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
@@ -192,15 +189,13 @@
       <string>Cancel</string>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
+      <iconset theme="remove">
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

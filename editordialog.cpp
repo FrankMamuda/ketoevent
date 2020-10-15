@@ -38,7 +38,6 @@ EditorDialog::EditorDialog() :
 {
     // set up ui
     this->ui->setupUi( this );
-    this->ui->buttonClose->setIcon( QIcon( ":/icons/close" ));
     this->container = this->ui->listView;
     this->dock = this->ui->dockWidget;
     this->hideDock();

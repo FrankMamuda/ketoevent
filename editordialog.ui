@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="ketone">
+    <normaloff>.</normaloff>.</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -41,6 +45,9 @@
      <widget class="QPushButton" name="buttonClose">
       <property name="text">
        <string>Close</string>
+      </property>
+      <property name="icon">
+       <iconset theme="close"/>
       </property>
      </widget>
     </item>

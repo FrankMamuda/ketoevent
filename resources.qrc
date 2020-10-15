@@ -1,42 +1,13 @@
 <RCC>
     <qresource prefix="/icons">
-        <file alias="add">icons/add.png</file>
-        <file alias="clear">icons/clear.png</file>
-        <file alias="down">icons/down.png</file>
-        <file alias="edit">icons/edit.png</file>
-        <file alias="find">icons/find.png</file>
-        <file alias="info">icons/info.png</file>
-        <file alias="remove">icons/remove.png</file>
-        <file alias="up">icons/up.png</file>
-        <file alias="update">icons/update.png</file>
-        <file alias="export">icons/export.png</file>
-        <file alias="overflow">icons/overflow.png</file>
-        <file alias="console">icons/console.png</file>
-        <file alias="rankings">icons/rankings.png</file>
-        <file alias="tasks">icons/tasks.png</file>
-        <file alias="teams">icons/teams.png</file>
-        <file alias="ketone">icons/ketone.png</file>
-        <file alias="combos">icons/combos.png</file>
-        <file alias="name">icons/name.png</file>
-        <file alias="close">icons/close.png</file>
-        <file alias="multi">icons/multi.png</file>
-        <file alias="style">icons/style.png</file>
-        <file alias="accept">icons/accept.png</file>
-        <file alias="time">icons/time.png</file>
-        <file alias="star">icons/star.png</file>
-        <file alias="type">icons/type.png</file>
-        <file alias="combine">icons/combine.png</file>
-        <file alias="cross">icons/cross.png</file>
-        <file alias="equals">icons/equals.png</file>
-        <file alias="editLog">icons/editLog.png</file>
-        <file alias="removeLog">icons/removeLog.png</file>
-        <file alias="check">icons/check.png</file>
-        <file alias="number">icons/number.png</file>
-        <file alias="description">icons/description.png</file>
         <file alias="ketone_large">icons/ketone_large.png</file>
         <file alias="logo_small">icons/logo_small.png</file>
     </qresource>
     <qresource prefix="/i18n">
         <file alias="ketoevent_lv_LV">i18n/ketoevent_lv_LV.qm</file>
+    </qresource>
+    <qresource prefix="/themes">
+        <file alias="dark.theme">themes/dark.theme</file>
+        <file alias="light.theme">themes/light.theme</file>
     </qresource>
 </RCC>

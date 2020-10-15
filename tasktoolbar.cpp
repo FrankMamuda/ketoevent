@@ -35,7 +35,7 @@
  */
 TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
-    this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Task" ), [ this ]() {
+    this->addAction( QIcon::fromTheme( "add" ), this->tr( "Add Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Add Task " ));
             TaskEdit::instance()->reset();
@@ -43,7 +43,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // edit action
-    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Task" ), [ this ]() {
+    this->edit = this->addAction( QIcon::fromTheme( "edit" ), this->tr( "Edit Task" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task " ));
             TaskEdit::instance()->reset( true );
@@ -51,7 +51,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // remove action
-    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Task" ), [ this ]() {
+    this->remove = this->addAction( QIcon::fromTheme( "remove" ), this->tr( "Remove Task" ), [ this ]() {
         const QModelIndex index( EditorDialog::instance()->container->currentIndex());
 
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
@@ -132,19 +132,19 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     };
 
     // move up action
-    this->moveUp = this->addAction( QIcon( ":/icons/up" ), this->tr( "Move up" ), [ move ]() {
+    this->moveUp = this->addAction( QIcon::fromTheme( "up" ), this->tr( "Move up" ), [ move ]() {
         move( true );
     } );
     moveUp->setEnabled( false );
 
     // move down action
-    this->moveDown = this->addAction( QIcon( ":/icons/down" ), this->tr( "Move down" ), [ move ]() {
+    this->moveDown = this->addAction( QIcon::fromTheme( "down" ), this->tr( "Move down" ), [ move ]() {
         move( false );
     } );
     moveDown->setEnabled( false );
 
     // export action
-    this->addAction( QIcon( ":/icons/export" ), this->tr( "Export tasks" ), [ this ]() {
+    this->addAction( QIcon::fromTheme( "export" ), this->tr( "Export tasks" ), [ this ]() {
         QString path( QFileDialog::getSaveFileName( this, this->tr( "Export tasks to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
     #ifdef Q_OS_WIN
         const bool win32 = true;

@@ -45,12 +45,14 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     // set up ui
     this->ui->setupUi( this );
 
+    // setup pixmaps
+    this->ui->teamPixmap->setPixmap( QIcon::fromTheme( "teams" ).pixmap( 16, 16 ));
+
     // make sure this window blocks other windows
     this->setWindowModality( Qt::ApplicationModal );
 
     // set up progressbar and team selector
     this->ui->progressBar->hide();
-    this->ui->closeButton->setIcon( QIcon( ":/icons/close" ));
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
@@ -59,9 +61,6 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
     Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
     this->connect( this->ui->actionCurrent, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
     this->connect( this->ui->teamCombo, SIGNAL( currentIndexChanged( int )), this->ui->tableView->viewport(), SLOT( repaint()));
-
-    // set window icon
-    this->setWindowIcon( QIcon( ":/icons/rankings" ));
 
     // add to garbage man
     GarbageMan::instance()->add( this );

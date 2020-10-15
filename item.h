@@ -22,6 +22,8 @@
 /*
  * includes
  */
+#include "variable.h"
+
 #include <QPainter>
 
 //
@@ -85,18 +87,18 @@ private:
     [[nodiscard]] static const QColor lighter( const QColor &colour ) { return QColor( colour.red(), colour.green(), colour.blue(), colour.alpha() / 2 ); }
 
     // colours
-    static const QColor Green;
-    static const QColor LtGreen;
-    static const QColor Blue;
-    static const QColor LtBlue;
-    static const QColor Gray;
-    static const QColor LtGray;
-    static const QColor Black;
-    static const QColor LtBlack;
-    static const QColor Red;
-    static const QColor LtRed;
-    static const QColor Yellow;
-    static const QColor LtYellow;
+    static const QColor Green() { return Variable::isEnabled( "darkMode" ) ? QColor( 77, 194, 77, 216 ) : QColor( 57, 174, 57, 196 ); }
+    static const QColor LtGreen() { return lighter( Item::Green()); }
+    static const QColor Blue() { return Variable::isEnabled( "darkMode" ) ? QColor( 20, 194, 255, 196 ) : QColor( 0, 174, 255, 196 ); }
+    static const QColor LtBlue() { return lighter( Item::Blue()); }
+    static const QColor Gray() { return Variable::isEnabled( "darkMode" ) ? QColor( 164, 164, 164, 196 ) : QColor( 64, 64, 64, 196 ); }
+    static const QColor LtGray() { return lighter( Item::Gray()); }
+    static const QColor Black() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 196 ) : QColor( 0, 0, 0, 196 ); }
+    static const QColor LtBlack() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 128 ) : QColor( 0, 0, 0, 128 ); }
+    static const QColor Red() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 80, 80, 216 ) : QColor( 190, 0, 0, 196 ); }
+    static const QColor LtRed() { return lighter( Item::Red()); }
+    static const QColor Yellow() { return Variable::isEnabled( "darkMode" ) ? QColor( 210, 210, 20, 196 ) : QColor( 190, 190, 0, 196 ); }
+    static const QColor LtYellow() { return lighter( Item::Yellow()); }
 };
 
 // declare enums

@@ -39,6 +39,11 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     // set up ui
     this->ui->setupUi( this );
 
+    // setup pixmaps
+    this->ui->membersPixmap->setPixmap( QIcon::fromTheme( "teams" ).pixmap( 16, 16 ));
+    this->ui->titlePixmap->setPixmap( QIcon::fromTheme( "name" ).pixmap( 16, 16 ));
+    this->ui->reviewerPixmap->setPixmap( QIcon::fromTheme( "ketone" ).pixmap( 16, 16 ));
+
     if ( event == Row::Invalid )
         return;
 
@@ -50,7 +55,6 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
 
     // only visible in quick add
     this->setWindowTitle( this->tr( "Add team" ));
-    this->setWindowIcon( QIcon( ":/icons/teams" ));
 
     // empty team title check
     auto emptyTitle = [ this ]() {

@@ -222,7 +222,9 @@ Row Table::add( const QVariantList &arguments ) {
         argument = arguments.at( y );
 
         // compare types
-        if ( field->type() != argument.type()) {
+        // ignore UInts for now
+        const QVariant::Type fieldType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
+        if ( fieldType != argument.type()) {
             qCCritical( Database_::Debug )
                 << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg(
                         argument.type()).arg( y ).arg( field->format()).arg( field->type());

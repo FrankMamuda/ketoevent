@@ -1,0 +1,38 @@
+<RCC>
+    <qresource prefix="/icons/dark">
+        <file alias="index.theme">icons/dark/index.theme</file>
+        <file alias="16x16/accept.png">icons/dark/16x16/accept.png</file>
+        <file alias="16x16/add.png">icons/dark/16x16/add.png</file>
+        <file alias="16x16/clear.png">icons/dark/16x16/clear.png</file>
+        <file alias="16x16/close.png">icons/dark/16x16/close.png</file>
+        <file alias="16x16/combos.png">icons/dark/16x16/combos.png</file>
+        <file alias="16x16/console.png">icons/dark/16x16/console.png</file>
+        <file alias="16x16/down.png">icons/dark/16x16/down.png</file>
+        <file alias="16x16/edit.png">icons/dark/16x16/edit.png</file>
+        <file alias="16x16/export.png">icons/dark/16x16/export.png</file>
+        <file alias="16x16/find.png">icons/dark/16x16/find.png</file>
+        <file alias="16x16/info.png">icons/dark/16x16/info.png</file>
+        <file alias="16x16/multi.png">icons/dark/16x16/multi.png</file>
+        <file alias="16x16/name.png">icons/dark/16x16/name.png</file>
+        <file alias="16x16/overflow.png">icons/dark/16x16/overflow.png</file>
+        <file alias="16x16/rankings.png">icons/dark/16x16/rankings.png</file>
+        <file alias="16x16/remove.png">icons/dark/16x16/remove.png</file>
+        <file alias="16x16/star.png">icons/dark/16x16/star.png</file>
+        <file alias="16x16/style.png">icons/dark/16x16/style.png</file>
+        <file alias="16x16/tasks.png">icons/dark/16x16/tasks.png</file>
+        <file alias="16x16/teams.png">icons/dark/16x16/teams.png</file>
+        <file alias="16x16/time.png">icons/dark/16x16/time.png</file>
+        <file alias="16x16/type.png">icons/dark/16x16/type.png</file>
+        <file alias="16x16/up.png">icons/dark/16x16/up.png</file>
+        <file alias="16x16/update.png">icons/dark/16x16/update.png</file>
+        <file alias="16x16/ketone.png">icons/dark/16x16/ketone.png</file>
+        <file alias="32x32/check.png">icons/dark/32x32/check.png</file>
+        <file alias="32x32/combine.png">icons/dark/32x32/combine.png</file>
+        <file alias="32x32/cross.png">icons/dark/32x32/cross.png</file>
+        <file alias="32x32/description.png">icons/dark/32x32/description.png</file>
+        <file alias="32x32/edit_log.png">icons/dark/32x32/edit_log.png</file>
+        <file alias="32x32/equals.png">icons/dark/32x32/equals.png</file>
+        <file alias="32x32/number.png">icons/dark/32x32/number.png</file>
+        <file alias="32x32/remove_log.png">icons/dark/32x32/remove_log.png</file>
+    </qresource>
+</RCC>

@@ -25,19 +25,6 @@
 #include "mainwindow.h"
 #include "task.h"
 
-// initialize colours
-const QColor Item::Green    = { 57, 174, 57, 196 };
-const QColor Item::LtGreen  = lighter( Green );
-const QColor Item::Blue     = { 0, 174, 255, 196 };
-const QColor Item::LtBlue   = lighter( Blue );
-const QColor Item::Gray     = { 64, 64, 64, 196 };
-const QColor Item::LtGray   = lighter( Gray );
-const QColor Item::Black    = { 0, 0, 0, 196 };
-const QColor Item::LtBlack  = { 0, 0, 0, 128 };
-const QColor Item::Red      = { 190, 0, 0, 196 };
-const QColor Item::LtRed    = lighter( Red );
-const QColor Item::Yellow   = { 190, 190, 0, 196 };
-const QColor Item::LtYellow = lighter( Yellow );
 /**
  * @brief Item::paint
  * @param painter
@@ -98,10 +85,10 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
             break;
 
         if (( hover || isSelected ) && hasValue ) {
-            drawEllipse( hover ? Red : LtRed );
+            drawEllipse( hover ? Red() : LtRed() );
             painter->drawPixmap( this->rect, Delegate::Remove());
         } else {
-            drawEllipse(( hover || !isSelected ) ? Green : LtGreen );
+            drawEllipse(( hover || !isSelected ) ? Green() : LtGreen() );
             painter->drawPixmap( this->rect, Delegate::Check());
         }
         break;
@@ -112,14 +99,14 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 
         if ( hasValue ) {
             if ( hover || isSelected ) {
-                drawEllipse( hover ? Gray : LtGray );
+                drawEllipse( hover ? Gray() : LtGray() );
                 painter->drawPixmap( this->rect, Delegate::Edit());
             } else {
-                drawEllipse( Green );
+                drawEllipse( Green() );
                 drawText( QString::number( value ));
             }
         } else if ( !hasValue && isSelected ) {
-            drawEllipse( hover ? Green : LtGreen );
+            drawEllipse( hover ? Green() : LtGreen() );
             painter->drawPixmap( this->rect, Delegate::Number());
         }
         break;
@@ -131,16 +118,16 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
         if ( isComboActive ) {
             if ( comboId != Id::Invalid ) {
                 if ( hover ) {
-                    drawEllipse( hover ? Red : LtRed );
+                    drawEllipse( hover ? Red() : LtRed() );
                     painter->drawPixmap( this->rect, Delegate::Remove());
                 } else {
-                    painter->setPen( { hover ? Black : LtBlack, 2.0 } );
+                    painter->setPen( { hover ? Black() : LtBlack(), 2.0 } );
                     drawEllipse( Qt::white );
-                    drawText( QString::number( relativeCombo ), hover ? Black : LtBlack );
+                    drawText( QString::number( relativeCombo ), hover ? Black() : LtBlack());
                 }
             } else {
                 if ( isSelected ) {
-                    drawEllipse( hover ? Blue : LtBlue );
+                    drawEllipse( hover ? Blue() : LtBlue() );
                     painter->drawPixmap( this->rect, Delegate::Combine());
                 }
             }
@@ -153,15 +140,15 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
 
             if (( isSelected && ( hasValue || type == Task::Types::Check ))) {
                 if ( comboId != Id::Invalid ) {
-                    painter->setPen( { hover ? Black : LtBlack, 2.0 } );
+                    painter->setPen( { hover ? Black() : LtBlack(), 2.0 } );
                     drawEllipse( Qt::white );
-                    drawText( QString::number( relativeCombo ), hover ? Black : LtBlack );
+                    drawText( QString::number( relativeCombo ), hover ? Black() : LtBlack());
                 } else {
-                    drawEllipse( hover ? Blue : LtBlue );
+                    drawEllipse( hover ? Blue() : LtBlue());
                     painter->drawPixmap( this->rect, Delegate::Combine());
                 }
             } else {
-                drawEllipse( hasValue ? Blue : LtBlue );
+                drawEllipse( hasValue ? Blue() : LtBlue());
                 drawText( QString::number( points ));
             }
         }
@@ -173,10 +160,10 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
             break;
 
         if (( hover || isSelected ) && hasValue ) {
-            drawEllipse( hover ? Red : LtRed );
+            drawEllipse( hover ? Red() : LtRed());
             painter->drawPixmap( this->rect, Delegate::Remove());
         } else {
-            drawEllipse( !hasValue ? LtBlue : Blue );
+            drawEllipse( !hasValue ? LtBlue() : Blue());
             drawText( QString::number( points * ( edit ? this->delegate->currentEditorValue() : value )));
         }
 
@@ -186,13 +173,13 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
         if ( !hasDescription || !isSelected )
             break;
 
-        drawEllipse( hover ? Yellow : LtYellow );
+        drawEllipse( hover ? Yellow() : LtYellow());
         painter->drawPixmap( this->rect, Delegate::Desc());
         break;
 
 
     case Editor:
-        drawEllipse( Red );
+        drawEllipse( Red());
         break;
     }
 

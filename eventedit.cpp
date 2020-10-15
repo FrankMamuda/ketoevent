@@ -36,9 +36,11 @@ EventEdit::EventEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::EventEd
     // set up ui
     this->ui->setupUi( this );
 
+    // setup pixmaps
+    this->ui->titlePixmap->setPixmap( QIcon::fromTheme( "name" ).pixmap( 16, 16 ));
+
     // only visible in quick add
     this->setWindowTitle( this->tr( "Add event" ));
-    this->setWindowIcon( QIcon( ":/icons/ketone" ));
 
     // empty event title check
     auto emptyTitle = [ this ]() {

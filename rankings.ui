@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Rankings</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="rankings">
+    <normaloff>.</normaloff>.</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -27,9 +31,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="resources.qrc">:/icons/teams</pixmap>
         </property>
        </widget>
       </item>
@@ -163,6 +164,10 @@
       <property name="text">
        <string>Close</string>
       </property>
+      <property name="icon">
+       <iconset theme="close">
+        <normaloff>.</normaloff>.</iconset>
+      </property>
      </widget>
     </item>
    </layout>
@@ -198,8 +203,8 @@
   </widget>
   <action name="actionUpdate">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/update</normaloff>:/icons/update</iconset>
+    <iconset theme="update">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Update</string>
@@ -207,8 +212,8 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/export</normaloff>:/icons/export</iconset>
+    <iconset theme="export">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Export</string>
@@ -219,16 +224,14 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources.qrc">
-     <normaloff>:/icons/teams</normaloff>:/icons/teams</iconset>
+    <iconset theme="teams">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Current team</string>
    </property>
   </action>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

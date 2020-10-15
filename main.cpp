@@ -26,6 +26,8 @@
 #include <QSharedMemory>
 #include <QDesktopWidget>
 #include <QTranslator>
+#include <QSettings>
+#include "theme.h"
 #include "database.h"
 #include "event.h"
 #include "task.h"
@@ -147,6 +149,9 @@ int main( int argc, char *argv[] ) {
     Variable::add( "databasePath", "", Var::Flag::Hidden );
     Variable::add( "backup/enabled", false );
     Variable::add( "backup/changes", 25 );
+    Variable::add( "darkMode", false, Var::Flag::ReadOnly | Var::Flag::Hidden | Var::Flag::NoSave );
+    Variable::add( "overrideTheme", false, Var::Flag::ReadOnly | Var::Flag::Hidden );
+    Variable::add( "theme", "light", Var::Flag::ReadOnly | Var::Flag::Hidden );
 
     // read configuration
     XMLTools::read();
@@ -202,6 +207,42 @@ int main( int argc, char *argv[] ) {
 
         QApplication::quit();
         return 0;
+    }
+    // detect dark mode
+    bool darkMode = false;
+    bool darkModeWin10 = false;
+#ifdef Q_OS_WIN
+    const QVariant key( QSettings( R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",
+                                   QSettings::NativeFormat ).value( "AppsUseLightTheme" ));
+    if ( key.isValid() && !key.toBool()) {
+        darkMode = true;
+        darkModeWin10 = true;
+
+        if ( !Variable::isEnabled( "overrideTheme" ))
+            Variable::setString( "theme", "dark" );
+    }
+#else
+    if ( qGray( QApplication::palette().color( QPalette::Base ).rgb()) < 128 )
+        darkMode = true;
+#endif
+
+    // set default icon theme
+    QIcon::setThemeName( darkMode ? "dark" : "light" );
+
+    if ( Variable::isEnabled( "overrideTheme" ) || darkModeWin10 ) {
+        // load theme from file
+        auto *theme( new Theme( Variable::string( "theme" )));
+
+        // override the variable
+        Variable::setEnabled( "darkMode", theme->isDark());
+
+        // override style and palette
+        QApplication::setStyle( theme->style());
+        QApplication::setPalette( theme->palette());
+
+        // override icon theme and syntax highlighter theme
+        QIcon::setThemeName( theme->isDark() ? "dark" : "light" );
+        //MainWindow::instance()->setTheme( theme );
     }
 
     // show main window

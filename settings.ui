@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>155</height>
+    <width>401</width>
+    <height>177</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="overflow">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -52,9 +56,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="resources.qrc">:/icons/ketone</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -102,17 +103,47 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="themeLayout">
+      <item>
+       <widget class="QCheckBox" name="overrideCheck">
+        <property name="text">
+         <string>Override theme (on restart)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="themeCombo">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>light</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>dark</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QPushButton" name="closeButton">
       <property name="text">
        <string>Close</string>
+      </property>
+      <property name="icon">
+       <iconset theme="close">
+        <normaloff>.</normaloff>.</iconset>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

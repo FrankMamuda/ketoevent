@@ -33,7 +33,7 @@
  */
 TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
-    this->addAction( QIcon( ":/icons/add" ), this->tr( "Add Team" ), [ this ]() {
+    this->addAction( QIcon::fromTheme( "add" ), this->tr( "Add Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Add Team " ));
             TeamEdit::instance()->reset();
@@ -41,7 +41,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // edit action
-    this->edit = this->addAction( QIcon( ":/icons/edit" ), this->tr( "Edit Team" ), [ this ]() {
+    this->edit = this->addAction( QIcon::fromTheme( "edit" ), this->tr( "Edit Team" ), [ this ]() {
         if ( !EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock( TeamEdit::instance(), this->tr( "Edit Team " ));
             TeamEdit::instance()->reset( true );
@@ -49,7 +49,7 @@ TeamToolBar::TeamToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 
     // remove action
-    this->remove = this->addAction( QIcon( ":/icons/remove" ), this->tr( "Remove Team" ), [ this ]() {
+    this->remove = this->addAction( QIcon::fromTheme( "remove" ), this->tr( "Remove Team" ), [ this ]() {
         const QModelIndex index( EditorDialog::instance()->container->currentIndex());
 
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())

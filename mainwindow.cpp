@@ -65,6 +65,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->ui->teamCombo->setModel( Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
+    // setup pixmaps
+    this->ui->eventPixmap->setPixmap( QIcon::fromTheme( "name" ).pixmap( 16, 16 ));
+    this->ui->teamPixmap->setPixmap( QIcon::fromTheme( "teams" ).pixmap( 16, 16 ));
+    this->ui->findPixmap->setPixmap( QIcon::fromTheme( "find" ).pixmap( 16, 16 ));
+
     // setup task/logView
     this->ui->taskView->setModel( Task::instance());
     this->ui->taskView->setModelColumn( Task::Name );
@@ -349,7 +354,7 @@ void MainWindow::on_actionEvents_triggered() {
     editor->container->setModelColumn( Event::Title );
     editor->setToolBar( EventToolBar::instance());
     editor->setWindowTitle( this->tr( "Event manager" ));
-    editor->setWindowIcon( QIcon( ":/icons/ketone" ));
+    editor->setWindowIcon( QIcon::fromTheme( "ketone" ));
 
     EventToolBar::instance()->buttonTest();
     EventToolBar::instance()->show();
@@ -367,7 +372,7 @@ void MainWindow::on_actionTeams_triggered() {
     editor->container->setModelColumn( Team::Title );
     editor->setToolBar( TeamToolBar::instance());
     editor->setWindowTitle( this->tr( "Team manager" ));
-    editor->setWindowIcon( QIcon( ":/icons/teams" ));
+    editor->setWindowIcon( QIcon::fromTheme( "teams" ));
 
     TeamToolBar::instance()->buttonTest();
     TeamToolBar::instance()->show();
@@ -385,7 +390,7 @@ void MainWindow::on_actionTasks_triggered() {
     editor->container->setModelColumn( Task::Name );
     editor->setToolBar( TaskToolBar::instance());
     editor->setWindowTitle( this->tr( "Task manager" ));
-    editor->setWindowIcon( QIcon( ":/icons/tasks" ));
+    editor->setWindowIcon( QIcon::fromTheme( "tasks" ));
 
     TaskToolBar::instance()->buttonTest();
     TaskToolBar::instance()->show();
