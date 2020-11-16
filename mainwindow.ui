@@ -245,8 +245,7 @@
   </action>
   <action name="actionDone">
    <property name="icon">
-    <iconset theme="done">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="accept"/>
    </property>
    <property name="text">
     <string>Done</string>

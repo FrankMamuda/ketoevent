@@ -29,6 +29,9 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#ifdef XLSX_SUPPORT
+#include <xlsxdocument.h>
+#endif
 
 /**
  * @brief TaskToolBar::TaskToolBar
@@ -203,6 +206,96 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         }
         csv.close();
     } );
+
+#ifdef XLSX_SUPPORT
+    // export action (xlsx)
+    this->addAction( QIcon::fromTheme( "export" ), this->tr( "Export as xlsx" ), [ this ]() {
+        QString path( QFileDialog::getSaveFileName( this, this->tr( "Export tasks to XLSX format" ), QDir::homePath(), this->tr( "XLSX spreadsheet (*.xlsx)" )));
+
+        // check for empty filenames
+        if ( path.isEmpty())
+            return;
+
+        // add extension
+        if ( !path.endsWith( ".xlsx" ))
+            path.append( ".xlsx" );
+
+        // create file
+        QXlsx::Document xlsx;
+
+        QStringList simple;
+        QStringList difficult;
+        QStringList other;
+
+        for ( int y = 0; y < Task::instance()->count(); y++ ) {
+            const Row row = Task::instance()->row( y );
+            if ( row == Row::Invalid )
+                break;
+
+            const int points = Task::instance()->points( row );
+            const QString description( Task::instance()->description( row ));
+            const QString out( QString( "%1%2 %3 %4 " )
+                   .arg( Task::instance()->name( row ),
+                         description.isEmpty() ? "" : QString( " (%1)" ).arg( Task::instance()->description( row )),
+                         QChar( 0x2013 ),
+                         ( Task::instance()->type( row ) == Task::Types::Multi ) ?
+                         QString( "%1-%2" ).arg( QString::number( points ), QString::number( points * Task::instance()->multi( row ))) : QString::number( points ))
+                               + this->tr( "points" ));
+
+            QString style;
+            switch ( Task::instance()->style( row )) {
+            case Task::Styles::Regular:
+                simple << out;
+                break;
+
+            case Task::Styles::Bold:
+                difficult << out;
+                break;
+
+            case Task::Styles::Italic:
+                other << out;
+                break;
+
+            case Task::Styles::NoStyle:
+                break;
+            }
+        }
+
+        std::sort( simple.begin(), simple.end(), []( const QString &left, const QString &right ) { return QString::localeAwareCompare( left, right ) < 0; } );
+        std::sort( difficult.begin(), difficult.end(), []( const QString &left, const QString &right ) { return QString::localeAwareCompare( left, right ) < 0; } );
+        std::sort( other.begin(), other.end(), []( const QString &left, const QString &right ) { return QString::localeAwareCompare( left, right ) < 0; } );
+
+        QXlsx::Format boldFormat;
+        boldFormat.setFontBold( true );
+
+        int row = 1;
+        xlsx.write( row++, 1, this->tr( "Simple tasks" ), boldFormat );
+        for ( const QString &str : simple ) {
+            xlsx.write( row, 1, str );
+            row++;
+        }
+        row++;
+
+        xlsx.write( row++, 1, this->tr( "Difficult tasks" ), boldFormat );
+        for ( const QString &str : difficult ) {
+            xlsx.write( row, 1, str );
+            row++;
+        }
+        row++;
+
+        xlsx.write( row++, 1, this->tr( "Other tasks" ), boldFormat );
+        for ( const QString &str : other ) {
+            xlsx.write( row, 1, str );
+            row++;
+        }
+
+        xlsx.setDocumentProperty( "title", "Tasks" );
+        xlsx.setDocumentProperty( "creator", "Ketoevent" );
+        xlsx.setDocumentProperty( "description", "Exported with ketoevent via qtxlsx" );
+
+        xlsx.saveAs( path );
+    } );
+#endif
 
     // button test (disconnected in ~EditorDialog)
     this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));

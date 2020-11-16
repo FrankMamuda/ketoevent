@@ -140,7 +140,7 @@ Database::Database( QObject *parent ) : QObject( parent ) {
             auto localeCompare = []( void *, int l0, const void* d0, int l1, const void* d1 ) {
                 return QString::localeAwareCompare(
                             QString::fromRawData( reinterpret_cast<const QChar*>( d0 ), l0 / static_cast<int>( sizeof( QChar ))),
-                            QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar ))));
+                            QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar )))) < 0;
             };
 
             // initialize

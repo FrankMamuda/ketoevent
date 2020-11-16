@@ -36,6 +36,9 @@
 #include <QSqlQuery>
 #include <QTextStream>
 #include <QtMath>
+#ifdef XLSX_SUPPORT
+#include <xlsxdocument.h>
+#endif
 
 /**
  * @brief Rankings::Rankings
@@ -64,6 +67,52 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
 
     // add to garbage man
     GarbageMan::instance()->add( this );
+
+#ifdef XLSX_SUPPORT
+    // export action (xlsx)
+    this->ui->toolBar->addAction( QIcon::fromTheme( "export" ), this->tr( "Export as xlsx" ), [ this ]() {
+        QString path( QFileDialog::getSaveFileName( this, this->tr( "Export rankings to XLSX format" ), QDir::homePath(), this->tr( "XLSX spreadsheet (*.xlsx)" )));
+
+        // check for empty filenames
+        if ( path.isEmpty())
+            return;
+
+        // add extension
+        if ( !path.endsWith( ".xlsx" ))
+            path.append( ".xlsx" );
+
+        // create file
+        QXlsx::Document xlsx;
+
+        QXlsx::Format boldFormat;
+        boldFormat.setFontBold( true );
+
+        int row = 1;
+        xlsx.write( row, 1, this->tr( "Team name" ), boldFormat );
+        xlsx.write( row, 2, this->tr( "Tasks" ), boldFormat );
+        xlsx.write( row, 3, this->tr( "Combos" ), boldFormat );
+        xlsx.write( row, 4, this->tr( "Time" ), boldFormat );
+        xlsx.write( row, 5, this->tr( "Penalty points" ), boldFormat );
+        xlsx.write( row, 6, this->tr( "Total points" ), boldFormat );
+        row++;
+
+        for ( const TeamStatistics &team : qAsConst( this->list )) {
+            xlsx.write( row, 1, team.title );
+            xlsx.write( row, 2, team.completedTasks );
+            xlsx.write( row, 3, team.combos );
+            xlsx.write( row, 4, team.time );
+            xlsx.write( row, 5, team.penalty );
+            xlsx.write( row, 6, team.points );
+            row++;
+        }
+
+        xlsx.setDocumentProperty( "title", "Rankings" );
+        xlsx.setDocumentProperty( "creator", "Ketoevent" );
+        xlsx.setDocumentProperty( "description", "Exported with ketoevent via qtxlsx" );
+
+        xlsx.saveAs( path );
+    } );
+#endif
 }
 
 /**
