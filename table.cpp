@@ -125,7 +125,7 @@ QVariant Table::data( const QModelIndex &index, int role ) const {
     if ( !Database::instance().hasInitialised())
         return QVariant();
 
-    if ( role == IDRole ) {
+    if ( role == IDRole || role == Qt::UserRole ) {
         if ( !index.isValid())
             return static_cast<int>( Id::Invalid );
 
@@ -175,7 +175,7 @@ Field Table::field( int id ) const {
  * @param unique
  * @param autoValue
  */
-void Table::addField( int id, const QString &fieldName, QVariant::Type type, const QString &format, bool unique,
+void Table::addField( int id, const QString &fieldName, QMetaType::Type type, const QString &format, bool unique,
                       bool autoValue ) {
     if ( this->fields.contains( id ))
         return;
@@ -222,12 +222,10 @@ Row Table::add( const QVariantList &arguments ) {
         argument = arguments.at( y );
 
         // compare types
-        // ignore UInts for now
-        const QVariant::Type fieldType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
-        if ( fieldType != argument.type()) {
+        if ( field->type() != argument.typeId()) {
             qCCritical( Database_::Debug )
                 << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg(
-                        argument.type()).arg( y ).arg( field->format()).arg( field->type());
+                        argument.typeId()).arg( y ).arg( field->format()).arg( field->type());
             this->revert();
             this->endInsertRows();
             return Row::Invalid;
@@ -262,12 +260,12 @@ Row Table::add( const QVariantList &arguments ) {
  * @brief Table::prepare
  * @return
  */
-QSqlQuery Table::prepare() const {
+QSqlQuery Table::prepare( bool ignore ) const {
     if ( !this->isValid())
         return QSqlQuery();
 
     // prepare statement
-    QString statement( "insert or ignore into " + this->tableName() + " (" );
+    QString statement(( ignore ? "insert or ignore into " : "insert into " ) + this->tableName() + " (" );
     QString values;
     for ( int y = 0; y < this->fields.count(); y++ ) {
         const Field &field( this->fields[y] );
@@ -290,15 +288,17 @@ QSqlQuery Table::prepare() const {
  * @param query
  * @param arguments
  */
-void Table::bind( QSqlQuery &query, const QVariantList &arguments ) {
+bool Table::bind( QSqlQuery &query, const QVariantList &arguments ) {
     if ( !this->isValid())
-        return;
+        return false;
 
-    const int numFields = this->fields.count() - ( this->hasPrimaryField() ? 1 : 0 );
-    if ( numFields != arguments.count())
+    const qsizetype numFields = this->fields.count() - ( this->hasPrimaryField() ? 1 : 0 );
+    if ( numFields != arguments.count()) {
         qCCritical( Database_::Debug )
             << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg(
                     this->fields.count());
+        return false;
+    }
 
     // prepare statement
     int y = 0;
@@ -309,11 +309,11 @@ void Table::bind( QSqlQuery &query, const QVariantList &arguments ) {
         const QVariant& argument( arguments.at( y ));
 
         // compare types
-        if ( field->type() != argument.type()) {
+        if ( field->type() != argument.typeId()) {
             qCCritical( Database_::Debug )
                 << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" )
-                        .arg( argument.type()).arg( y ).arg( field->format()).arg( field->type());
-            return;
+                        .arg( argument.typeId()).arg( y ).arg( field->format()).arg( field->type());
+            return false;
         }
 
         // bind value
@@ -321,6 +321,8 @@ void Table::bind( QSqlQuery &query, const QVariantList &arguments ) {
 
         y++;
     }
+
+    return true;
 }
 
 /**

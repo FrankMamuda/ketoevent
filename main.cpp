@@ -133,13 +133,13 @@ int main( int argc, char *argv[] ) {
     // i18n
     QTranslator translator;
 #ifndef FORCE_LV_LOCALE
-    const QString locale( QLocale::system().name());
+    QLocale::setDefault( QLocale::System );
 #else
     const QString locale( "lv_LV" );
+    QLocale::setDefault( QLocale::Latvian );
 #endif
-    QLocale::setDefault( locale );
-    translator.load( ":/i18n/ketoevent_" + locale );
-    QApplication::installTranslator( &translator );
+    if ( translator.load( ":/i18n/ketoevent_" + QLocale().name()))
+        QApplication::installTranslator( &translator );
 
     // set variable defaults
     Variable::add( "reviewerName", "" );

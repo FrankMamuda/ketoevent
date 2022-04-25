@@ -252,8 +252,8 @@ bool Database::add( Table &table ) {
                 }
 
                 // ignore unsigned ints for now
-                const QVariant::Type internalType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
-                const QVariant::Type databaseType = database.record( table.tableName()).field( field->id()).type();
+                const QMetaType::Type internalType = field->type() == QMetaType::UInt ? QMetaType::Int : field->type();
+                const QMetaType::Type databaseType = static_cast<QMetaType::Type>( database.record( table.tableName()).field( field->id()).metaType().id());
 
                 if ( internalType != databaseType ) {
                     qCCritical( Database_::Debug )
@@ -286,13 +286,13 @@ bool Database::add( Table &table ) {
 
         // check for constraints
         QString constraints;
-        const int tc = table.constraints.count();
+        const qsizetype tc = table.constraints.count();
 
         if ( tc > 0 ) {
             for ( int y = 0; y < table.constraints.count(); y++ ) {
                 constraints.append( "unique( " );
 
-                const int cc = table.constraints.at( y ).count();
+                const qsizetype cc = table.constraints.at( y ).count();
                 for ( int k = 0; k < cc; k++ ) {
                     const QSharedPointer<Field_> field( table.constraints.at( y ).at( k ));
                     constraints.append( field->name());
@@ -335,24 +335,19 @@ bool Database::add( Table &table ) {
 void Database::writeBackup() {
     const QFileInfo info( Variable::string( "databasePath" ));
     const QDir dir( info.absolutePath() + + "/backups/" );
-
     if ( !dir.exists()) {
         dir.mkpath( dir.absolutePath());
         qCDebug( Database_::Debug ) << this->tr( "making non-existant database backup path \"%1\"" ).arg( dir.absolutePath());
-
         if ( !dir.exists())
             qFatal( QT_TR_NOOP_UTF8( "could not create database backup path" ));
     }
-
     // backup database filename
     const QString backup( QString( "%1/%2_%3.db" )
                           .arg( dir.absolutePath(),
                                 info.fileName().remove( ".db" ),
                                 QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
-
     // announce
     qCDebug( Database_::Debug ) << this->tr( "performing backup to \"%1\"" ).arg( backup );
-
     // perform a simple copy
     QFile::copy( Variable::string( "databasePath" ),
                  QString( "%1/%2_%3.db" )
