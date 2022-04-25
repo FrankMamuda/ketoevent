@@ -30,7 +30,7 @@
  */
 class Team final : public Table {
     Q_OBJECT
-    Q_DISABLE_COPY( Team )
+    Q_DISABLE_COPY_MOVE( Team )
     friend class Log;
 
 public:
@@ -49,15 +49,11 @@ public:
     };
     Q_ENUM( Fields )
 
-    // disable move
-    Team( Team&& ) = delete;
-    Team& operator=( Team&& ) = delete;
-
     /**
      * @brief instance
      * @return
      */
-    static Team *instance() { static Team *instance( new Team()); return instance; }
+    static Team& instance() { static Team instance; return instance; }
     ~Team() override = default;
 
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }

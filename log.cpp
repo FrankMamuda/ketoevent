@@ -107,15 +107,15 @@ void Log::removeOrphanedEntries() {
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
                 .arg( this->tableName(),
                       this->fieldName( Team ),
-                      Team::instance()->fieldName( Team::ID ),
-                      Team::instance()->tableName(),
+                      Team::instance().fieldName( Team::ID ),
+                      Team::instance().tableName(),
                       this->fieldName( Task ),
-                      Task::instance()->fieldName( Task::ID ),
-                      Task::instance()->tableName()));
+                      Task::instance().fieldName( Task::ID ),
+                      Task::instance().tableName()));
 
     // delete duplicate logs
-    for ( int y = 0; y < Team::instance()->count(); y++ ) {
-        const int teamId = static_cast<int>( Team::instance()->id( Team::instance()->row( y )));
+    for ( int y = 0; y < Team::instance().count(); y++ ) {
+        const int teamId = static_cast<int>( Team::instance().id( Team::instance().row( y )));
 
         // find duplicate log entries:
         //   (multiple instances of same taskId & teamId)
@@ -134,8 +134,8 @@ void Log::removeOrphanedEntries() {
             // announce the total amount of duplicate logs
             qCDebug( Database_::Debug ) << this->tr( "performing deletion of %1 duplicate logs from team %2 for task %3" )
                                            .arg( QString::number( count ),
-                                                 Team::instance()->title( Team::instance()->row( static_cast<Id>( team ))),
-                                                 Task::instance()->name( Task::instance()->row( static_cast<Id>( task ))));
+                                                 Team::instance().title( Team::instance().row( static_cast<Id>( team ))),
+                                                 Task::instance().name( Task::instance().row( static_cast<Id>( task ))));
 
             // delete actual logs
             subQuery.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
@@ -158,14 +158,14 @@ void Log::removeOrphanedEntries() {
             const int combo = query.value( 0 ).toInt();
             qCDebug( Database_::Debug ) << this->tr( "clearing an orphaned combo with id:%1" ).arg( combo );
             subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
-                           .arg( Log::instance()->tableName(),
-                                 Log::instance()->fieldName( Log::Combo ),
+                           .arg( Log::instance().tableName(),
+                                 Log::instance().fieldName( Log::Combo ),
                                  QString::number( combo )));
         }
     }
 
     // select the updated table
-    Log::instance()->select();
+    Log::instance().select();
 }
 
 /**
@@ -203,9 +203,9 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
             return;
 
         if ( multi <= 0 )
-            Log::instance()->remove( row );
+            Log::instance().remove( row );
         else
-            Log::instance()->setMultiplier( row, multi );
+            Log::instance().setMultiplier( row, multi );
 
 #ifdef QT_DEBUG
         qCDebug( Database_::Debug ) << ( multi <= 0 ? "delete" : "change" ) << "log at row" << row;
@@ -214,6 +214,6 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
 #ifdef QT_DEBUG
         qCDebug( Database_::Debug ) << "new log";
 #endif
-        Log::instance()->add( taskId, teamId, multi );
+        Log::instance().add( taskId, teamId, multi );
     }
 }

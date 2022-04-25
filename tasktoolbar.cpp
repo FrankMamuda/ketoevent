@@ -39,34 +39,34 @@
 TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
     this->addAction( QIcon::fromTheme( "add" ), this->tr( "Add Task" ), [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Add Task " ));
-            TaskEdit::instance()->reset();
+        if ( !EditorDialog::instance().isDockVisible()) {
+            EditorDialog::instance().showDock( &TaskEdit::instance(), this->tr( "Add Task " ));
+            TaskEdit::instance().reset();
         }
     } );
 
     // edit action
     this->edit = this->addAction( QIcon::fromTheme( "edit" ), this->tr( "Edit Task" ), [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( TaskEdit::instance(), this->tr( "Edit Task " ));
-            TaskEdit::instance()->reset( true );
+        if ( !EditorDialog::instance().isDockVisible()) {
+            EditorDialog::instance().showDock( &TaskEdit::instance(), this->tr( "Edit Task " ));
+            TaskEdit::instance().reset( true );
         }
     } );
 
     // remove action
     this->remove = this->addAction( QIcon::fromTheme( "remove" ), this->tr( "Remove Task" ), [ this ]() {
-        const QModelIndex index( EditorDialog::instance()->container->currentIndex());
+        const QModelIndex index( EditorDialog::instance().container->currentIndex());
 
-        if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
+        if ( EditorDialog::instance().isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Task::instance()->row( index );
+        const Row row = Task::instance().row( index );
         if ( row == Row::Invalid )
             return;
 
-        const QString name( Task::instance()->name( row ));
+        const QString name( Task::instance().name( row ));
         if ( QMessageBox::question( this, this->tr( "Remove task" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( name )) == QMessageBox::Yes )
-            Task::instance()->remove( row );
+            Task::instance().remove( row );
     } );
     this->remove->setEnabled( false );
 
@@ -80,8 +80,8 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         QSet<int> orderSet;
         bool reindex = false;
         int y;
-        for ( y = 0; y < Task::instance()->count(); y++ ) {
-            const int order = Task::instance()->order( Task::instance()->row( y ));
+        for ( y = 0; y < Task::instance().count(); y++ ) {
+            const int order = Task::instance().order( Task::instance().row( y ));
             if ( orderSet.contains( order )) {
                 if ( QMessageBox::question( this, this->tr( "Corrupted order" ),
                                             this->tr( "Tasks have corrupted order. Perform reindexing? This cannot be undone." )) == QMessageBox::Yes ) {
@@ -98,37 +98,37 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
             QList<Id> idList;
 
             // get id list
-            for ( int y = 0; y < Task::instance()->count(); y++ )
-                idList << Task::instance()->id( Task::instance()->row( y ));
+            for ( int y = 0; y < Task::instance().count(); y++ )
+                idList << Task::instance().id( Task::instance().row( y ));
 
             // reorder tasks accordint to id list
             y = 0;
             for ( const Id id : qAsConst( idList )) {
-                Task::instance()->setOrder( Task::instance()->row( id ), y );
+                Task::instance().setOrder( Task::instance().row( id ), y );
                 y++;
             }
         }
 
         // get container pointer and order indexes
-        QListView *container( EditorDialog::instance()->container );
+        QListView *container( EditorDialog::instance().container );
         const QModelIndex index( container->currentIndex());
         const QModelIndex other( container->model()->index( container->currentIndex().row() + ( up ? -1 : 1 ), 0 ));
 
-        if ( EditorDialog::instance()->isDockVisible() || !index.isValid() || !other.isValid())
+        if ( EditorDialog::instance().isDockVisible() || !index.isValid() || !other.isValid())
             return;
 
         // use ids in lookup (QPersistentModel index should work too?)
-        const Id id0 = Task::instance()->id( Task::instance()->row( index ));
-        const Id id1 = Task::instance()->id( Task::instance()->row( other ));
-        const int order0 = Task::instance()->order( Task::instance()->row( index ));
-        const int order1 = Task::instance()->order( Task::instance()->row( other ));
+        const Id id0 = Task::instance().id( Task::instance().row( index ));
+        const Id id1 = Task::instance().id( Task::instance().row( other ));
+        const int order0 = Task::instance().order( Task::instance().row( index ));
+        const int order1 = Task::instance().order( Task::instance().row( other ));
 
         // swap order
-        Task::instance()->setOrder( Task::instance()->row( id0 ), order1 );
-        Task::instance()->setOrder( Task::instance()->row( id1 ), order0 );
+        Task::instance().setOrder( Task::instance().row( id0 ), order1 );
+        Task::instance().setOrder( Task::instance().row( id1 ), order0 );
 
-        Task::instance()->select();
-        const QModelIndex current( container->model()->index( static_cast<int>( Task::instance()->row( id0 )), 0 ));
+        Task::instance().select();
+        const QModelIndex current( container->model()->index( static_cast<int>( Task::instance().row( id0 )), 0 ));
         container->setCurrentIndex( current );
         container->setFocus();
         this->buttonTest( current );
@@ -171,13 +171,13 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
             out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
             out << this->tr( "Task name;Description;Type;Style;Multi;Points" ).append( win32 ? "\r" : "\n" );
 
-            for ( int y = 0; y < Task::instance()->count(); y++ ) {
-                const Row row = Task::instance()->row( y );
+            for ( int y = 0; y < Task::instance().count(); y++ ) {
+                const Row row = Task::instance().row( y );
                 if ( row == Row::Invalid )
                     break;
 
                 QString style;
-                switch ( Task::instance()->style( row )) {
+                switch ( Task::instance().style( row )) {
                 case Task::Styles::Regular:
                     style = this->tr( "Simple" );
                     break;
@@ -195,12 +195,12 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                 }
 
                 out << QString( "%1;%2;%3;%4;%5;%6%7" )
-                       .arg( Task::instance()->name( row ).replace( ";", " |" ),
-                             Task::instance()->description( row ).replace( ";", "  |" ),
-                             Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ),
+                       .arg( Task::instance().name( row ).replace( ";", " |" ),
+                             Task::instance().description( row ).replace( ";", "  |" ),
+                             Task::instance().type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ),
                              style,
-                             Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "",
-                             QString::number( Task::instance()->points( row )),
+                             Task::instance().type( row ) == Task::Types::Multi ? QString::number( Task::instance().multi( row )) : "",
+                             QString::number( Task::instance().points( row )),
                              win32 ? "\r" : "\n" );
             }
         }
@@ -227,23 +227,23 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         QStringList difficult;
         QStringList other;
 
-        for ( int y = 0; y < Task::instance()->count(); y++ ) {
-            const Row row = Task::instance()->row( y );
+        for ( int y = 0; y < Task::instance().count(); y++ ) {
+            const Row row = Task::instance().row( y );
             if ( row == Row::Invalid )
                 break;
 
-            const int points = Task::instance()->points( row );
-            const QString description( Task::instance()->description( row ));
+            const int points = Task::instance().points( row );
+            const QString description( Task::instance().description( row ));
             const QString out( QString( "%1%2 %3 %4 " )
-                   .arg( Task::instance()->name( row ),
-                         description.isEmpty() ? "" : QString( " (%1)" ).arg( Task::instance()->description( row )),
+                   .arg( Task::instance().name( row ),
+                         description.isEmpty() ? "" : QString( " (%1)" ).arg( Task::instance().description( row )),
                          QChar( 0x2013 ),
-                         ( Task::instance()->type( row ) == Task::Types::Multi ) ?
-                         QString( "%1-%2" ).arg( QString::number( points ), QString::number( points * Task::instance()->multi( row ))) : QString::number( points ))
+                         ( Task::instance().type( row ) == Task::Types::Multi ) ?
+                         QString( "%1-%2" ).arg( QString::number( points ), QString::number( points * Task::instance().multi( row ))) : QString::number( points ))
                                + this->tr( "points" ));
 
             QString style;
-            switch ( Task::instance()->style( row )) {
+            switch ( Task::instance().style( row )) {
             case Task::Styles::Regular:
                 simple << out;
                 break;
@@ -298,11 +298,8 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 #endif
 
     // button test (disconnected in ~EditorDialog)
-    this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
+    this->connect( EditorDialog::instance().container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
     this->buttonTest();
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 }
 
 /**
@@ -315,7 +312,7 @@ void TaskToolBar::buttonTest( const QModelIndex &index ) {
         this->moveDown->setDisabled( true );
     } else {
         this->moveUp->setEnabled( index.isValid() && index.row() != 0 );
-        this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance()->count() - 1 );
+        this->moveDown->setEnabled( index.isValid() && index.row() != Task::instance().count() - 1 );
     }
     this->edit->setEnabled( index.isValid());
     this->remove->setEnabled( index.isValid());

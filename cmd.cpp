@@ -42,7 +42,7 @@ static constexpr const char *testEventName( "Test" );
  * @param parent
  */
 Cmd::Cmd( QObject *parent ) : QObject( parent ) {
-    auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance()->list( name, args ); };
+    auto listCmd = []( const QString &name, const QStringList &args ) { Cmd::instance().list( name, args ); };
     // disable for now on MSVC
 #ifndef Q_CC_MSVC
     constexpr const char *testEventName( "Test" );
@@ -50,10 +50,10 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
 
     // add common commands
     this->add( "cmd_list", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "list all available commands" ));
-    this->add( "con_print", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->print( name, args ); } ), this->tr( "print text to console" ));
-    this->add( "cv_list", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->listCvars(); } ), this->tr( "list all available console variables" ));
-    this->add( "cv_set", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); } ), this->tr( "set console variable value" ));
-    this->add( "db_info", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); } ), this->tr( "display database information" ));
+    this->add( "con_print", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance().print( name, args ); } ), this->tr( "print text to console" ));
+    this->add( "cv_list", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance().listCvars(); } ), this->tr( "list all available console variables" ));
+    this->add( "cv_set", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance().cvarSet( name, args ); } ), this->tr( "set console variable value" ));
+    this->add( "db_info", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance().dbInfo(); } ), this->tr( "display database information" ));
     this->add( "help", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "same as cmd_list" ));
 
     // setting up test environment
@@ -68,39 +68,39 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
         }
 
         // add event
-        const Row event = Event::instance()->add( testEventName );
+        const Row event = Event::instance().add( testEventName );
         if ( event == Row::Invalid )
             return;
 
         // set current event, so that new teams are added to it
-        MainWindow::instance()->setCurrentEvent( event );
+        MainWindow::instance().setCurrentEvent( event );
 
         // add tasks
         for ( y = 0; y < numTasks; y++ )
-            Task::instance()->add( "Task " + QString::number( y ), rand() % 20 + 1, rand() % 5 + 1, static_cast<Task::Types>( rand() % 2 ), static_cast<Task::Styles>( rand() % 3 ), "" );
+            Task::instance().add( "Task " + QString::number( y ), rand() % 20 + 1, rand() % 5 + 1, static_cast<Task::Types>( rand() % 2 ), static_cast<Task::Styles>( rand() % 3 ), "" );
 
         // add teams
         for ( y = 0; y < numTeams; y++ ) {
-            Row team = Team::instance()->add( "Team " + QString::number( y ), rand() % EventTable::DefaultMaxMembers + 1, QTime(), "Test" );
+            Row team = Team::instance().add( "Team " + QString::number( y ), rand() % EventTable::DefaultMaxMembers + 1, QTime(), "Test" );
             if ( team == Row::Invalid )
                 continue;
 
             // add logs
             for ( k = 0; k < numTasks; k++ ) {
-                const Row row = Task::instance()->row( k );
+                const Row row = Task::instance().row( k );
                 if ( row == Row::Invalid )
                     continue;
 
-                const int value = rand() % (( Task::instance()->type( row ) == Task::Types::Check ) ? 2 : Task::instance()->multi( row ) + 1 );
+                const int value = rand() % (( Task::instance().type( row ) == Task::Types::Check ) ? 2 : Task::instance().multi( row ) + 1 );
                 if ( !value )
                     continue;
 
-                Log::instance()->add( Task::instance()->id( row ), Team::instance()->id( team ), Task::instance()->type( row ) == Task::Types::Check ? true : value );
+                Log::instance().add( Task::instance().id( row ), Team::instance().id( team ), Task::instance().type( row ) == Task::Types::Check ? true : value );
             }
         }
 
         // relock ui elements if required
-        MainWindow::instance()->setLock();
+        MainWindow::instance().setLock();
     } ), this->tr( "add a demo event with teams, tasks and logs" ));
 
     // clear test environment
@@ -108,41 +108,40 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
         int y;
 
         // remove all events
-        for ( y = 0; y < Event::instance()->count(); y++ ) {
-            const Row row = Event::instance()->row( y );
+        for ( y = 0; y < Event::instance().count(); y++ ) {
+            const Row row = Event::instance().row( y );
             if ( row == Row::Invalid )
                 continue;
 
 
-            if ( !QString::compare( Event::instance()->title( row ), testEventName )) {
-                 Event::instance()->remove( row );
+            if ( !QString::compare( Event::instance().title( row ), testEventName )) {
+                 Event::instance().remove( row );
                  break;
             }
         }
 
         // clean up orphans
-        Database::instance()->removeOrphanedEntries();
-        MainWindow::instance()->setLock();
+        Database::instance().removeOrphanedEntries();
+        MainWindow::instance().setLock();
     } ), this->tr( "clear demo event" ));
 
     // obliterate all entries within database
     this->add( "test_delete_db", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
         QSqlQuery query;
-        query.exec( QString( "delete from %1" ).arg( Event::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Log::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Team::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Task::instance()->tableName()));
+        query.exec( QString( "delete from %1" ).arg( Event::instance().tableName()));
+        query.exec( QString( "delete from %1" ).arg( Log::instance().tableName()));
+        query.exec( QString( "delete from %1" ).arg( Team::instance().tableName()));
+        query.exec( QString( "delete from %1" ).arg( Task::instance().tableName()));
 
-        Event::instance()->select();
-        Log::instance()->select();
-        Team::instance()->select();
-        Task::instance()->select();
-        MainWindow::instance()->setLock();
+        Event::instance().select();
+        Log::instance().select();
+        Team::instance().select();
+        Task::instance().select();
+        MainWindow::instance().setLock();
     } ), this->tr( "obliterate all entries within database " ));
 
     // add to garbage man
     this->setObjectName( "Cmd" );
-    GarbageMan::instance()->add( this );
 }
 
 /**
@@ -218,10 +217,10 @@ void Cmd::list( const QString &, const QStringList &args ) {
  * @brief Cmd::listCvars lists all available console variables
  */
 void Cmd::listCvars() {
-    if ( !qAsConst( Variable::instance()->list ).isEmpty())
-        qWarning() << this->tr( "%1 available console variables:" ).arg( qAsConst( Variable::instance()->list).count());
+    if ( !qAsConst( Variable::instance().list ).isEmpty())
+        qWarning() << this->tr( "%1 available console variables:" ).arg( qAsConst( Variable::instance().list).count());
 
-    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance()->list )) {
+    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance().list )) {
         if ( entry->flags() & Var::Flag::Hidden )
             continue;
 
@@ -242,12 +241,12 @@ void Cmd::cvarSet( const QString &name, const QStringList &args ) {
         return;
     }
 
-    if ( !Variable::instance()->contains( args.first())) {
+    if ( !Variable::instance().contains( args.first())) {
         qInfo() << this->tr( "no such cvar - \"%1\"" ).arg( args.first());
     } else {
         QSharedPointer<Var> entry;
 
-        entry = Variable::instance()->list[args.first()];
+        entry = Variable::instance().list[args.first()];
         if ( entry->flags() & Var::Flag::ReadOnly ) {
             qInfo() << this->tr( "\"%1\" is read only" ).arg( entry->key());
             return;
@@ -267,34 +266,34 @@ void Cmd::dbInfo() {
 
     // get memory contents
     qInfo() << QString( "Current: teams - %1, tasks - %2, logs - %3" )
-                   .arg( Team::instance()->count())
-                   .arg( Task::instance()->count())
-                   .arg( Log::instance()->count());
+                   .arg( Team::instance().count())
+                   .arg( Task::instance().count())
+                   .arg( Log::instance().count());
 
     // get actual databse contents
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Event::instance()->tableName()));
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Event::instance().tableName()));
     if ( query.next())
         events = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Team::instance()->tableName()));
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Team::instance().tableName()));
     if ( query.next())
         teams = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Task::instance()->tableName()));
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Task::instance().tableName()));
     if ( query.next())
         tasks = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Log::instance()->tableName()));
+    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Log::instance().tableName()));
     if ( query.next())
         logs = query.value( 0 ).toInt();
 
     // print out
     qInfo() << QString( "Database: events - %1 (%2), teams - %3(%4), tasks - %5(%6), logs - %7(%8)" )
                    .arg( events )
-               .arg( Event::instance()->count())
+               .arg( Event::instance().count())
                .arg( teams )
-               .arg( Team::instance()->count())
+               .arg( Team::instance().count())
                .arg( tasks )
-               .arg( Task::instance()->count())
+               .arg( Task::instance().count())
                .arg( logs )
-               .arg( Log::instance()->count());
+               .arg( Log::instance().count());
 }
 
 /**
@@ -310,10 +309,10 @@ bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
     }
 
     // find the cvar
-    if ( Variable::instance()->contains( name )) {
+    if ( Variable::instance().contains( name )) {
         QSharedPointer<Var> entry;
 
-        entry = Variable::instance()->list[name];
+        entry = Variable::instance().list[name];
         if ( args.count() >= 1 ) {
             QStringList cvCmd;
             cvCmd.append( name );

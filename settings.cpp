@@ -50,16 +50,16 @@ Settings::Settings() : ui( new Ui::Settings ) {
                    [ this ]( bool checked ) { this->ui->themeCombo->setEnabled( checked ); } );
 
     // bind variables
-    this->variables << Variable::instance()->bind( "overrideTheme", this->ui->overrideCheck );
-    this->variables << Variable::instance()->bind( "theme", this->ui->themeCombo );
-    this->variables << Variable::instance()->bind( "reviewerName", this->ui->reviewerEdit );
-    this->variables << Variable::instance()->bind( "sortByType", this->ui->sortByTypeCheck );
+    this->variables << Variable::instance().bind( "overrideTheme", this->ui->overrideCheck );
+    this->variables << Variable::instance().bind( "theme", this->ui->themeCombo );
+    this->variables << Variable::instance().bind( "reviewerName", this->ui->reviewerEdit );
+    this->variables << Variable::instance().bind( "sortByType", this->ui->sortByTypeCheck );
 
     this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
 
     // handle database path
     this->connect( this->ui->pathButton, &QPushButton::clicked, [ this ]() {
-        const QString fileName( QFileDialog::getOpenFileName
+        const QString fileName( QFileDialog::getSaveFileName
                                 ( this, this->tr( "Open database" ),
                                   QFileInfo( Variable::string( "databasePath" )).absolutePath(),
                                   this->tr( "Database (*.db *.sqlite)" ), nullptr, QFileDialog::DontConfirmOverwrite ));
@@ -81,12 +81,9 @@ Settings::Settings() : ui( new Ui::Settings ) {
     } );
 
     // bind database path to edit
-    Variable::instance()->bind( "databasePath", this->ui->pathEdit );
-    Variable::instance()->bind( "backup/enabled", this->ui->backupCheck );
-    Variable::instance()->bind( "backup/changes", this->ui->backupValue );
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
+    Variable::instance().bind( "databasePath", this->ui->pathEdit );
+    Variable::instance().bind( "backup/enabled", this->ui->backupCheck );
+    Variable::instance().bind( "backup/changes", this->ui->backupValue );
 }
 
 /**
@@ -95,7 +92,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
 Settings::~Settings() {
     // unbind vars
     for ( const QString &key : qAsConst( this->variables ))
-        Variable::instance()->unbind( key );
+        Variable::instance().unbind( key );
     this->variables.clear();
 
     this->disconnect( this->ui->closeButton, SIGNAL( clicked()));

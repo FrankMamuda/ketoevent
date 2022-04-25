@@ -37,42 +37,42 @@
 EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
     // add action
     this->addAction( QIcon::fromTheme( "add" ), this->tr( "Add Event" ), [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Add Event" ));
-            EventEdit::instance()->reset();
+        if ( !EditorDialog::instance().isDockVisible()) {
+            EditorDialog::instance().showDock( &EventEdit::instance(), this->tr( "Add Event" ));
+            EventEdit::instance().reset();
         }
     } );
 
     // edit action
     this->edit = this->addAction( QIcon::fromTheme( "edit" ), this->tr( "Edit Event" ), [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock( EventEdit::instance(), this->tr( "Edit Event" ));
-            EventEdit::instance()->reset( true );
+        if ( !EditorDialog::instance().isDockVisible()) {
+            EditorDialog::instance().showDock( &EventEdit::instance(), this->tr( "Edit Event" ));
+            EventEdit::instance().reset( true );
         }
     } );
 
     // remove action
     this->remove = this->addAction( QIcon::fromTheme( "remove" ), this->tr( "Remove Event" ), [ this ]() {
-        const QModelIndex index( EditorDialog::instance()->container->currentIndex());
+        const QModelIndex index( EditorDialog::instance().container->currentIndex());
 
-        if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
+        if ( EditorDialog::instance().isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Event::instance()->row( index );
+        const Row row = Event::instance().row( index );
         if ( row == Row::Invalid )
             return;
 
-        const QString title( Event::instance()->title( row ));
-        const Row event = MainWindow::instance()->currentEvent();
+        const QString title( Event::instance().title( row ));
+        const Row event = MainWindow::instance().currentEvent();
 
         if ( QMessageBox::question( this, this->tr( "Remove event" ), this->tr( "Do you really want to remove \"%1\"?" ).arg( title )) == QMessageBox::Yes ) {
-            Event::instance()->remove( row );
-            Database::instance()->removeOrphanedEntries();
+            Event::instance().remove( row );
+            Database::instance().removeOrphanedEntries();
         }
 
         // restore eventId (model resets on remove apparently)
         if ( event != row )
-            MainWindow::instance()->setCurrentEvent( event );
+            MainWindow::instance().setCurrentEvent( event );
     } );
 
     // import action
@@ -82,16 +82,13 @@ EventToolBar::EventToolBar( QWidget *parent ) : ToolBar( parent ) {
             return;
 
         if ( QMessageBox::question( this, this->tr( "Import event" ), this->tr( "Do you really want to import logs and teams from \"%1\"?" ).arg( info.fileName())) == QMessageBox::Yes ) {
-            Database::instance()->attach( info );
+            Database::instance().attach( info );
         }
     } );
 
     // button test (disconnected in ~EditorDialog)
-    this->connect( EditorDialog::instance()->container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
+    this->connect( EditorDialog::instance().container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
     this->buttonTest();
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 }
 
 /**

@@ -63,14 +63,14 @@ bool Console::completeCommand() {
     int y;
 
     // find matching commands
-    const QStringList keys( Cmd::instance()->keys());
+    const QStringList keys( Cmd::instance().keys());
     for ( const QString &name : keys ) {
         if ( name.startsWith( this->edit->text()))
             matchedStrings << name;
     }
 
     // find matching cvars
-    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance()->list )) {
+    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance().list )) {
         if ( !QString::compare( entry->key(), "system/consoleHistory" ))
             continue;
 
@@ -105,14 +105,14 @@ bool Console::completeCommand() {
     qInfo() << this->tr( "Available commands and cvars:" );
     for ( const QString &str : qAsConst( matchedStrings )) {
         // check commands
-        if ( Cmd::instance()->keys().contains( str )) {
-            QString description( Cmd::instance()->description( str ));
+        if ( Cmd::instance().keys().contains( str )) {
+            QString description( Cmd::instance().description( str ));
             qInfo() << ( !description.isEmpty() ? QString( "  \"%1\" - %2" ).arg( str, description ) : QString( "  \"%1" ).arg( str ));
         }
 
         // check variables
-        if ( Variable::instance()->contains( str )) {
-            QSharedPointer<Var> entry( Variable::instance()->list[str] );
+        if ( Variable::instance().contains( str )) {
+            QSharedPointer<Var> entry( Variable::instance().list[str] );
             qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key(), entry->value().toString());
         }
     }
@@ -194,7 +194,7 @@ void Console::print( const QString &msg ) {
  * @brief Console::on_input_returnPressed
  */
 void Console::on_input_returnPressed() {
-    if ( Cmd::instance()->execute( this->edit->text()))
+    if ( Cmd::instance().execute( this->edit->text()))
         this->edit->add( this->edit->text());
 
     // set min offset

@@ -46,7 +46,7 @@ class XMLTools;
  * @brief The Variable class
  */
 class Variable final : public QObject {
-    Q_DISABLE_COPY( Variable )
+    Q_DISABLE_COPY_MOVE( Variable )
     Q_OBJECT
     friend class XMLTools;
 
@@ -57,10 +57,7 @@ public:
      * @brief instance
      * @return
      */
-    static Variable *instance() {
-        static auto *instance( new Variable());
-        return instance;
-    }
+    static Variable& instance() { static Variable instance; return instance; }
 
     /**
      * @brief contains
@@ -77,10 +74,10 @@ public:
      */
     template<typename T>
     static T value( const QString &key, bool defaultValue = false ) {
-        if ( !Variable::instance()->contains( key ))
+        if ( !Variable::instance().contains( key ))
             return QVariant().value<T>();
-        if ( defaultValue ) return qvariant_cast<T>( Variable::instance()->list[key]->defaultValue());
-        return qvariant_cast<T>( Variable::instance()->list[key]->value());
+        if ( defaultValue ) return qvariant_cast<T>( Variable::instance().list[key]->defaultValue());
+        return qvariant_cast<T>( Variable::instance().list[key]->value());
     }
 
     /**
@@ -182,10 +179,10 @@ public:
      */
     template<typename T>
     void updateConnections( const QString &key, const T &value ) {
-        if ( Variable::instance()->slotList.contains( key )) {
+        if ( Variable::instance().slotList.contains( key )) {
             QPair<QObject *, int> slot;
 
-            slot = Variable::instance()->slotList[key];
+            slot = Variable::instance().slotList[key];
             slot.first->metaObject()->method( slot.second ).invoke( slot.first, Qt::QueuedConnection,
                                                                     Q_ARG( QVariant, value ));
         }
@@ -220,20 +217,20 @@ public:
 
         if ( initial ) {
             // initial read from configuration file
-            Variable::instance()->list[key]->setValue( var );
+            Variable::instance().list[key]->setValue( var );
         } else {
             QVariant currentValue;
 
-            if ( !Variable::instance()->contains( key ))
+            if ( !Variable::instance().contains( key ))
                 return;
 
-            currentValue = Variable::instance()->list[key]->value();
+            currentValue = Variable::instance().list[key]->value();
 
             // any subsequent value changes emit a valueChanged signal
             if ( value != currentValue ) {
-                Variable::instance()->list[key]->setValue( var );
-                emit Variable::instance()->valueChanged( key );
-                Variable::instance()->updateConnections( key, var );
+                Variable::instance().list[key]->setValue( var );
+                emit Variable::instance().valueChanged( key );
+                Variable::instance().updateConnections( key, var );
             }
         }
     }
@@ -259,8 +256,8 @@ public:
     static void add( const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags ) {
         const QVariant var( Variable::validate( value ));
 
-        if ( !Variable::instance()->list.contains( key ) && !key.isEmpty())
-            Variable::instance()->list[key] = Container( key, var, flags ).copy();
+        if ( !Variable::instance().list.contains( key ) && !key.isEmpty())
+            Variable::instance().list[key] = Container( key, var, flags ).copy();
     }
 
 public slots:
@@ -329,7 +326,7 @@ public slots:
      * @param key
      */
     static void reset( const QString &key ) {
-        if ( Variable::instance()->contains( key ))
+        if ( Variable::instance().contains( key ))
             Variable::setValue<QVariant>( key, Variable::value<QVariant>( key, true ));
     }
     void bind( const QString &key, const QObject *receiver, const char *method );

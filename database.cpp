@@ -158,8 +158,8 @@ Database::Database( QObject *parent ) : QObject( parent ) {
  * @brief Database::removeOrphanedEntries removes orphaned entries in database tables
  */
 void Database::removeOrphanedEntries() {
-    for ( Table *table : qAsConst( this->tables ))
-        table->removeOrphanedEntries();
+    for ( Table &table : qAsConst( this->tables ))
+        table.removeOrphanedEntries();
 }
 
 /**
@@ -193,14 +193,14 @@ Database::~Database() {
     this->setInitialised( false );
 
     // unbind variables
-    Variable::instance()->unbind( "eventId" );
-    Variable::instance()->unbind( "teamId" );
+    Variable::instance().unbind( "eventId" );
+    Variable::instance().unbind( "teamId" );
     qCInfo( Database_::Debug ) << Database::tr( "clearing tables" );
-    for ( Table *table : qAsConst( this->tables ))
-        table->clear();
+    for ( Table &table : qAsConst( this->tables ))
+        table.clear();
 
     // delete all tables
-    qDeleteAll( this->tables );
+    this->tables.clear();
 
     // according to Qt5 documentation, this must be out of scope
     {
@@ -228,12 +228,12 @@ Database::~Database() {
  * @brief Database::add adds and validates Table instance to database
  * @param table Table instance (QSqlTableModel)
  */
-bool Database::add( Table *table ) {
+bool Database::add( Table &table ) {
     QSqlDatabase database( QSqlDatabase::database());
     const QStringList tableList( database.tables());
 
     // store table
-    this->tables[table->tableName()] = table;
+    this->tables.push_back( table );
 
     // announce
     if ( !tableList.count())
@@ -242,10 +242,10 @@ bool Database::add( Table *table ) {
     // validate schema
     bool found = false;
     for ( const QString &tableName : tableList ) {
-        if ( !QString::compare( table->tableName(), tableName )) {
-            for ( const Field &field : qAsConst( table->fields )) {
+        if ( !QString::compare( table.tableName(), tableName )) {
+            for ( const Field &field : qAsConst( table.fields )) {
 
-                if ( !database.record( table->tableName()).contains( field->name())) {
+                if ( !database.record( table.tableName()).contains( field->name())) {
                     qCCritical( Database_::Debug )
                         << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field->name());
                     return false;
@@ -253,7 +253,7 @@ bool Database::add( Table *table ) {
 
                 // ignore unsigned ints for now
                 const QVariant::Type internalType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
-                const QVariant::Type databaseType = database.record( table->tableName()).field( field->id()).type();
+                const QVariant::Type databaseType = database.record( table.tableName()).field( field->id()).type();
 
                 if ( internalType != databaseType ) {
                     qCCritical( Database_::Debug )
@@ -271,30 +271,30 @@ bool Database::add( Table *table ) {
 
     if ( !found ) {
         // announce
-        qCInfo( Database_::Debug ) << Database::tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
+        qCInfo( Database_::Debug ) << Database::tr( "creating an empty table - \"%1\"" ).arg( table.tableName());
 
         // prepare statement
-        for ( const Field &field : qAsConst( table->fields )) {
+        for ( const Field &field : qAsConst( table.fields )) {
             statement.append( QString( "%1 %2" ).arg( field->name(), field->format()));
 
             if ( field->isUnique())
                 statement.append( " unique" );
 
-            if ( QString::compare( field->name(), table->fields.last()->name()))
+            if ( QString::compare( field->name(), table.fields.last()->name()))
                 statement.append( ", " );
         }
 
         // check for constraints
         QString constraints;
-        const int tc = table->constraints.count();
+        const int tc = table.constraints.count();
 
         if ( tc > 0 ) {
-            for ( int y = 0; y < table->constraints.count(); y++ ) {
+            for ( int y = 0; y < table.constraints.count(); y++ ) {
                 constraints.append( "unique( " );
 
-                const int cc = table->constraints.at( y ).count();
+                const int cc = table.constraints.at( y ).count();
                 for ( int k = 0; k < cc; k++ ) {
-                    const QSharedPointer<Field_> field( table->constraints.at( y ).at( k ));
+                    const QSharedPointer<Field_> field( table.constraints.at( y ).at( k ));
                     constraints.append( field->name());
                     constraints.append( k == cc - 1 ? " )" : ", " );
 
@@ -308,22 +308,22 @@ bool Database::add( Table *table ) {
             statement.append( constraints );
         }
 
-        if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName(), statement )))
+        if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table.tableName(), statement )))
             qCCritical( Database_::Debug )
-                << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
+                << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table.tableName(), query.lastError().text());
     }
 
     // table has been verified and is marked as valid
-    table->setValid();
+    table.setValid();
 
     // create table model
-    table->setTable( table->tableName());
+    table.setTable( table.tableName());
 
     // load data
-    if ( !table->select()) {
+    if ( !table.select()) {
         qCCritical( Database_::Debug )
-            << Database::tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
-        table->setValid( false );
+            << Database::tr( "could not initialize model for table - \"%1\"" ).arg( table.tableName());
+        table.setValid( false );
     }
 
     return true;
@@ -367,12 +367,12 @@ void Database::writeBackup() {
  */
 void Database::attach( const QFileInfo &info ) {
     // get current event if any
-    const Row row = MainWindow::instance()->currentEvent();
+    const Row row = MainWindow::instance().currentEvent();
     if ( row == Row::Invalid )
         return;
 
     // get current event name
-    const QString currentTitle( Event::instance()->title( row ));
+    const QString currentTitle( Event::instance().title( row ));
 
     // check if database exists
     if ( !info.exists()) {
@@ -389,7 +389,7 @@ void Database::attach( const QFileInfo &info ) {
 
     // check if tasks match in both tables
     // TODO: also check API
-    if ( !query.exec( QString( "select not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )" ).arg( Task::instance()->tableName()))) {
+    if ( !query.exec( QString( "select not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )" ).arg( Task::instance().tableName()))) {
         qCritical( Database_::Debug ) << this->tr( "could not compare task tables" );
         return;
     } else {
@@ -407,7 +407,7 @@ void Database::attach( const QFileInfo &info ) {
     // find a matching event in the foreign database
     bool found = false;
     Id eventId = Id::Invalid;
-    if ( query.exec( QString( "select * from merge.%1" ).arg( Event::instance()->tableName()))) {
+    if ( query.exec( QString( "select * from merge.%1" ).arg( Event::instance().tableName()))) {
         while ( query.next()) {
             const QString title( query.record().value( Event::Title ).toString());
             eventId = static_cast<Id>( query.record().value( Event::ID ).toInt());
@@ -437,13 +437,13 @@ void Database::attach( const QFileInfo &info ) {
     };
 
     // get highest combo id from current database
-    int comboHiId = getHiId( Log::instance()->tableName(),  Log::instance()->fieldName( Log::Combo ));
+    int comboHiId = getHiId( Log::instance().tableName(),  Log::instance().fieldName( Log::Combo ));
     int teams = 0, logs = 0;
 
     // find unique teams that are not in the current event
     if ( query.exec( QString( "select * from merge.%1 where %2 not in ( select %2 from %1 )" )
-                     .arg( Team::instance()->tableName(),
-                           Team::instance()->fieldName( Team::Title )))) {
+                     .arg( Team::instance().tableName(),
+                           Team::instance().fieldName( Team::Title )))) {
 
         // go through the team list
         while ( query.next()) {
@@ -457,11 +457,11 @@ void Database::attach( const QFileInfo &info ) {
                 continue;
 
             // add a new team
-            const Row row = Team::instance()->add( title, members, finish, reviewer );
+            const Row row = Team::instance().add( title, members, finish, reviewer );
             if ( row == Row::Invalid )
                 return;
 
-            const Id newTeamId = Team::instance()->id( row );
+            const Id newTeamId = Team::instance().id( row );
             if ( newTeamId == Id::Invalid )
                 return;
 
@@ -469,8 +469,8 @@ void Database::attach( const QFileInfo &info ) {
             QSqlQuery subQuery;
             QMap<Id, Id> comboIdRemap;
             if ( subQuery.exec( QString( "select * from merge.%1 where %2=%3" )
-                                .arg( Log::instance()->tableName(),
-                                      Log::instance()->fieldName( Log::Team ),
+                                .arg( Log::instance().tableName(),
+                                      Log::instance().fieldName( Log::Team ),
                                       QString::number( static_cast<int>( teamId ))))) {
 
                 // go through the log list
@@ -484,7 +484,7 @@ void Database::attach( const QFileInfo &info ) {
                         comboIdRemap[comboId] = comboId == Id::Invalid ? Id::Invalid : static_cast<Id>( comboHiId++ );
 
                     // add logs
-                    Log::instance()->add( taskId, newTeamId, multi, comboIdRemap[comboId] );
+                    Log::instance().add( taskId, newTeamId, multi, comboIdRemap[comboId] );
                     logs++;
                 }
             }

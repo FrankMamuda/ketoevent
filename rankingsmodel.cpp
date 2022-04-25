@@ -81,7 +81,7 @@ int RankingsModel::rowCount( const QModelIndex &parent ) const {
     if ( parent.isValid())
         return 0;
 
-    return Rankings::instance()->list.count();
+    return Rankings::instance().list.count();
 }
 
 /**
@@ -108,56 +108,56 @@ QVariant RankingsModel::data( const QModelIndex &index, int role ) const {
 
     if ( role == Qt::DisplayRole ) {
         if ( index.column() == Rank )
-            return Rankings::instance()->list.at( index.row()).rank;
+            return Rankings::instance().list.at( index.row()).rank;
 
         if ( index.column() == TeamTitle ) {
-            if ( !Rankings::instance()->isDisplayingCurrentTeam()) {
-                return Rankings::instance()->list.at( index.row()).title;
+            if ( !Rankings::instance().isDisplayingCurrentTeam()) {
+                return Rankings::instance().list.at( index.row()).title;
             } else {
-                const Row team = Team::instance()->row( Rankings::instance()->ui->teamCombo->currentIndex());
+                const Row team = Team::instance().row( Rankings::instance().ui->teamCombo->currentIndex());
                 if ( team == Row::Invalid )
                     return QVariant();
 
-                const QString title( Team::instance()->title( team ));
+                const QString title( Team::instance().title( team ));
 
-                if ( !QString::compare( title, Rankings::instance()->list.at( index.row()).title ))
-                    return Rankings::instance()->list.at( index.row()).title;
+                if ( !QString::compare( title, Rankings::instance().list.at( index.row()).title ))
+                    return Rankings::instance().list.at( index.row()).title;
             }
         }
 
         if ( index.column() == Completed )
-            return Rankings::instance()->list.at( index.row()).completedTasks;
+            return Rankings::instance().list.at( index.row()).completedTasks;
 
         if ( index.column() == Combos )
-            return Rankings::instance()->list.at( index.row()).combos;
+            return Rankings::instance().list.at( index.row()).combos;
 
         if ( index.column() == Combined )
-            return Rankings::instance()->list.at( index.row()).comboTasks;
+            return Rankings::instance().list.at( index.row()).comboTasks;
 
         if ( index.column() == Penalty )
-            return Rankings::instance()->list.at( index.row()).penalty;
+            return Rankings::instance().list.at( index.row()).penalty;
 
 #ifdef KK6_SPECIAL
         if ( index.column() == Regular )
-            return Rankings::instance()->list.at( index.row()).points -
-                   Rankings::instance()->list.at( index.row()).specialPoints0 -
-                   Rankings::instance()->list.at( index.row()).specialPoints1;
+            return Rankings::instance().list.at( index.row()).points -
+                   Rankings::instance().list.at( index.row()).specialPoints0 -
+                   Rankings::instance().list.at( index.row()).specialPoints1;
 
         if ( index.column() == Special0 )
-            return Rankings::instance()->list.at( index.row()).specialPoints0;
+            return Rankings::instance().list.at( index.row()).specialPoints0;
 
         if ( index.column() == Special1 )
-            return Rankings::instance()->list.at( index.row()).specialPoints1;
+            return Rankings::instance().list.at( index.row()).specialPoints1;
 #endif
 
         if ( index.column() == Points )
-            return Rankings::instance()->list.at( index.row()).points;
+            return Rankings::instance().list.at( index.row()).points;
     }
 
     if ( role == Qt::TextAlignmentRole )
         return Qt::AlignCenter;
 
-    if ( role == Qt::ForegroundRole && index.column() == Penalty && Rankings::instance()->list.at( index.row()).penalty > 0 )
+    if ( role == Qt::ForegroundRole && index.column() == Penalty && Rankings::instance().list.at( index.row()).penalty > 0 )
         return QColor( Qt::red );
 
     return QVariant();

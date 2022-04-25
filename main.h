@@ -24,52 +24,11 @@
  */
 #include <QSharedPointer>
 #include <QtGlobal>
+#include <QDebug>
 
 /**
  * namespace Main
  */
 namespace Main {
 [[maybe_unused]] static constexpr const char *Path = ".database2";
-[[maybe_unused]] static QObject *Console( nullptr );
 }
-
-/**
- * @brief The GarbageMan class
- */
-class GarbageMan final {
-public:    
-    /**
-     * @brief instance
-     * @return
-     */
-    static GarbageMan *instance() { static GarbageMan *instance( new GarbageMan()); return instance; }
-    GarbageMan( const GarbageMan & ) = delete;
-    ~GarbageMan() = default;
-
-    /**
-     * @brief add adds pointers (singletons) to garbage collection list
-     * @param object
-     */
-    void add( QObject *object ) {
-        if ( !this->garbage.contains( object ))
-            this->garbage << object;
-    }
-
-    /**
-     * @brief clear deletes poiners in reverse order
-     */
-    void clear() {
-        std::reverse( this->garbage.begin(), this->garbage.end());
-        for ( QObject *object : qAsConst( this->garbage )) {
-            if ( object != nullptr ) {
-                delete object;
-                object = nullptr;
-            }
-        }
-        this->garbage.clear();
-    }
-
-private:
-    explicit GarbageMan() = default;
-    QList<QObject*> garbage;
-};

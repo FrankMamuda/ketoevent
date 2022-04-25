@@ -30,15 +30,11 @@
  */
 class EventToolBar final : public ToolBar {
     Q_OBJECT
-    Q_DISABLE_COPY( EventToolBar )
+    Q_DISABLE_COPY_MOVE( EventToolBar )
 
 public:
-    static EventToolBar *instance() { static EventToolBar *instance = new EventToolBar(); return instance; }
+    static EventToolBar& instance() { static EventToolBar instance; return instance; }
     ~EventToolBar() override = default;
-
-    // disable move
-    EventToolBar( EventToolBar&& ) = delete;
-    EventToolBar& operator=( EventToolBar&& ) = delete;
 
 public slots:
     void buttonTest( const QModelIndex &index = QModelIndex());

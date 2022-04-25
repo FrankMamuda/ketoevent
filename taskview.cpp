@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2018-2019 Factory #12
  * Copyright (C) 2020 Armands Aleksejevs
  *
@@ -56,31 +56,31 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
             int y;
 
             for ( y = 0; y < this->model()->rowCount(); y++ ) {
-                const QModelIndex index( this->model()->index( y, Task::instance()->Name ));
+                const QModelIndex index( this->model()->index( y, Task::instance().Name ));
 
                 // comboId lambda
                 auto setComboId = [index, delegate]( const Id &id ) {
                     const Row task = delegate->row( index );
-                    const Row team = MainWindow::instance()->currentTeam();
+                    const Row team = MainWindow::instance().currentTeam();
 
                     if ( task == Row::Invalid || team == Row::Invalid )
                         return;
 
-                    const Id taskId = Task::instance()->id( task );
-                    const Id teamId = Team::instance()->id( team );
+                    const Id taskId = Task::instance().id( task );
+                    const Id teamId = Team::instance().id( team );
 
-                    const Id logId = Log::instance()->id( taskId, teamId );
+                    const Id logId = Log::instance().id( taskId, teamId );
                     if ( logId == Id::Invalid )
                         return;
 
-                    const Row log = Log::instance()->row( logId );
+                    const Row log = Log::instance().row( logId );
                     if ( log == Row::Invalid )
                         return;
 
-                    Log::instance()->setComboId( log, id );
+                    Log::instance().setComboId( log, id );
 
                     // increment counter
-                    Database::instance()->incrementCounter();
+                    Database::instance().incrementCounter();
                 };
 
                 if ( this->visualRect( index ).contains( event->pos())) {
@@ -91,10 +91,10 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Set:
-                        Task::instance()->setMultiplier( delegate->row( index ), true );
+                        Task::instance().setMultiplier( delegate->row( index ), true );
 
                         // increment counter
-                        Database::instance()->incrementCounter();
+                        Database::instance().incrementCounter();
 
                         break;
 
@@ -103,26 +103,26 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         break;
 
                     case Item::Remove:
-                        Task::instance()->setMultiplier( delegate->row( index ), false );
+                        Task::instance().setMultiplier( delegate->row( index ), false );
 
                         // increment counter
-                        Database::instance()->incrementCounter();
+                        Database::instance().incrementCounter();
                         break;
 
 
                     case Item::InfoPopup:
                     {
-                        const QString desc( Task::instance()->description( Task::instance()->row( index )));
+                        const QString desc( Task::instance().description( Task::instance().row( index )));
                         if ( desc.isEmpty())
                             break;
 
-                        Popup( MainWindow::instance(), desc ).exec();
+                        Popup( &MainWindow::instance(), desc ).exec();
                     }
                         break;
 
                     case Item::Combine:
-                        if ( MainWindow::instance()->isComboModeActive()) {
-                            MainWindow::instance()->setTaskFilter();
+                        if ( MainWindow::instance().isComboModeActive()) {
+                            MainWindow::instance().setTaskFilter();
                             delegate->reset();
                         } else {
                             // TODO: restore position in list after filtering
@@ -130,8 +130,8 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             if ( id == Id::Invalid ) {
                                 QSqlQuery query;
                                 query.exec( QString( "select max( %1 ) from %2" )
-                                            .arg( Log::instance()->fieldName( Log::Combo ),
-                                                  Log::instance()->tableName()));
+                                            .arg( Log::instance().fieldName( Log::Combo ),
+                                                  Log::instance().tableName()));
 
                                 id = query.next() ? static_cast<Id>( query.value( 0 ).toInt() + 1 ) : static_cast<Id>( 0 );
                             }
@@ -144,7 +144,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             int count = 0;
                             query.exec( QString( "select COUNT(*) from logs where logs.value>0 and ( comboId=%1 or comboId=-1) and logs.teamId=%2" )
                                         .arg( static_cast<int>( id ))
-                                        .arg( static_cast<int>( Team::instance()->id( MainWindow::instance()->currentTeam()))));
+                                        .arg( static_cast<int>( Team::instance().id( MainWindow::instance().currentTeam()))));
                             if ( query.next())
                                 count = query.value( 0 ).toInt();
 
@@ -165,7 +165,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             qCDebug( Database_::Debug ) << "set id" << id;
 #endif
 
-                            MainWindow::instance()->setTaskFilter( true, id );
+                            MainWindow::instance().setTaskFilter( true, id );
                         }
                         break;
 
@@ -173,7 +173,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         this->edit( index );
 
                         // increment counter
-                        Database::instance()->incrementCounter();
+                        Database::instance().incrementCounter();
                         break;
 
                     case Item::AddCombo:
@@ -181,7 +181,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                         qCDebug( Database_::Debug ) << "add combo";
 #endif
 
-                        setComboId( MainWindow::instance()->currentComboId());
+                        setComboId( MainWindow::instance().currentComboId());
                         break;
 
                     case Item::RemoveCombo:

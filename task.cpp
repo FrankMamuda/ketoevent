@@ -68,7 +68,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
     int y, highest = -1;
 
     // failsafe
-    const Row event = MainWindow::instance()->currentEvent();
+    const Row event = MainWindow::instance().currentEvent();
     if ( event == Row::Invalid ) {
         qDebug() << this->tr( "no active event, aborting" );
         return Row::Invalid;
@@ -87,7 +87,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
                        static_cast<int>( style ) <<
                        static_cast<int>( type ) <<
                        highest + 1 <<
-                       static_cast<int>( Event::instance()->id( event )) <<
+                       static_cast<int>( Event::instance().id( event )) <<
                        description );
 }
 
@@ -103,12 +103,12 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
     if ( role == Qt::FontRole ) {
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
 
-        if ( Task::instance()->style( row ) == Styles::Italic ) {
+        if ( Task::instance().style( row ) == Styles::Italic ) {
             font.setItalic( true );
             return font;
         }
 
-        if ( Task::instance()->style( row ) == Styles::Bold ) {
+        if ( Task::instance().style( row ) == Styles::Bold ) {
             font.setBold( true );
             return font;
         }
@@ -138,7 +138,7 @@ int Task::multiplier( const Row &row ) const {
     bool ok;
     const QPair<Id, Id> ids( getIds( row, &ok ));
 
-    return ok ? Log::instance()->multiplier( ids.first, ids.second ) : 0;
+    return ok ? Log::instance().multiplier( ids.first, ids.second ) : 0;
 }
 
 /**
@@ -150,7 +150,7 @@ Id Task::comboId( const Row &row ) const {
     bool ok;
     const QPair<Id, Id> ids( getIds( row, &ok ));
 
-    return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
+    return ok ? Log::instance().comboId( ids.first, ids.second ) : Id::Invalid;
 
     // NOTE: could replace with a value from extended (LOG) table (could increase performance marginally)
     //return static_cast<Id>( this->value( row, ComboID ).toInt());
@@ -169,11 +169,11 @@ QPair<Id, Id> Task::getIds( const Row &row, bool *ok ) const {
     if ( row == Row::Invalid )
         return out;
 
-    const Row team = MainWindow::instance()->currentTeam();
+    const Row team = MainWindow::instance().currentTeam();
     if ( team == Row::Invalid )
         return out;
 
-    out.second = Team::instance()->id( team );
+    out.second = Team::instance().id( team );
     if ( out.second == Id::Invalid )
         return out;
 
@@ -195,8 +195,8 @@ void Task::removeOrphanedEntries() {
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
                 .arg( this->tableName(),
                       this->fieldName( Event ),
-                      Event::instance()->fieldName( Event::ID ),
-                      Event::instance()->tableName()));
+                      Event::instance().fieldName( Event::ID ),
+                      Event::instance().tableName()));
     this->select();
 }
 
@@ -210,7 +210,7 @@ void Task::setMultiplier( const Row &row, int value ) {
     QPair<Id, Id> ids( getIds( row, &ok ));
 
     if ( ok )
-        Log::instance()->setMultiplier( value, ids.first, ids.second );
+        Log::instance().setMultiplier( value, ids.first, ids.second );
 }
 
 /**
@@ -222,21 +222,21 @@ QString Task::selectStatement() const {
     QString statement;
 
     // return default statment if database has not been initialized
-    if ( !Database::instance()->hasInitialised() || !this->hasInitialised())
+    if ( !Database::instance().hasInitialised() || !this->hasInitialised())
         return Table::selectStatement();
 
     // validate team row
-    const Row team = MainWindow::instance()->currentTeam();
+    const Row team = MainWindow::instance().currentTeam();
     if ( team == Row::Invalid )
         return statement;
 
     // validate team id
-    const Id teamId = Team::instance()->id( team );
+    const Id teamId = Team::instance().id( team );
     if ( teamId == Id::Invalid )
         return statement;
 
     // get table name from LOGS
-    const QString logs( Log::instance()->tableName());
+    const QString logs( Log::instance().tableName());
     if ( logs.isEmpty())
         return statement;
 
@@ -253,8 +253,8 @@ QString Task::selectStatement() const {
     }
 
     // append fields from LOG table
-    statement.append( QString( " %1.%2," ).arg( logs, Log::instance()->fieldName( Log::Fields::Multi )));
-    statement.append( QString( " %1.%2" ).arg( logs, Log::instance()->fieldName( Log::Fields::Combo )));
+    statement.append( QString( " %1.%2," ).arg( logs, Log::instance().fieldName( Log::Fields::Multi )));
+    statement.append( QString( " %1.%2" ).arg( logs, Log::instance().fieldName( Log::Fields::Combo )));
 
     // append table name
     statement.append( QString( " FROM %1" ).arg( this->tableName()));
@@ -262,15 +262,15 @@ QString Task::selectStatement() const {
     // FROM table statement
     const QString leftTable( QString( "( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1" )
                              .arg( logs,
-                                   Log::instance()->fieldName( Log::Fields::Team ),
+                                   Log::instance().fieldName( Log::Fields::Team ),
                                    QString::number( static_cast<int>( teamId )),
-                                   Log::instance()->fieldName( Log::Fields::Task )));
+                                   Log::instance().fieldName( Log::Fields::Task )));
 
     // append JOIN statement from LOGS table
     statement.append( QString( " LEFT JOIN %1 ON %2.%3=%4.%5" )
                       .arg( leftTable,
                             logs,
-                            Log::instance()->fieldName( Log::Fields::Task ),
+                            Log::instance().fieldName( Log::Fields::Task ),
                             this->tableName(),
                             this->fieldName( ID )));
 

@@ -36,15 +36,11 @@ class About;
  */
 class About final : public QDialog {
     Q_OBJECT
-    Q_DISABLE_COPY( About )
+    Q_DISABLE_COPY_MOVE( About )
 
 public:
     explicit About( QWidget *parent = nullptr );
     ~About() override;
-
-    // disable move
-    About( About&& ) = delete;
-    About& operator=( About&& ) = delete;
 
 private:
     Ui::About *ui;

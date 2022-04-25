@@ -35,15 +35,11 @@ class Settings;
  * @brief The Settings class
  */
 class Settings final : public ModalWindow {
-    Q_DISABLE_COPY( Settings )
+    Q_DISABLE_COPY_MOVE( Settings )
     Q_OBJECT
 
 public:
-    // disable move
-    Settings( Settings&& ) = delete;
-    Settings& operator=( Settings&& ) = delete;
-
-    static Settings *instance() { static Settings *instance( new Settings()); return instance; }
+    static Settings& instance() { static Settings instance; return instance; }
     ~Settings() override;
 
 private:

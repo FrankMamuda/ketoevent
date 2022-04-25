@@ -56,17 +56,14 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
 
     // set up progressbar and team selector
     this->ui->progressBar->hide();
-    this->ui->teamCombo->setModel( Team::instance());
+    this->ui->teamCombo->setModel( &Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
     // bind currentTeam action to a variable
     // and repaint table when either team or currentTeam variable changes
-    Variable::instance()->bind( "rankingsCurrent", this->ui->actionCurrent );
+    Variable::instance().bind( "rankingsCurrent", this->ui->actionCurrent );
     this->connect( this->ui->actionCurrent, SIGNAL( toggled( bool )), this->ui->tableView->viewport(), SLOT( repaint()));
     this->connect( this->ui->teamCombo, SIGNAL( currentIndexChanged( int )), this->ui->tableView->viewport(), SLOT( repaint()));
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 
 #ifdef XLSX_SUPPORT
     // export action (xlsx)
@@ -119,7 +116,7 @@ Rankings::Rankings() : ui( new Ui::Rankings ), model( nullptr ), proxyModel( nul
  * @brief Rankings::~Rankings
  */
 Rankings::~Rankings() {
-    Variable::instance()->unbind( "rankingsCurrent", this->ui->actionCurrent );
+    Variable::instance().unbind( "rankingsCurrent", this->ui->actionCurrent );
     this->disconnect( this->ui->actionCurrent, SIGNAL( toggled( bool )));
     this->disconnect( this->ui->teamCombo, SIGNAL( currentIndexChanged( int )));
 
@@ -141,10 +138,10 @@ void Rankings::on_actionUpdate_triggered() {
     int totalLogged = 0;
 
     // remove junk to make sure it does not affect results
-    Log::instance()->removeOrphanedEntries();
+    Log::instance().removeOrphanedEntries();
 
     // set up and show progress bar
-    this->ui->progressBar->setRange( 0, Team::instance()->count());
+    this->ui->progressBar->setRange( 0, Team::instance().count());
     this->ui->progressBar->setValue( 0 );
     this->ui->progressBar->show();
 
@@ -167,25 +164,25 @@ void Rankings::on_actionUpdate_triggered() {
     this->model->reset();
 
     // get event related variables
-    const Row event = MainWindow::instance()->currentEvent();
+    const Row event = MainWindow::instance().currentEvent();
     if ( event == Row::Invalid )
         return;
 
-    const QTime eventStartTime( Event::instance()->startTime( event ));
-    const QTime eventFinishTime( Event::instance()->finishTime( event ));
-    const QTime eventFinalTime( Event::instance()->finalTime( event ));
-    const int penaltyPoints( Event::instance()->penalty( event ));
+    const QTime eventStartTime( Event::instance().startTime( event ));
+    const QTime eventFinishTime( Event::instance().finishTime( event ));
+    const QTime eventFinalTime( Event::instance().finalTime( event ));
+    const int penaltyPoints( Event::instance().penalty( event ));
 
     // go through team list (might seem a little less efficient than going through logs,
     // but in reality there is not that much of a performance penalty
     // team method also avoids unnecessary complexity over calculation by logs
-    for ( int team = 0; team < Team::instance()->count(); team++ ) {
-        const Row teamRow = Team::instance()->row( team );
+    for ( int team = 0; team < Team::instance().count(); team++ ) {
+        const Row teamRow = Team::instance().row( team );
 
         if ( teamRow == Row::Invalid )
             continue;
 
-        TeamStatistics stats( Team::instance()->title( teamRow ));
+        TeamStatistics stats( Team::instance().title( teamRow ));
         QMap<Id, int> combos;
         QList<Id> dup;
 
@@ -193,25 +190,25 @@ void Rankings::on_actionUpdate_triggered() {
         this->ui->progressBar->setValue( team );
 
         // go through logs
-        for ( int log = 0; log < Log::instance()->count(); log++ ) {
-            const Row logRow = Log::instance()->row( log );
-            const int value = Log::instance()->multiplier( logRow );
+        for ( int log = 0; log < Log::instance().count(); log++ ) {
+            const Row logRow = Log::instance().row( log );
+            const int value = Log::instance().multiplier( logRow );
 
             if ( logRow == Row::Invalid )
                 continue;
 
             // abort on invalid log values or logs not related to the current team
-            if ( value <= 0 || Team::instance()->id( teamRow ) != Log::instance()->teamId( logRow ))
+            if ( value <= 0 || Team::instance().id( teamRow ) != Log::instance().teamId( logRow ))
                 continue;
 
             // get task related variables
-            const Id taskId = Log::instance()->taskId( logRow );
-            const Row task = Task::instance()->row( taskId );
+            const Id taskId = Log::instance().taskId( logRow );
+            const Row task = Task::instance().row( taskId );
 
             if ( task == Row::Invalid )
                 continue;
 
-            const Task::Types type = Task::instance()->type( task );
+            const Task::Types type = Task::instance().type( task );
 
             // test for duplicates
             if ( dup.contains( taskId ))
@@ -222,10 +219,10 @@ void Rankings::on_actionUpdate_triggered() {
             stats.completedTasks++;
 
             // calculate points form completed tasks
-            stats.points += Task::instance()->points( task ) * (( type == Task::Types::Multi ) ? value : 1 );
+            stats.points += Task::instance().points( task ) * (( type == Task::Types::Multi ) ? value : 1 );
 
             // build combo map
-            const Id comboId = Log::instance()->comboId( logRow );
+            const Id comboId = Log::instance().comboId( logRow );
             if ( !combos.contains( comboId ) && comboId > Id::Invalid )
                 combos[comboId] = 0;
 
@@ -237,7 +234,7 @@ void Rankings::on_actionUpdate_triggered() {
 #ifdef KK6_SPECIAL
             // NOTE: hardcoded
             // special event-related points
-            const QString taskName( Task::instance()->name( task ));
+            const QString taskName( Task::instance().name( task ));
             if ( !QString::compare( taskName, "Papilduzdevums" ))
                 stats.specialPoints1 = value;
             else if ( !QString::compare( taskName, "FTF" ))
@@ -261,8 +258,8 @@ void Rankings::on_actionUpdate_triggered() {
         }
 
         // calculate penalty points
-        const int overTime = eventFinishTime.secsTo( Team::instance()->finishTime( teamRow )) / 60 + 1;
-        stats.time = eventStartTime.secsTo( Team::instance()->finishTime( teamRow )) / 60 + 1;
+        const int overTime = eventFinishTime.secsTo( Team::instance().finishTime( teamRow )) / 60 + 1;
+        stats.time = eventStartTime.secsTo( Team::instance().finishTime( teamRow )) / 60 + 1;
         if ( overTime > 0 ) {
             stats.penalty = penaltyPoints * overTime;
             stats.points -= stats.penalty;
@@ -315,36 +312,36 @@ void Rankings::on_actionUpdate_triggered() {
     }
 
     // total teams
-    this->ui->totalTeamsEdit->setText( QString::number( Team::instance()->count()));
+    this->ui->totalTeamsEdit->setText( QString::number( Team::instance().count()));
 
     // total members
     int members = 0;
-    for ( int y = 0; y < Team::instance()->count(); y++ )
-        members += Team::instance()->members( Team::instance()->row( y ));
+    for ( int y = 0; y < Team::instance().count(); y++ )
+        members += Team::instance().members( Team::instance().row( y ));
     this->ui->totalMembersEdit->setText( QString::number( members ));
 
     // total logged points
     this->ui->totalLoggedEdit->setText( QString::number( totalLogged ));
 
     // total tasks
-    this->ui->totalTasksEdit->setText( QString::number( Task::instance()->count()));
+    this->ui->totalTasksEdit->setText( QString::number( Task::instance().count()));
 
     // total points
     int totalPoints = 0;
-    for ( int y = 0; y < Task::instance()->count(); y++ ) {
-        const Row row = Task::instance()->row( y );
-        const Task::Types type = Task::instance()->type( row );
+    for ( int y = 0; y < Task::instance().count(); y++ ) {
+        const Row row = Task::instance().row( y );
+        const Task::Types type = Task::instance().type( row );
 
-        totalPoints += ( Task::instance()->points( row ) * ( type == Task::Types::Multi ? Task::instance()->multi( row ) : 1 ));
+        totalPoints += ( Task::instance().points( row ) * ( type == Task::Types::Multi ? Task::instance().multi( row ) : 1 ));
     }
-    int comboPoints = static_cast<int>( qFloor( static_cast<qreal>( Task::instance()->count()) / 4 )) * Event::instance()->comboOfFourPlus( MainWindow::instance()->currentEvent());
-    switch ( Task::instance()->count() % 4 ) {
+    int comboPoints = static_cast<int>( qFloor( static_cast<qreal>( Task::instance().count()) / 4 )) * Event::instance().comboOfFourPlus( MainWindow::instance().currentEvent());
+    switch ( Task::instance().count() % 4 ) {
     case 3:
-        comboPoints += Event::instance()->comboOfThree( MainWindow::instance()->currentEvent());
+        comboPoints += Event::instance().comboOfThree( MainWindow::instance().currentEvent());
         break;
 
     case 2:
-        comboPoints += Event::instance()->comboOfTwo( MainWindow::instance()->currentEvent());
+        comboPoints += Event::instance().comboOfTwo( MainWindow::instance().currentEvent());
         break;
     }
     this->ui->totalPointsEdit->setText( this->tr( "%1 (%2+%3)" ).arg( totalPoints + comboPoints ).arg( totalPoints ).arg( comboPoints ));
@@ -353,9 +350,9 @@ void Rankings::on_actionUpdate_triggered() {
     int numTasksCompleted = 0;
     QSqlQuery query;
     query.exec( QString( "SELECT COUNT(*) from %1 WHERE %2>0 GROUP BY %3" )
-                .arg( Log::instance()->tableName(),
-                      Log::instance()->fieldName( Log::Multi ),
-                      Log::instance()->fieldName( Log::Task )));
+                .arg( Log::instance().tableName(),
+                      Log::instance().fieldName( Log::Multi ),
+                      Log::instance().fieldName( Log::Task )));
     while ( query.next())
         numTasksCompleted += query.value( 0 ).toInt();
     this->ui->completedEdit->setText( QString::number( numTasksCompleted ));
@@ -373,7 +370,7 @@ void Rankings::showEvent( QShowEvent *event ) {
     this->ui->tableView->resizeRowsToContents();
 
     // set current team
-    this->ui->teamCombo->setCurrentIndex( static_cast<int>( MainWindow::instance()->currentTeam()));
+    this->ui->teamCombo->setCurrentIndex( static_cast<int>( MainWindow::instance().currentTeam()));
 }
 
 /**

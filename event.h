@@ -47,7 +47,7 @@ namespace EventTable {
  */
 class Event final : public Table {
     Q_OBJECT
-    Q_DISABLE_COPY( Event )
+    Q_DISABLE_COPY_MOVE( Event )
     friend class Task;
     friend class Team;
 
@@ -73,15 +73,11 @@ public:
     };
     Q_ENUM( Fields )
 
-    // disable move
-    Event( Event&& ) = delete;
-    Event& operator=( Event&& ) = delete;
-
     /**
      * @brief instance
      * @return
      */
-    static Event *instance() { static Event *instance = new Event(); return instance; }
+    static Event& instance() { static Event instance; return instance; }
     ~Event() override {}
 
     Row add( const QString &title, int minMembers = EventTable::DefaultMinMembers, int maxMembers = EventTable::DefaultMaxMembers,

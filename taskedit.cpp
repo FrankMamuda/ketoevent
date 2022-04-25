@@ -59,8 +59,8 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             this->ui->multiPixmap->show();
         }
     } );
-    this->ui->typeCombo->addItems( Task::instance()->types.values());
-    this->ui->styleCombo->addItems( Task::instance()->styles.values());
+    this->ui->typeCombo->addItems( Task::instance().types.values());
+    this->ui->styleCombo->addItems( Task::instance().styles.values());
 
     // empty task name check
     auto emptyName = [ this ]() {
@@ -81,34 +81,34 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             return;
 
         // abort on existing task
-        if ( Task::instance()->contains( Task::Name, taskName ) && !this->isEditing()) {
+        if ( Task::instance().contains( Task::Name, taskName ) && !this->isEditing()) {
             QMessageBox::information( this, this->tr( "Task already exists" ), this->tr( "Task already exists\nChoose a different name" ));
             return;
         }
 
         // if everything is ok, add a new task
         if ( !this->isEditing()) {
-            Task::instance()->add( taskName, this->ui->pointsInteger->value(), this->ui->multiInteger->value(),
+            Task::instance().add( taskName, this->ui->pointsInteger->value(), this->ui->multiInteger->value(),
                                    static_cast<Task::Types>( this->ui->typeCombo->currentIndex()),
                                    static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()),
                                    this->ui->descEdit->text());
         } else {
-            const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
+            const Row task = Task::instance().row( EditorDialog::instance().container->currentIndex().row());
 
             if ( task == Row::Invalid )
                 return;
 
-            Task::instance()->setName( task, taskName );
-            Task::instance()->setPoints( task, this->ui->pointsInteger->value());
-            Task::instance()->setMulti( task, this->ui->multiInteger->value());
-            Task::instance()->setType( task, static_cast<Task::Types>( this->ui->typeCombo->currentIndex()));
-            Task::instance()->setStyle( task, static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()));
-            Task::instance()->setDescription( task, this->ui->descEdit->text());
+            Task::instance().setName( task, taskName );
+            Task::instance().setPoints( task, this->ui->pointsInteger->value());
+            Task::instance().setMulti( task, this->ui->multiInteger->value());
+            Task::instance().setType( task, static_cast<Task::Types>( this->ui->typeCombo->currentIndex()));
+            Task::instance().setStyle( task, static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()));
+            Task::instance().setDescription( task, this->ui->descEdit->text());
         }
 
         // close dock
-        if ( EditorDialog::instance()->isDockVisible())
-            EditorDialog::instance()->hideDock();
+        if ( EditorDialog::instance().isDockVisible())
+            EditorDialog::instance().hideDock();
     });
 
 #if 0
@@ -122,7 +122,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // shortcut from points to type
     this->connect( this->ui->pointsInteger, &QSpinBox::editingFinished, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
+        if ( !EditorDialog::instance().isDockVisible() || !this->isVisible())
             return;
 
         this->ui->typeCombo->setFocus();
@@ -131,7 +131,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // shortcut from type to either style or multi
     this->connect( this->ui->typeCombo, &ComboBox::popupHidden, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
+        if ( !EditorDialog::instance().isDockVisible() || !this->isVisible())
             return;
 
         qDebug() << "type popup hidden" << this->ui->typeCombo->currentIndex();
@@ -146,7 +146,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // shortcut from multi to style
     this->connect( this->ui->multiInteger, &QSpinBox::editingFinished, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
+        if ( !EditorDialog::instance().isDockVisible() || !this->isVisible())
             return;
 
         this->ui->styleCombo->setFocus();
@@ -155,7 +155,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // shortcut from style to desc
     this->connect( this->ui->styleCombo, &ComboBox::popupHidden, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
+        if ( !EditorDialog::instance().isDockVisible() || !this->isVisible())
             return;
 
         qDebug() << "style popup hidden";
@@ -172,12 +172,9 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
 
     // cancel button just closes the dialog
     this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
-        if ( EditorDialog::instance()->isDockVisible())
-            EditorDialog::instance()->hideDock();
+        if ( EditorDialog::instance().isDockVisible())
+            EditorDialog::instance().hideDock();
     } );
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 }
 
 /**
@@ -215,17 +212,17 @@ void TaskEdit::reset( bool edit ) {
         this->ui->styleCombo->setCurrentIndex( 0 );
         this->ui->descEdit->clear();
     } else {
-        const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
+        const Row task = Task::instance().row( EditorDialog::instance().container->currentIndex().row());
 
         if ( task == Row::Invalid )
             return;
 
-        this->ui->nameEdit->setText( Task::instance()->name( task ));
-        this->ui->pointsInteger->setValue( Task::instance()->points( task ));
-        this->ui->multiInteger->setValue( Task::instance()->multi( task ));
-        this->ui->typeCombo->setCurrentIndex( static_cast<int>( Task::instance()->type( task )));
-        this->ui->styleCombo->setCurrentIndex( static_cast<int>( Task::instance()->style( task )));
-        this->ui->descEdit->setText( Task::instance()->description( task ));
+        this->ui->nameEdit->setText( Task::instance().name( task ));
+        this->ui->pointsInteger->setValue( Task::instance().points( task ));
+        this->ui->multiInteger->setValue( Task::instance().multi( task ));
+        this->ui->typeCombo->setCurrentIndex( static_cast<int>( Task::instance().type( task )));
+        this->ui->styleCombo->setCurrentIndex( static_cast<int>( Task::instance().style( task )));
+        this->ui->descEdit->setText( Task::instance().description( task ));
     }
 
     this->ui->nameEdit->setFocus();

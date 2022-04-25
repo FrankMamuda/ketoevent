@@ -59,10 +59,10 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
     // set up ui
     this->ui->setupUi( this );
-    this->ui->eventCombo->setModel( Event::instance());
+    this->ui->eventCombo->setModel( &Event::instance());
     this->ui->eventCombo->setModelColumn( Event::Title );
 
-    this->ui->teamCombo->setModel( Team::instance());
+    this->ui->teamCombo->setModel( &Team::instance());
     this->ui->teamCombo->setModelColumn( Team::Title );
 
     // setup pixmaps
@@ -71,23 +71,23 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
     this->ui->findPixmap->setPixmap( QIcon::fromTheme( "find" ).pixmap( 16, 16 ));
 
     // setup task/logView
-    this->ui->taskView->setModel( Task::instance());
+    this->ui->taskView->setModel( &Task::instance());
     this->ui->taskView->setModelColumn( Task::Name );
     this->ui->taskView->setItemDelegate( new Delegate( this->ui->taskView ));
 
     // bind event/team variables to comboBoxes
-    Variable::instance()->bind( "eventId", this->ui->eventCombo );
-    Variable::instance()->bind( "teamId", this->ui->teamCombo );
+    Variable::instance().bind( "eventId", this->ui->eventCombo );
+    Variable::instance().bind( "teamId", this->ui->teamCombo );
 
     // insert spacer
     this->spacer->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
     this->ui->toolBar->insertWidget( this->ui->actionAbout, spacer );
 
     // bind for sorting updates
-    Variable::instance()->bind( "sortByType", this, SLOT( setTaskFilter()));
+    Variable::instance().bind( "sortByType", this, SLOT( setTaskFilter()));
 
     // set up completer
-    this->completer.setModel( Task::instance());
+    this->completer.setModel( &Task::instance());
     this->ui->findEdit->setCompleter( &this->completer );
     this->completer.setCompletionColumn( Task::Name );
     this->completer.setCaseSensitivity( Qt::CaseInsensitive );
@@ -136,12 +136,12 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
         if ( idList.count() == 1 ) {
             QSqlQuery query;
             query.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
-                        .arg( Log::instance()->tableName(),
-                              Log::instance()->fieldName( Log::Combo ),
+                        .arg( Log::instance().tableName(),
+                              Log::instance().fieldName( Log::Combo ),
                               QString::number( static_cast<int>( idList.first()))));
 
             // must perform SELECT!
-            Log::instance()->select();
+            Log::instance().select();
         }
 
         this->setTaskFilter();
@@ -160,9 +160,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
             return;
 
         // check for valid time
-        const QTime startTime = Event::instance()->startTime( event );
-        const QTime finalTime = Event::instance()->finalTime( event );
-        const QTime teamTime = Team::instance()->finishTime( team );
+        const QTime startTime = Event::instance().startTime( event );
+        const QTime finalTime = Event::instance().finalTime( event );
+        const QTime teamTime = Team::instance().finishTime( team );
 
         if ( time > finalTime ) {
             this->timeEdit->setTime( finalTime );
@@ -176,16 +176,13 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
         // set new time if anything changed
         if ( teamTime != time )
-            Team::instance()->setFinishTime( this->currentTeam(), time );
+            Team::instance().setFinishTime( this->currentTeam(), time );
     } );
 
     // clear button
     this->connect( this->ui->clearButton, &QToolButton::pressed, [ this ]() {
         this->ui->findEdit->clear();
     } );
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 
 #ifndef QT_DEBUG
     this->ui->quickBar->removeAction( this->ui->actionExport_logs );
@@ -199,9 +196,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
+    qDebug() << "DESTRUCTOR";
+
     // unbind variables
-    Variable::instance()->unbind( "eventId", this->ui->eventCombo );
-    Variable::instance()->unbind( "teamId", this->ui->teamCombo );
+    Variable::instance().unbind( "eventId", this->ui->eventCombo );
+    Variable::instance().unbind( "teamId", this->ui->teamCombo );
 
     // disconnect lambdas
     this->disconnect( this->ui->findEdit, SLOT( textChanged( QString )));
@@ -216,6 +215,8 @@ MainWindow::~MainWindow() {
     delete this->quickSpacerLeft;
     delete this->quickSpacerRight;
     delete this->ui;
+
+    qDebug() << "DONE";
 }
 
 /**
@@ -226,13 +227,13 @@ Row MainWindow::currentEvent() const {
     const int index = this->ui->eventCombo->currentIndex();
 
     // abort if database has not been initialized
-    if ( !Database::instance()->hasInitialised())
+    if ( !Database::instance().hasInitialised())
         return Row::Invalid;
 
     if ( index == -1 )
         return Row::Invalid;
 
-    return Event::instance()->row( index );
+    return Event::instance().row( index );
 }
 
 /**
@@ -243,13 +244,13 @@ Row MainWindow::currentTeam() const {
     const int index = this->ui->teamCombo->currentIndex();
 
     // abort if database has not been initialized
-    if ( !Database::instance()->hasInitialised())
+    if ( !Database::instance().hasInitialised())
         return Row::Invalid;
 
     if ( index == -1 )
         return Row::Invalid;
 
-    return Team::instance()->row( index );
+    return Team::instance().row( index );
 }
 
 /**
@@ -280,22 +281,22 @@ void MainWindow::setCurrentEvent( const Row &row ) {
  */
 void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
     // abort if database has not been initialized
-    if ( !Database::instance()->hasInitialised()) {
+    if ( !Database::instance().hasInitialised()) {
         this->setLock();
         return;
     }
 
     // failsafe
-    const Row row = Event::instance()->row( index );
+    const Row row = Event::instance().row( index );
     if ( row == Row::Invalid ) {
-        Team::instance()->setFilter( "eventId=-1" );
+        Team::instance().setFilter( "eventId=-1" );
 
         this->setLock();
         return;
     }
 
     // filter tasks
-    Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( row ))));
+    Team::instance().setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance().id( row ))));
     this->setTaskFilter();
 }
 
@@ -305,7 +306,7 @@ void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
  */
 void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     // abort if database has not been initialized
-    if ( !Database::instance()->hasInitialised()) {
+    if ( !Database::instance().hasInitialised()) {
         this->setLock();
         return;
     }
@@ -325,7 +326,7 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     this->ui->taskView->viewport()->update();
 
     // failsafe
-    const Row team = Event::instance()->row( index );
+    const Row team = Event::instance().row( index );
     if ( team == Row::Invalid ) {
         this->setLock();
 
@@ -336,7 +337,7 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
     }
 
     // update time edit
-    this->timeEdit->setTime( Team::instance()->finishTime( team ));
+    this->timeEdit->setTime( Team::instance().finishTime( team ));
 
     // reset task filter
     this->setTaskFilter();
@@ -346,54 +347,54 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
  * @brief MainWindow::on_actionEvents_triggered
  */
 void MainWindow::on_actionEvents_triggered() {
-    EditorDialog *editor( EditorDialog::instance());
+    EditorDialog *editor( &EditorDialog::instance());
 
     editor->show();
     editor->container->clearSelection();
-    editor->container->setModel( Event::instance());
+    editor->container->setModel( &Event::instance());
     editor->container->setModelColumn( Event::Title );
-    editor->setToolBar( EventToolBar::instance());
+    editor->setToolBar( &EventToolBar::instance());
     editor->setWindowTitle( this->tr( "Event manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "ketone" ));
 
-    EventToolBar::instance()->buttonTest();
-    EventToolBar::instance()->show();
+    EventToolBar::instance().buttonTest();
+    EventToolBar::instance().show();
 }
 
 /**
  * @brief MainWindow::on_actionTeams_triggered
  */
 void MainWindow::on_actionTeams_triggered() {
-    EditorDialog *editor( EditorDialog::instance());
+    EditorDialog *editor( &EditorDialog::instance());
 
     editor->show();
     editor->container->clearSelection();
-    editor->container->setModel( Team::instance());
+    editor->container->setModel( &Team::instance());
     editor->container->setModelColumn( Team::Title );
-    editor->setToolBar( TeamToolBar::instance());
+    editor->setToolBar( &TeamToolBar::instance());
     editor->setWindowTitle( this->tr( "Team manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "teams" ));
 
-    TeamToolBar::instance()->buttonTest();
-    TeamToolBar::instance()->show();
+    TeamToolBar::instance().buttonTest();
+    TeamToolBar::instance().show();
 }
 
 /**
  * @brief MainWindow::on_actionTasks_triggered
  */
 void MainWindow::on_actionTasks_triggered() {
-    EditorDialog *editor( EditorDialog::instance());
+    EditorDialog *editor( &EditorDialog::instance());
 
     editor->show();
     editor->container->clearSelection();
-    editor->container->setModel( Task::instance());
+    editor->container->setModel( &Task::instance());
     editor->container->setModelColumn( Task::Name );
-    editor->setToolBar( TaskToolBar::instance());
+    editor->setToolBar( &TaskToolBar::instance());
     editor->setWindowTitle( this->tr( "Task manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "tasks" ));
 
-    TaskToolBar::instance()->buttonTest();
-    TaskToolBar::instance()->show();
+    TaskToolBar::instance().buttonTest();
+    TaskToolBar::instance().show();
 
     // clear this, so that task editor is not empty
     this->ui->findEdit->clear();
@@ -406,8 +407,8 @@ void MainWindow::on_actionTasks_triggered() {
  */
 void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     const bool sort = Variable::isEnabled( "sortByType" );
-    const Id eventId = this->currentEvent() == Row::Invalid ? Id::Invalid : Event::instance()->id( this->currentEvent());
-    const Id teamId = this->currentTeam() == Row::Invalid ? Id::Invalid : Team::instance()->id( this->currentTeam());
+    const Id eventId = this->currentEvent() == Row::Invalid ? Id::Invalid : Event::instance().id( this->currentEvent());
+    const Id teamId = this->currentTeam() == Row::Invalid ? Id::Invalid : Team::instance().id( this->currentTeam());
     const QString find( this->ui->findEdit->text());
 
     // make sure to store this variable
@@ -425,19 +426,19 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
 
     // selects tasks from current event
     const QString eventFilter( QString( "%1=%2" )
-                               .arg( Task::instance()->fieldName( Task::Event ))
+                               .arg( Task::instance().fieldName( Task::Event ))
                                .arg( static_cast<int>( eventId )));
 
     // selects matching tasks from quick search
     const QString comboFind( !filterByCombo ? "" :
                                               QString( "OR %1=%2" )
-                                              .arg( Log::instance()->fieldName( Log::Fields::Combo ))
+                                              .arg( Log::instance().fieldName( Log::Fields::Combo ))
                                               .arg( static_cast<int>( comboId ))
                                               );
     const QString findFilter( find.isEmpty() ?
                                   "" :
                                   QString( "AND %1 LIKE '%%2%' %3 " )
-                                  .arg( Task::instance()->fieldName( Task::Name ),
+                                  .arg( Task::instance().fieldName( Task::Name ),
                                         find,
                                         comboFind ));
 
@@ -445,34 +446,34 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     const QString comboFilter( filterByCombo ?
                                    QString( "and %1.%2 in "
                                             "( SELECT %3 FROM %4 WHERE %5=%6 AND ( %7=%8 OR %7=-1 ) AND %9>0 )" )
-                                   .arg( Task::instance()->tableName(),
-                                         Task::instance()->fieldName( Task::ID ),
-                                         Log::instance()->fieldName( Log::Task ),
-                                         Log::instance()->tableName(),
-                                         Log::instance()->fieldName( Log::Team ),
+                                   .arg( Task::instance().tableName(),
+                                         Task::instance().fieldName( Task::ID ),
+                                         Log::instance().fieldName( Log::Task ),
+                                         Log::instance().tableName(),
+                                         Log::instance().fieldName( Log::Team ),
                                          QString::number( static_cast<int>( teamId )),
-                                         Log::instance()->fieldName( Log::Combo ),
+                                         Log::instance().fieldName( Log::Combo ),
                                          QString::number( static_cast<int>( comboId )),
-                                         Log::instance()->fieldName( Log::Multi )) :
+                                         Log::instance().fieldName( Log::Multi )) :
                                    "" );
 
     // orders tasks according to settings
-    const QString comboOrder( QString( "%1 DESC," ).arg( Log::instance()->fieldName( Log::Fields::Combo )));
+    const QString comboOrder( QString( "%1 DESC," ).arg( Log::instance().fieldName( Log::Fields::Combo )));
     const QString orderFilter(
                 QString( "ORDER BY %1 %2 ASC %3" )
                 .arg( !filterByCombo ?
                           "" :
                           comboOrder )
                 .arg( sort ?
-                          Task::instance()->fieldName( Task::Style ) :
-                          Task::instance()->fieldName( Task::Order ))
+                          Task::instance().fieldName( Task::Style ) :
+                          Task::instance().fieldName( Task::Order ))
                 .arg( sort ?
                       #ifdef SQLITE_CUSTOM
                           QString( ", %1 COLLATE localeCompare ASC" )
                       #else
                           QString( ", %1 COLLATE NOCASE ASC" )
                       #endif
-                          .arg( Task::instance()->fieldName( Task::Name )) :
+                          .arg( Task::instance().fieldName( Task::Name )) :
                           "" ));
 
     // put all filters together
@@ -483,7 +484,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     //qDebug() << filter;
 
     // set filter
-    Task::instance()->setFilter( filter );
+    Task::instance().setFilter( filter );
 
     // scroll to the beginning
     this->ui->taskView->scrollToTop();
@@ -497,7 +498,7 @@ void MainWindow::setLock() {
     const bool comboMode = this->isComboModeActive();
     const bool noEvents = !this->ui->eventCombo->count();
     const bool noTeams = !this->ui->teamCombo->count();
-    const bool noTasks = !Task::instance()->count();
+    const bool noTasks = !Task::instance().count();
 
     // lock common ui elements
     this->ui->actionTasks->setDisabled( comboMode || noEvents || noTeams );
@@ -536,9 +537,9 @@ void MainWindow::closeEvent( QCloseEvent *event ) {
  * @brief MainWindow::on_actionAddQuick_triggered
  */
 void MainWindow::on_actionAddQuick_triggered() {
-    TeamEdit *edit( TeamEdit::instance());
+    TeamEdit *edit( &TeamEdit::instance());
 
-    EditorDialog::instance()->dock->setWidget( nullptr );
+    EditorDialog::instance().dock->setWidget( nullptr );
     edit->setParent( nullptr );
     edit->reset( false );
     edit->show();
@@ -549,22 +550,22 @@ void MainWindow::on_actionAddQuick_triggered() {
 /**
  * @brief MainWindow::on_actionRankings_triggered
  */
-void MainWindow::on_actionRankings_triggered() { Rankings::instance()->show(); }
+void MainWindow::on_actionRankings_triggered() { Rankings::instance().show(); }
 
 /**
  * @brief MainWindow::on_actionSettings_triggered
  */
-void MainWindow::on_actionSettings_triggered() { Settings::instance()->show(); }
+void MainWindow::on_actionSettings_triggered() { Settings::instance().show(); }
 
 /**
  * @brief MainWindow::on_actionConsole_triggered
  */
-void MainWindow::on_actionConsole_triggered() { Console::instance()->show(); }
+void MainWindow::on_actionConsole_triggered() { Console::instance().show(); }
 
 /**
  * @brief MainWindow::on_actionCombos_triggered
  */
-void MainWindow::on_actionCombos_triggered() { Combos::instance()->show(); }
+void MainWindow::on_actionCombos_triggered() { Combos::instance().show(); }
 
 /**
  * @brief MainWindow::on_actionAbout_triggered
@@ -583,11 +584,11 @@ void MainWindow::on_actionExport_logs_triggered() {
 
     //qDebug() << Team::instance()
     query.exec( QString( "select * from %1 where %2=%3" )
-                .arg( Log::instance()->tableName(),
-                      Log::instance()->fieldName( Log::Team ),
-                      QString::number( static_cast<int>( Team::instance()->id( team )))));
+                .arg( Log::instance().tableName(),
+                      Log::instance().fieldName( Log::Team ),
+                      QString::number( static_cast<int>( Team::instance().id( team )))));
 
-    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath() + "/" + Team::instance()->title( team ) + ".csv", this->tr( "CSV file (*.csv)" )));
+    QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath() + "/" + Team::instance().title( team ) + ".csv", this->tr( "CSV file (*.csv)" )));
 #ifdef Q_OS_WIN
     const bool win32 = true;
 #else
@@ -614,13 +615,13 @@ void MainWindow::on_actionExport_logs_triggered() {
             if ( id == Id::Invalid )
                 continue;
 
-            const Row row = Task::instance()->row( id );
+            const Row row = Task::instance().row( id );
             if ( row == Row::Invalid )
                 continue;
 
             out << QString( "%1;%2;%3%4" )
-                   .arg( Task::instance()->name( row ))
-                   .arg( static_cast<int>( Task::instance()->style( row )))
+                   .arg( Task::instance().name( row ))
+                   .arg( static_cast<int>( Task::instance().style( row )))
                    .arg( query.value( Log::Multi ).toInt())
                    .arg( win32 ? "\r" : "\n" );
 

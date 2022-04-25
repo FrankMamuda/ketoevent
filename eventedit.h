@@ -36,14 +36,10 @@ class EventEdit;
  */
 class EventEdit final : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY( EventEdit )
+    Q_DISABLE_COPY_MOVE( EventEdit )
 
 public:
-    // disable move
-    EventEdit( EventEdit&& ) = delete;
-    EventEdit& operator=( EventEdit&& ) = delete;
-
-    static EventEdit *instance() { static EventEdit *instance = new EventEdit(); return instance; }
+    static EventEdit& instance() { static EventEdit instance; return instance; }
     ~EventEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }

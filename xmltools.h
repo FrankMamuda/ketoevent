@@ -40,7 +40,7 @@ namespace XMLTools_ {
  * @brief The XMLTools class
  */
 class XMLTools final : public QObject {
-    Q_DISABLE_COPY( XMLTools )
+    Q_DISABLE_COPY_MOVE( XMLTools )
     Q_OBJECT
 
 public:
@@ -50,10 +50,7 @@ public:
      * @brief instance
      * @return
      */
-    static XMLTools *instance() {
-        static auto *instance( new XMLTools());
-        return instance;
-    }
+    static XMLTools& instance() { static XMLTools instance; return instance; }
     static void write();
     static void read();
 
@@ -62,8 +59,5 @@ private:
      * @brief XMLTools
      * @param parent
      */
-    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) {
-        this->setObjectName( "XMLTools" );
-        GarbageMan::instance()->add( this );
-    }
+    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) {}
 };

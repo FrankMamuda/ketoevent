@@ -31,7 +31,7 @@
  * @return
  */
 int Table::count() const {
-    return Database::instance()->hasInitialised() ? this->rowCount() : 0;
+    return Database::instance().hasInitialised() ? this->rowCount() : 0;
 }
 
 /**
@@ -122,7 +122,7 @@ void Table::addUniqueConstraint( const QList<QSharedPointer<Field_>> &constraine
  * @return
  */
 QVariant Table::data( const QModelIndex &index, int role ) const {
-    if ( !Database::instance()->hasInitialised())
+    if ( !Database::instance().hasInitialised())
         return QVariant();
 
     if ( role == IDRole ) {

@@ -46,9 +46,6 @@ EditorDialog::EditorDialog() :
     this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ] () {
         this->close();
     } );
-
-    // add to garbage man
-    GarbageMan::instance()->add( this );
 }
 
 /**

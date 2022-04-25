@@ -80,7 +80,7 @@ void XMLTools::read() {
                     value = element.attribute( "value" );
                 }
 
-                if ( Variable::instance()->contains( key ) && !key.isEmpty())
+                if ( Variable::instance().contains( key ) && !key.isEmpty())
                     Variable::setValue( key, value, true );
             }
         }
@@ -122,7 +122,7 @@ void XMLTools::write() {
     stream.writeAttribute( "version", "3" );
 
     // switch mode
-    for ( const QSharedPointer<Var> &var : qAsConst( Variable::instance()->list )) {
+    for ( const QSharedPointer<Var> &var : qAsConst( Variable::instance().list )) {
         if ( var->key().isEmpty() || var->flags() & Var::Flag::NoSave )
             continue;
 

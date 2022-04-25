@@ -36,14 +36,10 @@ class TaskEdit;
  */
 class TaskEdit final : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY( TaskEdit )
+    Q_DISABLE_COPY_MOVE( TaskEdit )
 
 public:
-    // disable move
-    TaskEdit( TaskEdit&& ) = delete;
-    TaskEdit& operator=( TaskEdit&& ) = delete;
-
-    static TaskEdit *instance() { static TaskEdit *instance = new TaskEdit(); return instance; }
+    static TaskEdit& instance() { static TaskEdit instance; return instance; }
     ~TaskEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }

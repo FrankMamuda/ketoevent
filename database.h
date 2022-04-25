@@ -46,23 +46,16 @@ namespace Database_ {
  */
 class Database final : public QObject {
     Q_OBJECT
-    Q_DISABLE_COPY( Database )
+    Q_DISABLE_COPY_MOVE( Database )
 
 public:
-    // disable move
-    Database( Database&& ) = delete;
-    Database& operator=( Database&& ) = delete;
-
     /**
      * @brief instance
      * @return
      */
-    static Database *instance() {
-        static auto *instance( new Database());
-        return instance;
-    }
+    static Database& instance() { static Database instance; return instance; }
     ~Database() override;
-    bool add( Table *table );
+    bool add( Table &table );
 
     /**
      * @brief hasInitialised
@@ -94,7 +87,7 @@ private:
      * @param initialised
      */
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
-    QMap<QString, Table*> tables;
+    std::vector<std::reference_wrapper<Table>> tables;
     bool m_initialised = false;
     int m_counter = 0;
 };

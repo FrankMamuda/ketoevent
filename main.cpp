@@ -70,8 +70,8 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    if ( Main::Console != nullptr )
-        qobject_cast<Console*>( Main::Console )->print( msg );
+    //if ( Main::Console != nullptr )
+    //    qobject_cast<Console*>( Main::Console )->print( msg );
 }
 
 /**
@@ -185,10 +185,10 @@ int main( int argc, char *argv[] ) {
         bool success = true;
 
         // initialize database and its tables
-        success &= Database::instance()->add( Event::instance());
-        success &= Database::instance()->add( Task::instance());
-        success &= Database::instance()->add( Team::instance());
-        success &= Database::instance()->add( Log::instance());
+        success &= Database::instance().add( Event::instance());
+        success &= Database::instance().add( Task::instance());
+        success &= Database::instance().add( Team::instance());
+        success &= Database::instance().add( Log::instance());
 
         return success;
     };
@@ -242,36 +242,21 @@ int main( int argc, char *argv[] ) {
 
         // override icon theme and syntax highlighter theme
         QIcon::setThemeName( theme->isDark() ? "dark" : "light" );
-        //MainWindow::instance()->setTheme( theme );
+        //MainWindow::instance().setTheme( theme );
     }
 
     // show main window
-    MainWindow::instance()->show();
-    Task::instance()->setInitialised();
+    MainWindow::instance().show();
+    Task::instance().setInitialised();
 
     // reset tasks after task table initialization
-    MainWindow::instance()->setTaskFilter();
+    MainWindow::instance().setTaskFilter();
 
-    // initialize console
-    Main::Console = Console::instance();
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
-        Task::instance()->setInitialised( false );
-
-        delete Console::instance();
-        Main::Console = nullptr;
-
+        Task::instance().setInitialised( false );
         XMLTools::write();
-        GarbageMan::instance()->clear();
-
-        delete GarbageMan::instance();
-
-        if ( Database::instance() != nullptr )
-            delete Database::instance();
-
-        delete Variable::instance();
-        // FIXME: delete MainWindow::instance();
     } );
 
     return a.exec();

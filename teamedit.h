@@ -36,14 +36,10 @@ class TeamEdit;
  */
 class TeamEdit final : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY( TeamEdit )
+    Q_DISABLE_COPY_MOVE( TeamEdit )
 
 public:
-    // disable move
-    TeamEdit( TeamEdit&& ) = delete;
-    TeamEdit& operator=( TeamEdit&& ) = delete;
-
-    static TeamEdit *instance() { static TeamEdit *instance = new TeamEdit(); return instance; }
+    static TeamEdit& instance() { static TeamEdit instance; return instance; }
     ~TeamEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }

@@ -31,16 +31,12 @@
  * @brief The ComboModel class
  */
 class ComboModel final : public QStringListModel {
-    Q_DISABLE_COPY( ComboModel )
+    Q_DISABLE_COPY_MOVE( ComboModel )
     Q_OBJECT
     friend class Combos;
 
 public:
-    // disable move
-    ComboModel( ComboModel&& ) = delete;
-    ComboModel& operator=( ComboModel&& ) = delete;
-
-    static ComboModel *instance() { static ComboModel *instance( new ComboModel()); return instance; }
+    static ComboModel& instance() { static ComboModel instance; return instance; }
     ~ComboModel() override = default;
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 
@@ -63,7 +59,7 @@ public slots:
     void reset( const Id &id );
 
 private:
-    explicit ComboModel() : combos( 0 ), points( 0 ) { GarbageMan::instance()->add( this ); }
+    explicit ComboModel() : combos( 0 ), points( 0 ) {}
     QMultiMap<Id, QString> map;
     QMap<QString, QRgb> colours;
     static QList<QRgb> colourList;

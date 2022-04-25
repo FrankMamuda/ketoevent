@@ -51,7 +51,7 @@ Team::Team() : Table( "teams" ) {
  */
 Row Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
     // failsafe
-    const Row event = MainWindow::instance()->currentEvent();
+    const Row event = MainWindow::instance().currentEvent();
     if ( event == Row::Invalid ) {
         qDebug() << this->tr( "no active event, aborting" );
         return Row::Invalid;
@@ -64,7 +64,7 @@ Row Team::add( const QString &title, int members, const QTime &finishTime, const
                 finishTime.toString( Database_::TimeFormat ) <<
                 0 <<
                 reviewer <<
-                       static_cast<int>( Event::instance()->id( event )));
+                       static_cast<int>( Event::instance().id( event )));
 }
 
 /**
@@ -77,7 +77,7 @@ void Team::removeOrphanedEntries() {
     query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
                 .arg( this->tableName(),
                       this->fieldName( Event ),
-                      Event::instance()->fieldName( Event::ID ),
-                      Event::instance()->tableName()));
+                      Event::instance().fieldName( Event::ID ),
+                      Event::instance().tableName()));
     this->select();
 }

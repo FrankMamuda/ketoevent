@@ -80,14 +80,10 @@ static const QMap<QVariant::Type, QString> _fieldTypes {{ QVariant::Int,       "
  */
 class Table : public QSqlTableModel {
     Q_OBJECT
-    Q_DISABLE_COPY( Table )
+    Q_DISABLE_COPY_MOVE( Table )
     friend class Database;
 
 public:
-    // disable move
-    Table( Table&& ) = delete;
-    Table& operator=( Table&& ) = delete;
-
     enum Roles {
         IDRole = Qt::UserRole
     };

@@ -58,14 +58,14 @@ void ComboModel::reset( const Id &id ) {
 
     // build comboId/taskName map and taskName/colour map
     if ( id != Id::Invalid ) {
-        for ( int y = 0; y < Log::instance()->count(); y++ ) {
-            const Row log = Log::instance()->row( y );
+        for ( int y = 0; y < Log::instance().count(); y++ ) {
+            const Row log = Log::instance().row( y );
             if ( log == Row::Invalid )
                 return;
 
-            if ( Log::instance()->teamId( log ) == id ) {
-                const Id comboId = Log::instance()->comboId( log );
-                const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( log ))));
+            if ( Log::instance().teamId( log ) == id ) {
+                const Id comboId = Log::instance().comboId( log );
+                const QString taskName( Task::instance().name( Task::instance().row( Log::instance().taskId( log ))));
 
                 if ( comboId > Id::Invalid ) {
                     this->map.insert( comboId, taskName );

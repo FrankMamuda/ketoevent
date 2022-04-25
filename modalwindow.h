@@ -40,16 +40,16 @@ protected:
      * @brief showEvent
      * @param event
      */
-    void showEvent( QShowEvent *event ) override { MainWindow::instance()->setDisabled( true ); QMainWindow::showEvent( event ); }
+    void showEvent( QShowEvent *event ) override { MainWindow::instance().setDisabled( true ); QMainWindow::showEvent( event ); }
 
     /**
      * @brief hideEvent
      * @param event
      */
     void hideEvent( QHideEvent *event ) override {
-        MainWindow::instance()->setEnabled( true );
+        MainWindow::instance().setEnabled( true );
         // relock ui elements if required
-        MainWindow::instance()->setLock();
+        MainWindow::instance().setLock();
         QMainWindow::hideEvent( event );
     }
 

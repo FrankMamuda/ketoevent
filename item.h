@@ -93,8 +93,8 @@ private:
     static const QColor LtBlue() { return lighter( Item::Blue()); }
     static const QColor Gray() { return Variable::isEnabled( "darkMode" ) ? QColor( 164, 164, 164, 196 ) : QColor( 64, 64, 64, 196 ); }
     static const QColor LtGray() { return lighter( Item::Gray()); }
-    static const QColor Black() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 196 ) : QColor( 0, 0, 0, 196 ); }
-    static const QColor LtBlack() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 128 ) : QColor( 0, 0, 0, 128 ); }
+    static const QColor Black() { return /*Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 196 ) :*/ QColor( 0, 0, 0, 196 ); }
+    static const QColor LtBlack() { return /*Variable::isEnabled( "darkMode" ) ? QColor( 255, 255, 255, 128 ) :*/ QColor( 0, 0, 0, 128 ); }
     static const QColor Red() { return Variable::isEnabled( "darkMode" ) ? QColor( 255, 80, 80, 216 ) : QColor( 190, 0, 0, 196 ); }
     static const QColor LtRed() { return lighter( Item::Red()); }
     static const QColor Yellow() { return Variable::isEnabled( "darkMode" ) ? QColor( 210, 210, 20, 196 ) : QColor( 190, 190, 0, 196 ); }
