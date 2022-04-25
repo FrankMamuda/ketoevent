@@ -31,6 +31,7 @@
 #include "database.h"
 #include <QSqlQuery>
 #include <QDebug>
+#include <QRegularExpression>
 
 // fixes msvc compile issues
 #ifdef Q_CC_MSVC
@@ -337,37 +338,22 @@ bool Cmd::executeTokenized( const QString &name, const QStringList &args ) {
  * @return
  */
 bool Cmd::tokenize( const QString &string, QString &command, QStringList &args ) {
-    int pos = 0, len;
-    QString capture;
-    QRegExp rx;
-
     // make sure input is blank
     command.clear();
     args.clear();
 
-    // set capture pattern
-    rx.setPattern( "((?:[^\\s\"]+)|(?:\"(?:\\\\\"|[^\"])*\"))" );
+    QStringList list( string.split( " " ));
+    for ( const QString &str : list ) {
+        QString token( str.simplified());
+        if ( token.startsWith( "\"" ))
+            token = token.remove( 0, 1 );
+        if ( token.endsWith( "\"" ))
+            token = token.remove( token.length()-1, 1 );
 
-    // tokenize the string
-    while (( pos = rx.indexIn( string, pos )) != -1 ) {
-        capture = rx.cap( 1 );
-        len = rx.matchedLength();
-
-        // the first one should be the command
-        if ( command.isEmpty()) {
-            command = capture;
-            pos += len;
-            continue;
-        }
-
-        // then follow the arguments
-        // make sure we remove extra quotes
-        if ( capture.startsWith( "\"" ) || capture.endsWith( "\"" )) {
-            capture.remove( 0, 1 );
-            capture.remove( capture.length()-1, 1 );
-        }
-        args.append( capture );
-        pos += len;
+        if ( command.isEmpty())
+            command = token;
+        else
+            args << token;
     }
 
     return !command.isEmpty();
@@ -384,7 +370,7 @@ bool Cmd::execute( const QString &buffer ) {
     QStringList arguments, separated;
 
     // separate multiline commands first
-    separated = buffer.split( QRegExp( ";|\\n" ));
+    separated = buffer.split( QRegularExpression( ";|\\n" ));
 
     // parse separated command strings
     for ( const QString &string : qAsConst( separated )) {

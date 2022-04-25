@@ -589,11 +589,6 @@ void MainWindow::on_actionExport_logs_triggered() {
                       QString::number( static_cast<int>( Team::instance().id( team )))));
 
     QString path( QFileDialog::getSaveFileName( this, this->tr( "Export logs to CSV format" ), QDir::homePath() + "/" + Team::instance().title( team ) + ".csv", this->tr( "CSV file (*.csv)" )));
-#ifdef Q_OS_WIN
-    const bool win32 = true;
-#else
-    const bool win32 = false;
-#endif
 
     // check for empty filenames
     if ( path.isEmpty())
@@ -607,8 +602,7 @@ void MainWindow::on_actionExport_logs_triggered() {
     QFile csv( path );
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &csv );
-        out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
-        out << this->tr( "Name;Style;Points" ).append( win32 ? "\r" : "\n" );
+        out << this->tr( "Name;Style;Points" ).append( "\n" );
 
         while ( query.next()) {
             const Id id = static_cast<Id>( query.value( Log::Task ).toInt());
@@ -623,7 +617,7 @@ void MainWindow::on_actionExport_logs_triggered() {
                    .arg( Task::instance().name( row ))
                    .arg( static_cast<int>( Task::instance().style( row )))
                    .arg( query.value( Log::Multi ).toInt())
-                   .arg( win32 ? "\r" : "\n" );
+                   .arg( "\n" );
 
         }
     }

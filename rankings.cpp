@@ -378,11 +378,6 @@ void Rankings::showEvent( QShowEvent *event ) {
  */
 void Rankings::on_actionExport_triggered() {
     QString path( QFileDialog::getSaveFileName( this, this->tr( "Export statistics to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
-#ifdef Q_OS_WIN
-    const bool win32 = true;
-#else
-    const bool win32 = false;
-#endif
 
     // check for empty filenames
     if ( path.isEmpty())
@@ -397,8 +392,7 @@ void Rankings::on_actionExport_triggered() {
 
     if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
         QTextStream out( &csv );
-        out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
-        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" ).append( win32 ? "\r" : "\n" );
+        out << this->tr( "Team name;Tasks;Combos;Time;Penalty points;Total points" ).append( "\n" );
 
         for ( const TeamStatistics &team : qAsConst( this->list )) {
             out << QString( "%1;%2;%3;%4;%5;%6%7" )
@@ -408,7 +402,7 @@ void Rankings::on_actionExport_triggered() {
                    .arg( team.time )
                    .arg( team.penalty )
                    .arg( team.points )
-                   .arg( win32 ? "\r" : "\n" );
+                   .arg( "\n" );
         }
     }
     csv.close();

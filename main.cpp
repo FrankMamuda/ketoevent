@@ -24,7 +24,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QSharedMemory>
-#include <QDesktopWidget>
 #include <QTranslator>
 #include <QSettings>
 #include "theme.h"
@@ -56,6 +55,9 @@
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( nullptr );
 
+// initialization check
+static bool init_complete = false;
+
 /**
  * @brief messageFilter
  * @param type
@@ -70,8 +72,8 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    //if ( Main::Console != nullptr )
-    //    qobject_cast<Console*>( Main::Console )->print( msg );
+    if ( init_complete )
+        Console::instance().print( msg );
 }
 
 /**
@@ -194,7 +196,7 @@ int main( int argc, char *argv[] ) {
     };
 
     if ( !loadTables()) {
-        QMessageBox::critical( QApplication::desktop(),
+        QMessageBox::critical( nullptr,
                                QObject::tr( "Internal error" ),
                                QObject::tr( "Could not load database\n"
                                             "New database will be created\n"
@@ -247,11 +249,11 @@ int main( int argc, char *argv[] ) {
 
     // show main window
     MainWindow::instance().show();
+    init_complete = true;
     Task::instance().setInitialised();
 
     // reset tasks after task table initialization
     MainWindow::instance().setTaskFilter();
-
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {

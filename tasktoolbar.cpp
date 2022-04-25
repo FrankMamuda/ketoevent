@@ -149,11 +149,6 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     // export action
     this->addAction( QIcon::fromTheme( "export" ), this->tr( "Export tasks" ), [ this ]() {
         QString path( QFileDialog::getSaveFileName( this, this->tr( "Export tasks to CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
-    #ifdef Q_OS_WIN
-        const bool win32 = true;
-    #else
-        const bool win32 = false;
-    #endif
 
         // check for empty filenames
         if ( path.isEmpty())
@@ -168,8 +163,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
         if ( csv.open( QFile::WriteOnly | QFile::Truncate )) {
             QTextStream out( &csv );
-            out.setCodec( win32 ? "Windows-1257" : "UTF-8" );
-            out << this->tr( "Task name;Description;Type;Style;Multi;Points" ).append( win32 ? "\r" : "\n" );
+            out << this->tr( "Task name;Description;Type;Style;Multi;Points" ).append( "\n" );
 
             for ( int y = 0; y < Task::instance().count(); y++ ) {
                 const Row row = Task::instance().row( y );
@@ -201,7 +195,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                              style,
                              Task::instance().type( row ) == Task::Types::Multi ? QString::number( Task::instance().multi( row )) : "",
                              QString::number( Task::instance().points( row )),
-                             win32 ? "\r" : "\n" );
+                             "\n" );
             }
         }
         csv.close();
