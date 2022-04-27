@@ -87,7 +87,6 @@ private:
      * @param initialised
      */
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
-    std::vector<std::reference_wrapper<Table>> tables;
     bool m_initialised = false;
     int m_counter = 0;
 };

@@ -291,6 +291,56 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
     } );
 #endif
 
+    // import action (csv)
+    this->addAction( QIcon::fromTheme( "tasks" ), this->tr( "Import tasks" ), [ this ]() {
+        QString path( QFileDialog::getOpenFileName( this, this->tr( "Import tasks from CSV format" ), QDir::homePath(), this->tr( "CSV file (*.csv)" )));
+
+        // check for empty filenames
+        if ( path.isEmpty())
+            return;
+
+        QFile file( path );
+        if ( file.open( QIODevice::ReadOnly )) {
+            QTextStream stream( &file );
+            const Row currentEvent = MainWindow::instance().currentEvent();
+            if ( currentEvent == Row::Invalid ) {
+                QMessageBox::critical( this, TaskToolBar::tr( "Error" ), TaskToolBar::tr( "No active event" ));
+                return;
+            }
+
+            int count = 0;
+            while ( !stream.atEnd()) {
+                QString line;
+                stream.readLineInto( &line );
+
+                // skip header
+                if ( !count ) {
+                    count++;
+                    continue;
+                }
+
+                const QStringList parms( line.split( ";" ));
+                if ( parms.length() != 6 ) {
+                    QMessageBox::critical( this, TaskToolBar::tr( "Error" ), TaskToolBar::tr( "Could not parse CSV file, numParms=%1 (required 6)" ).arg( parms.length()));
+                    return;
+                }
+
+                const QString name( QString( parms.at( 0 )).replace( "|", " ;" ));
+                const QString desc( QString( parms.at( 1 )).replace( "|", " ;" ));
+                const Task::Types type( static_cast<Task::Types>( parms.at( 2 ).toInt()));
+                const Task::Styles style( static_cast<Task::Styles>( parms.at( 3 ).toInt()));
+                const int multi( type == Task::Types::Multi ? parms.at( 4 ).toInt() : 0 );
+                const int points( parms.at( 5 ).toInt());
+
+                Task::instance().add( name, points, multi, type, style, desc );
+
+                count++;
+            }
+
+            file.close();
+        }
+    } );
+
     // button test (disconnected in ~EditorDialog)
     this->connect( EditorDialog::instance().container, SIGNAL( clicked( QModelIndex )), this, SLOT( buttonTest( QModelIndex )));
     this->buttonTest();

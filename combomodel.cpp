@@ -75,12 +75,12 @@ void ComboModel::reset( const Id &id ) {
         }
 
         // build display list
-        this->combos = this->map.uniqueKeys().count();
+        this->combos = static_cast<int>( this->map.uniqueKeys().count());
         this->points = 0;
         const QList<Id>uniqueKeys( this->map.uniqueKeys());
         for ( const Id &comboId : uniqueKeys ) {
             const QStringList taskNames( this->map.values( comboId ));
-            const int count = taskNames.count();
+            const int count = static_cast<int>( taskNames.count());
 
             if ( count == 2 )
                 this->points += EventTable::DefaultComboOfTwo;

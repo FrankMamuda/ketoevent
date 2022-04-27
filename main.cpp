@@ -259,6 +259,7 @@ int main( int argc, char *argv[] ) {
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
         Task::instance().setInitialised( false );
         XMLTools::write();
+        init_complete = false;
     } );
 
     return a.exec();

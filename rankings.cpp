@@ -243,7 +243,7 @@ void Rankings::on_actionUpdate_triggered() {
         }
 
         // store combo count
-        stats.combos = combos.count();
+        stats.combos = static_cast<int>( combos.count());
 
         // calculate bonus points from combos
         for ( const int count : qAsConst( combos )) {

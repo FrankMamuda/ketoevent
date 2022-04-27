@@ -128,7 +128,12 @@ DEFINES += FORCE_LV_LOCALE
 TRANSLATIONS = i18n/ketoevent_lv_LV.ts
 
 # special stats for KK6
-DEFINES += KK6_SPECIAL
+# DEFINES += KK6_SPECIAL
+# CONFIG += xlsx_support
+xlsx_support {
+include(3rdparty/qxlsx/qxlsx.pri)
+DEFINES += XLSX_SUPPORT
+}
 
 TRANSLATION_TARGET_DIR = $${_PRO_FILE_PWD_}/i18n/
 

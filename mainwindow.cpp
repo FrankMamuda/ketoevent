@@ -196,8 +196,6 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
  * @brief MainWindow::~MainWindow
  */
 MainWindow::~MainWindow() {
-    qDebug() << "DESTRUCTOR";
-
     // unbind variables
     Variable::instance().unbind( "eventId", this->ui->eventCombo );
     Variable::instance().unbind( "teamId", this->ui->teamCombo );
@@ -215,8 +213,6 @@ MainWindow::~MainWindow() {
     delete this->quickSpacerLeft;
     delete this->quickSpacerRight;
     delete this->ui;
-
-    qDebug() << "DONE";
 }
 
 /**

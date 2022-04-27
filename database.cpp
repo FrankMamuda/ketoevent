@@ -158,8 +158,10 @@ Database::Database( QObject *parent ) : QObject( parent ) {
  * @brief Database::removeOrphanedEntries removes orphaned entries in database tables
  */
 void Database::removeOrphanedEntries() {
-    for ( Table &table : qAsConst( this->tables ))
-        table.removeOrphanedEntries();
+    Task::instance().removeOrphanedEntries();
+    Team::instance().removeOrphanedEntries();
+    Log::instance().removeOrphanedEntries();
+    Event::instance().removeOrphanedEntries();
 }
 
 /**
@@ -195,12 +197,6 @@ Database::~Database() {
     // unbind variables
     Variable::instance().unbind( "eventId" );
     Variable::instance().unbind( "teamId" );
-    qCInfo( Database_::Debug ) << Database::tr( "clearing tables" );
-    for ( Table &table : qAsConst( this->tables ))
-        table.clear();
-
-    // delete all tables
-    this->tables.clear();
 
     // according to Qt5 documentation, this must be out of scope
     {
@@ -231,9 +227,6 @@ Database::~Database() {
 bool Database::add( Table &table ) {
     QSqlDatabase database( QSqlDatabase::database());
     const QStringList tableList( database.tables());
-
-    // store table
-    this->tables.push_back( table );
 
     // announce
     if ( !tableList.count())
