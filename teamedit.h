@@ -39,7 +39,7 @@ class TeamEdit final : public QWidget {
     Q_DISABLE_COPY_MOVE( TeamEdit )
 
 public:
-    static TeamEdit *instance() { static TeamEdit instance; return &instance; }
+    static TeamEdit *instance() { if ( TeamEdit::i == nullptr ) TeamEdit::i = new TeamEdit(); return TeamEdit::i; }
     ~TeamEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }
@@ -48,6 +48,7 @@ public slots:
     void setCurrentTime();
 
 private:
+    static TeamEdit *i;
     explicit TeamEdit( QWidget *parent = nullptr );
     Ui::TeamEdit *ui;
     bool m_edit;

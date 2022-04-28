@@ -30,6 +30,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+// singleton
+EventToolBar *EventToolBar::i = nullptr;
+
 /**
  * @brief EventToolBar::EventToolBar
  * @param parent

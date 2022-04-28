@@ -38,6 +38,9 @@
 static constexpr const char *testEventName( "Test" );
 #endif
 
+// singleton
+Cmd *Cmd::i = nullptr;
+
 /**
  * @brief Cmd::Cmd
  * @param parent

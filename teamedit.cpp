@@ -29,6 +29,9 @@
 #include "variable.h"
 #include <QMessageBox>
 
+// singleton
+TeamEdit *TeamEdit::i = nullptr;
+
 /**
  * @brief TeamEdit::TeamEdit
  * @param parent

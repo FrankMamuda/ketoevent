@@ -27,6 +27,9 @@
 #include "ui_combos.h"
 #include "variable.h"
 
+// singleton
+Combos *Combos::i = nullptr;
+
 /**
  * @brief Combos::Combos
  */

@@ -36,7 +36,8 @@ class ComboModel final : public QStringListModel {
     friend class Combos;
 
 public:
-    static ComboModel *instance() { static ComboModel instance; return &instance; }
+    static ComboModel *instance() { if ( ComboModel::i == nullptr ) ComboModel::i = new ComboModel(); return ComboModel::i; }
+
     ~ComboModel() override = default;
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 
@@ -59,6 +60,7 @@ public slots:
     void reset( const Id &id );
 
 private:
+    static ComboModel *i;
     explicit ComboModel() : combos( 0 ), points( 0 ) { GarbageMan::instance()->add( this ); }
     QMultiMap<Id, QString> map;
     QMap<QString, QRgb> colours;

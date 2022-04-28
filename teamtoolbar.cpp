@@ -28,6 +28,9 @@
 #include <QDebug>
 #include <QMessageBox>
 
+// singleton
+TeamToolBar *TeamToolBar::i = nullptr;
+
 /**
  * @brief TeamToolBar::TeamToolBar
  */

@@ -28,6 +28,9 @@
 #include "variable.h"
 #include <QMessageBox>
 
+// singleton
+EventEdit *EventEdit::i = nullptr;
+
 /**
  * @brief EventEdit::EventEdit
  * @param parent

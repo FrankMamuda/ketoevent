@@ -52,7 +52,7 @@ public:
      * @brief instance
      * @return
      */
-    static Database *instance() { static Database instance; return &instance; }
+    static Database *instance() { if ( Database::i == nullptr ) Database::i = new Database(); return Database::i; }
     ~Database() override;
     bool add( Table *table );
 
@@ -76,6 +76,7 @@ public slots:
     void resetCounter() { this->m_counter = 0; }
 
 private:
+    static Database *i;
     explicit Database( QObject *parent = nullptr );
     bool testPath( const QString &path );
 

@@ -33,13 +33,14 @@ class EventToolBar final : public ToolBar {
     Q_DISABLE_COPY_MOVE( EventToolBar )
 
 public:
-    static EventToolBar *instance() { static EventToolBar instance; return &instance; }
+    static EventToolBar *instance() { if ( EventToolBar::i == nullptr ) EventToolBar::i = new EventToolBar(); return EventToolBar::i; }
     ~EventToolBar() override = default;
 
 public slots:
     void buttonTest( const QModelIndex &index = QModelIndex());
 
 private:
+    static EventToolBar *i;
     explicit EventToolBar( QWidget *parent = nullptr );
     QAction *edit;
     QAction *remove;

@@ -39,7 +39,7 @@ class Combos final : public ModalWindow {
     Q_OBJECT
 
 public:
-    static Combos *instance() { static Combos instance; return &instance; }
+    static Combos *instance() { if ( Combos::i == nullptr ) Combos::i = new Combos(); return Combos::i; }
     ~Combos() override;
 
 protected:
@@ -49,6 +49,7 @@ private slots:
     void on_teamCombo_currentIndexChanged( int index );
 
 private:
+    static Combos *i;
     explicit Combos();
     Ui::Combos *ui;
 };

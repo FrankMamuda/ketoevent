@@ -39,10 +39,11 @@ class Settings final : public ModalWindow {
     Q_OBJECT
 
 public:
-    static Settings *instance() { static Settings instance; return &instance; }
+    static Settings *instance() { if ( Settings::i == nullptr ) Settings::i = new Settings(); return Settings::i; }
     ~Settings() override;
 
 private:
+    static Settings *i;
     explicit Settings();
     QStringList variables;
     Ui::Settings *ui;

@@ -60,7 +60,7 @@ public:
      * @brief instance
      * @return
      */
-    static Variable *instance() { static Variable instance; return &instance; }
+    static Variable *instance() { if ( Variable::i == nullptr ) Variable::i = new Variable(); return Variable::i; }
 
     /**
      * @brief contains
@@ -359,6 +359,7 @@ signals:
     void widgetChanged( const QString &key, Widget *widget, const QVariant &value );
 
 private:
+    static Variable *i;
     QMap<QString, QSharedPointer<Var>> list;
     QMultiMap<QString, Widget *> boundVariables;
     QMap<QString, QPair<QObject *, int> > slotList;

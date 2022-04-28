@@ -26,6 +26,9 @@
 #include <QComboBox>
 #include <QAction>
 
+// singleton
+Variable *Variable::i = nullptr;
+
 /**
  * @brief Variable::Variable
  */

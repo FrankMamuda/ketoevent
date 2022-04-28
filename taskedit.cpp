@@ -29,6 +29,9 @@
 #include <QMessageBox>
 #include <QDebug>
 
+// singleton
+TaskEdit *TaskEdit::i = nullptr;
+
 /**
  * @brief TaskEdit::TaskEdit
  * @param parent

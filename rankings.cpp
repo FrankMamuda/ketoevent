@@ -40,6 +40,9 @@
 #include <xlsxdocument.h>
 #endif
 
+// singleton
+Rankings *Rankings::i = nullptr;
+
 /**
  * @brief Rankings::Rankings
  * @param parent

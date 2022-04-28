@@ -26,6 +26,9 @@
 #include "variable.h"
 #include "main.h"
 
+// singleton
+Console *Console::i = nullptr;
+
 /**
  * @brief Console::Console
  */
@@ -50,7 +53,6 @@ Console::Console() : ui( new Ui::Console ) {
 Console::~Console() {
     Variable::setValue( "system/consoleHistory", this->edit->history.join( ";" ));
     this->edit->removeEventFilter( this );
-    qDebug() << "delete console ";
     delete this->ui;
 }
 

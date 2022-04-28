@@ -41,6 +41,9 @@
 #include "rankingsmodel.h"
 #include "widget.h"
 
+// singleton
+GarbageMan *GarbageMan::i = nullptr;
+
 //
 // GENERAL TODO/FIXME LIST
 //
@@ -54,6 +57,7 @@
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( nullptr );
+static bool console_init = false;
 
 /**
  * @brief messageFilter
@@ -69,8 +73,8 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
         exit( 0 );
     }
 
-    if ( Main::Console != nullptr )
-        qobject_cast<Console*>( Main::Console )->print( msg );
+    if ( console_init )
+       Console::instance()->print( msg );
 }
 
 /**
@@ -252,14 +256,14 @@ int main( int argc, char *argv[] ) {
     MainWindow::instance()->setTaskFilter();
 
     // initialize console
-    Main::Console = Console::instance();
+    console_init = true;
 
     // clean up on exit
     qApp->connect( qApp, &QApplication::aboutToQuit, []() {
         Task::instance()->setInitialised( false );
 
+        console_init = false;
         delete Console::instance();
-        Main::Console = nullptr;
 
         XMLTools::write();
         GarbageMan::instance()->clear();
@@ -270,7 +274,6 @@ int main( int argc, char *argv[] ) {
             delete Database::instance();
 
         delete Variable::instance();
-        // FIXME: delete MainWindow::instance();
     } );
 
     return a.exec();

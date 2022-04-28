@@ -39,12 +39,13 @@ class TaskEdit final : public QWidget {
     Q_DISABLE_COPY_MOVE( TaskEdit )
 
 public:
-    static TaskEdit *instance() { static TaskEdit instance; return &instance; }
+    static TaskEdit *instance() { if ( TaskEdit::i == nullptr ) TaskEdit::i = new TaskEdit(); return TaskEdit::i; }
     ~TaskEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }
 
 private:
+    static TaskEdit *i;
     explicit TaskEdit( QWidget *parent = nullptr );
     Ui::TaskEdit *ui;
     bool m_edit;

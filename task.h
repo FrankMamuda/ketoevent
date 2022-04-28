@@ -79,7 +79,7 @@ public:
      * @brief instance
      * @return
      */
-    static Task *instance() { static Task instance; return &instance; }
+    static Task *instance() { if ( Task::i == nullptr ) Task::i = new Task(); return Task::i; }
     ~Task() override { this->setInitialised( false ); }
 
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
@@ -118,6 +118,7 @@ protected:
     QString selectStatement() const override;
 
 private:
+    static Task *i;
     explicit Task();
     QMap<Types,QString> types;
     QMap<Styles,QString> styles;

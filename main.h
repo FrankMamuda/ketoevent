@@ -30,7 +30,6 @@
  */
 namespace Main {
 [[maybe_unused]] static constexpr const char *Path = ".database2";
-[[maybe_unused]] static QObject *Console( nullptr );
 }
 
 /**
@@ -38,12 +37,13 @@ namespace Main {
  */
 class GarbageMan final {
     Q_DISABLE_COPY_MOVE( GarbageMan )
+
 public:    
     /**
      * @brief instance
      * @return
      */
-    static GarbageMan *instance() { static GarbageMan instance; return &instance; }
+    static GarbageMan *instance() { if ( GarbageMan::i == nullptr ) GarbageMan::i = new GarbageMan(); return GarbageMan::i; }
 
     /**
      * @brief add adds pointers (singletons) to garbage collection list
@@ -69,6 +69,7 @@ public:
     }
 
 private:
+    static GarbageMan *i;
     explicit GarbageMan() = default;
     QList<QObject*> garbage;
 };

@@ -39,6 +39,9 @@
 #include "sqlite/sqlite3.h"
 #endif
 
+// singleton
+Database *Database::i = nullptr;
+
 /**
  * @brief Database::testPath checks if provided database path is valid and creates non-existent sub-directories
  * @param path database path

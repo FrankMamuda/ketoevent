@@ -26,6 +26,9 @@
 #include "ui_editordialog.h"
 #include <QDebug>
 
+// singleton
+EditorDialog *EditorDialog::i = nullptr;
+
 /**
  * @brief EditorDialog::EditorDialog
  * @param parent

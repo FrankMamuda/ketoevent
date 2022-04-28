@@ -44,7 +44,7 @@ class EditorDialog final : public ModalWindow {
     Q_DISABLE_COPY_MOVE( EditorDialog )
 
 public:
-    static EditorDialog *instance() { static EditorDialog instance; return &instance; }
+    static EditorDialog *instance() { if ( EditorDialog::i == nullptr ) EditorDialog::i = new EditorDialog(); return EditorDialog::i; }
     ~EditorDialog() override;
     QListView *container;
     QDockWidget *dock;
@@ -59,6 +59,7 @@ protected:
     void closeEvent( QCloseEvent *event ) override;
 
 private:
+    static EditorDialog *i;
     explicit EditorDialog();
     QToolBar *toolBar;
     Ui::EditorDialog *ui;

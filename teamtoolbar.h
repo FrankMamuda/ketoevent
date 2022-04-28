@@ -33,13 +33,14 @@ class TeamToolBar final : public ToolBar {
     Q_DISABLE_COPY_MOVE( TeamToolBar )
 
 public:
-    static TeamToolBar *instance() { static TeamToolBar instance; return &instance; }
+    static TeamToolBar *instance() { if ( TeamToolBar::i == nullptr ) TeamToolBar::i = new TeamToolBar(); return TeamToolBar::i; }
     ~TeamToolBar() override = default;
 
 public slots:
     void buttonTest( const QModelIndex &index = QModelIndex());
 
 private:
+    static TeamToolBar *i;
     explicit TeamToolBar( QWidget *parent = nullptr );
     QAction *edit;
     QAction *remove;

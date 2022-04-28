@@ -51,7 +51,7 @@ class Console final : public QMainWindow {
     Q_DISABLE_COPY_MOVE( Console )
 
 public:
-    static Console *instance() { static Console instance; return &instance; }
+    static Console *instance() { if ( Console::i == nullptr ) Console::i = new Console(); return Console::i; }
     ~Console() override;
 
 public slots:
@@ -67,6 +67,7 @@ private slots:
     void on_input_returnPressed();
 
 private:
+    static Console *i;
     explicit Console();
     Ui::Console *ui;
     QPoint m_windowPos;
@@ -83,7 +84,7 @@ class HistoryEdit final : public QLineEdit {
 
 public:
     explicit HistoryEdit( QWidget *parent = nullptr ) : m_historyOffset( 0 ) { this->setParent( parent ); this->reset(); }
-    virtual ~HistoryEdit() { this->history.clear(); }
+    ~HistoryEdit() override { this->history.clear(); }
     [[nodiscard]] int offset() const { return this->m_historyOffset; }
 
 public slots:

@@ -91,9 +91,10 @@ public:
      * @brief instance
      * @return
      */
-    static Cmd *instance() { static Cmd instance; return &instance; }
+    static Cmd *instance() { if ( Cmd::i == nullptr ) Cmd::i = new Cmd(); return Cmd::i; }
 
 private:
+    static Cmd *i;
     [[nodiscard]] bool executeTokenized( const QString &, const QStringList & );
 
     // constructor/destructor/instance

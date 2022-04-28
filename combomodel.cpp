@@ -26,6 +26,9 @@
 #include "task.h"
 #include "event.h"
 
+// singleton
+ComboModel *ComboModel::i = nullptr;
+
 // initialize colors
 QList<QRgb> ComboModel::colourList = ( QList<QRgb>() << 1073774592 << 1082195712 << 1082163200 << 1090453632 << 1082130687 << 1073774720 << 1073807232 );
 

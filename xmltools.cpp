@@ -31,6 +31,9 @@
 #include <QXmlStreamWriter>
 #include "main.h"
 
+// singleton
+XMLTools *XMLTools::i = nullptr;
+
 /**
  * @brief XMLTools::read
  * @param mode

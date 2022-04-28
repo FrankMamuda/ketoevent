@@ -33,13 +33,14 @@ class TaskToolBar final : public ToolBar {
     Q_DISABLE_COPY_MOVE( TaskToolBar )
 
 public:
-    static TaskToolBar *instance() { static TaskToolBar instance; return &instance; }
+    static TaskToolBar *instance() { if ( TaskToolBar::i == nullptr ) TaskToolBar::i = new TaskToolBar(); return TaskToolBar::i; }
     ~TaskToolBar() override = default;
 
 public slots:
     void buttonTest (const QModelIndex &index = QModelIndex());
 
 private:
+    static TaskToolBar *i;
     explicit TaskToolBar( QWidget *parent = nullptr );
     QAction *moveUp;
     QAction *moveDown;

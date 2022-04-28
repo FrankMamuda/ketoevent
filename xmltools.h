@@ -50,11 +50,13 @@ public:
      * @brief instance
      * @return
      */
-    static XMLTools *instance() { static XMLTools instance; return &instance; }
+    static XMLTools *instance() { if ( XMLTools::i == nullptr ) XMLTools::i = new XMLTools(); return XMLTools::i; }
     static void write();
     static void read();
 
 private:
+    static XMLTools *i;
+
     /**
      * @brief XMLTools
      * @param parent

@@ -46,6 +46,9 @@
 #include "eventtoolbar.h"
 #include "about.h"
 
+// singleton
+MainWindow *MainWindow::i = nullptr;
+
 /**
  * @brief MainWindow::MainWindow
  * @param parent
@@ -216,6 +219,8 @@ MainWindow::~MainWindow() {
     delete this->quickSpacerLeft;
     delete this->quickSpacerRight;
     delete this->ui;
+
+    qDebug() << "DELETE MAIN";
 }
 
 /**

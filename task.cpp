@@ -30,6 +30,9 @@
 #include <QFont>
 #include <QSqlQuery>
 
+// singleton
+Task *Task::i = nullptr;
+
 /**
  * @brief Task::Task
  */

@@ -28,6 +28,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+// singleton
+Settings *Settings::i = nullptr;
+
 /**
  * @brief Settings::Settings
  * @param parent

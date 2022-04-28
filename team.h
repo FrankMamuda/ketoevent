@@ -53,7 +53,7 @@ public:
      * @brief instance
      * @return
      */
-    static Team *instance() { static Team instance; return &instance; }
+    static Team *instance() { if ( Team::i == nullptr ) Team::i = new Team(); return Team::i; }
     ~Team() override = default;
 
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
@@ -72,6 +72,7 @@ public slots:
     void setReviewer( const Row &row, const QString &name ) { this->setValue( row, Reviewer, name ); }
 
 private:
+    static Team *i;
     explicit Team();
 };
 

@@ -69,7 +69,7 @@ class Rankings final : public ModalWindow {
     friend class RankingsModel;
 
 public:
-    static Rankings *instance() { static Rankings instance; return &instance; }
+    static Rankings *instance() { if ( Rankings::i == nullptr ) Rankings::i = new Rankings(); return Rankings::i; }
     ~Rankings() override;
     [[nodiscard]] bool isDisplayingCurrentTeam() const;
 
@@ -79,9 +79,10 @@ private slots:
     void on_actionExport_triggered();
 
 protected:
-    void showEvent( QShowEvent *event );
+    void showEvent( QShowEvent *event ) override;
 
 private:
+    static Rankings *i;
     explicit Rankings();
     Ui::Rankings *ui;
     RankingsModel *model;

@@ -39,12 +39,13 @@ class EventEdit final : public QWidget {
     Q_DISABLE_COPY_MOVE( EventEdit )
 
 public:
-    static EventEdit *instance() { static EventEdit instance; return &instance; }
+    static EventEdit *instance() { if ( EventEdit::i == nullptr ) EventEdit::i = new EventEdit(); return EventEdit::i; }
     ~EventEdit() override;
     void reset( bool edit = false );
     [[nodiscard]] bool isEditing() const { return this->m_edit; }
 
 private:
+    static EventEdit *i;
     explicit EventEdit( QWidget *parent = nullptr );
     Ui::EventEdit *ui;
     bool m_edit;

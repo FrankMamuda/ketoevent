@@ -24,6 +24,9 @@
 #include "field.h"
 #include "database.h"
 
+// singleton
+Event *Event::i = nullptr;
+
 //
 // namespaces
 //

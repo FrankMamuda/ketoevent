@@ -33,6 +33,9 @@
 #include <xlsxdocument.h>
 #endif
 
+// singleton
+TaskToolBar *TaskToolBar::i = nullptr;
+
 /**
  * @brief TaskToolBar::TaskToolBar
  */

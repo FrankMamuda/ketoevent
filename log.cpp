@@ -28,6 +28,9 @@
 #include "task.h"
 #include "team.h"
 
+// singleton
+Log *Log::i = nullptr;
+
 /**
  * @brief Log::Log
  */

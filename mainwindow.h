@@ -49,7 +49,7 @@ class MainWindow final : public QMainWindow {
 
 public:
     ~MainWindow() override;
-    static MainWindow *instance() { static MainWindow instance; return &instance; }
+    static MainWindow *instance() { if ( MainWindow::i == nullptr ) MainWindow::i = new MainWindow(); return MainWindow::i; }
     [[nodiscard]] Row currentEvent() const;
     [[nodiscard]] Row currentTeam() const;
     [[nodiscard]] Id currentComboId() const { return this->m_currentCombo; }
@@ -79,6 +79,7 @@ protected:
     void closeEvent( QCloseEvent *event ) override;
 
 private:
+    static MainWindow *i;
     explicit MainWindow( QWidget *parent = nullptr );
     Ui::MainWindow *ui;
     QCompleter completer;

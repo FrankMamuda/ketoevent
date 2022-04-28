@@ -77,7 +77,7 @@ public:
      * @brief instance
      * @return
      */
-    static Event *instance() { static Event instance; return &instance; }
+    static Event *instance() { if ( Event::i == nullptr ) Event::i = new Event(); return Event::i; }
     ~Event() override {}
 
     Row add( const QString &title, int minMembers = EventTable::DefaultMinMembers, int maxMembers = EventTable::DefaultMaxMembers,
@@ -113,6 +113,7 @@ public slots:
     void setComboOfFourPlus( const Row &row, int points ) { this->setValue( row, Combo4, points ); }
 
 private:
+    static Event *i;
     explicit Event();
 };
 

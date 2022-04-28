@@ -49,7 +49,7 @@ public:
      * @brief instance
      * @return
      */
-    static Log *instance() { static Log instance; return &instance; }
+    static Log *instance() { if ( Log::i == nullptr ) Log::i = new Log(); return Log::i; }
     ~Log() override {}
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
@@ -72,6 +72,7 @@ public slots:
     void setComboId( const Row &row, const Id &id ) { this->setValue( row, Combo, static_cast<int>( id )); }
 
 private:
+    static Log *i;
     explicit Log();
 };
 
