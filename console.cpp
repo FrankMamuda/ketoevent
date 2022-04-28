@@ -50,6 +50,7 @@ Console::Console() : ui( new Ui::Console ) {
 Console::~Console() {
     Variable::setValue( "system/consoleHistory", this->edit->history.join( ";" ));
     this->edit->removeEventFilter( this );
+    qDebug() << "delete console ";
     delete this->ui;
 }
 
@@ -143,7 +144,7 @@ bool Console::eventFilter( QObject *object, QEvent *event ) {
                     if ( edit->offset() < edit->history.count())
                         edit->push();
 
-                    const int offset = edit->history.count() - edit->offset();
+                    const int offset = static_cast<int>( edit->history.count() - edit->offset());
                     edit->setText( offset > 0 ? edit->history.at( offset ) : edit->history.first());
                 }
                 return true;
@@ -157,7 +158,7 @@ bool Console::eventFilter( QObject *object, QEvent *event ) {
                         return true;
                     }
 
-                    const int offset = edit->history.count() - edit->offset();
+                    const int offset = static_cast<int>( edit->history.count() - edit->offset());
                     edit->setText( offset < edit->history.count() ? edit->history.at( offset ) : edit->history.last());
                 }
                 return true;

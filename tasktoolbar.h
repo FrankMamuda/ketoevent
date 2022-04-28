@@ -30,14 +30,10 @@
  */
 class TaskToolBar final : public ToolBar {
     Q_OBJECT
-    Q_DISABLE_COPY( TaskToolBar )
+    Q_DISABLE_COPY_MOVE( TaskToolBar )
 
 public:
-    // disable move
-    TaskToolBar( TaskToolBar&& ) = delete;
-    TaskToolBar& operator=( TaskToolBar&& ) = delete;
-
-    static TaskToolBar *instance() { static TaskToolBar *instance = new TaskToolBar(); return instance; }
+    static TaskToolBar *instance() { static TaskToolBar instance; return &instance; }
     ~TaskToolBar() override = default;
 
 public slots:

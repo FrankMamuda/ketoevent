@@ -30,14 +30,10 @@
  */
 class TeamToolBar final : public ToolBar {
     Q_OBJECT
-    Q_DISABLE_COPY( TeamToolBar )
+    Q_DISABLE_COPY_MOVE( TeamToolBar )
 
 public:
-    // disable move
-    TeamToolBar( TeamToolBar&& ) = delete;
-    TeamToolBar& operator=( TeamToolBar&& ) = delete;
-
-    static TeamToolBar *instance() { static TeamToolBar *instance = new TeamToolBar(); return instance; }
+    static TeamToolBar *instance() { static TeamToolBar instance; return &instance; }
     ~TeamToolBar() override = default;
 
 public slots:

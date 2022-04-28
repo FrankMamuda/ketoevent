@@ -31,14 +31,10 @@
  */
 class DockWidget : public QDockWidget {
     Q_OBJECT
-    Q_DISABLE_COPY( DockWidget )
+    Q_DISABLE_COPY_MOVE( DockWidget )
 
 public:
     explicit DockWidget( QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags()) : QDockWidget( parent, flags ) {}
-
-    // disable move
-    DockWidget( DockWidget&& ) = delete;
-    DockWidget& operator=( DockWidget&& ) = delete;
 
 protected:
     void closeEvent ( QCloseEvent *event ) {

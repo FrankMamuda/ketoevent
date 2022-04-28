@@ -34,19 +34,19 @@ using namespace EventTable;
  * @param parent
  */
 Event::Event() : Table( "events" ) {
-    this->addField( ID,      "id",                 QVariant::UInt,   "integer primary key", true, true );
-    this->addField( API,     "api",                QVariant::Int,    "integer" );
-    this->addField( Title,   "name",               QVariant::String, "text",       true );
-    this->addField( Min,     "minMembers",         QVariant::Int,    "integer" );
-    this->addField( Max,     "maxMembers",         QVariant::Int,    "integer" );
-    this->addField( Start,   "startTime",          QVariant::String, "text" );
-    this->addField( Finish,  "finishTime",         QVariant::String, "text" );
-    this->addField( Final,   "finalTime",          QVariant::String, "text" );
-    this->addField( Penalty, "penalty",            QVariant::Int,    "integer" );
-    this->addField( Combo2,  "comboOfTwo",         QVariant::Int,    "integer" );
-    this->addField( Combo3,  "comboOfThree",       QVariant::Int,    "integer" );
-    this->addField( Combo4,  "comboOfFourAndMore", QVariant::Int,    "integer" );
-    this->addField( Lock,    "lock",               QVariant::Int,    "integer" );
+    this->addField( ID,      "id",                 QMetaType::Int,     "integer primary key", true, true );
+    this->addField( API,     "api",                QMetaType::Int,     "integer" );
+    this->addField( Title,   "name",               QMetaType::QString, "text",       true );
+    this->addField( Min,     "minMembers",         QMetaType::Int,     "integer" );
+    this->addField( Max,     "maxMembers",         QMetaType::Int,     "integer" );
+    this->addField( Start,   "startTime",          QMetaType::QString, "text" );
+    this->addField( Finish,  "finishTime",         QMetaType::QString, "text" );
+    this->addField( Final,   "finalTime",          QMetaType::QString, "text" );
+    this->addField( Penalty, "penalty",            QMetaType::Int,     "integer" );
+    this->addField( Combo2,  "comboOfTwo",         QMetaType::Int,     "integer" );
+    this->addField( Combo3,  "comboOfThree",       QMetaType::Int,     "integer" );
+    this->addField( Combo4,  "comboOfFourAndMore", QMetaType::Int,     "integer" );
+    this->addField( Lock,    "lock",               QMetaType::Int,     "integer" );
 }
 
 /**

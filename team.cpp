@@ -32,13 +32,13 @@
  * @brief Team::Team
  */
 Team::Team() : Table( "teams" ) {
-    this->addField( ID,       "id",         QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Title,    "name",       QVariant::String, "text",       true );
-    this->addField( Members,  "members",    QVariant::Int,    "integer" );
-    this->addField( Finish,   "finishTime", QVariant::String, "text" );
-    this->addField( Lock,     "lock",       QVariant::Int,    "integer" );
-    this->addField( Reviewer, "reviewer",   QVariant::String, "text" );
-    this->addField( Event,    "eventId",    QVariant::Int,    "integer" );
+    this->addField( ID,       "id",         QMetaType::Int,     "integer primary key", true, true );
+    this->addField( Title,    "name",       QMetaType::QString, "text",       true );
+    this->addField( Members,  "members",    QMetaType::Int,     "integer" );
+    this->addField( Finish,   "finishTime", QMetaType::QString, "text" );
+    this->addField( Lock,     "lock",       QMetaType::Int,     "integer" );
+    this->addField( Reviewer, "reviewer",   QMetaType::QString, "text" );
+    this->addField( Event,    "eventId",    QMetaType::Int,     "integer" );
 }
 
 /**

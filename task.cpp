@@ -34,15 +34,15 @@
  * @brief Task::Task
  */
 Task::Task() : Table( "tasks" ) {
-    this->addField( ID,     "id",          QVariant::UInt,   "integer primary key", true, true );
-    this->addField( Name,   "name",        QVariant::String, "text",      true );
-    this->addField( Points, "points",      QVariant::Int,    "integer" );
-    this->addField( Mult,   "multi",       QVariant::Int,    "integer" );
-    this->addField( Style,  "style",       QVariant::Int,    "integer" );
-    this->addField( Type,   "type",        QVariant::Int,    "integer" );
-    this->addField( Order,  "parent",      QVariant::Int,    "integer" );
-    this->addField( Event,  "eventId",     QVariant::Int,    "integer" );
-    this->addField( Desc,   "description", QVariant::String, "text" );
+    this->addField( ID,     "id",          QMetaType::Int,     "integer primary key", true, true );
+    this->addField( Name,   "name",        QMetaType::QString, "text",      true );
+    this->addField( Points, "points",      QMetaType::Int,     "integer" );
+    this->addField( Mult,   "multi",       QMetaType::Int,     "integer" );
+    this->addField( Style,  "style",       QMetaType::Int,     "integer" );
+    this->addField( Type,   "type",        QMetaType::Int,     "integer" );
+    this->addField( Order,  "parent",      QMetaType::Int,     "integer" );
+    this->addField( Event,  "eventId",     QMetaType::Int,     "integer" );
+    this->addField( Desc,   "description", QMetaType::QString, "text" );
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );

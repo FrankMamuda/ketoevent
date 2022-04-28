@@ -29,7 +29,7 @@
  */
 class Task final : public Table {
     Q_OBJECT
-    Q_DISABLE_COPY( Task )
+    Q_DISABLE_COPY_MOVE( Task )
     friend class Log;
     friend class TaskEdit;
 
@@ -75,15 +75,11 @@ public:
     };
     Q_ENUM( Styles )
 
-    // disable move
-    Task( Task&& ) = delete;
-    Task& operator=( Task&& ) = delete;
-
     /**
      * @brief instance
      * @return
      */
-    static Task *instance() { static Task *instance( new Task()); return instance; }
+    static Task *instance() { static Task instance; return &instance; }
     ~Task() override { this->setInitialised( false ); }
 
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }

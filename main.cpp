@@ -24,7 +24,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QSharedMemory>
-#include <QDesktopWidget>
 #include <QTranslator>
 #include <QSettings>
 #include "theme.h"
@@ -131,13 +130,13 @@ int main( int argc, char *argv[] ) {
     // i18n
     QTranslator translator;
 #ifndef FORCE_LV_LOCALE
-    const QString locale( QLocale::system().name());
+    QLocale::setDefault( QLocale::System );
 #else
     const QString locale( "lv_LV" );
+    QLocale::setDefault( QLocale::Latvian );
 #endif
-    QLocale::setDefault( locale );
-    translator.load( ":/i18n/ketoevent_" + locale );
-    QApplication::installTranslator( &translator );
+    if ( translator.load( ":/i18n/ketoevent_" + QLocale().name()))
+        QApplication::installTranslator( &translator );
 
     // set variable defaults
     Variable::add( "reviewerName", "" );
@@ -194,7 +193,7 @@ int main( int argc, char *argv[] ) {
     };
 
     if ( !loadTables()) {
-        QMessageBox::critical( QApplication::desktop(),
+        QMessageBox::critical( nullptr,
                                QObject::tr( "Internal error" ),
                                QObject::tr( "Could not load database\n"
                                             "New database will be created\n"

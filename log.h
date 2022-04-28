@@ -29,7 +29,7 @@
  */
 class Log final : public Table {
     Q_OBJECT
-    Q_DISABLE_COPY( Log )
+    Q_DISABLE_COPY_MOVE( Log )
 
 public:
     enum Fields {
@@ -49,12 +49,8 @@ public:
      * @brief instance
      * @return
      */
-    static Log *instance() { static Log *instance( new Log()); return instance; }
+    static Log *instance() { static Log instance; return &instance; }
     ~Log() override {}
-
-    // disable move
-    Log( Log&& ) = delete;
-    Log& operator=( Log&& ) = delete;
 
     void add( const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid );
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }

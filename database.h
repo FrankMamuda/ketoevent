@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2018-2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,34 +32,27 @@
 class Table;
 
 /**
- * @brief The Dabanase_ class
+ * @brief The Database_ class
  */
 namespace Database_ {
     const static QLoggingCategory Debug( "database" );
-    [[maybe_unused]] const static constexpr int null = 0;
-};
-
+    const static constexpr int null = 0;
+    [[maybe_unused]] static const constexpr int API = 1;
+}
 
 /**
  * @brief The Database class
  */
 class Database final : public QObject {
     Q_OBJECT
-    Q_DISABLE_COPY( Database )
+    Q_DISABLE_COPY_MOVE( Database )
 
 public:
-    // disable move
-    Database( Database&& ) = delete;
-    Database& operator=( Database&& ) = delete;
-
     /**
      * @brief instance
      * @return
      */
-    static Database *instance() {
-        static auto *instance( new Database());
-        return instance;
-    }
+    static Database *instance() { static Database instance; return &instance; }
     ~Database() override;
     bool add( Table *table );
 
@@ -80,8 +72,6 @@ public slots:
     void removeOrphanedEntries();
     void incrementCounter();
     void attach( const QFileInfo &info );
-
-private slots:
     void writeBackup();
     void resetCounter() { this->m_counter = 0; }
 

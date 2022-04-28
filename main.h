@@ -37,14 +37,13 @@ namespace Main {
  * @brief The GarbageMan class
  */
 class GarbageMan final {
+    Q_DISABLE_COPY_MOVE( GarbageMan )
 public:    
     /**
      * @brief instance
      * @return
      */
-    static GarbageMan *instance() { static GarbageMan *instance( new GarbageMan()); return instance; }
-    GarbageMan( const GarbageMan & ) = delete;
-    ~GarbageMan() = default;
+    static GarbageMan *instance() { static GarbageMan instance; return &instance; }
 
     /**
      * @brief add adds pointers (singletons) to garbage collection list

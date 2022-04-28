@@ -65,15 +65,11 @@ public:
  */
 class Rankings final : public ModalWindow {
     Q_OBJECT
-    Q_DISABLE_COPY( Rankings )
+    Q_DISABLE_COPY_MOVE( Rankings )
     friend class RankingsModel;
 
 public:
-    // disable move
-    Rankings( Rankings&& ) = delete;
-    Rankings& operator=( Rankings&& ) = delete;
-
-    static Rankings *instance() { static Rankings *instance( new Rankings()); return instance; }
+    static Rankings *instance() { static Rankings instance; return &instance; }
     ~Rankings() override;
     [[nodiscard]] bool isDisplayingCurrentTeam() const;
 

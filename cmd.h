@@ -37,14 +37,10 @@ Q_DECLARE_METATYPE( function_t )
  */
 class Cmd final : public QObject {
     Q_OBJECT
-    Q_DISABLE_COPY( Cmd )
+    Q_DISABLE_COPY_MOVE( Cmd )
     Q_CLASSINFO( "description", "Command subsystem" )
 
 public:
-    // disable move
-    Cmd( Cmd&& ) = delete;
-    Cmd& operator=( Cmd&& ) = delete;
-
     void add( const QString &, function_t, const QString & = QString());
 
     /**
@@ -95,14 +91,13 @@ public:
      * @brief instance
      * @return
      */
-    static Cmd *instance() { static Cmd *instance( new Cmd()); /*GarbageMan::instance()->add( instance );*/ return instance; }
+    static Cmd *instance() { static Cmd instance; return &instance; }
 
 private:
     [[nodiscard]] bool executeTokenized( const QString &, const QStringList & );
 
     // constructor/destructor/instance
     explicit Cmd( QObject *parent = nullptr );
-    static Cmd *createInstance() { return new Cmd(); }
 
     QMap<QString, function_t> functionMap;
     QMap<QString, QString> descriptionMap;

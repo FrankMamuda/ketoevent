@@ -40,17 +40,13 @@ enum class Row;
  */
 class Delegate : public QStyledItemDelegate {
     Q_OBJECT
-    Q_DISABLE_COPY( Delegate )
+    Q_DISABLE_COPY_MOVE( Delegate )
     friend class Item;
     friend class EditWidget;
     friend class TaskView;
     friend class MainWindow;
 
 public:
-    // disable move
-    Delegate( Delegate&& ) = delete;
-    Delegate& operator=( Delegate&& ) = delete;
-
     explicit Delegate( QWidget *parent = nullptr ) : QStyledItemDelegate( parent ) {}
     void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
     [[nodiscard]] QSize sizeHint( const QStyleOptionViewItem &option, const QModelIndex &index ) const override;

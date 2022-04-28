@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2018-2020 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,17 +19,17 @@
 /*
  * includes
  */
-#include <QDebug>
 #include <QDir>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QSqlRecord>
 #include <QApplication>
+#include <QTime>
 #include "database.h"
 #include "table.h"
 #include "field.h"
 #include "main.h"
 #include "variable.h"
+#include "mainwindow.h"
 #include "log.h"
 #include "team.h"
 #include "task.h"
@@ -39,7 +38,6 @@
 #include <QSqlDriver>
 #include "sqlite/sqlite3.h"
 #endif
-#include "mainwindow.h"
 
 /**
  * @brief Database::testPath checks if provided database path is valid and creates non-existent sub-directories
@@ -82,8 +80,8 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     // validate path
     if ( !testPath( Variable::string( "databasePath" ))) {
         Variable::setString( "databasePath",
-                                         QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" +
-                                         "database.db" );
+                             QDir( QDir::homePath() + "/" + Main::Path ).absolutePath() + "/" +
+                             "database.db" );
 
         if ( !this->testPath( Variable::string( "databasePath" )))
             qFatal( QT_TR_NOOP_UTF8( "could not create database path" ) );
@@ -130,19 +128,16 @@ Database::Database( QObject *parent ) : QObject( parent ) {
     QVariant handle( database.driver()->handle());
     if ( handle.isValid() && !QString::compare( handle.typeName(), "sqlite3*" )) {
         sqlite3 *libSqlite3 = *static_cast<sqlite3 **>( handle.data());
-
         if ( libSqlite3 != nullptr && database.isOpen() && database.isValid()) {
             // initialize sqlite
             qCWarning( Database_::Debug ) << this->tr( "initializing custom sqlite lib" );
             sqlite3_initialize();
-
             // localeCompare lambda
             auto localeCompare = []( void *, int l0, const void* d0, int l1, const void* d1 ) {
                 return QString::localeAwareCompare(
                             QString::fromRawData( reinterpret_cast<const QChar*>( d0 ), l0 / static_cast<int>( sizeof( QChar ))),
                             QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar )))) < 0;
             };
-
             // initialize
             if ( sqlite3_create_collation( libSqlite3, "localeCompare", SQLITE_UTF16, 0, localeCompare ) != SQLITE_OK )
                 qCWarning( Database_::Debug ) << this->tr( "could not add locale aware string collation" );
@@ -168,10 +163,8 @@ void Database::removeOrphanedEntries() {
 void Database::incrementCounter() {
     if ( Variable::isDisabled( "backup/enabled" ))
         return;
-
     // increment value
     this->m_counter++;
-
     if ( this->count() >= Variable::integer( "backup/changes" )) {
         this->resetCounter();
         this->writeBackup();
@@ -189,7 +182,7 @@ Database::~Database() {
     this->removeOrphanedEntries();
 
     // announce
-    qCInfo( Database_::Debug ) << this->tr( "unloading database" );
+    qCInfo( Database_::Debug ) << Database::tr( "unloading database" );
     this->setInitialised( false );
 
     // unbind variables
@@ -247,18 +240,18 @@ bool Database::add( Table *table ) {
 
                 if ( !database.record( table->tableName()).contains( field->name())) {
                     qCCritical( Database_::Debug )
-                        << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field->name());
+                            << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field->name());
                     return false;
                 }
 
                 // ignore unsigned ints for now
-                const QVariant::Type internalType = field->type() == QVariant::UInt ? QVariant::Int : field->type();
-                const QVariant::Type databaseType = database.record( table->tableName()).field( field->id()).type();
+                const QMetaType::Type internalType = field->type() == QMetaType::UInt ? QMetaType::Int : field->type();
+                const QMetaType::Type databaseType = static_cast<QMetaType::Type>( database.record( table->tableName()).field( field->id()).metaType().id());
 
                 if ( internalType != databaseType ) {
                     qCCritical( Database_::Debug )
-                        << Database::tr( R"(database type mismatch in table "%1", field - "%2")" ).arg(
-                                tableName, field->name());
+                            << Database::tr( R"(database type mismatch in table "%1", field - "%2")" ).arg(
+                                   tableName, field->name());
                     return false;
                 }
             }
@@ -286,13 +279,13 @@ bool Database::add( Table *table ) {
 
         // check for constraints
         QString constraints;
-        const int tc = table->constraints.count();
+        const qsizetype tc = table->constraints.count();
 
         if ( tc > 0 ) {
             for ( int y = 0; y < table->constraints.count(); y++ ) {
                 constraints.append( "unique( " );
 
-                const int cc = table->constraints.at( y ).count();
+                const qsizetype cc = table->constraints.at( y ).count();
                 for ( int k = 0; k < cc; k++ ) {
                     const QSharedPointer<Field_> field( table->constraints.at( y ).at( k ));
                     constraints.append( field->name());
@@ -310,7 +303,7 @@ bool Database::add( Table *table ) {
 
         if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName(), statement )))
             qCCritical( Database_::Debug )
-                << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
+                    << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
     }
 
     // table has been verified and is marked as valid
@@ -322,7 +315,7 @@ bool Database::add( Table *table ) {
     // load data
     if ( !table->select()) {
         qCCritical( Database_::Debug )
-            << Database::tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
+                << Database::tr( "could not initialize model for table - \"%1\"" ).arg( table->tableName());
         table->setValid( false );
     }
 
@@ -335,24 +328,19 @@ bool Database::add( Table *table ) {
 void Database::writeBackup() {
     const QFileInfo info( Variable::string( "databasePath" ));
     const QDir dir( info.absolutePath() + + "/backups/" );
-
     if ( !dir.exists()) {
         dir.mkpath( dir.absolutePath());
         qCDebug( Database_::Debug ) << this->tr( "making non-existant database backup path \"%1\"" ).arg( dir.absolutePath());
-
         if ( !dir.exists())
             qFatal( QT_TR_NOOP_UTF8( "could not create database backup path" ));
     }
-
     // backup database filename
     const QString backup( QString( "%1/%2_%3.db" )
                           .arg( dir.absolutePath(),
                                 info.fileName().remove( ".db" ),
                                 QDateTime::currentDateTime().toString( "hhmmss_ddMM" )));
-
     // announce
     qCDebug( Database_::Debug ) << this->tr( "performing backup to \"%1\"" ).arg( backup );
-
     // perform a simple copy
     QFile::copy( Variable::string( "databasePath" ),
                  QString( "%1/%2_%3.db" )
@@ -502,3 +490,4 @@ void Database::attach( const QFileInfo &info ) {
     // detach database
     query.exec( "detach merge" );
 }
+

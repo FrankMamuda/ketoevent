@@ -45,15 +45,11 @@ enum class Row;
  */
 class MainWindow final : public QMainWindow {
     Q_OBJECT
-    Q_DISABLE_COPY( MainWindow )
+    Q_DISABLE_COPY_MOVE( MainWindow )
 
 public:
-    // disable move
-    MainWindow( MainWindow&& ) = delete;
-    MainWindow& operator=( MainWindow&& ) = delete;
-
     ~MainWindow() override;
-    static MainWindow *instance() { static MainWindow *instance( new MainWindow()); return instance; }
+    static MainWindow *instance() { static MainWindow instance; return &instance; }
     [[nodiscard]] Row currentEvent() const;
     [[nodiscard]] Row currentTeam() const;
     [[nodiscard]] Id currentComboId() const { return this->m_currentCombo; }

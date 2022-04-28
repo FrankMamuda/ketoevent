@@ -31,16 +31,12 @@
  * @brief The ComboModel class
  */
 class ComboModel final : public QStringListModel {
-    Q_DISABLE_COPY( ComboModel )
+    Q_DISABLE_COPY_MOVE( ComboModel )
     Q_OBJECT
     friend class Combos;
 
 public:
-    // disable move
-    ComboModel( ComboModel&& ) = delete;
-    ComboModel& operator=( ComboModel&& ) = delete;
-
-    static ComboModel *instance() { static ComboModel *instance( new ComboModel()); return instance; }
+    static ComboModel *instance() { static ComboModel instance; return &instance; }
     ~ComboModel() override = default;
     QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 

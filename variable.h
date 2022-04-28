@@ -46,21 +46,21 @@ class XMLTools;
  * @brief The Variable class
  */
 class Variable final : public QObject {
-    Q_DISABLE_COPY( Variable )
+    Q_DISABLE_COPY_MOVE( Variable )
     Q_OBJECT
     friend class XMLTools;
+    friend class Console;
+    friend class Cmd;
 
 public:
+    explicit Variable();
     ~Variable() override;
 
     /**
      * @brief instance
      * @return
      */
-    static Variable *instance() {
-        static auto *instance( new Variable());
-        return instance;
-    }
+    static Variable *instance() { static Variable instance; return &instance; }
 
     /**
      * @brief contains
@@ -89,7 +89,7 @@ public:
      * @param defaultValue
      * @return
      */
-    [[maybe_unused]] static int integer( const QString &key, bool defaultValue = false ) {
+    [[maybe_unused]] Q_INVOKABLE static int integer( const QString &key, bool defaultValue = false ) {
         return Variable::value<int>( key, defaultValue );
     }
 
@@ -99,7 +99,7 @@ public:
      * @param defaultValue
      * @return
      */
-    [[maybe_unused]] static qreal decimalValue( const QString &key, bool defaultValue = false ) {
+    [[maybe_unused]] Q_INVOKABLE static qreal decimalValue( const QString &key, bool defaultValue = false ) {
         return Variable::value<qreal>( key, defaultValue );
     }
 
@@ -109,7 +109,7 @@ public:
      * @param defaultValue
      * @return
      */
-    static bool isEnabled( const QString &key, bool defaultValue = false ) {
+    Q_INVOKABLE static bool isEnabled( const QString &key, bool defaultValue = false ) {
         return Variable::value<bool>( key, defaultValue );
     }
 
@@ -119,7 +119,7 @@ public:
      * @param defaultValue
      * @return
      */
-    static bool isDisabled( const QString &key, bool defaultValue = false ) {
+    Q_INVOKABLE static bool isDisabled( const QString &key, bool defaultValue = false ) {
         return !Variable::isEnabled( key, defaultValue );
     }
 
@@ -129,7 +129,7 @@ public:
      * @param defaultValue
      * @return
      */
-    static QString string( const QString &key, bool defaultValue = false ) {
+    Q_INVOKABLE static QString string( const QString &key, bool defaultValue = false ) {
         return Variable::value<QString>( key, defaultValue );
     }
 
@@ -198,7 +198,11 @@ public:
      */
     [[nodiscard]] static QVariant validate( const QVariant &value ) {
         QVariant var( value );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+        if ( var.typeId() == QMetaType::QString ) {
+#else
         if ( var.type() == QVariant::String ) {
+#endif
             if ( !QString::compare( var.toString(), "true" )) {
                 var = true;
             } else if ( !QString::compare( var.toString(), "false" )) {
@@ -269,14 +273,14 @@ public slots:
      * @param key
      * @param value
      */
-    static void setInteger( const QString &key, int value ) { Variable::setValue<int>( key, value ); }
+    Q_INVOKABLE static void setInteger( const QString &key, int value ) { Variable::setValue<int>( key, value ); }
 
     /**
      * @brief setDecimalValue
      * @param key
      * @param value
      */
-    static void setDecimalValue( const QString &key, qreal value ) { Variable::setValue<qreal>( key, value ); }
+    Q_INVOKABLE static void setDecimalValue( const QString &key, qreal value ) { Variable::setValue<qreal>( key, value ); }
 
     /**
      * @brief setCompressedString
@@ -301,26 +305,26 @@ public slots:
      * @param key
      * @param value
      */
-    static void setEnabled( const QString &key, bool value ) { Variable::setValue<bool>( key, value ); }
+    Q_INVOKABLE static void setEnabled( const QString &key, bool value ) { Variable::setValue<bool>( key, value ); }
 
     /**
      * @brief enable
      * @param key
      */
-    static void enable( const QString &key ) { Variable::setValue<bool>( key, true ); }
+    Q_INVOKABLE static void enable( const QString &key ) { Variable::setValue<bool>( key, true ); }
 
     /**
      * @brief disable
      * @param key
      */
-    static void disable( const QString &key ) { Variable::setValue<bool>( key, false ); }
+    Q_INVOKABLE static void disable( const QString &key ) { Variable::setValue<bool>( key, false ); }
 
     /**
      * @brief setString
      * @param key
      * @param string
      */
-    static void setString( const QString &key, const QString &string ) {
+    Q_INVOKABLE static void setString( const QString &key, const QString &string ) {
         Variable::setValue<QString>( key, string );
     }
 
@@ -355,11 +359,7 @@ signals:
     void widgetChanged( const QString &key, Widget *widget, const QVariant &value );
 
 private:
-    explicit Variable();
+    QMap<QString, QSharedPointer<Var>> list;
     QMultiMap<QString, Widget *> boundVariables;
     QMap<QString, QPair<QObject *, int> > slotList;
-#ifndef VARIABLE_PRIVATE_LIST
-public:
-#endif
-    QMap<QString, QSharedPointer<Var>> list;
 };

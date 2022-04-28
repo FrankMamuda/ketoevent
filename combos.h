@@ -35,19 +35,15 @@ class Combos;
  * @brief The Combos class
  */
 class Combos final : public ModalWindow {
-    Q_DISABLE_COPY( Combos )
+    Q_DISABLE_COPY_MOVE( Combos )
     Q_OBJECT
 
 public:
-    // disable move
-    Combos( Combos&& ) = delete;
-    Combos& operator=( Combos&& ) = delete;
-
-    static Combos *instance() { static Combos *instance( new Combos()); return instance; }
+    static Combos *instance() { static Combos instance; return &instance; }
     ~Combos() override;
 
 protected:
-    void showEvent( QShowEvent *event );
+    void showEvent( QShowEvent *event ) override;
 
 private slots:
     void on_teamCombo_currentIndexChanged( int index );

@@ -48,14 +48,10 @@ class HistoryEdit;
  */
 class Console final : public QMainWindow {
     Q_OBJECT
-    Q_DISABLE_COPY( Console )
+    Q_DISABLE_COPY_MOVE( Console )
 
 public:
-    // disable move
-    Console( Console&& ) = delete;
-    Console& operator=( Console&& ) = delete;
-
-    static Console *instance() { static Console *instance( new Console()); return instance; }
+    static Console *instance() { static Console instance; return &instance; }
     ~Console() override;
 
 public slots:

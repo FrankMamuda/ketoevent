@@ -32,11 +32,11 @@
  * @brief Log::Log
  */
 Log::Log() : Table( "logs" ) {
-    this->addField( ID,    "id",      QVariant::UInt, "integer primary key", true, true );
-    this->addField( Multi, "value",   QVariant::Int,  "integer" );
-    this->addField( Task,  "taskId",  QVariant::Int,  "integer" );
-    this->addField( Team,  "teamId",  QVariant::Int,  "integer" );
-    this->addField( Combo, "comboId", QVariant::Int,  "integer" );
+    this->addField( ID,    "id",      QMetaType::Int, "integer primary key", true, true );
+    this->addField( Multi, "value",   QMetaType::Int,  "integer" );
+    this->addField( Task,  "taskId",  QMetaType::Int,  "integer" );
+    this->addField( Team,  "teamId",  QMetaType::Int,  "integer" );
+    this->addField( Combo, "comboId", QMetaType::Int,  "integer" );
 }
 
 /**
