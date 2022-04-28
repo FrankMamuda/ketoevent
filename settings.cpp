@@ -62,7 +62,7 @@ Settings::Settings() : ui( new Ui::Settings ) {
 
     // handle database path
     this->connect( this->ui->pathButton, &QPushButton::clicked, [ this ]() {
-        const QString fileName( QFileDialog::getOpenFileName
+        const QString fileName( QFileDialog::getSaveFileName
                                 ( this, this->tr( "Open database" ),
                                   QFileInfo( Variable::string( "databasePath" )).absolutePath(),
                                   this->tr( "Database (*.db *.sqlite)" ), nullptr, QFileDialog::DontConfirmOverwrite ));

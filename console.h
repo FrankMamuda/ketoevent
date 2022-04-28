@@ -60,7 +60,7 @@ public slots:
 
 protected:
     void mousePressEvent( QMouseEvent *event ) override { this->m_windowPos = event->pos(); }
-    void mouseMoveEvent( QMouseEvent *event ) override { if ( event->buttons() && Qt::LeftButton ) this->move( this->pos() + event->pos() - this->m_windowPos ); }
+    void mouseMoveEvent( QMouseEvent *event ) override { if ( event->buttons() & Qt::LeftButton ) this->move( this->pos() + event->pos() - this->m_windowPos ); }
     bool eventFilter( QObject *object, QEvent *event ) override;
 
 private slots:
