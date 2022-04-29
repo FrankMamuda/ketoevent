@@ -273,8 +273,11 @@ bool Database::add( Table *table ) {
         for ( const Field &field : qAsConst( table->fields )) {
             statement.append( QString( "%1 %2" ).arg( field->name(), field->format()));
 
-            if ( field->isUnique())
+            if ( field->isUnique() && !field->isAutoValue())
                 statement.append( " unique" );
+
+            if ( field->isAutoValue())
+                statement.append( " autoincrement" );
 
             if ( QString::compare( field->name(), table->fields.last()->name()))
                 statement.append( ", " );

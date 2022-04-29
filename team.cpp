@@ -35,12 +35,13 @@ Team *Team::i = nullptr;
  */
 Team::Team() : Table( "teams" ) {
     this->addField( ID,       "id",         QMetaType::Int,     "integer primary key", true, true );
-    this->addField( Title,    "name",       QMetaType::QString, "text",       true );
+    this->addField( Title,    "name",       QMetaType::QString, "text" );
     this->addField( Members,  "members",    QMetaType::Int,     "integer" );
     this->addField( Finish,   "finishTime", QMetaType::QString, "text" );
     this->addField( Lock,     "lock",       QMetaType::Int,     "integer" );
     this->addField( Reviewer, "reviewer",   QMetaType::QString, "text" );
     this->addField( Event,    "eventId",    QMetaType::Int,     "integer" );
+    this->addUniqueConstraint( QList<Field>() << this->field( Title ) << this->field( Event ));
 }
 
 /**

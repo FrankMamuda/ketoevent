@@ -38,7 +38,7 @@ Task *Task::i = nullptr;
  */
 Task::Task() : Table( "tasks" ) {
     this->addField( ID,     "id",          QMetaType::Int,     "integer primary key", true, true );
-    this->addField( Name,   "name",        QMetaType::QString, "text",      true );
+    this->addField( Name,   "name",        QMetaType::QString, "text" );
     this->addField( Points, "points",      QMetaType::Int,     "integer" );
     this->addField( Mult,   "multi",       QMetaType::Int,     "integer" );
     this->addField( Style,  "style",       QMetaType::Int,     "integer" );
@@ -46,6 +46,7 @@ Task::Task() : Table( "tasks" ) {
     this->addField( Order,  "parent",      QMetaType::Int,     "integer" );
     this->addField( Event,  "eventId",     QMetaType::Int,     "integer" );
     this->addField( Desc,   "description", QMetaType::QString, "text" );
+    this->addUniqueConstraint( QList<Field>() << this->field( Name ) << this->field( Event ));
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );
