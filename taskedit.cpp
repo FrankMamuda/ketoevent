@@ -114,65 +114,6 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             EditorDialog::instance()->hideDock();
     });
 
-#if 0
-    // shortcut from name to points
-    this->connect( this->ui->nameEdit, &QLineEdit::returnPressed, [ this, emptyName ]() {
-        if ( emptyName())
-            return;
-
-        this->ui->pointsInteger->setFocus();
-    } );
-
-    // shortcut from points to type
-    this->connect( this->ui->pointsInteger, &QSpinBox::editingFinished, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
-            return;
-
-        this->ui->typeCombo->setFocus();
-        this->ui->typeCombo->showPopup();
-    } );
-
-    // shortcut from type to either style or multi
-    this->connect( this->ui->typeCombo, &ComboBox::popupHidden, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
-            return;
-
-        qDebug() << "type popup hidden" << this->ui->typeCombo->currentIndex();
-
-        if ( this->ui->typeCombo->currentIndex() == Task::Check ) {
-            this->ui->styleCombo->setFocus();
-            this->ui->styleCombo->showPopup();
-        } else if ( this->ui->typeCombo->currentIndex() == Task::Multi ) {
-            this->ui->multiInteger->setFocus();
-        }
-    } );
-
-    // shortcut from multi to style
-    this->connect( this->ui->multiInteger, &QSpinBox::editingFinished, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
-            return;
-
-        this->ui->styleCombo->setFocus();
-        this->ui->styleCombo->showPopup();
-    } );
-
-    // shortcut from style to desc
-    this->connect( this->ui->styleCombo, &ComboBox::popupHidden, [ this ]() {
-        if ( !EditorDialog::instance()->isDockVisible() || !this->isVisible())
-            return;
-
-        qDebug() << "style popup hidden";
-        this->ui->descEdit->setFocus();
-    } );
-
-    // shortcut from desc to desc
-    this->connect( this->ui->descEdit, &QLineEdit::returnPressed, [ this ]() {
-        this->ui->addButton->setFocus();
-        this->ui->addButton->setDefault( true );
-        this->ui->addButton->setAutoDefault( true );
-    } );
-#endif
-
     // cancel button just closes the dialog
     this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
         if ( EditorDialog::instance()->isDockVisible())
@@ -190,15 +131,6 @@ TaskEdit::~TaskEdit() {
     // disconnect lambdas
     this->disconnect( this->ui->addButton, SIGNAL( clicked()));
     this->disconnect( this->ui->cancelButton, SIGNAL( clicked()));
-
-#if 0
-    this->disconnect( this->ui->nameEdit, SIGNAL( returnPressed()));
-    this->disconnect( this->ui->pointsInteger, SIGNAL( editingFinished()));
-    this->disconnect( this->ui->typeCombo, SIGNAL( popupHidden()));
-    this->disconnect( this->ui->multiInteger, SIGNAL( editingFinished()));
-    this->disconnect( this->ui->styleCombo, SIGNAL( popupHidden()));
-    this->disconnect( this->ui->descEdit, SIGNAL( returnPressed()));
-#endif
 
     // delete ui
     delete this->ui;

@@ -53,6 +53,9 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - ideally info button would align itself to the left
 //   - new combo should not start with 1
 //   - task export
+//   - icons for task subTypes (whole team/one member/object only)
+//   - option to disable combos
+//   - option to disable time tracking
 //
 
 // default message handler

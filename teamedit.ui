@@ -98,7 +98,11 @@
       </widget>
      </item>
      <item row="0" column="6">
-      <widget class="QSpinBox" name="membersInteger"/>
+      <widget class="QSpinBox" name="membersInteger">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="reviewerPixmap">

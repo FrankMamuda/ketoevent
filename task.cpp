@@ -32,6 +32,7 @@
 
 // singleton
 Task *Task::i = nullptr;
+TaskProxyModel *TaskProxyModel::i = nullptr;
 
 /**
  * @brief Task::Task
@@ -117,18 +118,6 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
             return font;
         }
     }
-
-#ifdef QT_DEBUG
-    if ( role == Qt::DisplayRole ) {
-        const Row row = this->row( index.row());
-        const bool isMulti = this->type( row ) == Task::Types::Multi;
-
-        return QString( "%1 (%2%3)")
-                .arg( this->name( row ),
-                isMulti ? this->tr( "M" ) : this->tr( "R" ),
-                isMulti ? QString( ", %1x%2" ).arg( QString::number( this->points( row )), QString::number( this->multi( row ))) : QString( ", %1" ).arg( QString::number( this->points( row ))));
-    }
-#endif
 
     return Table::data( index, role );
 }
@@ -285,8 +274,32 @@ QString Task::selectStatement() const {
     // remove trailing whitespace
     statement = statement.simplified();
 
-    // DEBUG:
-    //qDebug() << statement;
-
     return statement;
+}
+
+/**
+ * @brief TaskProxyModel::data
+ * @param index
+ * @param role
+ * @return
+ */
+QVariant TaskProxyModel::data( const QModelIndex &index, int role ) const {
+    if ( role == Qt::DisplayRole ) {
+        const Row row = Task::instance()->row( index.row());
+        const bool isMulti = Task::instance()->type( row ) == Task::Types::Multi;
+
+        return QString( "%1 (%2%3)")
+                .arg( Task::instance()->name( row ),
+                      isMulti ? this->tr( "M" ) : this->tr( "R" ),
+                      isMulti ? QString( ", %1x%2" ).arg( QString::number( Task::instance()->points( row )), QString::number( Task::instance()->multi( row ))) : QString( ", %1" ).arg( QString::number( Task::instance()->points( row ))));
+    }
+
+    return Task::instance()->data( index, role );
+}
+
+/**
+ * @brief TaskProxyModel::TaskProxyModel
+ */
+TaskProxyModel::TaskProxyModel() {
+    this->setSourceModel( Task::instance());
 }

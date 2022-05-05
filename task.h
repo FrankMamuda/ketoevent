@@ -23,6 +23,7 @@
  * includes
  */
 #include "table.h"
+#include <QIdentityProxyModel>
 
 /**
  * @brief The Task class
@@ -129,3 +130,21 @@ private:
 Q_DECLARE_METATYPE( Task::Fields )
 Q_DECLARE_METATYPE( Task::Types )
 Q_DECLARE_METATYPE( Task::Styles )
+
+/**
+ * @brief The TaskProxyModel class
+ */
+class TaskProxyModel : public QIdentityProxyModel {
+public:
+    /**
+     * @brief instance
+     * @return
+     */
+    static TaskProxyModel *instance() { if ( TaskProxyModel::i == nullptr ) TaskProxyModel::i = new TaskProxyModel(); return TaskProxyModel::i; }
+    ~TaskProxyModel() override {}
+    QVariant data( const QModelIndex &index, int role ) const override;
+
+private:
+    static TaskProxyModel *i;
+    explicit TaskProxyModel();
+};

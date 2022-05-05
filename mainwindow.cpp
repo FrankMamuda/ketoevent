@@ -219,8 +219,6 @@ MainWindow::~MainWindow() {
     delete this->quickSpacerLeft;
     delete this->quickSpacerRight;
     delete this->ui;
-
-    qDebug() << "DELETE MAIN";
 }
 
 /**
@@ -391,7 +389,7 @@ void MainWindow::on_actionTasks_triggered() {
 
     editor->show();
     editor->container->clearSelection();
-    editor->container->setModel( Task::instance());
+    editor->container->setModel( TaskProxyModel::instance());
     editor->container->setModelColumn( Task::Name );
     editor->setToolBar( TaskToolBar::instance());
     editor->setWindowTitle( this->tr( "Task manager" ));
