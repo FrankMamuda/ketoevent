@@ -63,7 +63,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid())
             return;
 
-        const Row row = Task::instance()->row( index );
+        const Row row = Task::instance()->row( dynamic_cast<TaskProxyModel*>( EditorDialog::instance()->container->model())->mapToSource( index ));
         if ( row == Row::Invalid )
             return;
 
@@ -114,9 +114,8 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
 
         // get container pointer and order indexes
         QListView *container( EditorDialog::instance()->container );
-        const QModelIndex index( container->currentIndex());
-        const QModelIndex other( container->model()->index( container->currentIndex().row() + ( up ? -1 : 1 ), 0 ));
-
+        const QModelIndex index( dynamic_cast<TaskProxyModel*>( EditorDialog::instance()->container->model())->mapToSource( container->currentIndex()));
+        const QModelIndex other( dynamic_cast<TaskProxyModel*>( EditorDialog::instance()->container->model())->mapToSource( container->model()->index( container->currentIndex().row() + ( up ? -1 : 1 ), 0 )));
         if ( EditorDialog::instance()->isDockVisible() || !index.isValid() || !other.isValid())
             return;
 

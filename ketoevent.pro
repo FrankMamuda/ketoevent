@@ -153,7 +153,7 @@ QMAKE_EXTRA_TARGETS += langupd
 QMAKE_EXTRA_COMPILERS += langrel
 PRE_TARGETDEPS += langupd compiler_langrel_make_all
 
-#CONFIG += xlsx_support
+CONFIG += xlsx_support
 xlsx_support {
 include(3rdparty/qxlsx/qxlsx.pri)
 DEFINES += XLSX_SUPPORT

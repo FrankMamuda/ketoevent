@@ -115,7 +115,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
     });
 
     // cancel button just closes the dialog
-    this->connect( this->ui->cancelButton, &QPushButton::clicked, [ this ]() {
+    this->connect( this->ui->cancelButton, &QPushButton::clicked, []() {
         if ( EditorDialog::instance()->isDockVisible())
             EditorDialog::instance()->hideDock();
     } );

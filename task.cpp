@@ -105,7 +105,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
 QVariant Task::data( const QModelIndex &index, int role ) const {
     const Row row = this->row( index );
 
-    if ( role == Qt::FontRole ) {
+    if ( role == Qt::FontRole && index.isValid() && row != Row::Invalid ) {
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
 
         if ( Task::instance()->style( row ) == Styles::Italic ) {
@@ -284,7 +284,7 @@ QString Task::selectStatement() const {
  * @return
  */
 QVariant TaskProxyModel::data( const QModelIndex &index, int role ) const {
-    if ( role == Qt::DisplayRole ) {
+    if ( role == Qt::DisplayRole && index.column() == Task::Name ) {
         const Row row = Task::instance()->row( index.row());
         const bool isMulti = Task::instance()->type( row ) == Task::Types::Multi;
 
