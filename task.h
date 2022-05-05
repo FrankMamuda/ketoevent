@@ -43,7 +43,7 @@ public:
         Mult,
         Style,
         Type,
-        Order,
+        Order_,
         Event,
         Desc,
 
@@ -90,7 +90,7 @@ public:
     [[nodiscard]] int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
     [[nodiscard]] Styles style( const Row &row ) const { return static_cast<Styles>( this->value( row, Style ).toInt()); }
     [[nodiscard]] Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
-    [[nodiscard]] int order( const Row &row ) const { return this->value( row, Order ).toInt(); }
+    [[nodiscard]] int order( const Row &row ) const { return this->value( row, Order_ ).toInt(); }
     [[nodiscard]] QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
     [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     [[nodiscard]] QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
@@ -110,7 +110,7 @@ public slots:
     void setMulti( const Row &row, int points ) { this->setValue( row, Mult, points ); }
     void setStyle( const Row &row, Task::Styles style ) { this->setValue( row, Style, static_cast<int>( style )); }
     void setType( const Row &row, Task::Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
-    void setOrder( const Row &row, int position ) { this->setValue( row, Order, position ); }
+    void setOrder( const Row &row, int position ) { this->setValue( row, Order_, position ); }
     void setDescription( const Row &row, const QString &description ) { this->setValue( row, Desc, description ); }
     void setMultiplier( const Row &row, int value );
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }

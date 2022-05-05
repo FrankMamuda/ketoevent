@@ -291,14 +291,14 @@ void MainWindow::on_eventCombo_currentIndexChanged( int index ) {
     // failsafe
     const Row row = Event::instance()->row( index );
     if ( row == Row::Invalid ) {
-        Team::instance()->setFilter( "eventId=-1" );
+        Team::instance()->setFilter( Team::instance()->fieldName( Team::Event ) + "=-1" );
 
         this->setLock();
         return;
     }
 
     // filter tasks
-    Team::instance()->setFilter( QString( "eventId=%1" ).arg( static_cast<int>( Event::instance()->id( row ))));
+    Team::instance()->setFilter( QString( Team::instance()->fieldName( Team::Event ) + "=%1" ).arg( static_cast<int>( Event::instance()->id( row ))));
     this->setTaskFilter();
 }
 
@@ -468,7 +468,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
                           comboOrder )
                 .arg( sort ?
                           Task::instance()->fieldName( Task::Style ) :
-                          Task::instance()->fieldName( Task::Order ))
+                          Task::instance()->fieldName( Task::Order_ ))
                 .arg( sort ?
                       #ifdef SQLITE_CUSTOM
                           QString( ", %1 COLLATE localeCompare ASC" )

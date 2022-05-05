@@ -26,7 +26,6 @@
 #include <QTime>
 #include "database.h"
 #include "table.h"
-#include "field.h"
 #include "main.h"
 #include "variable.h"
 #include "mainwindow.h"
@@ -239,24 +238,27 @@ bool Database::add( Table *table ) {
     bool found = false;
     for ( const QString &tableName : tableList ) {
         if ( !QString::compare( table->tableName(), tableName )) {
-            for ( const Field &field : qAsConst( table->fields )) {
+            int y = 0;
+            for ( const QSqlField &field : qAsConst( table->fields )) {
 
-                if ( !database.record( table->tableName()).contains( field->name())) {
+                if ( !database.record( table->tableName()).contains( field.name())) {
                     qCCritical( Database_::Debug )
-                            << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field->name());
+                            << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field.name());
                     return false;
                 }
 
                 // ignore unsigned ints for now
-                const QMetaType::Type internalType = field->type() == QMetaType::UInt ? QMetaType::Int : field->type();
-                const QMetaType::Type databaseType = static_cast<QMetaType::Type>( database.record( table->tableName()).field( field->id()).metaType().id());
+                const QMetaType::Type internalType = field.metaType().id() == QMetaType::UInt ? QMetaType::Int : static_cast<QMetaType::Type>( field.metaType().id());
+                const QMetaType::Type databaseType = static_cast<QMetaType::Type>( database.record( table->tableName()).field( y ).metaType().id());
 
                 if ( internalType != databaseType ) {
                     qCCritical( Database_::Debug )
                             << Database::tr( R"(database type mismatch in table "%1", field - "%2")" ).arg(
-                                   tableName, field->name());
+                                   tableName, field.name());
                     return false;
                 }
+
+                y++;
             }
             found = true;
         }
@@ -270,17 +272,23 @@ bool Database::add( Table *table ) {
         qCInfo( Database_::Debug ) << Database::tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
 
         // prepare statement
-        for ( const Field &field : qAsConst( table->fields )) {
-            statement.append( QString( "%1 %2" ).arg( field->name(), field->format()));
+        int y = 0;
+        for ( const QSqlField &field : qAsConst( table->fields )) {
+            statement.append( QString( "%1 %2" ).arg( field.name(), Table::FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))));
 
-            if ( field->isUnique() && !field->isAutoValue())
-                statement.append( " unique" );
+            if ( table->hasPrimaryField() && table->primaryFieldIndex == y )
+                statement.append( " PRIMARY KEY" );
 
-            if ( field->isAutoValue())
-                statement.append( " autoincrement" );
+            if ( table->uniqueFields.contains( field ) && !field.isAutoValue())
+                statement.append( " UNIQUE" );
 
-            if ( QString::compare( field->name(), table->fields.last()->name()))
+            if ( field.isAutoValue())
+                statement.append( " AUTOINCREMENT" );
+
+            if ( QString::compare( field.name(), table->fields.last().name()))
                 statement.append( ", " );
+
+            y++;
         }
 
         // check for constraints
@@ -289,12 +297,12 @@ bool Database::add( Table *table ) {
 
         if ( tc > 0 ) {
             for ( int y = 0; y < table->constraints.count(); y++ ) {
-                constraints.append( "unique( " );
+                constraints.append( "UNIQUE( " );
 
                 const qsizetype cc = table->constraints.at( y ).count();
                 for ( int k = 0; k < cc; k++ ) {
-                    const QSharedPointer<Field_> field( table->constraints.at( y ).at( k ));
-                    constraints.append( field->name());
+                    const QSqlField field( table->constraints.at( y ).at( k ));
+                    constraints.append( field.name());
                     constraints.append( k == cc - 1 ? " )" : ", " );
 
                 }
@@ -307,7 +315,8 @@ bool Database::add( Table *table ) {
             statement.append( constraints );
         }
 
-        if ( !query.exec( QString( "create table if not exists %1 ( %2 )" ).arg( table->tableName(), statement )))
+        //qDebug() << QString( "CREATE TABLE IF NOT EXISTS %1 ( %2 )" ).arg( table->tableName(), statement );
+        if ( !query.exec( QString( "CREATE TABLE IF NOT EXISTS %1 ( %2 )" ).arg( table->tableName(), statement )))
             qCCritical( Database_::Debug )
                     << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
     }

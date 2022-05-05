@@ -21,7 +21,6 @@
  * includes
  */
 #include "task.h"
-#include "field.h"
 #include "database.h"
 #include "event.h"
 #include "mainwindow.h"
@@ -34,20 +33,22 @@
 Task *Task::i = nullptr;
 TaskProxyModel *TaskProxyModel::i = nullptr;
 
+#define stringify( x ) #x
+
 /**
  * @brief Task::Task
  */
 Task::Task() : Table( "tasks" ) {
-    this->addField( ID,     "id",          QMetaType::Int,     "integer primary key", true, true );
-    this->addField( Name,   "name",        QMetaType::QString, "text" );
-    this->addField( Points, "points",      QMetaType::Int,     "integer" );
-    this->addField( Mult,   "multi",       QMetaType::Int,     "integer" );
-    this->addField( Style,  "style",       QMetaType::Int,     "integer" );
-    this->addField( Type,   "type",        QMetaType::Int,     "integer" );
-    this->addField( Order,  "parent",      QMetaType::Int,     "integer" );
-    this->addField( Event,  "eventId",     QMetaType::Int,     "integer" );
-    this->addField( Desc,   "description", QMetaType::QString, "text" );
-    this->addUniqueConstraint( QList<Field>() << this->field( Name ) << this->field( Event ));
+    PRIMARY_FIELD( ID );
+    FIELD( Name,   QMetaType::QString );
+    FIELD( Points, QMetaType::Int );
+    FIELD( Mult,   QMetaType::Int );
+    FIELD( Style,  QMetaType::Int );
+    FIELD( Type,   QMetaType::Int );
+    FIELD( Order_, QMetaType::Int );
+    FIELD( Event,  QMetaType::Int );
+    FIELD( Desc,   QMetaType::QString );
+    this->addUniqueConstraint( QList<QSqlField>() << this->field( Name ) << this->field( Event ));
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );
@@ -57,7 +58,7 @@ Task::Task() : Table( "tasks" ) {
     this->styles[Styles::Italic]  = QObject::tr( "Italic" );
 
     // sort by order
-    this->setSort( Task::Order, Qt::AscendingOrder );
+    this->setSort( Task::Order_, Qt::AscendingOrder );
 }
 
 /**

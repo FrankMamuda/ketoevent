@@ -23,7 +23,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include "log.h"
-#include "field.h"
 #include "database.h"
 #include "task.h"
 #include "team.h"
@@ -35,11 +34,11 @@ Log *Log::i = nullptr;
  * @brief Log::Log
  */
 Log::Log() : Table( "logs" ) {
-    this->addField( ID,    "id",      QMetaType::Int, "integer primary key", true, true );
-    this->addField( Multi, "value",   QMetaType::Int,  "integer" );
-    this->addField( Task,  "taskId",  QMetaType::Int,  "integer" );
-    this->addField( Team,  "teamId",  QMetaType::Int,  "integer" );
-    this->addField( Combo, "comboId", QMetaType::Int,  "integer" );
+    PRIMARY_FIELD( ID );
+    FIELD( Multi, QMetaType::Int );
+    FIELD( Task,  QMetaType::Int );
+    FIELD( Team,  QMetaType::Int );
+    FIELD( Combo, QMetaType::Int );
 }
 
 /**

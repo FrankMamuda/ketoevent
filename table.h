@@ -24,11 +24,11 @@
 #include <QSqlRelationalTableModel>
 #include <QSharedPointer>
 #include <QSqlRecord>
+#include <QSqlField>
 
 //
 // classes
 //
-class Field_;
 class QDebug;
 class QSqlQuery;
 
@@ -61,14 +61,11 @@ Q_DECLARE_METATYPE( Row )
 /*
  * FIELD macro generates a lowercase fieldName from field index (enum)
  */
-static const QMap<QMetaType::Type, QString> _fieldTypes {{ QMetaType::Int,       "integer" },
-                                                        { QMetaType::Double,    "real" },
-                                                        { QMetaType::QString,    "text" },
-                                                        { QMetaType::QColor,     "colour" },
-                                                        { QMetaType::QByteArray, "blob" }};
-#define FIELD( fieldId, type ) fieldId, QString( #fieldId ).replace( 0, 1, QString( #fieldId ).at( 0 ).toLower()), QMetaType::type, _fieldTypes[QMetaType::type]
-#define UNIQUE_FIELD( fieldId, type ) fieldId, QString( #fieldId ).replace( 0, 1, QString( #fieldId ).at( 0 ).toLower()), QMetaType::type, _fieldTypes[QMetaType::type], true
-#define PRIMARY_FIELD( fieldId ) fieldId, QString( #fieldId ).toLower(), QMetaType::Int, "integer primary key", true, true
+// field map
+
+#define FIELD( fieldId, type ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::type )
+#define UNIQUE_FIELD( fieldId, type ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::type, true )
+#define PRIMARY_FIELD( fieldId ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::Int, true, true, true )
 #define FIELD_GETTER( type, fieldId, name ) public: [[nodiscard]] type name( const Row &row ) const { return this->value( row, fieldId ).value<type>(); } type name( const Id &id ) const { return this->value( id, fieldId ).value<type>(); }
 #define FIELD_SETTER( type, fieldId ) public slots: void set##fieldId( const Row &row, const type &variable ) { this->setValue( row, fieldId, QVariant::fromValue( variable )); }
 #define INITIALIZE_FIELD( type, fieldId, name ) FIELD_GETTER( type, fieldId, name ) FIELD_SETTER( type, fieldId )
@@ -106,7 +103,7 @@ public:
      * @brief hasPrimaryField
      * @return
      */
-    [[nodiscard]] bool hasPrimaryField() const { return this->m_hasPrimary; }
+    [[nodiscard]] bool hasPrimaryField() const { return this->primaryFieldIndex != -1; }
     Q_INVOKABLE [[nodiscard]] int count() const;
 
     [[nodiscard]] virtual QVariant value( const Row &row, int fieldId ) const;
@@ -118,19 +115,17 @@ public:
      * @param value
      * @return
      */
-    [[nodiscard]] bool contains( int fieldId, const QVariant &value ) const {
-        return this->contains( this->field( fieldId ), value );
-    }
+    [[nodiscard]] bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
     bool select() override;
-
-    /**
-     * @brief primaryField
-     * @return
-     */
-    [[nodiscard]] QSharedPointer<Field_> primaryField() const { return this->m_primaryField; }
     [[nodiscard]] QVariant data( const QModelIndex &index, int role ) const override;
     void setFilter( const QString &filter ) override;
-    [[nodiscard]] QString fieldName( int id ) const;
+
+    /**
+     * @brief fieldName
+     * @param id
+     * @return
+     */
+    [[nodiscard]] QString fieldName( int id ) const { return this->field( id ).name(); }
 
     /**
      * @brief row
@@ -148,12 +143,18 @@ public:
      * @return
      */
     [[nodiscard]] Row row( const QModelIndex &index ) const {
-        if ( index.row() < 0 || index.row() >= this->count() || index.model() != this )return Row::Invalid;
+        if ( index.row() < 0 || index.row() >= this->count() || index.model() != this )
+            return Row::Invalid;
+
         return static_cast<Row>( index.row());
     }
     [[nodiscard]] Row row( const Id &id ) const;
 
-    [[maybe_unused]] void addUniqueConstraint( const QList<QSharedPointer<Field_>> &constrainedFields );
+    /**
+     * @brief addUniqueConstraint
+     * @param constrainedFields
+     */
+    [[maybe_unused]] void addUniqueConstraint( const QList<QSqlField> &constrainedFields ) { this->constraints << constrainedFields; }
     [[maybe_unused]][[nodiscard]] QSqlQuery prepare( bool ignore = true ) const;
     [[maybe_unused]] bool bind( QSqlQuery &query, const QVariantList &arguments );
 
@@ -163,8 +164,7 @@ public slots:
      * @param valid
      */
     void setValid( bool valid = true ) { this->m_valid = valid; }
-    void addField( int id, const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType,
-                   const QString &format = QString( "text" ), bool unique = false, bool autoValue = false );
+    void addField( int id, const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false );
     Row add( const QVariantList &arguments );
     virtual void remove( const Row &row );
     void setValue( const Row &row, int fieldId, const QVariant &value );
@@ -175,15 +175,17 @@ public slots:
     virtual void removeOrphanedEntries() {}
 
 protected:
-    QMap<int, QSharedPointer<Field_>> fields;
-    [[nodiscard]] QSharedPointer<Field_> field( int id ) const;
-    [[nodiscard]] bool contains( const QSharedPointer<Field_> &field, const QVariant &value ) const;
+    QMap<int, QSqlField> fields;
+    QList<QSqlField> uniqueFields;
+    [[nodiscard]] QSqlField field( int id ) const;
+    [[nodiscard]] bool contains( const QSqlField &field, const QVariant &value ) const;
 
 private:
     bool m_valid = false;
-    bool m_hasPrimary = false;
-    QSharedPointer<Field_> m_primaryField;
-    QList<QList<QSharedPointer<Field_>>> constraints;
+    QList<QList<QSqlField>> constraints;
+    int primaryFieldIndex = -1;
+
+    static QMultiMap<QMetaType::Type, QString> FieldTypes;
 };
 
 // declare enums

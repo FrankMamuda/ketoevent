@@ -21,7 +21,6 @@
  * includes
  */
 #include "event.h"
-#include "field.h"
 #include "database.h"
 
 // singleton
@@ -37,19 +36,19 @@ using namespace EventTable;
  * @param parent
  */
 Event::Event() : Table( "events" ) {
-    this->addField( ID,      "id",                 QMetaType::Int,     "integer primary key", true, true );
-    this->addField( API,     "api",                QMetaType::Int,     "integer" );
-    this->addField( Title,   "name",               QMetaType::QString, "text",       true );
-    this->addField( Min,     "minMembers",         QMetaType::Int,     "integer" );
-    this->addField( Max,     "maxMembers",         QMetaType::Int,     "integer" );
-    this->addField( Start,   "startTime",          QMetaType::QString, "text" );
-    this->addField( Finish,  "finishTime",         QMetaType::QString, "text" );
-    this->addField( Final,   "finalTime",          QMetaType::QString, "text" );
-    this->addField( Penalty, "penalty",            QMetaType::Int,     "integer" );
-    this->addField( Combo2,  "comboOfTwo",         QMetaType::Int,     "integer" );
-    this->addField( Combo3,  "comboOfThree",       QMetaType::Int,     "integer" );
-    this->addField( Combo4,  "comboOfFourAndMore", QMetaType::Int,     "integer" );
-    this->addField( Lock,    "lock",               QMetaType::Int,     "integer" );
+    PRIMARY_FIELD( ID );
+    FIELD( API,     QMetaType::Int );
+    FIELD( Title,   QMetaType::QString );
+    FIELD( Min,     QMetaType::Int );
+    FIELD( Max,     QMetaType::Int );
+    FIELD( Start,   QMetaType::QString );
+    FIELD( Finish,  QMetaType::QString );
+    FIELD( Final,   QMetaType::QString );
+    FIELD( Penalty, QMetaType::Int );
+    FIELD( Combo2,  QMetaType::Int);
+    FIELD( Combo3,  QMetaType::Int );
+    FIELD( Combo4,  QMetaType::Int );
+    FIELD( Lock,    QMetaType::Int );
 }
 
 /**

@@ -21,7 +21,6 @@
  * includes
  */
 #include "team.h"
-#include "field.h"
 #include "database.h"
 #include "event.h"
 #include "mainwindow.h"
@@ -34,14 +33,14 @@ Team *Team::i = nullptr;
  * @brief Team::Team
  */
 Team::Team() : Table( "teams" ) {
-    this->addField( ID,       "id",         QMetaType::Int,     "integer primary key", true, true );
-    this->addField( Title,    "name",       QMetaType::QString, "text" );
-    this->addField( Members,  "members",    QMetaType::Int,     "integer" );
-    this->addField( Finish,   "finishTime", QMetaType::QString, "text" );
-    this->addField( Lock,     "lock",       QMetaType::Int,     "integer" );
-    this->addField( Reviewer, "reviewer",   QMetaType::QString, "text" );
-    this->addField( Event,    "eventId",    QMetaType::Int,     "integer" );
-    this->addUniqueConstraint( QList<Field>() << this->field( Title ) << this->field( Event ));
+    PRIMARY_FIELD( ID );
+    FIELD( Title,    QMetaType::QString );
+    FIELD( Members,  QMetaType::Int );
+    FIELD( Finish,   QMetaType::QString );
+    FIELD( Lock,     QMetaType::Int );
+    FIELD( Reviewer, QMetaType::QString );
+    FIELD( Event,    QMetaType::Int );
+    this->addUniqueConstraint( QList<QSqlField>() << this->field( Title ) << this->field( Event ));
 }
 
 /**
