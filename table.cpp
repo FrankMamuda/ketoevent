@@ -19,11 +19,12 @@
 /*
  * includes
  */
-#include <QSqlRecord>
 #include "table.h"
 #include "database.h"
 #include <QDebug>
 #include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
 
 /*
  * FieldTypes
@@ -199,65 +200,40 @@ void Table::addField( int id, const QString &fieldName, QMetaType::Type type, bo
  * @brief Table::add
  * @param name
  */
-Row Table::add( const QVariantList &arguments ) {
-    int y;
-
-    if ( !this->isValid())
-        return Row::Invalid;
-
-    if ( this->fields.count() != arguments.count())
-        qCCritical( Database_::Debug )
-            << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg(
-                    this->fields.count());
-
-    // insert empty row
-    const int row = this->count();
-    this->beginInsertRows( QModelIndex(), this->count(), this->count());
-    if ( !this->insertRow( this->count())) {
-        qCCritical( Database_::Debug ) << Table::tr( "cannot insert row into table \"%1\"" ).arg( this->tableName());
-        this->endInsertRows();
+Row Table::add( const QVariantList &arguments ) {  
+    if ( this->fields.count() != arguments.count()) {
+        qCCritical( Database_::Debug ) << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
         return Row::Invalid;
     }
 
     // prepare statement
-    for ( y = 0; y < arguments.count(); y++ ) {
-        QSqlField &field( this->fields[y] );
-        QVariant argument;
+    QSqlRecord record( this->record());
+    for ( int y = 0; y < arguments.count(); y++ ) {
+        const QSqlField field( this->fields[y] );
+        const QVariant argument( arguments.at( y ));
 
-        // get field and argument
-        argument = arguments.at( y );
-
-        // compare types
-        if ( field.metaType().id() != argument.typeId()) {
-            qCCritical( Database_::Debug )
-                << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg(
-                        argument.typeId()).arg( y ).arg( FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))).arg( field.metaType().id());
-            this->revert();
-            this->endInsertRows();
-            return Row::Invalid;
-        }
-
-        // check for unique fields
-        if ( this->uniqueFields.contains( field ) && !field.isAutoValue()) {
-            if ( this->contains( field, argument )) {
-                qCWarning( Database_::Debug )
-                    << Table::tr( R"(table already has a unique field "%1" with value - "%2", aborting addition)" )
-                            .arg( field.name(), argument.toString());
-                this->revert();
-                this->endInsertRows();
+        if ( !field.isAutoValue()) {
+            if ( argument.typeId() != field.metaType().id()) {
+                qCCritical( Database_::Debug ) << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.typeId()).arg( y ).arg( FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))).arg( field.metaType().id());
                 return Row::Invalid;
             }
-        }
 
-        // set data if field is not primary
-        if ( this->primaryFieldIndex != y )
-            this->setData( this->index( row, y ), argument );
+            record.setValue( field.name(), argument );
+        }
     }
 
-    this->submit();
-    this->endInsertRows();
+    this->insertRecord( -1, record );
+
+    if ( this->submitAll()) {
+        this->database().commit();
+    } else {
+        this->database().rollback();
+        qCCritical( Database_::Debug ) << Table::tr( R"(cannot insert record into table "%1" (reason - "%2")" ).arg( this->tableName()).arg( this->lastError().text());
+        return Row::Invalid;
+    }
+
     this->select();
-    return this->row( row );
+    return static_cast<Row>( this->count() - 1 );
 }
 
 /**
