@@ -129,7 +129,7 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
                             Id id = static_cast<Id>( delegate->combos[index] );
                             if ( id == Id::Invalid ) {
                                 QSqlQuery query;
-                                query.exec( QString( "select max( %1 ) from %2" )
+                                query.exec( QString( "SELECT max( %1 ) from %2" )
                                             .arg( Log::instance()->fieldName( Log::Combo ),
                                                   Log::instance()->tableName()));
 

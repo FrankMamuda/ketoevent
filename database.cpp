@@ -235,34 +235,7 @@ bool Database::add( Table *table ) {
         qCInfo( Database_::Debug ) << Database::tr( "creating an empty database" );
 
     // validate schema
-    bool found = false;
-    for ( const QString &tableName : tableList ) {
-        if ( !QString::compare( table->tableName(), tableName )) {
-            int y = 0;
-            for ( const QSqlField &field : qAsConst( table->fields )) {
-
-                if ( !database.record( table->tableName()).contains( field.name())) {
-                    qCCritical( Database_::Debug )
-                            << Database::tr( R"(database field mismatch in table "%1", field - "%2")" ).arg( tableName, field.name());
-                    return false;
-                }
-
-                // ignore unsigned ints for now
-                const QMetaType::Type internalType = field.metaType().id() == QMetaType::UInt ? QMetaType::Int : static_cast<QMetaType::Type>( field.metaType().id());
-                const QMetaType::Type databaseType = static_cast<QMetaType::Type>( database.record( table->tableName()).field( y ).metaType().id());
-
-                if ( internalType != databaseType ) {
-                    qCCritical( Database_::Debug )
-                            << Database::tr( R"(database type mismatch in table "%1", field - "%2")" ).arg(
-                                   tableName, field.name());
-                    return false;
-                }
-
-                y++;
-            }
-            found = true;
-        }
-    }
+    const bool found = database.tables().contains( table->tableName());
 
     QString statement;
     QSqlQuery query;
@@ -272,23 +245,22 @@ bool Database::add( Table *table ) {
         qCInfo( Database_::Debug ) << Database::tr( "creating an empty table - \"%1\"" ).arg( table->tableName());
 
         // prepare statement
-        int y = 0;
-        for ( const QSqlField &field : qAsConst( table->fields )) {
+        for ( int y = 0; y < table->tmpFields.count(); y++ ) {
+            const QSqlField &field( table->tmpFields[y] );
+
             statement.append( QString( "%1 %2" ).arg( field.name(), Table::FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))));
 
             if ( table->hasPrimaryField() && table->primaryFieldIndex == y )
                 statement.append( " PRIMARY KEY" );
 
-            if ( table->uniqueFields.contains( field ) && !field.isAutoValue())
+            if ( table->uniqueFields.contains( field.name()) && !field.isAutoValue())
                 statement.append( " UNIQUE" );
 
             if ( field.isAutoValue())
                 statement.append( " AUTOINCREMENT" );
 
-            if ( QString::compare( field.name(), table->fields.last().name()))
+            if ( y < table->tmpFields.count() - 1 )
                 statement.append( ", " );
-
-            y++;
         }
 
         // check for constraints
@@ -301,8 +273,8 @@ bool Database::add( Table *table ) {
 
                 const qsizetype cc = table->constraints.at( y ).count();
                 for ( int k = 0; k < cc; k++ ) {
-                    const QSqlField field( table->constraints.at( y ).at( k ));
-                    constraints.append( field.name());
+                    const QString field( table->constraints.at( y ).at( k ));
+                    constraints.append( field );
                     constraints.append( k == cc - 1 ? " )" : ", " );
 
                 }
@@ -315,11 +287,11 @@ bool Database::add( Table *table ) {
             statement.append( constraints );
         }
 
-        //qDebug() << QString( "CREATE TABLE IF NOT EXISTS %1 ( %2 )" ).arg( table->tableName(), statement );
         if ( !query.exec( QString( "CREATE TABLE IF NOT EXISTS %1 ( %2 )" ).arg( table->tableName(), statement )))
             qCCritical( Database_::Debug )
                     << Database::tr( R"(could not create table - "%1", reason - "%2")" ).arg( table->tableName(), query.lastError().text());
     }
+
 
     // table has been verified and is marked as valid
     table->setValid();
@@ -392,7 +364,7 @@ void Database::attach( const QFileInfo &info ) {
 
     // check if tasks match in both tables
     // TODO: also check API
-    if ( !query.exec( QString( "select not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )" ).arg( Task::instance()->tableName()))) {
+    if ( !query.exec( QString( "SELECT not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )" ).arg( Task::instance()->tableName()))) {
         qCritical( Database_::Debug ) << this->tr( "could not compare task tables" );
         return;
     } else {
@@ -410,7 +382,7 @@ void Database::attach( const QFileInfo &info ) {
     // find a matching event in the foreign database
     bool found = false;
     Id eventId = Id::Invalid;
-    if ( query.exec( QString( "select * from merge.%1" ).arg( Event::instance()->tableName()))) {
+    if ( query.exec( QString( "SELECT * from merge.%1" ).arg( Event::instance()->tableName()))) {
         while ( query.next()) {
             const QString title( query.record().value( Event::Title ).toString());
             eventId = static_cast<Id>( query.record().value( Event::ID ).toInt());
@@ -432,7 +404,7 @@ void Database::attach( const QFileInfo &info ) {
     auto getHiId = []( const QString &table, const QString &fieldName ) {
         QSqlQuery query;
 
-        query.exec( QString( "select max( %1 ) from %2" ).arg( fieldName, table ));
+        query.exec( QString( "SELECT max( %1 ) from %2" ).arg( fieldName, table ));
         if ( query.next())
             return query.value( 0 ).toInt();
 
@@ -444,7 +416,7 @@ void Database::attach( const QFileInfo &info ) {
     int teams = 0, logs = 0;
 
     // find unique teams that are not in the current event
-    if ( query.exec( QString( "select * from merge.%1 where %2 not in ( select %2 from %1 )" )
+    if ( query.exec( QString( "SELECT * from merge.%1 where %2 not in ( select %2 from %1 )" )
                      .arg( Team::instance()->tableName(),
                            Team::instance()->fieldName( Team::Title )))) {
 
@@ -471,7 +443,7 @@ void Database::attach( const QFileInfo &info ) {
             // find logs that belong to the current team
             QSqlQuery subQuery;
             QMap<Id, Id> comboIdRemap;
-            if ( subQuery.exec( QString( "select * from merge.%1 where %2=%3" )
+            if ( subQuery.exec( QString( "SELECT * from merge.%1 where %2=%3" )
                                 .arg( Log::instance()->tableName(),
                                       Log::instance()->fieldName( Log::Team ),
                                       QString::number( static_cast<int>( teamId ))))) {

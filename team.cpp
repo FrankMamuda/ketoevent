@@ -40,7 +40,7 @@ Team::Team() : Table( "teams" ) {
     FIELD( Lock,     QMetaType::Int );
     FIELD( Reviewer, QMetaType::QString );
     FIELD( Event,    QMetaType::Int );
-    this->addUniqueConstraint( QList<QSqlField>() << this->field( Title ) << this->field( Event ));
+    this->addUniqueConstraint( QStringList() << IDTOFIELD( Title ) << IDTOFIELD( Event ));
 }
 
 /**
@@ -76,7 +76,7 @@ void Team::removeOrphanedEntries() {
     QSqlQuery query;
 
     // remove orphaned teams
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+    query.exec( QString( "DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)" )
                 .arg( this->tableName(),
                       this->fieldName( Event ),
                       Event::instance()->fieldName( Event::ID ),

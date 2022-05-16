@@ -48,7 +48,7 @@ Task::Task() : Table( "tasks" ) {
     FIELD( Order_, QMetaType::Int );
     FIELD( Event,  QMetaType::Int );
     FIELD( Desc,   QMetaType::QString );
-    this->addUniqueConstraint( QList<QSqlField>() << this->field( Name ) << this->field( Event ));
+    this->addUniqueConstraint( QStringList() << IDTOFIELD( Name ) << IDTOFIELD( Event ));
 
     // map types and styles
     this->types[Types::Check]     = QObject::tr( "Check" );
@@ -84,7 +84,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
     for ( y = 0; y < this->count(); y++ )
         highest = qMax( highest, this->order( this->row( y )));
 
-    // add a new team
+    // add a new task
     return Table::add( QVariantList() <<
                        Database_::null <<
                        taskName <<
@@ -94,7 +94,8 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
                        static_cast<int>( type ) <<
                        highest + 1 <<
                        static_cast<int>( Event::instance()->id( event )) <<
-                       description );
+                       description
+                       );
 }
 
 /**
@@ -186,7 +187,7 @@ void Task::removeOrphanedEntries() {
     QSqlQuery query;
 
     // remove orphaned tasks
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4)" )
+    query.exec( QString( "DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)" )
                 .arg( this->tableName(),
                       this->fieldName( Event ),
                       Event::instance()->fieldName( Event::ID ),

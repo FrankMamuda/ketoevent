@@ -92,7 +92,7 @@ QVariant Table::value( const Id &id, int fieldId ) const {
         return -1;
 
     QSqlQuery query;
-    query.exec( QString( "select %1, %2 from %3 where %1=%4" )
+    query.exec( QString( "SELECT %1, %2 from %3 where %1=%4" )
                         .arg( this->fieldName( this->primaryFieldIndex ),
                               this->fieldName( fieldId ),
                               this->tableName(),
@@ -160,10 +160,7 @@ void Table::setFilter( const QString &filter ) {
  * @return
  */
 QSqlField Table::field( int id ) const {
-    if ( this->fields.contains( id ))
-        return this->fields[id];
-
-    return QSqlField();
+    return this->record().field( id );
 }
 
 /**
@@ -175,25 +172,43 @@ QSqlField Table::field( int id ) const {
  * @param autoValue
  * @param primary
  */
-void Table::addField( int id, const QString &fieldName, QMetaType::Type type, bool unique, bool autoValue, bool primary ) {
-    if ( this->fields.contains( id ))
+void Table::appendField( const QString &fieldName, QMetaType::Type type, bool unique, bool autoValue, bool primary ) {
+    if ( !this->database().isOpen() || this->tableName().isEmpty()) {
+        qWarning( Database_::Debug ) << Table::tr( R"(database not loaded)" );
         return;
+    }
 
-    QSqlField field( fieldName, QMetaType( type ));
-    field.setAutoValue( autoValue );
+    if ( !FieldTypes.contains( type )) {
+        qWarning( Database_::Debug ) << Table::tr( R"(unsupported field type %1)" ).arg( type );
+        return;
+    }
+
+    if ( primary && this->hasPrimaryField()) {
+        qWarning( Database_::Debug ) << Table::tr( R"(table "%1" already has a primary field")" ).arg( this->tableName());
+        return;
+    }
+
+    QSqlField field;
+    if ( this->record().contains( fieldName )) {
+        field = this->record().field( fieldName );
+
+        if ( primary )
+            this->primaryFieldIndex = this->record().indexOf( fieldName );
+    } else {
+        field = QSqlField( fieldName, QMetaType( type ));
+        field.setAutoValue( autoValue );
+        this->record().append( field );
+
+        if ( primary )
+            this->primaryFieldIndex = static_cast<int>( this->tmpFields.count());
+
+        this->tmpFields << field;
+    }
 
     if ( unique )
-        this->uniqueFields << field;
+        this->uniqueFields << field.name();
 
-    this->fields[id] = field;
-    if ( primary ) {
-        if ( this->hasPrimaryField()) {
-            qWarning( Database_::Debug ) << Table::tr( R"(table "%1" already has a primary field")" ).arg( this->tableName());
-            return;
-        }
-
-        this->primaryFieldIndex = id;
-    }
+    this->fields++;
 }
 
 /**
@@ -201,28 +216,37 @@ void Table::addField( int id, const QString &fieldName, QMetaType::Type type, bo
  * @param name
  */
 Row Table::add( const QVariantList &arguments ) {  
-    if ( this->fields.count() != arguments.count()) {
-        qCCritical( Database_::Debug ) << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->fields.count());
+    if ( this->fields != arguments.count()) {
+        qCCritical( Database_::Debug ) << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg( this->record().count());
         return Row::Invalid;
     }
 
-    // prepare statement
+    // record might have extraneous fields when custom select statement is set
+    // these have to be removed, otherwise record will not be inserted
     QSqlRecord record( this->record());
+    const int remove = static_cast<int>( record.count() - this->fields );
+    for ( int y = 0; y < remove; y++ )
+        record.remove( record.count() - 1 );
+
+    // prepare statement
     for ( int y = 0; y < arguments.count(); y++ ) {
-        const QSqlField field( this->fields[y] );
+        const QSqlField field( this->record().field( y ));
         const QVariant argument( arguments.at( y ));
 
-        if ( !field.isAutoValue()) {
-            if ( argument.typeId() != field.metaType().id()) {
-                qCCritical( Database_::Debug ) << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.typeId()).arg( y ).arg( FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))).arg( field.metaType().id());
-                return Row::Invalid;
-            }
-
-            record.setValue( field.name(), argument );
+        if ( argument.typeId() != field.metaType().id()) {
+            qCCritical( Database_::Debug ) << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" ).arg( argument.typeId()).arg( y ).arg( FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))).arg( field.metaType().id());
+            return Row::Invalid;
         }
+
+        if ( y != this->primaryFieldIndex )
+            record.setValue( field.name(), field.isAutoValue() ? 0 : argument );
     }
 
-    this->insertRecord( -1, record );
+    if ( !this->insertRecord( -1, record )) {
+        qCCritical( Database_::Debug ) << Table::tr( R"(cannot insert record into table "%1" (reason - "%2")" ).arg( this->tableName()).arg( this->lastError().text());
+
+        return Row::Invalid;
+    }
 
     if ( this->submitAll()) {
         this->database().commit();
@@ -247,12 +271,12 @@ QSqlQuery Table::prepare( bool ignore ) const {
     // prepare statement
     QString statement(( ignore ? "insert or ignore into " : "insert into " ) + this->tableName() + " (" );
     QString values;
-    for ( int y = 0; y < this->fields.count(); y++ ) {
-        const QSqlField &field( this->fields[y] );
+    for ( int y = 0; y < this->record().count(); y++ ) {
+        const QSqlField &field( this->record().field( y ));
         if ( this->primaryFieldIndex == y )
             continue;
 
-        const bool last = ( y == this->fields.count() - 1 );
+        const bool last = ( y == this->record().count() - 1 );
 
         values.append( " :_" + field.name() + +( last ? " )" : "," ));
         statement.append( " " + field.name() + ( last ? " ) values(" + values : "," ));
@@ -261,48 +285,6 @@ QSqlQuery Table::prepare( bool ignore ) const {
     query.prepare( statement );
 
     return query;
-}
-
-/**
- * @brief Table::bind
- * @param query
- * @param arguments
- */
-bool Table::bind( QSqlQuery &query, const QVariantList &arguments ) {
-    if ( !this->isValid())
-        return false;
-
-    const qsizetype numFields = this->fields.count() - ( this->hasPrimaryField() ? 1 : 0 );
-    if ( numFields != arguments.count()) {
-        qCCritical( Database_::Debug )
-            << Table::tr( "argument count mismatch - %1, required - %2" ).arg( arguments.count()).arg(
-                    this->fields.count());
-        return false;
-    }
-
-    // prepare statement
-    int y = 0;
-    for ( const QSqlField &field : qAsConst( this->fields )) {
-        if ( this->hasPrimaryField() && this->fields[this->primaryFieldIndex] == field )
-            continue;
-
-        const QVariant& argument( arguments.at( y ));
-
-        // compare types
-        if ( field.metaType() != argument.metaType()) {
-            qCCritical( Database_::Debug )
-                << Table::tr( "incompatible field type - %1 for argument %2 (%3), required - %4" )
-                        .arg( argument.typeId()).arg( y ).arg( FieldTypes.value( static_cast<QMetaType::Type>( field.metaType().id()))).arg( field.metaType().id());
-            return false;
-        }
-
-        // bind value
-        query.bindValue( ":_" + field.name(), argument );
-
-        y++;
-    }
-
-    return true;
 }
 
 /**

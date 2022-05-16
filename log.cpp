@@ -65,7 +65,7 @@ void Log::add( const Id &taskId, const Id &teamId, int multiplier, const Id &com
  */
 int Log::multiplier( const Id &taskId, const Id &teamId ) const {
     QSqlQuery query;
-    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
                 .arg( this->fieldName( Log::Multi ),
                       this->fieldName( Log::Task ),
                       this->fieldName( Log::Team ),
@@ -86,7 +86,7 @@ int Log::multiplier( const Id &taskId, const Id &teamId ) const {
  */
 Id Log::comboId( const Id &taskId, const Id &teamId ) const {
     QSqlQuery query;
-    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
                 .arg( this->fieldName( Log::Combo ),
                       this->fieldName( Log::Task ),
                       this->fieldName( Log::Team ),
@@ -178,7 +178,7 @@ void Log::removeOrphanedEntries() {
  */
 Id Log::id( const Id &taskId, const Id &teamId ) const {
     QSqlQuery query;
-    query.exec( QString( "select %1, %2, %3 from %4 where %5=%6 and %7=%8" )
+    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
                 .arg( this->fieldName( Log::ID ),
                       this->fieldName( Log::Task ),
                       this->fieldName( Log::Team ),

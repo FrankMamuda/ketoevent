@@ -585,7 +585,7 @@ void MainWindow::on_actionExport_logs_triggered() {
         return;
 
     //qDebug() << Team::instance()
-    query.exec( QString( "select * from %1 where %2=%3" )
+    query.exec( QString( "SELECT * from %1 where %2=%3" )
                 .arg( Log::instance()->tableName(),
                       Log::instance()->fieldName( Log::Team ),
                       QString::number( static_cast<int>( Team::instance()->id( team )))));

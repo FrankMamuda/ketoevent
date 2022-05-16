@@ -132,10 +132,10 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     // obliterate all entries within database
     this->add( "test_delete_db", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
         QSqlQuery query;
-        query.exec( QString( "delete from %1" ).arg( Event::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Log::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Team::instance()->tableName()));
-        query.exec( QString( "delete from %1" ).arg( Task::instance()->tableName()));
+        query.exec( QString( "DELETE FROM %1" ).arg( Event::instance()->tableName()));
+        query.exec( QString( "DELETE FROM %1" ).arg( Log::instance()->tableName()));
+        query.exec( QString( "DELETE FROM %1" ).arg( Team::instance()->tableName()));
+        query.exec( QString( "DELETE FROM %1" ).arg( Task::instance()->tableName()));
 
         Event::instance()->select();
         Log::instance()->select();
@@ -275,16 +275,16 @@ void Cmd::dbInfo() {
                    .arg( Log::instance()->count());
 
     // get actual databse contents
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Event::instance()->tableName()));
+    query = QSqlQuery( QString( "SELECT count(*) from %1" ).arg( Event::instance()->tableName()));
     if ( query.next())
         events = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Team::instance()->tableName()));
+    query = QSqlQuery( QString( "SELECT count(*) from %1" ).arg( Team::instance()->tableName()));
     if ( query.next())
         teams = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Task::instance()->tableName()));
+    query = QSqlQuery( QString( "SELECT count(*) from %1" ).arg( Task::instance()->tableName()));
     if ( query.next())
         tasks = query.value( 0 ).toInt();
-    query = QSqlQuery( QString( "select count(*) from %1" ).arg( Log::instance()->tableName()));
+    query = QSqlQuery( QString( "SELECT count(*) from %1" ).arg( Log::instance()->tableName()));
     if ( query.next())
         logs = query.value( 0 ).toInt();
 

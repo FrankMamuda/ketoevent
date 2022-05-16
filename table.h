@@ -63,9 +63,10 @@ Q_DECLARE_METATYPE( Row )
  */
 // field map
 
-#define FIELD( fieldId, type ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::type )
-#define UNIQUE_FIELD( fieldId, type ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::type, true )
-#define PRIMARY_FIELD( fieldId ) this->addField( fieldId, QString( #fieldId ).toLower(), QMetaType::Int, true, true, true )
+#define FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type )
+#define IDTOFIELD( fieldId ) QString( #fieldId ).toLower()
+#define UNIQUE_FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type, true )
+#define PRIMARY_FIELD( fieldId ) this->appendField( QString( #fieldId ).toLower(), QMetaType::Int, true, true, true )
 #define FIELD_GETTER( type, fieldId, name ) public: [[nodiscard]] type name( const Row &row ) const { return this->value( row, fieldId ).value<type>(); } type name( const Id &id ) const { return this->value( id, fieldId ).value<type>(); }
 #define FIELD_SETTER( type, fieldId ) public slots: void set##fieldId( const Row &row, const type &variable ) { this->setValue( row, fieldId, QVariant::fromValue( variable )); }
 #define INITIALIZE_FIELD( type, fieldId, name ) FIELD_GETTER( type, fieldId, name ) FIELD_SETTER( type, fieldId )
@@ -125,7 +126,7 @@ public:
      * @param id
      * @return
      */
-    [[nodiscard]] QString fieldName( int id ) const { return this->field( id ).name(); }
+    [[nodiscard]] QString fieldName( int id ) const { return this->record().fieldName( id ); }
 
     /**
      * @brief row
@@ -154,9 +155,8 @@ public:
      * @brief addUniqueConstraint
      * @param constrainedFields
      */
-    [[maybe_unused]] void addUniqueConstraint( const QList<QSqlField> &constrainedFields ) { this->constraints << constrainedFields; }
+    [[maybe_unused]] void addUniqueConstraint( const QStringList &constrainedFields ) { this->constraints << constrainedFields; }
     [[maybe_unused]][[nodiscard]] QSqlQuery prepare( bool ignore = true ) const;
-    [[maybe_unused]] bool bind( QSqlQuery &query, const QVariantList &arguments );
 
 public slots:
     /**
@@ -164,7 +164,7 @@ public slots:
      * @param valid
      */
     void setValid( bool valid = true ) { this->m_valid = valid; }
-    void addField( int id, const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false );
+    void appendField( const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false );
     Row add( const QVariantList &arguments );
     virtual void remove( const Row &row );
     void setValue( const Row &row, int fieldId, const QVariant &value );
@@ -175,15 +175,16 @@ public slots:
     virtual void removeOrphanedEntries() {}
 
 protected:
-    QMap<int, QSqlField> fields;
-    QList<QSqlField> uniqueFields;
+    QStringList uniqueFields;
     [[nodiscard]] QSqlField field( int id ) const;
     [[nodiscard]] bool contains( const QSqlField &field, const QVariant &value ) const;
+    QList<QSqlField> tmpFields;
 
 private:
     bool m_valid = false;
-    QList<QList<QSqlField>> constraints;
+    QList<QStringList> constraints;
     int primaryFieldIndex = -1;
+    int fields = 0; // NOTE: with altered SELECT statement record.count() != fieldCount
 
     static QMultiMap<QMetaType::Type, QString> FieldTypes;
 };
