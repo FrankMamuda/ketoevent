@@ -65,6 +65,9 @@ public:
     [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     void removeOrphanedEntries() override;
 
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
+    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
+
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
     void setMembers( const Row &row, int members ) { this->setValue( row, Members, members ); }

@@ -99,6 +99,8 @@ public:
     [[nodiscard]] int comboOfFourPlus( const Row &row ) const { return this->value( row, Combo4 ).toInt(); }
 
     void removeOrphanedEntries() override {}
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
+    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
 
 public slots:
     void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }

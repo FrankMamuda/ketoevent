@@ -25,7 +25,7 @@
 #include "modalwindow.h"
 #include <QCloseEvent>
 #include <QDockWidget>
-#include <QListView>
+#include <QTableView>
 #include <QMainWindow>
 #include <QToolBar>
 
@@ -46,7 +46,7 @@ class EditorDialog final : public ModalWindow {
 public:
     static EditorDialog *instance() { if ( EditorDialog::i == nullptr ) EditorDialog::i = new EditorDialog(); return EditorDialog::i; }
     ~EditorDialog() override;
-    QListView *container;
+    QTableView *container;
     QDockWidget *dock;
     [[nodiscard]] bool isDockVisible() const;
 

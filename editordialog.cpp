@@ -41,7 +41,8 @@ EditorDialog::EditorDialog() :
 {
     // set up ui
     this->ui->setupUi( this );
-    this->container = this->ui->listView;
+    this->container = this->ui->tableView;
+    this->container->verticalHeader()->hide();
     this->dock = this->ui->dockWidget;
     this->hideDock();
 

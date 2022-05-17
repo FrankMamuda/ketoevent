@@ -23,6 +23,8 @@
 #include "event.h"
 #include "database.h"
 
+#include <QFont>
+
 // singleton
 Event *Event::i = nullptr;
 
@@ -72,4 +74,59 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
                 three <<
                 fourPlus <<
                        0 );
+}
+
+/**
+ * @brief Event::headerData
+ * @param section
+ * @param orientation
+ * @param role
+ * @return
+ */
+QVariant Event::headerData( int section, Qt::Orientation orientation, int role ) const {
+    if ( role == Qt::DisplayRole ) {
+        switch ( section ) {
+
+        case Title: return Event::tr( "Title" );
+        case Min: return Event::tr( "Min members" );
+        case Max: return Event::tr( "Max members" );
+        case Start: return Event::tr( "Start time" );
+        case Finish: return Event::tr( "Finish time" );
+        case Final: return Event::tr( "Final time" );
+        case Penalty: return Event::tr( "Penalty" );
+
+        default:
+        case Lock:
+             case API:
+             case Combo2:
+             case Combo3:
+             case Combo4:
+        case ID:
+            break;
+        }
+    }
+
+    if ( role == Qt::TextAlignmentRole )
+        return Qt::AlignCenter;
+
+    if ( role == Qt::FontRole ) {
+        QFont font;
+        font.setBold( true );
+        return font;
+    }
+
+    return Table::headerData( section, orientation, role );
+}
+
+/**
+ * @brief Event::data
+ * @param index
+ * @param role
+ * @return
+ */
+QVariant Event::data( const QModelIndex &index, int role ) const {
+    if ( role == Qt::TextAlignmentRole && index.column() != Event::Title )
+        return Qt::AlignCenter;
+
+    return Table::data( index, role );
 }

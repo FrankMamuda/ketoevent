@@ -354,7 +354,23 @@ void MainWindow::on_actionEvents_triggered() {
     editor->show();
     editor->container->clearSelection();
     editor->container->setModel( Event::instance());
-    editor->container->setModelColumn( Event::Title );
+
+    editor->container->hideColumn( Event::ID );
+    editor->container->hideColumn( Event::API );
+    editor->container->hideColumn( Event::Combo2 );
+    editor->container->hideColumn( Event::Combo3 );
+    editor->container->hideColumn( Event::Combo4 );
+    editor->container->hideColumn( Event::Lock );
+    editor->container->hideColumn( Event::Min );
+    editor->container->hideColumn( Event::Max );
+    editor->container->hideColumn( Event::Penalty );
+    editor->container->showColumn( Event::Title );
+    editor->container->showColumn( Event::Start );
+    editor->container->showColumn( Event::Finish );
+    editor->container->showColumn( Event::Final );
+
+    editor->container->resizeColumnsToContents();
+
     editor->setToolBar( EventToolBar::instance());
     editor->setWindowTitle( this->tr( "Event manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "ketone" ));
@@ -372,7 +388,18 @@ void MainWindow::on_actionTeams_triggered() {
     editor->show();
     editor->container->clearSelection();
     editor->container->setModel( Team::instance());
-    editor->container->setModelColumn( Team::Title );
+
+    //editor->container->setModelColumn( Team::Title );
+    editor->container->hideColumn( Team::ID );
+    editor->container->hideColumn( Team::Lock );
+    editor->container->hideColumn( Team::Reviewer );
+    editor->container->hideColumn( Team::Event );
+    editor->container->showColumn( Team::Title );
+    editor->container->showColumn( Team::Members );
+    editor->container->showColumn( Team::Finish );
+
+    editor->container->resizeColumnsToContents();
+
     editor->setToolBar( TeamToolBar::instance());
     editor->setWindowTitle( this->tr( "Team manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "teams" ));
@@ -389,8 +416,24 @@ void MainWindow::on_actionTasks_triggered() {
 
     editor->show();
     editor->container->clearSelection();
-    editor->container->setModel( TaskProxyModel::instance());
-    editor->container->setModelColumn( Task::Name );
+    editor->container->setModel( Task::instance());
+
+
+    //editor->container->setModelColumn( Task::Name );
+    editor->container->hideColumn( Task::ID );
+    editor->container->hideColumn( Task::Style );
+    editor->container->hideColumn( Task::Order_ );
+    editor->container->hideColumn( Task::Event );
+    editor->container->hideColumn( Task::ComboID );
+    editor->container->hideColumn( Task::Multi );
+
+    editor->container->showColumn( Task::Name );
+    editor->container->showColumn( Task::Points );
+    editor->container->showColumn( Task::Mult );
+    editor->container->showColumn( Task::Desc );
+
+    editor->container->resizeColumnsToContents();
+
     editor->setToolBar( TaskToolBar::instance());
     editor->setWindowTitle( this->tr( "Task manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "tasks" ));

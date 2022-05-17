@@ -31,7 +31,6 @@
 
 // singleton
 Task *Task::i = nullptr;
-TaskProxyModel *TaskProxyModel::i = nullptr;
 
 #define stringify( x ) #x
 
@@ -107,7 +106,7 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
 QVariant Task::data( const QModelIndex &index, int role ) const {
     const Row row = this->row( index );
 
-    if ( role == Qt::FontRole && index.isValid() && row != Row::Invalid ) {
+    if ( role == Qt::FontRole && index.isValid() && row != Row::Invalid && index.column() == Task::Name ) {
         QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
 
         if ( Task::instance()->style( row ) == Styles::Italic ) {
@@ -121,7 +120,63 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
         }
     }
 
+    if ( role == Qt::DisplayRole && index.column() == Task::Type && row != Row::Invalid ) {
+        if ( Task::instance()->type( row ) == Types::Check )
+            return Task::tr( "\u2713" );
+        if ( Task::instance()->type( row ) == Types::Multi )
+            return Task::tr( "Multi" );
+    }
+
+    if ( role == Qt::DisplayRole && index.column() == Task::Mult && row != Row::Invalid ) {
+        if ( Task::instance()->type( row ) != Types::Multi )
+            return "";
+        if ( Task::instance()->type( row ) == Types::Multi )
+            return QString( "%1\u00d7%2=%3" ).arg( QString::number( Task::instance()->points( row )), QString::number( Task::instance()->multi( row )), QString::number( Task::instance()->points( row ) * Task::instance()->multi( row )));
+    }
+
+    if ( role == Qt::TextAlignmentRole && index.column() != Task::Name && index.column() != Task::Desc )
+        return Qt::AlignCenter;
+
     return Table::data( index, role );
+}
+
+
+/**
+ * @brief Task::headerData
+ * @param section
+ * @param orientation
+ * @param role
+ * @return
+ */
+QVariant Task::headerData( int section, Qt::Orientation orientation, int role ) const {
+    if ( role == Qt::DisplayRole ) {
+        switch ( section ) {
+
+        case Name: return Event::tr( "Name" );
+        case Points: return Event::tr( "Points" );
+        case Mult: return Event::tr( "Multi" );
+        case Desc: return Event::tr( "Description" );
+        case Type: return Event::tr( "Type" );
+
+        default:
+        case Style:
+        case Order_:
+        case Event:
+        case ID:
+            break;
+        }
+    }
+
+    if ( role == Qt::TextAlignmentRole )
+        return Qt::AlignCenter;
+
+    if ( role == Qt::FontRole ) {
+        QFont font;
+        font.setBold( true );
+        return font;
+    }
+
+    return Table::headerData( section, orientation, role );
 }
 
 /**
@@ -277,31 +332,4 @@ QString Task::selectStatement() const {
     statement = statement.simplified();
 
     return statement;
-}
-
-/**
- * @brief TaskProxyModel::data
- * @param index
- * @param role
- * @return
- */
-QVariant TaskProxyModel::data( const QModelIndex &index, int role ) const {
-    if ( role == Qt::DisplayRole && index.column() == Task::Name ) {
-        const Row row = Task::instance()->row( index.row());
-        const bool isMulti = Task::instance()->type( row ) == Task::Types::Multi;
-
-        return QString( "%1 (%2%3)")
-                .arg( Task::instance()->name( row ),
-                      isMulti ? this->tr( "M" ) : this->tr( "R" ),
-                      isMulti ? QString( ", %1x%2" ).arg( QString::number( Task::instance()->points( row )), QString::number( Task::instance()->multi( row ))) : QString( ", %1" ).arg( QString::number( Task::instance()->points( row ))));
-    }
-
-    return Task::instance()->data( index, role );
-}
-
-/**
- * @brief TaskProxyModel::TaskProxyModel
- */
-TaskProxyModel::TaskProxyModel() {
-    this->setSourceModel( Task::instance());
 }

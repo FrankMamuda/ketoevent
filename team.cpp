@@ -83,3 +83,52 @@ void Team::removeOrphanedEntries() {
                       Event::instance()->tableName()));
     this->select();
 }
+
+/**
+ * @brief Team::headerData
+ * @param section
+ * @param orientation
+ * @param role
+ * @return
+ */
+QVariant Team::headerData( int section, Qt::Orientation orientation, int role ) const {
+    if ( role == Qt::DisplayRole ) {
+        switch ( section ) {
+
+        case Title: return Event::tr( "Title" );
+        case Members: return Event::tr( "Members" );
+        case Finish: return Event::tr( "Finish time" );
+
+        default:
+        case Lock:
+        case Reviewer:
+        case Event:
+        case ID:
+            break;
+        }
+    }
+
+    if ( role == Qt::TextAlignmentRole )
+        return Qt::AlignCenter;
+
+    if ( role == Qt::FontRole ) {
+        QFont font;
+        font.setBold( true );
+        return font;
+    }
+
+    return Table::headerData( section, orientation, role );
+}
+
+/**
+ * @brief Team::data
+ * @param index
+ * @param role
+ * @return
+ */
+QVariant Team::data( const QModelIndex &index, int role ) const {
+    if ( role == Qt::TextAlignmentRole && index.column() != Team::Title )
+        return Qt::AlignCenter;
+
+    return Table::data( index, role );
+}

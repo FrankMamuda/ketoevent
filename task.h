@@ -93,7 +93,6 @@ public:
     [[nodiscard]] int order( const Row &row ) const { return this->value( row, Order_ ).toInt(); }
     [[nodiscard]] QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
     [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
-    [[nodiscard]] QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
     [[nodiscard]] int multiplier( const Row &row ) const;
     [[nodiscard]] Id comboId( const Row &row ) const;
     [[nodiscard]] QPair<Id, Id>getIds( const Row &row, bool *ok ) const;
@@ -101,6 +100,9 @@ public:
     [[nodiscard]] bool hasInitialised() const { return this->m_initialised; }
 
     void removeOrphanedEntries() override;
+
+    [[nodiscard]] QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const override;
+    [[nodiscard]] QVariant headerData( int section, Qt::Orientation orientation, int role ) const override;
 
     [[nodiscard]] int columnCount( const QModelIndex & = QModelIndex()) const override { return ExtendedCount; }
 
@@ -130,21 +132,3 @@ private:
 Q_DECLARE_METATYPE( Task::Fields )
 Q_DECLARE_METATYPE( Task::Types )
 Q_DECLARE_METATYPE( Task::Styles )
-
-/**
- * @brief The TaskProxyModel class
- */
-class TaskProxyModel : public QIdentityProxyModel {
-public:
-    /**
-     * @brief instance
-     * @return
-     */
-    static TaskProxyModel *instance() { if ( TaskProxyModel::i == nullptr ) TaskProxyModel::i = new TaskProxyModel(); return TaskProxyModel::i; }
-    ~TaskProxyModel() override {}
-    QVariant data( const QModelIndex &index, int role ) const override;
-
-private:
-    static TaskProxyModel *i;
-    explicit TaskProxyModel();
-};
