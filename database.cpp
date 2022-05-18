@@ -35,7 +35,7 @@
 #include "event.h"
 #ifdef SQLITE_CUSTOM
 #include <QSqlDriver>
-#include "sqlite/sqlite3.h"
+#include <sqlite3.h>
 #endif
 
 // singleton
@@ -76,6 +76,13 @@ bool Database::testPath( const QString &path ) {
  * @brief Database::Database initializes database
  * @param parent any qobject parent
  */
+#ifdef SQLITE_CUSTOM
+static int localeAwareCompare( void *, int l0, const void* d0, int l1, const void* d1 ) {
+    return QString::localeAwareCompare(
+                QString::fromRawData( reinterpret_cast<const QChar*>( d0 ), l0 / static_cast<int>( sizeof( QChar ))),
+                QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar )))) > 0;
+}
+#endif
 Database::Database( QObject *parent ) : QObject( parent ) {
     QSqlDatabase database( QSqlDatabase::database());
 
@@ -134,14 +141,9 @@ Database::Database( QObject *parent ) : QObject( parent ) {
             // initialize sqlite
             qCWarning( Database_::Debug ) << this->tr( "initializing custom sqlite lib" );
             sqlite3_initialize();
-            // localeCompare lambda
-            auto localeCompare = []( void *, int l0, const void* d0, int l1, const void* d1 ) {
-                return QString::localeAwareCompare(
-                            QString::fromRawData( reinterpret_cast<const QChar*>( d0 ), l0 / static_cast<int>( sizeof( QChar ))),
-                            QString::fromRawData( reinterpret_cast<const QChar*>( d1 ), l1 / static_cast<int>( sizeof( QChar )))) < 0;
-            };
+
             // initialize
-            if ( sqlite3_create_collation( libSqlite3, "localeCompare", SQLITE_UTF16, 0, localeCompare ) != SQLITE_OK )
+            if ( sqlite3_create_collation( libSqlite3, "localeCompare", SQLITE_UTF16, nullptr, localeAwareCompare ) != SQLITE_OK )
                 qCWarning( Database_::Debug ) << this->tr( "could not add locale aware string collation" );
         }
     }

@@ -115,10 +115,11 @@ RESOURCES += \
 win32:RC_FILE = icon.rc
 
 # custom sqlite lib switch
-# CONFIG += sqlite_custom
+CONFIG += sqlite_custom
 sqlite_custom {
-SOURCES += sqlite/sqlite3.c
-HEADERS += sqlite/sqlite3.h
+SOURCES += 3rdparty/sqlite-amalgamation/sqlite3.c
+HEADERS += 3rdparty/sqlite-amalgamation/sqlite3.h
+INCLUDEPATH += $$PWD/3rdparty/sqlite-amalgamation
 DEFINES += SQLITE_CUSTOM
 }
 

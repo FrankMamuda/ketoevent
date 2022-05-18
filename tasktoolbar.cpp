@@ -233,10 +233,10 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
             const QString out( QString( "%1%2 %3 %4 " )
                    .arg( Task::instance()->name( row ),
                          description.isEmpty() ? "" : QString( " (%1)" ).arg( Task::instance()->description( row )),
-                         QChar( 0x2013 ),
+                         ( Task::instance()->type( row ) == Task::Types::Multi ) ? QChar() : QChar( 0x2013 ),
                          ( Task::instance()->type( row ) == Task::Types::Multi ) ?
-                         QString( "%1-%2" ).arg( QString::number( points ), QString::number( points * Task::instance()->multi( row ))) : QString::number( points ))
-                               + this->tr( "points" ));
+                             "" :
+                          ( QString::number( points )) + " " + this->tr( "points" )));
 
             QString style;
             switch ( Task::instance()->style( row )) {
