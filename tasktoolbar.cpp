@@ -172,7 +172,7 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                 if ( row == Row::Invalid )
                     break;
 
-                QString style;
+               /*QString style;
                 switch ( Task::instance()->style( row )) {
                 case Task::Styles::Regular:
                     style = this->tr( "Simple" );
@@ -195,6 +195,16 @@ TaskToolBar::TaskToolBar( QWidget *parent ) : ToolBar( parent ) {
                              Task::instance()->description( row ).replace( ";", "  |" ),
                              Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ),
                              style,
+                             Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "",
+                             QString::number( Task::instance()->points( row )),
+                             "\n" );*/
+
+                // NOTE: reverting to numbers to match import
+                out << QString( "%1;%2;%3;%4;%5;%6%7" )
+                       .arg( Task::instance()->name( row ).replace( ";", " |" ),
+                             Task::instance()->description( row ).replace( ";", "  |" ),
+                             QString::number( static_cast<int>( Task::instance()->type( row ))),
+                             QString::number( static_cast<int>( Task::instance()->style( row ))),
                              Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "",
                              QString::number( Task::instance()->points( row )),
                              "\n" );

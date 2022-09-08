@@ -62,7 +62,9 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     this->add( "db_clear_tasks", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
         QSqlQuery query;
         query.exec( QString( "DELETE FROM %1" ).arg( Task::instance()->tableName()));
+        query.exec( QString( "DELETE FROM %1" ).arg( Log::instance()->tableName()));
 
+        Log::instance()->select();
         Task::instance()->select();
         } ), this->tr( "clear all tasks" ));
 
