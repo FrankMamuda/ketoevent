@@ -59,6 +59,12 @@ Cmd::Cmd( QObject *parent ) : QObject( parent ) {
     this->add( "cv_set", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &name, const QStringList &args ) { Cmd::instance()->cvarSet( name, args ); } ), this->tr( "set console variable value" ));
     this->add( "db_info", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) { Cmd::instance()->dbInfo(); } ), this->tr( "display database information" ));
     this->add( "help", static_cast<void(*)( const QString &, const QStringList & )>( listCmd ), this->tr( "same as cmd_list" ));
+    this->add( "db_clear_tasks", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList & ) {
+        QSqlQuery query;
+        query.exec( QString( "DELETE FROM %1" ).arg( Task::instance()->tableName()));
+
+        Task::instance()->select();
+        } ), this->tr( "clear all tasks" ));
 
     // setting up test environment
     this->add( "test_setup", static_cast<void(*)( const QString &, const QStringList & )>( []( const QString &, const QStringList &args ) {
