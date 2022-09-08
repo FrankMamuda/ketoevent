@@ -144,7 +144,7 @@ void TaskEdit::reset( bool edit ) {
 
     if ( !this->isEditing()) {
         this->ui->nameEdit->clear();
-        this->ui->pointsInteger->setValue( this->ui->pointsInteger->minimum());
+        this->ui->pointsInteger->setValue( 1 );
         this->ui->multiInteger->setValue( this->ui->multiInteger->minimum());
         this->ui->typeCombo->setCurrentIndex( 0 );
         this->ui->styleCombo->setCurrentIndex( 0 );

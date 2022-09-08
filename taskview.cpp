@@ -142,13 +142,13 @@ void TaskView::mouseReleaseEvent( QMouseEvent *event ) {
 
                             QSqlQuery query;
                             int count = 0;
-                            query.exec( QString( "SELECT COUNT(*) FROM %5 WHERE %5.%6>0 AND ( %3=%1 OR %3=-1) AND %5.%4=%2" )
-                                        .arg( static_cast<int>( id ))
-                                        .arg( static_cast<int>( Team::instance()->id( MainWindow::instance()->currentTeam())))
-                                        .arg( Log::instance()->fieldName( Log::Combo ))
-                                        .arg( Log::instance()->fieldName( Log::Team ))
-                                        .arg( Log::instance()->tableName())
-                                        .arg( Log::instance()->fieldName( Log::Multi ))
+                            query.exec( QString( "SELECT COUNT(*) FROM %5 WHERE %5.%6!=0 AND ( %3=%1 OR %3=-1) AND %5.%4=%2" )
+                                        /*1*/.arg( static_cast<int>( id ))
+                                        /*2*/.arg( static_cast<int>( Team::instance()->id( MainWindow::instance()->currentTeam())))
+                                        /*3*/.arg( Log::instance()->fieldName( Log::Combo ))
+                                        /*4*/.arg( Log::instance()->fieldName( Log::Team ))
+                                        /*5*/.arg( Log::instance()->tableName())
+                                        /*6*/.arg( Log::instance()->fieldName( Log::Multi ))
                                         );
                             if ( query.next())
                                 count = query.value( 0 ).toInt();

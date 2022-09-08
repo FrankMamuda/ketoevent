@@ -110,7 +110,7 @@ class EditWidget : public QSpinBox {
     Q_OBJECT
 
 public:
-    explicit EditWidget( const Delegate *d, const QModelIndex &i, QWidget *parent = nullptr ) : QSpinBox( parent ), delegate( d ), index( i ) {}
+    explicit EditWidget( const Delegate *d, const QModelIndex &i, QWidget *parent = nullptr ) : QSpinBox( parent ), delegate( d ), index( i ) { this->setMinimum( -999 ); }
 
 protected:
     void paintEvent( QPaintEvent *event ) override;

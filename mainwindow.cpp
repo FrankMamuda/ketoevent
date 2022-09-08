@@ -490,7 +490,7 @@ void MainWindow::setTaskFilter( bool filterByCombo, const Id &comboId ) {
     // selects tasks for combo mode
     const QString comboFilter( filterByCombo ?
                                    QString( "and %1.%2 in "
-                                            "( SELECT %3 FROM %4 WHERE %5=%6 AND ( %7=%8 OR %7=-1 ) AND %9>0 )" )
+                                            "( SELECT %3 FROM %4 WHERE %5=%6 AND ( %7=%8 OR %7=-1 ) AND %9!=0 )" )
                                    .arg( Task::instance()->tableName(),
                                          Task::instance()->fieldName( Task::ID ),
                                          Log::instance()->fieldName( Log::Task ),

@@ -84,7 +84,7 @@ void Delegate::paint( QPainter *painter, const QStyleOptionViewItem &option, con
     // draw cross/equals lambda
     auto drawCrossEquals = [ this, painter, index, rect, type, edit, isComboActive, isEventActive, isTeamActive ]() {
         const int isSelected = edit ? false : ( index == this->currentIndex());
-        const bool hasValue = this->values.isEmpty() ? false : this->values[index] > 0;
+        const bool hasValue = this->values.isEmpty() ? false : this->values[index] != 0;
         QRect small( rect.right() + Delegate::ButtonWidth * 2 + Delegate::SmallWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight );
 
         if ( type == Task::Types::Check || isComboActive || !isEventActive || !isTeamActive )

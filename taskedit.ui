@@ -49,7 +49,7 @@
         <string>Points for completion</string>
        </property>
        <property name="minimum">
-        <number>0</number>
+        <number>-999</number>
        </property>
        <property name="maximum">
         <number>999</number>

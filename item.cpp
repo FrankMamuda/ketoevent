@@ -38,7 +38,7 @@ void Item::paint( QPainter *painter, const QModelIndex &index ) const {
     const int points = Task::instance()->points( this->delegate->row( index ));
     const Task::Types type = Task::instance()->type( this->delegate->row( index ));
     const int isSelected = edit ? false : ( index == this->delegate->currentIndex());
-    const bool hasValue = edit ? true : value > 0;
+    const bool hasValue = edit ? true : value != 0;
     const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
     const bool hasDescription = !Task::instance()->description( this->delegate->row( index )).isEmpty();

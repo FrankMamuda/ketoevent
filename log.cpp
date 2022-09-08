@@ -204,10 +204,11 @@ void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
         if ( row == Row::Invalid )
             return;
 
-        if ( multi <= 0 )
+        /*if ( multi <= 0 )
             Log::instance()->remove( row );
-        else
-            Log::instance()->setMultiplier( row, multi );
+        else*/
+        // NOTE: allow negative values
+        Log::instance()->setMultiplier( row, multi );
 
 #ifdef QT_DEBUG
         qCDebug( Database_::Debug ) << ( multi <= 0 ? "delete" : "change" ) << "log at row" << row;

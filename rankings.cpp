@@ -204,7 +204,7 @@ void Rankings::on_actionUpdate_triggered() {
                 continue;
 
             // abort on invalid log values or logs not related to the current team
-            if ( value <= 0 || Team::instance()->id( teamRow ) != Log::instance()->teamId( logRow ))
+            if ( value == 0 || Team::instance()->id( teamRow ) != Log::instance()->teamId( logRow ))
                 continue;
 
             // get task related variables
