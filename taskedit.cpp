@@ -56,10 +56,14 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             this->ui->multiLabel->hide();
             this->ui->multiInteger->hide();
             this->ui->multiPixmap->hide();
+            this->ui->patternEdit->hide();
+            this->ui->patternLabel->hide();
         } else if ( type == Task::Types::Multi ) {
             this->ui->multiLabel->show();
             this->ui->multiInteger->show();
             this->ui->multiPixmap->show();
+            this->ui->patternEdit->show();
+            this->ui->patternLabel->show();
         }
     } );
     this->ui->typeCombo->addItems( Task::instance()->types.values());
@@ -94,7 +98,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             Task::instance()->add( taskName, this->ui->pointsInteger->value(), this->ui->multiInteger->value(),
                                    static_cast<Task::Types>( this->ui->typeCombo->currentIndex()),
                                    static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()),
-                                   this->ui->descEdit->text());
+                                   this->ui->descEdit->text(), this->ui->patternEdit->text());
         } else {
             const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
@@ -107,6 +111,7 @@ TaskEdit::TaskEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TaskEdit 
             Task::instance()->setType( task, static_cast<Task::Types>( this->ui->typeCombo->currentIndex()));
             Task::instance()->setStyle( task, static_cast<Task::Styles>( this->ui->styleCombo->currentIndex()));
             Task::instance()->setDescription( task, this->ui->descEdit->text());
+            Task::instance()->setPattern( task, this->ui->patternEdit->text());
         }
 
         // close dock
@@ -149,6 +154,7 @@ void TaskEdit::reset( bool edit ) {
         this->ui->typeCombo->setCurrentIndex( 0 );
         this->ui->styleCombo->setCurrentIndex( 0 );
         this->ui->descEdit->clear();
+        this->ui->patternEdit->clear();
     } else {
         const Row task = Task::instance()->row( EditorDialog::instance()->container->currentIndex().row());
 
@@ -161,6 +167,7 @@ void TaskEdit::reset( bool edit ) {
         this->ui->typeCombo->setCurrentIndex( static_cast<int>( Task::instance()->type( task )));
         this->ui->styleCombo->setCurrentIndex( static_cast<int>( Task::instance()->style( task )));
         this->ui->descEdit->setText( Task::instance()->description( task ));
+        this->ui->patternEdit->setText( Task::instance()->pattern( task ));
     }
 
     this->ui->nameEdit->setFocus();

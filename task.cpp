@@ -39,14 +39,15 @@ Task *Task::i = nullptr;
  */
 Task::Task() : Table( "tasks" ) {
     PRIMARY_FIELD( ID );
-    FIELD( Name,   QMetaType::QString );
-    FIELD( Points, QMetaType::Int );
-    FIELD( Mult,   QMetaType::Int );
-    FIELD( Style,  QMetaType::Int );
-    FIELD( Type,   QMetaType::Int );
-    FIELD( Order_, QMetaType::Int );
-    FIELD( Event,  QMetaType::Int );
-    FIELD( Desc,   QMetaType::QString );
+    FIELD( Name,     QMetaType::QString );
+    FIELD( Points,   QMetaType::Int );
+    FIELD( Mult,     QMetaType::Int );
+    FIELD( Style,    QMetaType::Int );
+    FIELD( Type,     QMetaType::Int );
+    FIELD( Order_,   QMetaType::Int );
+    FIELD( Event,    QMetaType::Int );
+    FIELD( Desc,     QMetaType::QString );
+    FIELD( Pattern,  QMetaType::QString );
     this->addUniqueConstraint( QStringList() << IDTOFIELD( Name ) << IDTOFIELD( Event ));
 
     // map types and styles
@@ -69,7 +70,8 @@ Task::Task() : Table( "tasks" ) {
  * @param style
  * @param description
  */
-Row Task::add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description ) {
+Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
+               Task::Styles style, const QString &description, const QString &pattern ) {
     int y, highest = -1;
 
     // failsafe
@@ -93,7 +95,8 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
                        static_cast<int>( type ) <<
                        highest + 1 <<
                        static_cast<int>( Event::instance()->id( event )) <<
-                       description
+                       description <<
+                       pattern
                        );
 }
 

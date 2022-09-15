@@ -46,6 +46,7 @@ public:
         Order_,
         Event,
         Desc,
+        Pattern,
 
         // count
         Count
@@ -84,7 +85,8 @@ public:
     ~Task() override { this->setInitialised( false ); }
 
     [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString());
+    Row add( const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle,
+             const QString &description = QString(), const QString &pattern = QString());
     [[nodiscard]] QString name( const Row &row ) const { return this->value( row, Name ).toString(); }
     [[nodiscard]] int points( const Row &row ) const { return this->value( row, Points ).toInt(); }
     [[nodiscard]] int multi( const Row &row ) const { return this->value( row, Mult ).toInt(); }
@@ -92,6 +94,7 @@ public:
     [[nodiscard]] Types type( const Row &row ) const { return static_cast<Types>( this->value( row, Type ).toInt()); }
     [[nodiscard]] int order( const Row &row ) const { return this->value( row, Order_ ).toInt(); }
     [[nodiscard]] QString description( const Row &row ) const { return this->value( row, Desc ).toString(); }
+    [[nodiscard]] QString pattern( const Row &row ) const { return this->value( row, Pattern ).toString(); }
     [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
     [[nodiscard]] int multiplier( const Row &row ) const;
     [[nodiscard]] Id comboId( const Row &row ) const;
@@ -114,6 +117,7 @@ public slots:
     void setType( const Row &row, Task::Types type ) { this->setValue( row, Type, static_cast<int>( type )); }
     void setOrder( const Row &row, int position ) { this->setValue( row, Order_, position ); }
     void setDescription( const Row &row, const QString &description ) { this->setValue( row, Desc, description ); }
+    void setPattern( const Row &row, const QString &pattern ) { this->setValue( row, Pattern, pattern ); }
     void setMultiplier( const Row &row, int value );
     void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
 

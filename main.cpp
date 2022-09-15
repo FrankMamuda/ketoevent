@@ -56,6 +56,9 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - icons for task subTypes (whole team/one member/object only)
 //   - option to disable combos
 //   - option to disable time tracking
+//   - remember window sizes (task edit, main screen, maximized/normal)
+//   - patterns
+//   - add tasks for columns in rankings (also save column settings)
 //
 
 // default message handler
