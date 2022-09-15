@@ -114,6 +114,7 @@ public:
 
 protected:
     void paintEvent( QPaintEvent *event ) override;
+    QValidator::State validate( QString &text, int &pos ) const override;
 
 private:
     const Delegate *delegate;

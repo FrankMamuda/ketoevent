@@ -109,6 +109,8 @@ public:
 
     [[nodiscard]] int columnCount( const QModelIndex & = QModelIndex()) const override { return ExtendedCount; }
 
+    [[nodiscard]] bool validate( const Row &row, int value ) const;
+
 public slots:
     void setName( const Row &row, const QString &name ) { this->setValue( row, Name, name ); }
     void setPoints( const Row &row, int points ) { this->setValue( row, Points, points ); }

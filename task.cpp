@@ -267,6 +267,76 @@ void Task::setMultiplier( const Row &row, int value ) {
 }
 
 /**
+ * @brief Task::validate
+ * @param row
+ * @param value
+ */
+bool Task::validate( const Row &row, int value ) const {
+    if ( this->type( row ) != Task::Types::Multi )
+        return true;
+
+    const QString &pattern( this->pattern( row ));
+    if ( pattern.isEmpty())
+        return true;
+
+    struct Validator {
+        QList<int> integers;
+
+        struct Range {
+            int min = 0;
+            int max = 0;
+        };
+        QList<Range> ranges;
+    };
+
+    Validator validator;
+    const QStringList patterns( pattern.split( ";" ));
+
+    for ( auto p : patterns ) {
+        bool ok;
+        const int value = p.toInt( &ok );
+        if ( ok ) {
+            validator.integers << value;
+        } else {
+            QStringList range( p.split( "->" ));
+            if ( range.count() != 2 )
+                continue;
+
+            const int vmin = range.at( 0 ).toInt( &ok );
+            if ( !ok )
+                continue;
+
+            const int vmax = range.at( 1 ).toInt( &ok );
+            if ( !ok )
+                continue;
+
+            if ( vmin >= vmax )
+                continue;
+
+            Validator::Range r { vmin, vmax };
+            validator.ranges << r;
+        }
+    }
+
+    auto validate = [=]( int num ) {
+        if ( validator.integers.isEmpty() && validator.ranges.isEmpty())
+            return true;
+
+        if ( validator.integers.contains( num ))
+            return true;
+
+        for ( const auto r : validator.ranges ) {
+            if ( num >= r.min && num <= r.max )
+                return true;
+        }
+
+        return false;
+    };
+
+    return validate( value );
+}
+
+/**
  * @brief Task::selectStatement
  * @return
  */

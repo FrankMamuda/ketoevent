@@ -269,7 +269,8 @@ QWidget *Delegate::createEditor( QWidget *parent, const QStyleOptionViewItem &, 
     this->currentEditWidget = edit;
 
     // set up widget
-    edit->setMaximum( Task::instance()->multi( this->row( index )));
+    edit->setMinimum( -9999 );
+    edit->setMaximum( Task::instance()->pattern( this->row( index )).isEmpty() ? Task::instance()->multi( this->row( index )) : 9999 );
     edit->setAlignment( Qt::AlignCenter );
     edit->setButtonSymbols( QAbstractSpinBox::NoButtons );
     edit->setStyleSheet( "QSpinBox { background-color: transparent; color: white; text-align: center; selection-background-color: transparent; } QSpinBox::up-button { width: 0px; } QSpinBox::down-button { width: 0px; }" );
@@ -299,7 +300,7 @@ void Delegate::setEditorData( QWidget *editor, const QModelIndex &index ) const 
 void Delegate::setModelData( QWidget *editor, QAbstractItemModel *, const QModelIndex &index ) const {
     EditWidget *editWidget( qobject_cast<EditWidget*>( editor ));
     editWidget->interpretText();
-    Task::instance()->setMultiplier( this->row( index ), editWidget->value() );
+    Task::instance()->setMultiplier( this->row( index ), editWidget->value());
 }
 
 /**
@@ -339,6 +340,32 @@ void EditWidget::paintEvent( QPaintEvent *event ) {
 
     // paint input
     QSpinBox::paintEvent( event );
+}
+
+/**
+ * @brief EditWidget::validate
+ * @param text
+ * @param pos
+ * @return
+ */
+QValidator::State EditWidget::validate( QString &text, int &pos ) const {
+    if ( text.isEmpty())
+        return QValidator::Acceptable;
+
+    bool ok;
+    const int value = text.toInt( &ok );
+
+    if ( !ok )
+        return QValidator::Intermediate;
+
+    const Row row = Task::instance()->row( this->index );
+    if ( row == Row::Invalid )
+        return QValidator::Invalid;
+
+    if ( Task::instance()->pattern( Task::instance()->row( this->index )).isEmpty())
+        return QValidator::Acceptable;
+
+    return Task::instance()->validate( row, value ) ? QValidator::Acceptable : QValidator::Intermediate;
 }
 
 /**
