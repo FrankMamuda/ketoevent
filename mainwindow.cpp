@@ -164,7 +164,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ),
 
         // check for valid time
         const QTime startTime = Event::instance()->startTime( event );
-        const QTime finalTime = Event::instance()->finalTime( event );
+        const QTime finalTime = Event::instance()->finalTime( event ).addSecs( 10800 );
         const QTime teamTime = Team::instance()->finishTime( team );
 
         if ( time > finalTime ) {

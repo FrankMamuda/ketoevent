@@ -272,7 +272,7 @@ void Rankings::on_actionUpdate_triggered() {
             stats.points = qMax( stats.points, 0 );
         }
         const int penaltyTime = eventFinishTime.secsTo( eventFinalTime );
-        if ( overTime > penaltyTime )
+        if ( overTime > penaltyTime || Team::instance()->finishTime( teamRow ) >= eventFinalTime )
             stats.points = 0;
 
         // add team stats to list

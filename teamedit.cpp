@@ -54,7 +54,7 @@ TeamEdit::TeamEdit( QWidget *parent ) : QWidget( parent ), ui( new Ui::TeamEdit 
     this->ui->membersInteger->setMinimum( Event::instance()->minMembers( event ));
     this->ui->membersInteger->setMaximum( Event::instance()->maxMembers( event ));
     this->ui->finishTime->setMinimumTime( Event::instance()->startTime( event ));
-    this->ui->finishTime->setMaximumTime( Event::instance()->finalTime( event ));
+    this->ui->finishTime->setMaximumTime( Event::instance()->finalTime( event ).addSecs( 10800 ));
 
     // only visible in quick add
     this->setWindowTitle( this->tr( "Add team" ));
