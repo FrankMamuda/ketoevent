@@ -18,8 +18,8 @@
  */
 
 /*
-/* includes
-*/
+ * includes
+ */
 #include <QMessageBox>
 #include "about.h"
 #include "ui_about.h"

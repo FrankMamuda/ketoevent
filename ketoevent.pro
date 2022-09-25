@@ -115,7 +115,7 @@ RESOURCES += \
 win32:RC_FILE = icon.rc
 
 # custom sqlite lib switch
-#CONFIG += sqlite_custom
+CONFIG += sqlite_custom
 sqlite_custom {
 SOURCES += 3rdparty/sqlite-amalgamation/sqlite3.c
 HEADERS += 3rdparty/sqlite-amalgamation/sqlite3.h
@@ -153,7 +153,7 @@ QMAKE_EXTRA_TARGETS += langupd
 QMAKE_EXTRA_COMPILERS += langrel
 PRE_TARGETDEPS += langupd compiler_langrel_make_all
 
-#CONFIG += xlsx_support
+CONFIG += xlsx_support
 xlsx_support {
 include(3rdparty/QXlsx/QXlsx.pri)
 DEFINES += XLSX_SUPPORT

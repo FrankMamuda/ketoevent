@@ -348,7 +348,7 @@ void EditWidget::paintEvent( QPaintEvent *event ) {
  * @param pos
  * @return
  */
-QValidator::State EditWidget::validate( QString &text, int &pos ) const {
+QValidator::State EditWidget::validate( QString &text, int & ) const {
     if ( text.isEmpty())
         return QValidator::Acceptable;
 
