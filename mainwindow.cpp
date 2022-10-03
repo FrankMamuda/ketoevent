@@ -351,7 +351,6 @@ void MainWindow::on_teamCombo_currentIndexChanged( int index ) {
 void MainWindow::on_actionEvents_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
-    editor->show();
     editor->container->clearSelection();
     editor->container->setModel( Event::instance());
 
@@ -375,6 +374,7 @@ void MainWindow::on_actionEvents_triggered() {
     editor->setWindowTitle( this->tr( "Event manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "ketone" ));
 
+    editor->show();
     EventToolBar::instance()->buttonTest();
     EventToolBar::instance()->show();
 }
@@ -385,7 +385,6 @@ void MainWindow::on_actionEvents_triggered() {
 void MainWindow::on_actionTeams_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
-    editor->show();
     editor->container->clearSelection();
     editor->container->setModel( Team::instance());
 
@@ -404,6 +403,7 @@ void MainWindow::on_actionTeams_triggered() {
     editor->setWindowTitle( this->tr( "Team manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "teams" ));
 
+    editor->show();
     TeamToolBar::instance()->buttonTest();
     TeamToolBar::instance()->show();
 }
@@ -414,10 +414,8 @@ void MainWindow::on_actionTeams_triggered() {
 void MainWindow::on_actionTasks_triggered() {
     EditorDialog *editor( EditorDialog::instance());
 
-    editor->show();
     editor->container->clearSelection();
     editor->container->setModel( Task::instance());
-
 
     //editor->container->setModelColumn( Task::Name );
     editor->container->hideColumn( Task::ID );
@@ -438,6 +436,7 @@ void MainWindow::on_actionTasks_triggered() {
     editor->setWindowTitle( this->tr( "Task manager" ));
     editor->setWindowIcon( QIcon::fromTheme( "tasks" ));
 
+    editor->show();
     TaskToolBar::instance()->buttonTest();
     TaskToolBar::instance()->show();
 
@@ -569,6 +568,9 @@ void MainWindow::setLock() {
  * @param event
  */
 void MainWindow::closeEvent( QCloseEvent *event ) {
+    if ( !this->isMaximized())
+        Variable::setCompressedByteArray( "geometry/main", this->saveGeometry());
+
     // disallow closing when modal windows are open
     if ( !this->isEnabled()) {
         event->ignore();
@@ -576,6 +578,18 @@ void MainWindow::closeEvent( QCloseEvent *event ) {
     }
 
     QMainWindow::closeEvent( event );
+}
+
+/**
+ * @brief MainWindow::showEvent
+ * @param event
+ */
+void MainWindow::showEvent( QShowEvent *event ) {
+    QMainWindow::showEvent( event );
+
+    // restore main window geomery
+    if ( !Variable::value<QVariant>( "geometry/main" ).isNull() && !this->isMaximized())
+        this->restoreGeometry( Variable::compressedByteArray( "geometry/main" ));
 }
 
 /**

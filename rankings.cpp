@@ -377,6 +377,21 @@ void Rankings::showEvent( QShowEvent *event ) {
 
     // set current team
     this->ui->teamCombo->setCurrentIndex( static_cast<int>( MainWindow::instance()->currentTeam()));
+
+    // restore main window geomery
+    if ( !Variable::value<QVariant>( "geometry/rankings" ).isNull() && !this->isMaximized())
+        this->restoreGeometry( Variable::compressedByteArray( "geometry/rankings" ));
+}
+
+/**
+ * @brief Rankings::closeEvent
+ * @param event
+ */
+void Rankings::closeEvent( QCloseEvent *event ) {
+    if ( !this->isMaximized())
+        Variable::setCompressedByteArray( "geometry/rankings", this->saveGeometry());
+
+    ModalWindow::closeEvent( event );
 }
 
 /**

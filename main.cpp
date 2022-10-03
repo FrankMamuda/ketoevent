@@ -161,6 +161,11 @@ int main( int argc, char *argv[] ) {
     Variable::add( "darkMode", false, Var::Flag::ReadOnly | Var::Flag::Hidden | Var::Flag::NoSave );
     Variable::add( "overrideTheme", false, Var::Flag::ReadOnly | Var::Flag::Hidden );
     Variable::add( "theme", "light", Var::Flag::ReadOnly | Var::Flag::Hidden );
+    Variable::add( "geometry/main", QByteArray(), Var::Flag::ReadOnly );
+    Variable::add( "geometry/events", QByteArray(), Var::Flag::ReadOnly );
+    Variable::add( "geometry/teams", QByteArray(), Var::Flag::ReadOnly );
+    Variable::add( "geometry/tasks", QByteArray(), Var::Flag::ReadOnly );
+    Variable::add( "geometry/rankings", QByteArray(), Var::Flag::ReadOnly ); // TODO
 
     // read configuration
     XMLTools::read();

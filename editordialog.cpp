@@ -22,8 +22,11 @@
  */
 #include "editordialog.h"
 #include "main.h"
-#include "mainwindow.h"
+#include "eventtoolbar.h"
+#include "tasktoolbar.h"
+#include "teamtoolbar.h"
 #include "ui_editordialog.h"
+#include "variable.h"
 #include <QDebug>
 
 // singleton
@@ -108,10 +111,40 @@ void EditorDialog::setToolBar( QToolBar *widget ) {
 }
 
 /**
+ * @brief EditorDialog::showEvent
+ * @param event
+ */
+void EditorDialog::showEvent( QShowEvent *event ) {
+    ModalWindow::showEvent( event );
+
+    if ( !this->isMaximized()) {
+        if ( this->toolBar == EventToolBar::instance() && !Variable::value<QVariant>( "geometry/events" ).isNull())
+            this->restoreGeometry( Variable::compressedByteArray( "geometry/events" ));
+
+        if ( this->toolBar == TaskToolBar::instance() && !Variable::value<QVariant>( "geometry/tasks" ).isNull())
+            this->restoreGeometry( Variable::compressedByteArray( "geometry/tasks" ));
+
+        if ( this->toolBar == TeamToolBar::instance() && !Variable::value<QVariant>( "geometry/teams" ).isNull())
+            this->restoreGeometry( Variable::compressedByteArray( "geometry/teams" ));
+    }
+}
+
+/**
  * @brief EditorDialog::closeEvent
  * @param event
  */
 void EditorDialog::closeEvent( QCloseEvent *event ) {
+    if ( !this->isMaximized()) {
+        if ( this->toolBar == EventToolBar::instance())
+            Variable::setCompressedByteArray( "geometry/events", this->saveGeometry());
+
+        if ( this->toolBar == TaskToolBar::instance())
+            Variable::setCompressedByteArray( "geometry/tasks", this->saveGeometry());
+
+        if ( this->toolBar == TeamToolBar::instance())
+            Variable::setCompressedByteArray( "geometry/teams", this->saveGeometry());
+    }
+
     this->hideDock();
     this->disconnect( this->container, SIGNAL( clicked( QModelIndex )));
     ModalWindow::closeEvent( event );
