@@ -32,8 +32,6 @@
 // singleton
 Task *Task::i = nullptr;
 
-#define stringify( x ) #x
-
 /**
  * @brief Task::Task
  */
