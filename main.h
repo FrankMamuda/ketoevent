@@ -22,6 +22,7 @@
 /*
  * includes
  */
+#include <QObject>
 #include <QSharedPointer>
 #include <QtGlobal>
 
@@ -59,7 +60,7 @@ public:
      */
     void clear() {
         std::reverse( this->garbage.begin(), this->garbage.end());
-        for ( QObject *object : qAsConst( this->garbage )) {
+        for ( QObject *object : std::as_const( this->garbage )) {
             if ( object != nullptr ) {
                 delete object;
                 object = nullptr;
