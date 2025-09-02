@@ -38,23 +38,23 @@ Popup::Popup(QWidget *parent, const QString &text, const int timeout)
     , label(new QLabel(this)) {
 
     // setup window
-    this->setAutoFillBackground(false);
-    this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-    this->setAttribute(Qt::WA_TranslucentBackground, true);
-    // this->setAttribute( Qt::WA_DeleteOnClose, true );
-    this->setWindowModality(Qt::ApplicationModal);
-    this->setModal(true);
+    setAutoFillBackground(false);
+    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    // setAttribute( Qt::WA_DeleteOnClose, true );
+    setWindowModality(Qt::ApplicationModal);
+    setModal(true);
 
     // setup shadow
-    this->shadow->setBlurRadius(this->shadowBlurRadius);
-    this->shadow->setOffset(this->shadowOffset);
-    this->setGraphicsEffect(shadow);
+    shadow->setBlurRadius(shadowBlurRadius);
+    shadow->setOffset(shadowOffset);
+    setGraphicsEffect(shadow);
 
     // setup label
-    const int o0 = this->shadowBlurRadius - this->shadowOffset;
-    const int o1 = this->shadowBlurRadius + this->shadowOffset;
-    this->setText(text);
-    this->label->setStyleSheet(QString("QLabel {"
+    const int o0 = shadowBlurRadius - shadowOffset;
+    const int o1 = shadowBlurRadius + shadowOffset;
+    setText(text);
+    label->setStyleSheet(QString("QLabel {"
                                        "padding-top: %1px;"
                                        "padding-left: %2px;"
                                        "padding-right: %3px;"
@@ -62,38 +62,38 @@ Popup::Popup(QWidget *parent, const QString &text, const int timeout)
                                    .arg(20 + o0)
                                    .arg(o0)
                                    .arg(o1));
-    this->setTextAlignment(Qt::AlignCenter);
-    this->label->setWordWrap(true);
+    setTextAlignment(Qt::AlignCenter);
+    label->setWordWrap(true);
 
     // setup layout
     layout->addWidget(label);
-    this->setLayout(layout);
+    setLayout(layout);
 
     // setup popup shape
-    this->setupShape();
+    setupShape();
 
     // setup options
-    this->setTimeOut(timeout);
-    this->pointAt(QCursor::pos());
+    setTimeOut(timeout);
+    pointAt(QCursor::pos());
 }
 
 /**
  * @brief Popup::setupShape
  */
 void Popup::setupShape() {
-    const int o0 = this->shadowBlurRadius - this->shadowOffset;
-    const int o1 = this->shadowBlurRadius + this->shadowOffset;
+    const int o0 = shadowBlurRadius - shadowOffset;
+    const int o1 = shadowBlurRadius + shadowOffset;
     const int padding = 16;
-    const int w = this->width();
-    const int h = this->height();
+    const int w = width();
+    const int h = height();
 
     // setup polygon
     // NOTE: a popup of a maxmimzed window will most likely be drawn off screen, so reverse the arrow location
     // NOTE: not implemented properly yet (disabled)
-    const bool inverse = false; // this->parentWidget() == nullptr ? false : this->parentWidget()->isMaximized();
+    const bool inverse = false; // parentWidget() == nullptr ? false : parentWidget()->isMaximized();
 
-    this->arrowHead = inverse ? QPoint(w - 40 - o1, 0 + o0) : QPoint(o0 + 40, 0 + o0);
-    this->poly = QPolygon(QVector<QPoint>() << QPoint(o0, 20 + o0) << // UL
+    arrowHead = inverse ? QPoint(w - 40 - o1, 0 + o0) : QPoint(o0 + 40, 0 + o0);
+    poly = QPolygon(QVector<QPoint>() << QPoint(o0, 20 + o0) << // UL
         QPoint(inverse ? w - 60 - o1 : o0 + 20, 20 + o0) << // arrow base L
         arrowHead << // arrow head
         QPoint(inverse ? w - 20 - o1 : o0 + 60, 20 + o0) << // arrow base R
@@ -102,14 +102,14 @@ void Popup::setupShape() {
         QPoint(o0, h - o1)); // LL
 
     // set minimum size to avoid uglies
-    this->setMinimumSize(o0 + 60 + o1 + padding, o0 + 20 + o1 + padding);
+    setMinimumSize(o0 + 60 + o1 + padding, o0 + 20 + o1 + padding);
 }
 
 /**
  * @brief Popup::setText
  * @param text
  */
-void Popup::setText(const QString &text) { this->label->setText(text); }
+void Popup::setText(const QString &text) { label->setText(text); }
 
 /**
  * @brief Popup::pointAt
@@ -117,11 +117,11 @@ void Popup::setText(const QString &text) { this->label->setText(text); }
  */
 void Popup::pointAt(const QPoint &point) {
     // NOTE: not implemented properly yet (disabled)
-    const bool inverse = false; // = this->parentWidget() == nullptr ? false : this->parentWidget()->isMaximized();
+    const bool inverse = false; // = parentWidget() == nullptr ? false : parentWidget()->isMaximized();
     Q_UNUSED(inverse)
 
-    const QPoint pos(point.x() - this->arrowHead.x(), point.y() - this->arrowHead.y());
-    this->move(pos);
+    const QPoint pos(point.x() - arrowHead.x(), point.y() - arrowHead.y());
+    move(pos);
 }
 
 /**
@@ -144,8 +144,8 @@ void Popup::paintEvent(QPaintEvent *event) {
 
     // draw popup shape
     painter.setPen(Qt::transparent);
-    painter.setBrush(this->palette().color(QPalette::Window));
-    painter.drawPolygon(this->poly, Qt::OddEvenFill);
+    painter.setBrush(palette().color(QPalette::Window));
+    painter.drawPolygon(poly, Qt::OddEvenFill);
 
     // draw label
     QDialog::paintEvent(event);
@@ -164,5 +164,5 @@ void Popup::mousePressEvent(QMouseEvent *event) { event->accept(); }
 void Popup::mouseReleaseEvent(QMouseEvent *event) {
     event->accept();
 
-    if (!this->poly.containsPoint(event->pos(), Qt::OddEvenFill)) this->close();
+    if (!poly.containsPoint(event->pos(), Qt::OddEvenFill)) close();
 }

@@ -32,27 +32,27 @@ Console *Console::i = nullptr;
  * @brief Console::Console
  */
 Console::Console() : ui(new Ui::Console) {
-    this->ui->setupUi(this);
-    this->edit = this->ui->input;
-    this->setWindowFlags(Qt::Tool);
-    this->setWindowOpacity(0.95);
-    this->ui->screen->clear();
+    ui->setupUi(this);
+    edit = ui->input;
+    setWindowFlags(Qt::Tool);
+    setWindowOpacity(0.95);
+    ui->screen->clear();
 
     // install event filter
-    this->edit->installEventFilter(this);
-    this->edit->history = Variable::string("system/consoleHistory").split(";");
+    edit->installEventFilter(this);
+    edit->history = Variable::string("system/consoleHistory").split(";");
 
     // announce
-    this->print(this->tr("This is the console. Type 'help' if unsure what to do.\n"));
+    print(tr("This is the console. Type 'help' if unsure what to do.\n"));
 }
 
 /**
  * @brief Console::~Console
  */
 Console::~Console() {
-    Variable::setValue("system/consoleHistory", this->edit->history.join(";"));
-    this->edit->removeEventFilter(this);
-    delete this->ui;
+    Variable::setValue("system/consoleHistory", edit->history.join(";"));
+    edit->removeEventFilter(this);
+    delete ui;
 }
 
 /**
@@ -67,20 +67,20 @@ bool Console::completeCommand() {
     // find matching commands
     const QStringList keys(Cmd::instance()->keys());
     for (const QString &name : keys) {
-        if (name.startsWith(this->edit->text())) matchedStrings << name;
+        if (name.startsWith(edit->text())) matchedStrings << name;
     }
 
     // find matching cvars
     for (const QSharedPointer<Var> &entry : std::as_const(Variable::instance()->list)) {
         if (!QString::compare(entry->key(), "system/consoleHistory")) continue;
 
-        if (entry->key().startsWith(this->edit->text())) matchedStrings << entry->key();
+        if (entry->key().startsWith(edit->text())) matchedStrings << entry->key();
     }
 
     // complete to shortest string
     if (matchedStrings.count() == 1) {
         // append extra space (since it's the only match that will likely be follwed by an argument)
-        this->edit->setText(matchedStrings.first() + " ");
+        edit->setText(matchedStrings.first() + " ");
     } else if (matchedStrings.count() > 1) {
         match = 1;
         for (y = 0; y < matchedStrings.count(); y++) {
@@ -94,13 +94,13 @@ bool Console::completeCommand() {
                 }
             }
         }
-        this->edit->setText(matchedStrings.first().left(match));
+        edit->setText(matchedStrings.first().left(match));
     } else if (!matchedStrings.count()) {
         return true;
     }
 
     // print out suggestions
-    qInfo() << this->tr("Available commands and cvars:");
+    qInfo() << tr("Available commands and cvars:");
     for (const QString &str : std::as_const(matchedStrings)) {
         // check commands
         if (Cmd::instance()->keys().contains(str)) {
@@ -111,7 +111,7 @@ bool Console::completeCommand() {
         // check variables
         if (Variable::instance()->contains(str)) {
             QSharedPointer<Var> entry(Variable::instance()->list[str]);
-            qInfo() << this->tr("  \"%1\" is \"%2\"").arg(entry->key(), entry->value().toString());
+            qInfo() << tr("  \"%1\" is \"%2\"").arg(entry->key(), entry->value().toString());
         }
     }
 
@@ -159,7 +159,7 @@ bool Console::eventFilter(QObject *object, QEvent *event) {
             } else if (keyEvent->key() == Qt::Key_Tab) {
                 if (edit->text().isEmpty()) return true;
 
-                return this->completeCommand();
+                return completeCommand();
             }
         }
     }
@@ -175,21 +175,21 @@ void Console::print(const QString &msg) {
 
     if (out.startsWith('"')) out = out.mid(1, out.length() - 2);
 
-    this->ui->screen->append(out.replace("\\\"", "\""));
+    ui->screen->append(out.replace("\\\"", "\""));
 
     // move cursor
-    QTextCursor cursor(this->ui->screen->textCursor());
+    QTextCursor cursor(ui->screen->textCursor());
     cursor.movePosition(QTextCursor::End);
-    this->ui->screen->setTextCursor(cursor);
+    ui->screen->setTextCursor(cursor);
 }
 
 /**
  * @brief Console::on_input_returnPressed
  */
 void Console::on_input_returnPressed() {
-    if (Cmd::instance()->execute(this->edit->text())) this->edit->add(this->edit->text());
+    if (Cmd::instance()->execute(edit->text())) edit->add(edit->text());
 
     // set min offset
-    this->edit->reset();
-    this->edit->clear();
+    edit->reset();
+    edit->clear();
 }

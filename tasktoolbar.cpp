@@ -41,23 +41,23 @@ TaskToolBar *TaskToolBar::i = nullptr;
  */
 TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    this->addAction(QIcon::fromTheme("add"), this->tr("Add Task"), [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Task"), [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock(TaskEdit::instance(), this->tr("Add Task "));
+            EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Add Task "));
             TaskEdit::instance()->reset();
         }
     });
 
     // edit action
-    this->edit = this->addAction(QIcon::fromTheme("edit"), this->tr("Edit Task"), [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Task"), [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock(TaskEdit::instance(), this->tr("Edit Task "));
+            EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Edit Task "));
             TaskEdit::instance()->reset(true);
         }
     });
 
     // remove action
-    this->remove = this->addAction(QIcon::fromTheme("remove"), this->tr("Remove Task"), [this]() {
+    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Task"), [this]() {
         const QModelIndex index(EditorDialog::instance()->container->currentIndex());
 
         if (EditorDialog::instance()->isDockVisible() || !index.isValid()) return;
@@ -66,10 +66,10 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
         if (row == Row::Invalid) return;
 
         const QString name(Task::instance()->name(row));
-        if (QMessageBox::question(this, this->tr("Remove task"), this->tr("Do you really want to remove \"%1\"?").arg(name)) == QMessageBox::Yes)
+        if (QMessageBox::question(this, tr("Remove task"), tr("Do you really want to remove \"%1\"?").arg(name)) == QMessageBox::Yes)
             Task::instance()->remove(row);
     });
-    this->remove->setEnabled(false);
+    remove->setEnabled(false);
 
     // move up/down lambda
     auto move = [this](bool up) {
@@ -84,7 +84,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
         for (y = 0; y < Task::instance()->count(); y++) {
             const int order = Task::instance()->order(Task::instance()->row(y));
             if (orderSet.contains(order)) {
-                if (QMessageBox::question(this, this->tr("Corrupted order"), this->tr("Tasks have corrupted order. Perform reindexing? This cannot be undone."))
+                if (QMessageBox::question(this, tr("Corrupted order"), tr("Tasks have corrupted order. Perform reindexing? This cannot be undone."))
                     == QMessageBox::Yes) {
                     reindex = true;
                 }
@@ -129,20 +129,20 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
         const QModelIndex current(container->model()->index(static_cast<int>(Task::instance()->row(id0)), 0));
         container->setCurrentIndex(current);
         container->setFocus();
-        this->buttonTest(current);
+        buttonTest(current);
     };
 
     // move up action
-    this->moveUp = this->addAction(QIcon::fromTheme("up"), this->tr("Move up"), [move]() { move(true); });
+    moveUp = addAction(QIcon::fromTheme("up"), tr("Move up"), [move]() { move(true); });
     moveUp->setEnabled(false);
 
     // move down action
-    this->moveDown = this->addAction(QIcon::fromTheme("down"), this->tr("Move down"), [move]() { move(false); });
+    moveDown = addAction(QIcon::fromTheme("down"), tr("Move down"), [move]() { move(false); });
     moveDown->setEnabled(false);
 
     // export action
-    this->addAction(QIcon::fromTheme("export"), this->tr("Export tasks"), [this]() {
-        QString path(QFileDialog::getSaveFileName(this, this->tr("Export tasks to CSV format"), QDir::homePath(), this->tr("CSV file (*.csv)")));
+    addAction(QIcon::fromTheme("export"), tr("Export tasks"), [this]() {
+        QString path(QFileDialog::getSaveFileName(this, tr("Export tasks to CSV format"), QDir::homePath(), tr("CSV file (*.csv)")));
 
         // check for empty filenames
         if (path.isEmpty()) return;
@@ -155,7 +155,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
 
         if (csv.open(QFile::WriteOnly | QFile::Truncate)) {
             QTextStream out(&csv);
-            out << this->tr("Task name;Description;Type;Style;Multi;Points").append("\n");
+            out << tr("Task name;Description;Type;Style;Multi;Points").append("\n");
 
             for (int y = 0; y < Task::instance()->count(); y++) {
                 const Row row = Task::instance()->row(y);
@@ -164,15 +164,15 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
                 /*QString style;
                  switch ( Task::instance()->style( row )) {
                  case Task::Styles::Regular:
-                     style = this->tr( "Simple" );
+                     style = tr( "Simple" );
                      break;
 
                  case Task::Styles::Bold:
-                     style = this->tr( "Difficult" );
+                     style = tr( "Difficult" );
                      break;
 
                  case Task::Styles::Italic:
-                     style = this->tr( "Other" );
+                     style = tr( "Other" );
                      break;
 
                  case Task::Styles::NoStyle:
@@ -182,7 +182,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
                  out << QString( "%1;%2;%3;%4;%5;%6%7" )
                         .arg( Task::instance()->name( row ).replace( ";", " |" ),
                               Task::instance()->description( row ).replace( ";", "  |" ),
-                              Task::instance()->type( row ) == Task::Types::Multi ? this->tr( "Multi" ) : this->tr( "Regular" ),
+                              Task::instance()->type( row ) == Task::Types::Multi ? tr( "Multi" ) : tr( "Regular" ),
                               style,
                               Task::instance()->type( row ) == Task::Types::Multi ? QString::number( Task::instance()->multi( row )) : "",
                               QString::number( Task::instance()->points( row )),
@@ -201,8 +201,8 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
 
 #ifdef XLSX_SUPPORT
     // export action (xlsx)
-    this->addAction(QIcon::fromTheme("export"), this->tr("Export as xlsx"), [this]() {
-        QString path(QFileDialog::getSaveFileName(this, this->tr("Export tasks to XLSX format"), QDir::homePath(), this->tr("XLSX spreadsheet (*.xlsx)")));
+    addAction(QIcon::fromTheme("export"), tr("Export as xlsx"), [this]() {
+        QString path(QFileDialog::getSaveFileName(this, tr("Export tasks to XLSX format"), QDir::homePath(), tr("XLSX spreadsheet (*.xlsx)")));
 
         // check for empty filenames
         if (path.isEmpty()) return;
@@ -226,7 +226,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
             const QString out(QString("%1%2 %3 %4 ")
                                   .arg(Task::instance()->name(row), description.isEmpty() ? "" : QString(" (%1)").arg(Task::instance()->description(row)),
                                       (Task::instance()->type(row) == Task::Types::Multi) ? QChar() : QChar(0x2013),
-                                      (Task::instance()->type(row) == Task::Types::Multi) ? "" : (QString::number(points)) + " " + this->tr("points")));
+                                      (Task::instance()->type(row) == Task::Types::Multi) ? "" : (QString::number(points)) + " " + tr("points")));
 
             QString style;
             switch (Task::instance()->style(row)) {
@@ -248,21 +248,21 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
         boldFormat.setFontBold(true);
 
         int row = 1;
-        xlsx.write(row++, 1, this->tr("Simple tasks"), boldFormat);
+        xlsx.write(row++, 1, tr("Simple tasks"), boldFormat);
         for (const QString &str : simple) {
             xlsx.write(row, 1, str);
             row++;
         }
         row++;
 
-        xlsx.write(row++, 1, this->tr("Difficult tasks"), boldFormat);
+        xlsx.write(row++, 1, tr("Difficult tasks"), boldFormat);
         for (const QString &str : difficult) {
             xlsx.write(row, 1, str);
             row++;
         }
         row++;
 
-        xlsx.write(row++, 1, this->tr("Other tasks"), boldFormat);
+        xlsx.write(row++, 1, tr("Other tasks"), boldFormat);
         for (const QString &str : other) {
             xlsx.write(row, 1, str);
             row++;
@@ -277,8 +277,8 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
 #endif
 
     // import action (csv)
-    this->addAction(QIcon::fromTheme("tasks"), this->tr("Import tasks"), [this]() {
-        QString path(QFileDialog::getOpenFileName(this, this->tr("Import tasks from CSV format"), QDir::homePath(), this->tr("CSV file (*.csv)")));
+    addAction(QIcon::fromTheme("tasks"), tr("Import tasks"), [this]() {
+        QString path(QFileDialog::getOpenFileName(this, tr("Import tasks from CSV format"), QDir::homePath(), tr("CSV file (*.csv)")));
 
         // check for empty filenames
         if (path.isEmpty()) return;
@@ -327,8 +327,8 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // button test (disconnected in ~EditorDialog)
-    this->connect(EditorDialog::instance()->container, SIGNAL(clicked(QModelIndex)), this, SLOT(buttonTest(QModelIndex)));
-    this->buttonTest();
+    connect(EditorDialog::instance()->container, SIGNAL(clicked(QModelIndex)), this, SLOT(buttonTest(QModelIndex)));
+    buttonTest();
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -340,12 +340,12 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
  */
 void TaskToolBar::buttonTest(const QModelIndex &index) {
     if (Variable::isEnabled("sortByType")) {
-        this->moveUp->setDisabled(true);
-        this->moveDown->setDisabled(true);
+        moveUp->setDisabled(true);
+        moveDown->setDisabled(true);
     } else {
-        this->moveUp->setEnabled(index.isValid() && index.row() != 0);
-        this->moveDown->setEnabled(index.isValid() && index.row() != Task::instance()->count() - 1);
+        moveUp->setEnabled(index.isValid() && index.row() != 0);
+        moveDown->setEnabled(index.isValid() && index.row() != Task::instance()->count() - 1);
     }
-    this->edit->setEnabled(index.isValid());
-    this->remove->setEnabled(index.isValid());
+    edit->setEnabled(index.isValid());
+    remove->setEnabled(index.isValid());
 };

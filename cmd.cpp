@@ -53,20 +53,20 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
 #endif
 
     // add common commands
-    this->add("cmd_list", static_cast<void (*)(const QString &, const QStringList &)>(listCmd), this->tr("list all available commands"));
-    this->add("con_print",
+    add("cmd_list", static_cast<void (*)(const QString &, const QStringList &)>(listCmd), tr("list all available commands"));
+    add("con_print",
         static_cast<void (*)(const QString &, const QStringList &)>([](const QString &name, const QStringList &args) { Cmd::instance()->print(name, args); }),
-        this->tr("print text to console"));
-    this->add("cv_list",
+        tr("print text to console"));
+    add("cv_list",
         static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) { Cmd::instance()->listCvars(); }),
-        this->tr("list all available console variables"));
-    this->add("cv_set",
+        tr("list all available console variables"));
+    add("cv_set",
         static_cast<void (*)(const QString &, const QStringList &)>([](const QString &name, const QStringList &args) { Cmd::instance()->cvarSet(name, args); }),
-        this->tr("set console variable value"));
-    this->add("db_info", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) { Cmd::instance()->dbInfo(); }),
-        this->tr("display database information"));
-    this->add("help", static_cast<void (*)(const QString &, const QStringList &)>(listCmd), this->tr("same as cmd_list"));
-    this->add("db_clear_tasks", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
+        tr("set console variable value"));
+    add("db_info", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) { Cmd::instance()->dbInfo(); }),
+        tr("display database information"));
+    add("help", static_cast<void (*)(const QString &, const QStringList &)>(listCmd), tr("same as cmd_list"));
+    add("db_clear_tasks", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
         QSqlQuery query;
         query.exec(QString("DELETE FROM %1").arg(Task::instance()->tableName()));
         query.exec(QString("DELETE FROM %1").arg(Log::instance()->tableName()));
@@ -74,10 +74,10 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
         Log::instance()->select();
         Task::instance()->select();
     }),
-        this->tr("clear all tasks"));
+        tr("clear all tasks"));
 
     // setting up test environment
-    this->add("test_setup", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &args) {
+    add("test_setup", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &args) {
         int y, k;
         int numTeams = 5, numTasks = 10;
 
@@ -119,10 +119,10 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
         // relock ui elements if required
         MainWindow::instance()->setLock();
     }),
-        this->tr("add a demo event with teams, tasks and logs"));
+        tr("add a demo event with teams, tasks and logs"));
 
     // clear test environment
-    this->add("test_clear", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
+    add("test_clear", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
         int y;
 
         // remove all events
@@ -140,10 +140,10 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
         Database::instance()->removeOrphanedEntries();
         MainWindow::instance()->setLock();
     }),
-        this->tr("clear demo event"));
+        tr("clear demo event"));
 
     // obliterate all entries within database
-    this->add("test_delete_db", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
+    add("test_delete_db", static_cast<void (*)(const QString &, const QStringList &)>([](const QString &, const QStringList &) {
         QSqlQuery query;
         query.exec(QString("DELETE FROM %1").arg(Event::instance()->tableName()));
         query.exec(QString("DELETE FROM %1").arg(Log::instance()->tableName()));
@@ -156,10 +156,10 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
         Task::instance()->select();
         MainWindow::instance()->setLock();
     }),
-        this->tr("obliterate all entries within database "));
+        tr("obliterate all entries within database "));
 
     // add to garbage man
-    this->setObjectName("Cmd");
+    setObjectName("Cmd");
 }
 
 /**
@@ -170,14 +170,14 @@ Cmd::Cmd(QObject *parent) : QObject(parent) {
  */
 void Cmd::add(const QString &name, function_t function, const QString &description) {
     // failsafe
-    if (this->contains(name)) {
-        qWarning() << this->tr("command \"%1\" already exists").arg(name);
+    if (contains(name)) {
+        qWarning() << tr("command \"%1\" already exists").arg(name);
         return;
     }
 
     // map a new command
-    this->functionMap.insert(name, function);
-    this->descriptionMap.insert(name, description);
+    functionMap.insert(name, function);
+    descriptionMap.insert(name, description);
 }
 
 /**
@@ -186,7 +186,7 @@ void Cmd::add(const QString &name, function_t function, const QString &descripti
  */
 void Cmd::print(const QString &name, const QStringList &args) {
     if (args.count() < 1) {
-        qWarning() << this->tr("usage: %1 [message] - prints text to console").arg(name);
+        qWarning() << tr("usage: %1 [message] - prints text to console").arg(name);
         return;
     }
 
@@ -199,7 +199,7 @@ void Cmd::print(const QString &name, const QStringList &args) {
  * @param args filter
  */
 void Cmd::list(const QString &, const QStringList &args) {
-    const QStringList keys(this->functionMap.keys());
+    const QStringList keys(functionMap.keys());
 
     // announce
     if (!args.isEmpty()) {
@@ -211,10 +211,10 @@ void Cmd::list(const QString &, const QStringList &args) {
             numFiltered++;
         }
 
-        if (!numFiltered) qWarning() << this->tr("could not match any available commands");
-        else qInfo() << this->tr("matched %1 of %2 available commands:").arg(numFiltered).arg(this->functionMap.count());
+        if (!numFiltered) qWarning() << tr("could not match any available commands");
+        else qInfo() << tr("matched %1 of %2 available commands:").arg(numFiltered).arg(functionMap.count());
     } else {
-        qInfo() << this->tr("%1 available commands:").arg(this->functionMap.count());
+        qInfo() << tr("%1 available commands:").arg(functionMap.count());
     }
 
     for (const QString &name : keys) {
@@ -222,7 +222,7 @@ void Cmd::list(const QString &, const QStringList &args) {
 
         if (!args.isEmpty() && !name.startsWith(args.first())) continue;
 
-        description = this->descriptionMap[name];
+        description = descriptionMap[name];
         qInfo() << (!description.isEmpty() ? QString(" %1 - %2").arg(name, description) : QString(" %1").arg(name));
     }
 }
@@ -232,14 +232,14 @@ void Cmd::list(const QString &, const QStringList &args) {
  */
 void Cmd::listCvars() {
     if (!std::as_const(Variable::instance()->list).isEmpty())
-        qWarning() << this->tr("%1 available console variables:").arg(std::as_const(Variable::instance()->list).count());
+        qWarning() << tr("%1 available console variables:").arg(std::as_const(Variable::instance()->list).count());
 
     for (const QSharedPointer<Var> &entry : std::as_const(Variable::instance()->list)) {
         if (entry->flags() & Var::Flag::Hidden) continue;
 
         if (QString::compare(entry->defaultValue().toString(), entry->value().toString(), Qt::CaseInsensitive))
-            qInfo() << this->tr("  \"%1\" is \"%2\", default - \"%3\"").arg(entry->key(), entry->value().toString(), entry->defaultValue().toString());
-        else qInfo() << this->tr("  \"%1\" is \"%2\"").arg(entry->key(), entry->value().toString());
+            qInfo() << tr("  \"%1\" is \"%2\", default - \"%3\"").arg(entry->key(), entry->value().toString(), entry->defaultValue().toString());
+        else qInfo() << tr("  \"%1\" is \"%2\"").arg(entry->key(), entry->value().toString());
     }
 }
 
@@ -249,22 +249,22 @@ void Cmd::listCvars() {
  */
 void Cmd::cvarSet(const QString &name, const QStringList &args) {
     if (args.count() < 2) {
-        qWarning() << this->tr("usage: %1 [key] [value] - set console variable value").arg(name);
+        qWarning() << tr("usage: %1 [key] [value] - set console variable value").arg(name);
         return;
     }
 
     if (!Variable::instance()->contains(args.first())) {
-        qInfo() << this->tr("no such cvar - \"%1\"").arg(args.first());
+        qInfo() << tr("no such cvar - \"%1\"").arg(args.first());
     } else {
         QSharedPointer<Var> entry;
 
         entry = Variable::instance()->list[args.first()];
         if (entry->flags() & Var::Flag::ReadOnly) {
-            qInfo() << this->tr("\"%1\" is read only").arg(entry->key());
+            qInfo() << tr("\"%1\" is read only").arg(entry->key());
             return;
         }
 
-        qInfo() << this->tr("setting \"%1\" to \"%2\"").arg(args.at(1), entry->key());
+        qInfo() << tr("setting \"%1\" to \"%2\"").arg(args.at(1), entry->key());
         Variable::setValue(entry->key(), args.at(1));
     }
 }
@@ -309,8 +309,8 @@ void Cmd::dbInfo() {
  * @return success
  */
 bool Cmd::executeTokenized(const QString &name, const QStringList &args) {
-    if (this->contains(name)) {
-        this->functionMap[name](name, args);
+    if (contains(name)) {
+        functionMap[name](name, args);
         return true;
     }
 
@@ -323,14 +323,14 @@ bool Cmd::executeTokenized(const QString &name, const QStringList &args) {
             QStringList cvCmd;
             cvCmd.append(name);
             cvCmd << args;
-            this->cvarSet(name, cvCmd);
+            cvarSet(name, cvCmd);
         } else qInfo() << entry->value().toString();
 
         return true;
     }
 
     // report unknown command
-    qWarning() << this->tr("unknown command \"%1\", prehaps try \"cmd_list\"").arg(name);
+    qWarning() << tr("unknown command \"%1\", prehaps try \"cmd_list\"").arg(name);
     return false;
 }
 
@@ -375,7 +375,7 @@ bool Cmd::execute(const QString &buffer) {
     // parse separated command strings
     for (const QString &string : std::as_const(separated)) {
         // tokenize & execute command
-        if (this->tokenize(string, command, arguments)) counter += this->executeTokenized(command, arguments);
+        if (tokenize(string, command, arguments)) counter += executeTokenized(command, arguments);
     }
 
     return counter != 0;

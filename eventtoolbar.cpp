@@ -39,23 +39,23 @@ EventToolBar *EventToolBar::i = nullptr;
  */
 EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    this->addAction(QIcon::fromTheme("add"), this->tr("Add Event"), [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Event"), [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock(EventEdit::instance(), this->tr("Add Event"));
+            EditorDialog::instance()->showDock(EventEdit::instance(), tr("Add Event"));
             EventEdit::instance()->reset();
         }
     });
 
     // edit action
-    this->edit = this->addAction(QIcon::fromTheme("edit"), this->tr("Edit Event"), [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Event"), [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
-            EditorDialog::instance()->showDock(EventEdit::instance(), this->tr("Edit Event"));
+            EditorDialog::instance()->showDock(EventEdit::instance(), tr("Edit Event"));
             EventEdit::instance()->reset(true);
         }
     });
 
     // remove action
-    this->remove = this->addAction(QIcon::fromTheme("remove"), this->tr("Remove Event"), [this]() {
+    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Event"), [this]() {
         const QModelIndex index(EditorDialog::instance()->container->currentIndex());
 
         if (EditorDialog::instance()->isDockVisible() || !index.isValid()) return;
@@ -66,7 +66,7 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
         const QString title(Event::instance()->title(row));
         const Row event = MainWindow::instance()->currentEvent();
 
-        if (QMessageBox::question(this, this->tr("Remove event"), this->tr("Do you really want to remove \"%1\"?").arg(title)) == QMessageBox::Yes) {
+        if (QMessageBox::question(this, tr("Remove event"), tr("Do you really want to remove \"%1\"?").arg(title)) == QMessageBox::Yes) {
             Event::instance()->remove(row);
             Database::instance()->removeOrphanedEntries();
         }
@@ -76,20 +76,20 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // import action
-    this->addAction(QIcon::fromTheme("export"), this->tr("Import logs"), [this]() {
+    addAction(QIcon::fromTheme("export"), tr("Import logs"), [this]() {
         const QFileInfo info(
-            QFileDialog::getOpenFileName(this, this->tr("Import logs from database"), QDir::homePath() + "/" + "database.db", this->tr("Database (*.db)")));
+            QFileDialog::getOpenFileName(this, tr("Import logs from database"), QDir::homePath() + "/" + "database.db", tr("Database (*.db)")));
         if (!info.exists()) return;
 
-        if (QMessageBox::question(this, this->tr("Import event"), this->tr("Do you really want to import logs and teams from \"%1\"?").arg(info.fileName()))
+        if (QMessageBox::question(this, tr("Import event"), tr("Do you really want to import logs and teams from \"%1\"?").arg(info.fileName()))
             == QMessageBox::Yes) {
             Database::instance()->attach(info);
         }
     });
 
     // button test (disconnected in ~EditorDialog)
-    this->connect(EditorDialog::instance()->container, SIGNAL(clicked(QModelIndex)), this, SLOT(buttonTest(QModelIndex)));
-    this->buttonTest();
+    connect(EditorDialog::instance()->container, SIGNAL(clicked(QModelIndex)), this, SLOT(buttonTest(QModelIndex)));
+    buttonTest();
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -100,6 +100,6 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
  * @param index
  */
 void EventToolBar::buttonTest(const QModelIndex &index) {
-    this->edit->setEnabled(index.isValid());
-    this->remove->setEnabled(index.isValid());
+    edit->setEnabled(index.isValid());
+    remove->setEnabled(index.isValid());
 };

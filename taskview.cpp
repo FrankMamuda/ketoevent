@@ -36,8 +36,8 @@
  * @param event
  */
 void TaskView::mouseMoveEvent(QMouseEvent *event) {
-    if (this->model() != nullptr && this->itemDelegate() != nullptr) {
-        Delegate *delegate(qobject_cast<Delegate *>(this->itemDelegate()));
+    if (model() != nullptr && itemDelegate() != nullptr) {
+        Delegate *delegate(qobject_cast<Delegate *>(itemDelegate()));
         if (delegate != nullptr) delegate->setMousePos(event->pos());
     }
 
@@ -49,13 +49,13 @@ void TaskView::mouseMoveEvent(QMouseEvent *event) {
  * @param event
  */
 void TaskView::mouseReleaseEvent(QMouseEvent *event) {
-    if (this->model() != nullptr && this->itemDelegate() != nullptr && event->button() == Qt::LeftButton) {
-        Delegate *delegate(qobject_cast<Delegate *>(this->itemDelegate()));
+    if (model() != nullptr && itemDelegate() != nullptr && event->button() == Qt::LeftButton) {
+        Delegate *delegate(qobject_cast<Delegate *>(itemDelegate()));
         if (delegate != nullptr) {
             int y;
 
-            for (y = 0; y < this->model()->rowCount(); y++) {
-                const QModelIndex index(this->model()->index(y, Task::instance()->Name));
+            for (y = 0; y < model()->rowCount(); y++) {
+                const QModelIndex index(model()->index(y, Task::instance()->Name));
 
                 // comboId lambda
                 auto setComboId = [index, delegate](const Id &id) {
@@ -79,7 +79,7 @@ void TaskView::mouseReleaseEvent(QMouseEvent *event) {
                     Database::instance()->incrementCounter();
                 };
 
-                if (this->visualRect(index).contains(event->pos())) {
+                if (visualRect(index).contains(event->pos())) {
                     delegate->setMousePos(event->pos());
                     Item::Actions action = delegate->action(index);
                     switch (action) {
@@ -93,7 +93,7 @@ void TaskView::mouseReleaseEvent(QMouseEvent *event) {
 
                         break;
 
-                    case Item::Edit: this->edit(index); break;
+                    case Item::Edit: edit(index); break;
 
                     case Item::Remove:
                         Task::instance()->setMultiplier(delegate->row(index), false);
@@ -165,7 +165,7 @@ void TaskView::mouseReleaseEvent(QMouseEvent *event) {
                         break;
 
                     case Item::SetNumeric:
-                        this->edit(index);
+                        edit(index);
 
                         // increment counter
                         Database::instance()->incrementCounter();
@@ -194,9 +194,9 @@ void TaskView::mouseReleaseEvent(QMouseEvent *event) {
  * @param event
  */
 void TaskView::leaveEvent(QEvent *event) {
-    if (this->model() != nullptr && this->itemDelegate() != nullptr) {
-        Delegate *delegate(qobject_cast<Delegate *>(this->itemDelegate()));
-        if (delegate != nullptr) delegate->setMousePos(QPoint(this->rect().x() - 1, 0), true);
+    if (model() != nullptr && itemDelegate() != nullptr) {
+        Delegate *delegate(qobject_cast<Delegate *>(itemDelegate()));
+        if (delegate != nullptr) delegate->setMousePos(QPoint(rect().x() - 1, 0), true);
     }
 
     QListView::leaveEvent(event);

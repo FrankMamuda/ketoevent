@@ -50,10 +50,10 @@ public:
     explicit Delegate(QWidget *parent = nullptr) : QStyledItemDelegate(parent) {}
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     [[nodiscard]] QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    [[nodiscard]] QPoint mousePos() const { return this->m_pos; }
-    [[nodiscard]] QModelIndex currentIndex() const { return this->m_currentIndex; }
-    [[nodiscard]] QModelIndex currentEditIndex() const { return this->m_currentEditIndex; }
-    [[nodiscard]] TaskView *view() const { return qobject_cast<TaskView *>(this->parent()); }
+    [[nodiscard]] QPoint mousePos() const { return m_pos; }
+    [[nodiscard]] QModelIndex currentIndex() const { return m_currentIndex; }
+    [[nodiscard]] QModelIndex currentEditIndex() const { return m_currentEditIndex; }
+    [[nodiscard]] TaskView *view() const { return qobject_cast<TaskView *>(parent()); }
     [[nodiscard]] QList<Item> getItems(const QModelIndex &index) const;
     [[nodiscard]] Item::Actions action(const QModelIndex &index) const;
 
@@ -135,7 +135,7 @@ class EditWidget : public QSpinBox {
 
 public:
     explicit EditWidget(const Delegate *d, const QModelIndex &i, QWidget *parent = nullptr) : QSpinBox(parent), delegate(d), index(i) {
-        this->setMinimum(-999);
+        setMinimum(-999);
     }
 
 protected:

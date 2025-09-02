@@ -97,16 +97,16 @@ int main(int argc, char *argv[]) {
     public:
         SharedMemory(const QString &key, QObject *parent = nullptr) : QSharedMemory(key, parent) {}
         ~SharedMemory() {
-            if (this->isAttached()) { this->detach(); }
+            if (isAttached()) { detach(); }
         }
 
         bool lock() {
-            if (this->isAttached()) return false;
-            if (this->attach(QSharedMemory::ReadOnly)) {
-                this->detach();
+            if (isAttached()) return false;
+            if (attach(QSharedMemory::ReadOnly)) {
+                detach();
                 return false;
             }
-            return this->create(sizeof(quint64));
+            return create(sizeof(quint64));
         }
     };
     QSharedPointer<SharedMemory> sharedMemory(new SharedMemory("ketoevent_singleInstance", &a));

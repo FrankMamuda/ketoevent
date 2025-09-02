@@ -45,7 +45,7 @@ public:
     }
     ~TaskEdit() override;
     void reset(bool edit = false);
-    [[nodiscard]] bool isEditing() const { return this->m_edit; }
+    [[nodiscard]] bool isEditing() const { return m_edit; }
 
 private:
     static TaskEdit *i;

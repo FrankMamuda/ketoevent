@@ -63,20 +63,20 @@ public:
      * @brief hasInitialised
      * @return
      */
-    [[nodiscard]] bool hasInitialised() const { return this->m_initialised; }
+    [[nodiscard]] bool hasInitialised() const { return m_initialised; }
 
     /**
      * @brief count
      * @return
      */
-    [[nodiscard]] int count() const { return this->m_counter; }
+    [[nodiscard]] int count() const { return m_counter; }
 
 public slots:
     void removeOrphanedEntries();
     void incrementCounter();
     void attach(const QFileInfo &info);
     void writeBackup();
-    void resetCounter() { this->m_counter = 0; }
+    void resetCounter() { m_counter = 0; }
 
 private:
     static Database *i;
@@ -87,7 +87,7 @@ private:
      * @brief setInitialised
      * @param initialised
      */
-    void setInitialised(bool initialised = true) { this->m_initialised = initialised; }
+    void setInitialised(bool initialised = true) { m_initialised = initialised; }
     QMap<QString, Table *> tables;
     bool m_initialised = false;
     int m_counter = 0;

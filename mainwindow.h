@@ -55,8 +55,8 @@ public:
     }
     [[nodiscard]] Row currentEvent() const;
     [[nodiscard]] Row currentTeam() const;
-    [[nodiscard]] Id currentComboId() const { return this->m_currentCombo; }
-    [[nodiscard]] bool isComboModeActive() const { return this->m_comboMode; }
+    [[nodiscard]] Id currentComboId() const { return m_currentCombo; }
+    [[nodiscard]] bool isComboModeActive() const { return m_comboMode; }
 
 public slots:
     void setCurrentTeam(const Row &row);

@@ -36,71 +36,71 @@ EventEdit *EventEdit::i = nullptr;
  */
 EventEdit::EventEdit(QWidget *parent) : QWidget(parent), ui(new Ui::EventEdit), m_edit(false) {
     // set up ui
-    this->ui->setupUi(this);
+    ui->setupUi(this);
 
     // setup pixmaps
-    this->ui->titlePixmap->setPixmap(QIcon::fromTheme("name").pixmap(16, 16));
+    ui->titlePixmap->setPixmap(QIcon::fromTheme("name").pixmap(16, 16));
 
     // only visible in quick add
-    this->setWindowTitle(this->tr("Add event"));
+    setWindowTitle(tr("Add event"));
 
     // empty event title check
     auto emptyTitle = [this]() {
         // warn upon empty event title
-        if (this->ui->titleEdit->text().isEmpty()) {
-            QMessageBox::information(this, this->tr("Empty event title"), this->tr("Please enter event title"));
+        if (ui->titleEdit->text().isEmpty()) {
+            QMessageBox::information(this, tr("Empty event title"), tr("Please enter event title"));
             return true;
         }
         return false;
     };
 
     // add button action
-    this->connect(this->ui->addButton, &QPushButton::clicked, this, [this, emptyTitle]() {
-        const QString eventTitle(this->ui->titleEdit->text());
+    connect(ui->addButton, &QPushButton::clicked, this, [this, emptyTitle]() {
+        const QString eventTitle(ui->titleEdit->text());
 
         // abort on empty event title
         if (emptyTitle()) return;
 
         // abort on existing event
-        if (Event::instance()->contains(Event::Title, eventTitle) && !this->isEditing()) {
-            QMessageBox::information(this, this->tr("Event already exists"), this->tr("Event already exists\nChoose a different title"));
+        if (Event::instance()->contains(Event::Title, eventTitle) && !isEditing()) {
+            QMessageBox::information(this, tr("Event already exists"), tr("Event already exists\nChoose a different title"));
             return;
         }
 
         // if everything is ok, add a new event
         Row event = Row::Invalid;
-        if (!this->isEditing()) {
-            event = Event::instance()->add(eventTitle, this->ui->minInteger->value(), this->ui->maxInteger->value(), this->ui->startTime->time(),
-                this->ui->finishTime->time(), this->ui->finalTime->time(), this->ui->penaltyInteger->value(), this->ui->twoInteger->value(),
-                this->ui->threeInteger->value(), this->ui->fourPlusInteger->value());
+        if (!isEditing()) {
+            event = Event::instance()->add(eventTitle, ui->minInteger->value(), ui->maxInteger->value(), ui->startTime->time(),
+                ui->finishTime->time(), ui->finalTime->time(), ui->penaltyInteger->value(), ui->twoInteger->value(),
+                ui->threeInteger->value(), ui->fourPlusInteger->value());
         } else {
             const Row event = Event::instance()->row(EditorDialog::instance()->container->currentIndex().row());
 
             if (event == Row::Invalid) return;
 
             Event::instance()->setTitle(event, eventTitle);
-            Event::instance()->setMinMembers(event, this->ui->minInteger->value());
-            Event::instance()->setMaxMembers(event, this->ui->maxInteger->value());
-            Event::instance()->setStartTime(event, this->ui->startTime->time());
-            Event::instance()->setFinishTime(event, this->ui->finishTime->time());
-            Event::instance()->setFinalTime(event, this->ui->finalTime->time());
-            Event::instance()->setPenaltyPoints(event, this->ui->penaltyInteger->value());
-            Event::instance()->setComboOfTwo(event, this->ui->twoInteger->value());
-            Event::instance()->setComboOfThree(event, this->ui->threeInteger->value());
-            Event::instance()->setComboOfFourPlus(event, this->ui->fourPlusInteger->value());
+            Event::instance()->setMinMembers(event, ui->minInteger->value());
+            Event::instance()->setMaxMembers(event, ui->maxInteger->value());
+            Event::instance()->setStartTime(event, ui->startTime->time());
+            Event::instance()->setFinishTime(event, ui->finishTime->time());
+            Event::instance()->setFinalTime(event, ui->finalTime->time());
+            Event::instance()->setPenaltyPoints(event, ui->penaltyInteger->value());
+            Event::instance()->setComboOfTwo(event, ui->twoInteger->value());
+            Event::instance()->setComboOfThree(event, ui->threeInteger->value());
+            Event::instance()->setComboOfFourPlus(event, ui->fourPlusInteger->value());
         }
 
         if (event != Row::Invalid) MainWindow::instance()->setCurrentEvent(event);
 
         // close dock
         if (EditorDialog::instance()->isDockVisible()) EditorDialog::instance()->hideDock();
-        else this->close();
+        else close();
     });
 
     // cancel button just closes the dialog
-    this->connect(this->ui->cancelButton, &QPushButton::clicked, this, [this]() {
+    connect(ui->cancelButton, &QPushButton::clicked, this, [this]() {
         if (EditorDialog::instance()->isDockVisible()) EditorDialog::instance()->hideDock();
-        else this->close();
+        else close();
     });
 
     // add to garbage man
@@ -112,12 +112,12 @@ EventEdit::EventEdit(QWidget *parent) : QWidget(parent), ui(new Ui::EventEdit), 
  */
 EventEdit::~EventEdit() {
     // disconnect lambdas
-    this->disconnect(this->ui->addButton, SIGNAL(clicked()));
-    this->disconnect(this->ui->cancelButton, SIGNAL(clicked()));
-    this->disconnect(this->ui->titleEdit, SIGNAL(returnPressed()));
+    disconnect(ui->addButton, SIGNAL(clicked()));
+    disconnect(ui->cancelButton, SIGNAL(clicked()));
+    disconnect(ui->titleEdit, SIGNAL(returnPressed()));
 
     // delete ui
-    delete this->ui;
+    delete ui;
 }
 
 /**
@@ -125,38 +125,38 @@ EventEdit::~EventEdit() {
  * @param edit
  */
 void EventEdit::reset(bool edit) {
-    this->m_edit = edit;
+    m_edit = edit;
 
-    if (!this->isEditing()) {
+    if (!isEditing()) {
         // reset ui components to default values
-        this->ui->titleEdit->clear();
-        this->ui->minInteger->setValue(EventTable::DefaultMinMembers);
-        this->ui->maxInteger->setValue(EventTable::DefaultMaxMembers);
-        this->ui->startTime->setTime(QTime::fromString(EventTable::DefaultStartTime, Database_::TimeFormat));
-        this->ui->finishTime->setTime(QTime::fromString(EventTable::DefaultFinishTime, Database_::TimeFormat));
-        this->ui->finalTime->setTime(QTime::fromString(EventTable::DefaultFinalTime, Database_::TimeFormat));
-        this->ui->penaltyInteger->setValue(EventTable::DefaultPenaltyPoints);
-        this->ui->twoInteger->setValue(EventTable::DefaultComboOfTwo);
-        this->ui->threeInteger->setValue(EventTable::DefaultComboOfThree);
-        this->ui->fourPlusInteger->setValue(EventTable::DefaultComboOfFourAndMore);
+        ui->titleEdit->clear();
+        ui->minInteger->setValue(EventTable::DefaultMinMembers);
+        ui->maxInteger->setValue(EventTable::DefaultMaxMembers);
+        ui->startTime->setTime(QTime::fromString(EventTable::DefaultStartTime, Database_::TimeFormat));
+        ui->finishTime->setTime(QTime::fromString(EventTable::DefaultFinishTime, Database_::TimeFormat));
+        ui->finalTime->setTime(QTime::fromString(EventTable::DefaultFinalTime, Database_::TimeFormat));
+        ui->penaltyInteger->setValue(EventTable::DefaultPenaltyPoints);
+        ui->twoInteger->setValue(EventTable::DefaultComboOfTwo);
+        ui->threeInteger->setValue(EventTable::DefaultComboOfThree);
+        ui->fourPlusInteger->setValue(EventTable::DefaultComboOfFourAndMore);
     } else {
         const Row event = Event::instance()->row(EditorDialog::instance()->container->currentIndex().row());
 
         if (event == Row::Invalid) return;
 
-        this->ui->titleEdit->setText(Event::instance()->title(event));
-        this->ui->minInteger->setValue(Event::instance()->minMembers(event));
-        this->ui->maxInteger->setValue(Event::instance()->maxMembers(event));
-        this->ui->startTime->setTime(Event::instance()->startTime(event));
-        this->ui->finishTime->setTime(Event::instance()->finishTime(event));
-        this->ui->finalTime->setTime(Event::instance()->finalTime(event));
-        this->ui->penaltyInteger->setValue(Event::instance()->penalty(event));
-        this->ui->twoInteger->setValue(Event::instance()->comboOfTwo(event));
-        this->ui->threeInteger->setValue(Event::instance()->comboOfThree(event));
-        this->ui->fourPlusInteger->setValue(Event::instance()->comboOfFourPlus(event));
+        ui->titleEdit->setText(Event::instance()->title(event));
+        ui->minInteger->setValue(Event::instance()->minMembers(event));
+        ui->maxInteger->setValue(Event::instance()->maxMembers(event));
+        ui->startTime->setTime(Event::instance()->startTime(event));
+        ui->finishTime->setTime(Event::instance()->finishTime(event));
+        ui->finalTime->setTime(Event::instance()->finalTime(event));
+        ui->penaltyInteger->setValue(Event::instance()->penalty(event));
+        ui->twoInteger->setValue(Event::instance()->comboOfTwo(event));
+        ui->threeInteger->setValue(Event::instance()->comboOfThree(event));
+        ui->fourPlusInteger->setValue(Event::instance()->comboOfFourPlus(event));
     }
 
-    this->ui->titleEdit->setFocus();
-    this->ui->addButton->setDefault(false);
-    this->ui->addButton->setAutoDefault(false);
+    ui->titleEdit->setFocus();
+    ui->addButton->setDefault(false);
+    ui->addButton->setAutoDefault(false);
 }

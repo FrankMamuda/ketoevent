@@ -36,45 +36,45 @@ Settings *Settings::i = nullptr;
  * @param parent
  */
 Settings::Settings() : ui(new Ui::Settings) {
-    this->setWindowModality(Qt::ApplicationModal);
-    this->ui->setupUi(this);
+    setWindowModality(Qt::ApplicationModal);
+    ui->setupUi(this);
 
     // setup pixmaps
-    this->ui->reviewerPixmap->setPixmap(QIcon::fromTheme("ketone").pixmap(16, 16));
+    ui->reviewerPixmap->setPixmap(QIcon::fromTheme("ketone").pixmap(16, 16));
 
     const QStringList themes(Theme::availableThemes().keys());
-    this->ui->themeCombo->clear();
-    for (const QString &themeName : themes) this->ui->themeCombo->addItem(themeName, themeName);
+    ui->themeCombo->clear();
+    for (const QString &themeName : themes) ui->themeCombo->addItem(themeName, themeName);
 
-    Settings::connect(this->ui->overrideCheck, &QCheckBox::toggled, this, [this](bool checked) { this->ui->themeCombo->setEnabled(checked); });
+    Settings::connect(ui->overrideCheck, &QCheckBox::toggled, this, [this](bool checked) { ui->themeCombo->setEnabled(checked); });
 
     // bind variables
-    this->variables << Variable::instance()->bind("overrideTheme", this->ui->overrideCheck);
-    this->variables << Variable::instance()->bind("theme", this->ui->themeCombo);
-    this->variables << Variable::instance()->bind("reviewerName", this->ui->reviewerEdit);
-    this->variables << Variable::instance()->bind("sortByType", this->ui->sortByTypeCheck);
+    variables << Variable::instance()->bind("overrideTheme", ui->overrideCheck);
+    variables << Variable::instance()->bind("theme", ui->themeCombo);
+    variables << Variable::instance()->bind("reviewerName", ui->reviewerEdit);
+    variables << Variable::instance()->bind("sortByType", ui->sortByTypeCheck);
 
-    this->connect(this->ui->closeButton, &QPushButton::clicked, [this]() { this->close(); });
+    connect(ui->closeButton, &QPushButton::clicked, [this]() { close(); });
 
     // handle database path
-    this->connect(this->ui->pathButton, &QPushButton::clicked, [this]() {
-        const QString fileName(QFileDialog::getSaveFileName(this, this->tr("Open database"), QFileInfo(Variable::string("databasePath")).absolutePath(),
-            this->tr("Database (*.db *.sqlite)"), nullptr, QFileDialog::DontConfirmOverwrite));
+    connect(ui->pathButton, &QPushButton::clicked, [this]() {
+        const QString fileName(QFileDialog::getSaveFileName(this, tr("Open database"), QFileInfo(Variable::string("databasePath")).absolutePath(),
+            tr("Database (*.db *.sqlite)"), nullptr, QFileDialog::DontConfirmOverwrite));
 
         if (fileName.isEmpty()) {
-            QMessageBox::warning(this, this->tr("Settings"), this->tr("Invalid database selection"), QMessageBox::Close);
+            QMessageBox::warning(this, tr("Settings"), tr("Invalid database selection"), QMessageBox::Close);
             return;
         }
 
-        QMessageBox::warning(this, this->tr("Settings"), this->tr("Application will be restarted"), QMessageBox::Ok);
+        QMessageBox::warning(this, tr("Settings"), tr("Application will be restarted"), QMessageBox::Ok);
         Variable::setString("databasePath", fileName);
         QApplication::quit();
     });
 
     // bind database path to edit
-    Variable::instance()->bind("databasePath", this->ui->pathEdit);
-    Variable::instance()->bind("backup/enabled", this->ui->backupCheck);
-    Variable::instance()->bind("backup/changes", this->ui->backupValue);
+    Variable::instance()->bind("databasePath", ui->pathEdit);
+    Variable::instance()->bind("backup/enabled", ui->backupCheck);
+    Variable::instance()->bind("backup/changes", ui->backupValue);
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -85,9 +85,8 @@ Settings::Settings() : ui(new Ui::Settings) {
  */
 Settings::~Settings() {
     // unbind vars
-    for (const QString &key : std::as_const(this->variables)) Variable::instance()->unbind(key);
-    this->variables.clear();
+    for (const QString &key : std::as_const(variables)) Variable::instance()->unbind(key);
 
-    this->disconnect(this->ui->closeButton, SIGNAL(clicked()));
-    delete this->ui;
+    disconnect(ui->closeButton, SIGNAL(clicked()));
+    delete ui;
 }

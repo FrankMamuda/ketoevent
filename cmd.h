@@ -46,8 +46,8 @@ public:
      * @brief remove
      */
     void remove(const QString &name) {
-        this->functionMap.remove(name);
-        this->descriptionMap.remove(name);
+        functionMap.remove(name);
+        descriptionMap.remove(name);
     }
 
     [[nodiscard]] bool execute(const QString &);
@@ -57,13 +57,13 @@ public:
      * @param name
      * @return
      */
-    [[nodiscard]] bool contains(const QString &name) const { return this->functionMap.contains(name); }
+    [[nodiscard]] bool contains(const QString &name) const { return functionMap.contains(name); }
 
     /**
      * @brief keys
      * @return
      */
-    [[nodiscard]] QStringList keys() const { return this->functionMap.keys(); }
+    [[nodiscard]] QStringList keys() const { return functionMap.keys(); }
 
     /**
      * @brief function
@@ -71,7 +71,7 @@ public:
      * @return
      */
     [[nodiscard]] [[maybe_unused]] function_t function(const QString &name) const {
-        if (this->contains(name)) return this->functionMap[name];
+        if (contains(name)) return functionMap[name];
         return nullptr;
     }
 
@@ -81,19 +81,11 @@ public:
      * @return
      */
     [[nodiscard]] QString description(const QString &name) const {
-        if (this->contains(name)) return this->descriptionMap[name];
+        if (contains(name)) return descriptionMap[name];
         return QString();
     }
 
     [[nodiscard]] static bool tokenize(const QString &string, QString &command, QStringList &arguments);
-
-    /**
-     * @brief Cmd::~Cmd
-     */
-    ~Cmd() override {
-        this->functionMap.clear();
-        this->descriptionMap.clear();
-    }
 
     /**
      * @brief instance

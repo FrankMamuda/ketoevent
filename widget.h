@@ -59,13 +59,13 @@ public:
      * @brief type
      * @return
      */
-    Types type() const { return this->m_type; }
+    Types type() const { return m_type; }
 
     /**
      * @brief name
      * @return
      */
-    QString name() const { return (this->widget != nullptr) ? this->widget->objectName() : QString(); }
+    QString name() const { return (widget != nullptr) ? widget->objectName() : QString(); }
 
     /**
      * @brief Widget
@@ -74,52 +74,52 @@ public:
     Widget(QObject *w) : m_type(Types::NoType), widget(w) {
         // determine widget type
         if (!QString::compare(widget->metaObject()->className(), "QCheckBox")) {
-            this->connection = this->connect(qobject_cast<QCheckBox *>(widget), SIGNAL(stateChanged(int)), this, SLOT(valueChanged()));
-            this->m_type = Types::CheckBox;
+            connection = connect(qobject_cast<QCheckBox *>(widget), SIGNAL(stateChanged(int)), this, SLOT(valueChanged()));
+            m_type = Types::CheckBox;
         } else if (!QString::compare(widget->metaObject()->className(), "QToolButton")) {
-            this->connection = this->connect(qobject_cast<QToolButton *>(widget), SIGNAL(toggled(bool)), this, SLOT(valueChanged()));
-            this->m_type = Types::ToolButton;
+            connection = connect(qobject_cast<QToolButton *>(widget), SIGNAL(toggled(bool)), this, SLOT(valueChanged()));
+            m_type = Types::ToolButton;
         } else if (!QString::compare(widget->metaObject()->className(), "QAction")) {
-            this->connection = this->connect(qobject_cast<QAction *>(widget), SIGNAL(triggered(bool)), this, SLOT(valueChanged()));
-            this->m_type = Types::Action;
+            connection = connect(qobject_cast<QAction *>(widget), SIGNAL(triggered(bool)), this, SLOT(valueChanged()));
+            m_type = Types::Action;
         } else if (!QString::compare(widget->metaObject()->className(), "QLineEdit")) {
-            this->connection = this->connect(qobject_cast<QLineEdit *>(widget), SIGNAL(textChanged(QString)), this, SLOT(valueChanged()));
-            this->m_type = Types::LineEdit;
+            connection = connect(qobject_cast<QLineEdit *>(widget), SIGNAL(textChanged(QString)), this, SLOT(valueChanged()));
+            m_type = Types::LineEdit;
         } else if (!QString::compare(widget->metaObject()->className(), "QTimeEdit")) {
-            this->connection = this->connect(qobject_cast<QTimeEdit *>(widget), SIGNAL(timeChanged(QTime)), this, SLOT(valueChanged()));
-            this->m_type = Types::TimeEdit;
+            connection = connect(qobject_cast<QTimeEdit *>(widget), SIGNAL(timeChanged(QTime)), this, SLOT(valueChanged()));
+            m_type = Types::TimeEdit;
         } else if (!QString::compare(widget->metaObject()->className(), "QSpinBox")) {
-            this->connection = this->connect(qobject_cast<QSpinBox *>(widget), SIGNAL(valueChanged(int)), this, SLOT(valueChanged()));
-            this->m_type = Types::SpinBox;
+            connection = connect(qobject_cast<QSpinBox *>(widget), SIGNAL(valueChanged(int)), this, SLOT(valueChanged()));
+            m_type = Types::SpinBox;
         } else if (!QString::compare(widget->metaObject()->className(), "QComboBox")) {
-            this->connection = this->connect(qobject_cast<QComboBox *>(widget), SIGNAL(currentIndexChanged(int)), this, SLOT(valueChanged()));
-            this->m_type = Types::ComboBox;
+            connection = connect(qobject_cast<QComboBox *>(widget), SIGNAL(currentIndexChanged(int)), this, SLOT(valueChanged()));
+            m_type = Types::ComboBox;
         } else {
-            qCWarning(Widget_::Debug) << this->tr("unsupported container \"%1\"").arg(widget->metaObject()->className());
+            qCWarning(Widget_::Debug) << tr("unsupported container \"%1\"").arg(widget->metaObject()->className());
         }
     }
 
     /**
      * @brief ~Widget
      */
-    ~Widget() { this->disconnect(this->connection); }
+    ~Widget() { disconnect(connection); }
 
     /**
      * @brief value
      * @return
      */
     QVariant value() const {
-        if (this->widget == nullptr) return QVariant();
+        if (widget == nullptr) return QVariant();
 
-        switch (this->type()) {
-        case Types::CheckBox: return qobject_cast<QCheckBox *>(this->widget)->isChecked();
-        case Types::ToolButton: return qobject_cast<QCheckBox *>(this->widget)->isChecked();
-        case Types::Action: return qobject_cast<QAction *>(this->widget)->isChecked();
-        case Types::LineEdit: return qobject_cast<QLineEdit *>(this->widget)->text();
-        case Types::TimeEdit: return qobject_cast<QTimeEdit *>(this->widget)->time();
-        case Types::SpinBox: return qobject_cast<QSpinBox *>(this->widget)->value();
+        switch (type()) {
+        case Types::CheckBox: return qobject_cast<QCheckBox *>(widget)->isChecked();
+        case Types::ToolButton: return qobject_cast<QCheckBox *>(widget)->isChecked();
+        case Types::Action: return qobject_cast<QAction *>(widget)->isChecked();
+        case Types::LineEdit: return qobject_cast<QLineEdit *>(widget)->text();
+        case Types::TimeEdit: return qobject_cast<QTimeEdit *>(widget)->time();
+        case Types::SpinBox: return qobject_cast<QSpinBox *>(widget)->value();
         case Types::ComboBox: {
-            QComboBox *comboBox(qobject_cast<QComboBox *>(this->widget));
+            QComboBox *comboBox(qobject_cast<QComboBox *>(widget));
             QAbstractItemModel *model(comboBox->model());
 
             if (model != nullptr) return model->data(model->index(comboBox->currentIndex(), 0), Qt::UserRole);
@@ -133,19 +133,19 @@ public:
 
 public slots:
     void setValue(const QVariant &value) {
-        if (this->widget == nullptr) return;
+        if (widget == nullptr) return;
 
-        this->blockSignals(true);
+        blockSignals(true);
 
-        switch (this->type()) {
-        case Types::CheckBox: qobject_cast<QCheckBox *>(this->widget)->setChecked(static_cast<bool>(value.toInt())); break;
-        case Types::ToolButton: qobject_cast<QToolButton *>(this->widget)->setChecked(static_cast<bool>(value.toInt())); break;
-        case Types::Action: qobject_cast<QAction *>(this->widget)->setChecked(static_cast<bool>(value.toInt())); break;
-        case Types::LineEdit: qobject_cast<QLineEdit *>(this->widget)->setText(value.toString()); break;
-        case Types::TimeEdit: qobject_cast<QTimeEdit *>(this->widget)->setTime(value.toTime()); break;
-        case Types::SpinBox: qobject_cast<QSpinBox *>(this->widget)->setValue(value.toInt()); break;
+        switch (type()) {
+        case Types::CheckBox: qobject_cast<QCheckBox *>(widget)->setChecked(static_cast<bool>(value.toInt())); break;
+        case Types::ToolButton: qobject_cast<QToolButton *>(widget)->setChecked(static_cast<bool>(value.toInt())); break;
+        case Types::Action: qobject_cast<QAction *>(widget)->setChecked(static_cast<bool>(value.toInt())); break;
+        case Types::LineEdit: qobject_cast<QLineEdit *>(widget)->setText(value.toString()); break;
+        case Types::TimeEdit: qobject_cast<QTimeEdit *>(widget)->setTime(value.toTime()); break;
+        case Types::SpinBox: qobject_cast<QSpinBox *>(widget)->setValue(value.toInt()); break;
         case Types::ComboBox: {
-            QComboBox *comboBox(qobject_cast<QComboBox *>(this->widget));
+            QComboBox *comboBox(qobject_cast<QComboBox *>(widget));
             QAbstractItemModel *model(comboBox->model());
             int y;
 
@@ -162,11 +162,11 @@ public slots:
         case Types::NoType: break;
         }
 
-        this->blockSignals(false);
+        blockSignals(false);
     }
 
 private slots:
-    void valueChanged() { emit this->changed(this->value()); }
+    void valueChanged() { emit changed(value()); }
 
 signals:
     void changed(const QVariant &variant);

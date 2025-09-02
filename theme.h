@@ -43,13 +43,13 @@ public:
      * @brief isDark
      * @return
      */
-    [[nodiscard]] bool isDark() const { return this->m_dark; }
+    [[nodiscard]] bool isDark() const { return m_dark; }
 
     /**
      * @brief style
      * @return
      */
-    [[nodiscard]] QStyle *style() const { return this->m_style; }
+    [[nodiscard]] QStyle *style() const { return m_style; }
 
 private slots:
     void readThemeFile(const QString &fileName);

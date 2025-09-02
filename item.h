@@ -55,7 +55,7 @@ public:
     explicit Item(Types t, const QRect &r, const Delegate *d) : m_type(t), rect(r), delegate(d) {}
     void paint(QPainter *painter, const QModelIndex &index) const;
     [[nodiscard]] Actions action(const QModelIndex &index) const;
-    [[nodiscard]] Types type() const { return this->m_type; }
+    [[nodiscard]] Types type() const { return m_type; }
 
 private:
     Types m_type;

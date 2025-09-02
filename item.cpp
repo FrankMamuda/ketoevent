@@ -31,17 +31,17 @@
  */
 void Item::paint(QPainter *painter, const QModelIndex &index) const {
     // retrieve model values
-    const bool isEditorActive = (this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
-    const bool edit = (this->delegate->currentEditIndex() == index);
-    const bool hover = edit ? false : this->rect.contains(this->delegate->mousePos());
-    const int value = this->delegate->values.isEmpty() ? 0 : this->delegate->values[index];
-    const int points = Task::instance()->points(this->delegate->row(index));
-    const Task::Types type = Task::instance()->type(this->delegate->row(index));
-    const int isSelected = edit ? false : (index == this->delegate->currentIndex());
+    const bool isEditorActive = (delegate->currentEditIndex() != QModelIndex() && index != delegate->currentEditIndex());
+    const bool edit = (delegate->currentEditIndex() == index);
+    const bool hover = edit ? false : rect.contains(delegate->mousePos());
+    const int value = delegate->values.isEmpty() ? 0 : delegate->values[index];
+    const int points = Task::instance()->points(delegate->row(index));
+    const Task::Types type = Task::instance()->type(delegate->row(index));
+    const int isSelected = edit ? false : (index == delegate->currentIndex());
     const bool hasValue = edit ? true : value != 0;
-    const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];
+    const Id comboId = delegate->combos.isEmpty() ? Id::Invalid : delegate->combos[index];
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
-    const bool hasDescription = !Task::instance()->description(this->delegate->row(index)).isEmpty();
+    const bool hasDescription = !Task::instance()->description(delegate->row(index)).isEmpty();
 
     // don't draw anything in edit mode
     if (isEditorActive && !edit) return;
@@ -51,8 +51,8 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
         const qreal penWidth = painter->pen().widthF();
         painter->setBrush(colour);
         painter->drawEllipse(penWidth > 0.0
-                ? QRectF(this->rect.x() + penWidth / 2.0, this->rect.y() + penWidth / 2.0, this->rect.width() - penWidth, this->rect.height() - penWidth)
-                : this->rect);
+                ? QRectF(rect.x() + penWidth / 2.0, rect.y() + penWidth / 2.0, rect.width() - penWidth, rect.height() - penWidth)
+                : rect);
     };
 
     // text drawing lambda
@@ -61,15 +61,15 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
 
         // set up text
         font.setBold(true);
-        font.setPointSizeF(this->rect.height() * 0.64);
-        font = Delegate::fontSizeForWidth(text, font, this->rect.width());
+        font.setPointSizeF(rect.height() * 0.64);
+        font = Delegate::fontSizeForWidth(text, font, rect.width());
 
         // set up painter and draw text
         painter->save();
         painter->setPen(colour);
         painter->setFont(font);
         painter->setRenderHint(QPainter::TextAntialiasing, true);
-        painter->drawText(this->rect.adjusted(0, -2, 0, 0), text, { Qt::AlignCenter });
+        painter->drawText(rect.adjusted(0, -2, 0, 0), text, { Qt::AlignCenter });
         painter->restore();
     };
 
@@ -85,10 +85,10 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
 
         if ((hover || isSelected) && hasValue) {
             drawEllipse(hover ? Red() : LtRed());
-            painter->drawPixmap(this->rect, Delegate::Remove());
+            painter->drawPixmap(rect, Delegate::Remove());
         } else {
             drawEllipse((hover || !isSelected) ? Green() : LtGreen());
-            painter->drawPixmap(this->rect, Delegate::Check());
+            painter->drawPixmap(rect, Delegate::Check());
         }
         break;
 
@@ -98,25 +98,25 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
         if (hasValue) {
             if (hover || isSelected) {
                 drawEllipse(hover ? Gray() : LtGray());
-                painter->drawPixmap(this->rect, Delegate::Edit());
+                painter->drawPixmap(rect, Delegate::Edit());
             } else {
                 drawEllipse(Green());
                 drawText(QString::number(value));
             }
         } else if (!hasValue && isSelected) {
             drawEllipse(hover ? Green() : LtGreen());
-            painter->drawPixmap(this->rect, Delegate::Number());
+            painter->drawPixmap(rect, Delegate::Number());
         }
         break;
 
     case Multi: {
-        const int relativeCombo = this->delegate->relativeCombos.isEmpty() ? -1 : this->delegate->relativeCombos[comboId];
+        const int relativeCombo = delegate->relativeCombos.isEmpty() ? -1 : delegate->relativeCombos[comboId];
 
         if (isComboActive) {
             if (comboId != Id::Invalid) {
                 if (hover) {
                     drawEllipse(hover ? Red() : LtRed());
-                    painter->drawPixmap(this->rect, Delegate::Remove());
+                    painter->drawPixmap(rect, Delegate::Remove());
                 } else {
                     painter->setPen({ hover ? Black() : LtBlack(), 2.0 });
                     drawEllipse(Qt::white);
@@ -125,7 +125,7 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
             } else {
                 if (isSelected) {
                     drawEllipse(hover ? Blue() : LtBlue());
-                    painter->drawPixmap(this->rect, Delegate::Combine());
+                    painter->drawPixmap(rect, Delegate::Combine());
                 }
             }
         } else {
@@ -138,7 +138,7 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
                     drawText(QString::number(relativeCombo), hover ? Black() : LtBlack());
                 } else {
                     drawEllipse(hover ? Blue() : LtBlue());
-                    painter->drawPixmap(this->rect, Delegate::Combine());
+                    painter->drawPixmap(rect, Delegate::Combine());
                 }
             } else {
                 drawEllipse(hasValue ? Blue() : LtBlue());
@@ -151,10 +151,10 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
         if ((!isSelected && !hasValue)) break;
         if ((hover || isSelected) && hasValue) {
             drawEllipse(hover ? Red() : LtRed());
-            painter->drawPixmap(this->rect, Delegate::Remove());
+            painter->drawPixmap(rect, Delegate::Remove());
         } else {
             drawEllipse(!hasValue ? LtBlue() : Blue());
-            drawText(QString::number(points * (edit ? this->delegate->currentEditorValue() : value)));
+            drawText(QString::number(points * (edit ? delegate->currentEditorValue() : value)));
         }
 
         break;
@@ -162,7 +162,7 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
     case Info:
         if (!hasDescription || !isSelected) break;
         drawEllipse(hover ? Yellow() : LtYellow());
-        painter->drawPixmap(this->rect, Delegate::Desc());
+        painter->drawPixmap(rect, Delegate::Desc());
         break;
 
     case Editor: drawEllipse(Red()); break;
@@ -179,15 +179,15 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
  */
 Item::Actions Item::action(const QModelIndex &index) const {
     // retrieve model values
-    const bool edit = (this->delegate->currentEditIndex() != QModelIndex() && index != this->delegate->currentEditIndex());
-    const Task::Types type = Task::instance()->type(this->delegate->row(index));
-    const bool hasValue = this->delegate->values.isEmpty() ? false : this->delegate->values[index] > 0;
+    const bool edit = (delegate->currentEditIndex() != QModelIndex() && index != delegate->currentEditIndex());
+    const Task::Types type = Task::instance()->type(delegate->row(index));
+    const bool hasValue = delegate->values.isEmpty() ? false : delegate->values[index] > 0;
     const bool isComboActive = MainWindow::instance()->isComboModeActive();
-    const Id comboId = this->delegate->combos.isEmpty() ? Id::Invalid : this->delegate->combos[index];
+    const Id comboId = delegate->combos.isEmpty() ? Id::Invalid : delegate->combos[index];
 
     // don't allow clicks in editing mode
     if (edit) return NoAction;
-    if (!this->rect.contains(this->delegate->mousePos()) || index != this->delegate->currentIndex()) return NoAction;
+    if (!rect.contains(delegate->mousePos()) || index != delegate->currentIndex()) return NoAction;
 
     // test buttons
     switch (this->type()) {

@@ -61,8 +61,8 @@ void Log::add(const Id &taskId, const Id &teamId, int multiplier, const Id &comb
 int Log::multiplier(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
     query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
-                   .arg(this->fieldName(Log::Multi), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
-                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
+                   .arg(fieldName(Log::Multi), fieldName(Log::Task), fieldName(Log::Team), tableName(), fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
     return query.next() ? query.value(0).toInt() : 0;
 }
@@ -76,8 +76,8 @@ int Log::multiplier(const Id &taskId, const Id &teamId) const {
 Id Log::comboId(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
     query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
-                   .arg(this->fieldName(Log::Combo), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
-                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
+                   .arg(fieldName(Log::Combo), fieldName(Log::Task), fieldName(Log::Team), tableName(), fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
     return query.next() ? static_cast<Id>(query.value(0).toInt()) : Id::Invalid;
 }
@@ -90,7 +90,7 @@ void Log::removeOrphanedEntries() {
 
     // remove orphaned logs
     query.exec(QString("delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)")
-                   .arg(this->tableName(), this->fieldName(Team), Team::instance()->fieldName(Team::ID), Team::instance()->tableName(), this->fieldName(Task),
+                   .arg(tableName(), fieldName(Team), Team::instance()->fieldName(Team::ID), Team::instance()->tableName(), fieldName(Task),
                        Task::instance()->fieldName(Task::ID), Task::instance()->tableName()));
 
     // delete duplicate logs
@@ -100,7 +100,7 @@ void Log::removeOrphanedEntries() {
         // find duplicate log entries:
         //   (multiple instances of same taskId & teamId)
         query.exec(QString("SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2 HAVING COUNT(*) > 1")
-                       .arg(this->fieldName(Task), this->fieldName(Team), this->tableName(), QString::number(teamId)));
+                       .arg(fieldName(Task), fieldName(Team), tableName(), QString::number(teamId)));
 
         while (query.next()) {
             const int count = query.value(2).toInt();
@@ -109,24 +109,24 @@ void Log::removeOrphanedEntries() {
             QSqlQuery subQuery;
 
             // announce the total amount of duplicate logs
-            qCDebug(Database_::Debug) << this->tr("performing deletion of %1 duplicate logs from team %2 for task %3")
+            qCDebug(Database_::Debug) << tr("performing deletion of %1 duplicate logs from team %2 for task %3")
                                              .arg(QString::number(count), Team::instance()->title(Team::instance()->row(static_cast<Id>(team))),
                                                  Task::instance()->name(Task::instance()->row(static_cast<Id>(task))));
 
             // delete actual logs
             subQuery.exec(QString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
-                              .arg(this->tableName(), this->fieldName(Team), QString::number(teamId), this->fieldName(Task), QString::number(task)));
+                              .arg(tableName(), fieldName(Team), QString::number(teamId), fieldName(Task), QString::number(task)));
         }
     }
 
     // removing orphaned combos here
     {
-        query.exec(QString("SELECT %1, COUNT(*) FROM %2 WHERE %1>-1 GROUP BY %1 HAVING COUNT(*) = 1").arg(this->fieldName(Combo), this->tableName()));
+        query.exec(QString("SELECT %1, COUNT(*) FROM %2 WHERE %1>-1 GROUP BY %1 HAVING COUNT(*) = 1").arg(fieldName(Combo), tableName()));
 
         while (query.next()) {
             QSqlQuery subQuery;
             const int combo = query.value(0).toInt();
-            qCDebug(Database_::Debug) << this->tr("clearing an orphaned combo with id:%1").arg(combo);
+            qCDebug(Database_::Debug) << tr("clearing an orphaned combo with id:%1").arg(combo);
             subQuery.exec(
                 QString("UPDATE %1 SET %2=-1 WHERE %2=%3").arg(Log::instance()->tableName(), Log::instance()->fieldName(Log::Combo), QString::number(combo)));
         }
@@ -145,8 +145,8 @@ void Log::removeOrphanedEntries() {
 Id Log::id(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
     query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
-                   .arg(this->fieldName(Log::ID), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
-                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
+                   .arg(fieldName(Log::ID), fieldName(Log::Task), fieldName(Log::Team), tableName(), fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
     return query.next() ? static_cast<Id>(query.value(0).toInt()) : Id::Invalid;
 }
@@ -157,7 +157,7 @@ Id Log::id(const Id &taskId, const Id &teamId) const {
  * @param teamId
  */
 void Log::setMultiplier(int multi, const Id &taskId, const Id &teamId) {
-    const Id logId = this->id(taskId, teamId);
+    const Id logId = id(taskId, teamId);
 
     if (logId != Id::Invalid) {
         const Row row = this->row(logId);

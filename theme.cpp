@@ -31,12 +31,12 @@
  * @brief Theme::Theme
  */
 Theme::Theme(const QString &name) {
-    this->m_style = QApplication::style();
+    m_style = QApplication::style();
 
-    const QMap<QString, QString> themes(this->availableThemes());
+    const QMap<QString, QString> themes(availableThemes());
     if (!themes.contains(name)) {
-        this->m_dark = Variable::isEnabled("darkMode");
-    } else this->readThemeFile(themes[name]);
+        m_dark = Variable::isEnabled("darkMode");
+    } else readThemeFile(themes[name]);
 }
 
 /**
@@ -54,10 +54,10 @@ QPalette Theme::palette() const {
             , m_group(group)
             , m_brush(isBrush) {}
 
-        [[nodiscard]] bool isBrush() const { return this->m_brush; }
-        [[nodiscard]] QString key() const { return this->m_key; }
-        [[nodiscard]] QPalette::ColorRole role() const { return this->m_role; }
-        [[nodiscard]] QPalette::ColorGroup group() const { return this->m_group; }
+        [[nodiscard]] bool isBrush() const { return m_brush; }
+        [[nodiscard]] QString key() const { return m_key; }
+        [[nodiscard]] QPalette::ColorRole role() const { return m_role; }
+        [[nodiscard]] QPalette::ColorGroup group() const { return m_group; }
 
     private:
         QString m_key;
@@ -102,8 +102,8 @@ QPalette Theme::palette() const {
 
     QPalette palette(QApplication::palette());
     for (const ThemeColour &themeColour : themeColours) {
-        if (this->paletteMap.contains(themeColour.key())) {
-            const QColor colour(this->paletteMap[themeColour.key()]);
+        if (paletteMap.contains(themeColour.key())) {
+            const QColor colour(paletteMap[themeColour.key()]);
             if (colour.isValid()) {
                 if (themeColour.isBrush()) palette.setBrush(themeColour.group(), themeColour.role(), std::as_const(colour));
                 else palette.setColor(themeColour.group(), themeColour.role(), std::as_const(colour));
@@ -144,7 +144,7 @@ void Theme::readThemeFile(const QString &fileName) {
      * @brief parseColour
      */
     auto parseColour = [this](const QString &key) {
-        if (this->paletteMap.contains(key)) return this->paletteMap[key];
+        if (paletteMap.contains(key)) return paletteMap[key];
 
         const QColor colour(QString("#%1").arg(key));
         return colour.isValid() ? colour : Qt::black;
@@ -155,15 +155,15 @@ void Theme::readThemeFile(const QString &fileName) {
 
     // parse palette
     settings.beginGroup("Palette");
-    for (const QString &key : settings.allKeys()) this->paletteMap[key] = parseColour(settings.value(key).toString());
+    for (const QString &key : settings.allKeys()) paletteMap[key] = parseColour(settings.value(key).toString());
     settings.endGroup();
 
     // parse general settings
     settings.beginGroup("Theme");
     for (const QString &key : settings.allKeys()) {
-        if (!QString::compare(key, "Dark")) this->m_dark = settings.value(key).toBool();
+        if (!QString::compare(key, "Dark")) m_dark = settings.value(key).toBool();
 
-        if (!QString::compare(key, "Style")) this->m_style = QStyleFactory::create("Fusion");
+        if (!QString::compare(key, "Style")) m_style = QStyleFactory::create("Fusion");
     }
     settings.endGroup();
 }

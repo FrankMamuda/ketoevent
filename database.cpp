@@ -89,7 +89,7 @@ Database::Database(QObject *parent) : QObject(parent) {
     if (!testPath(Variable::string("databasePath"))) {
         Variable::setString("databasePath", QDir(QDir::homePath() + "/" + Main::Path).absolutePath() + "/" + "database.db");
 
-        if (!this->testPath(Variable::string("databasePath"))) qFatal(QT_TR_NOOP_UTF8("could not create database path"));
+        if (!testPath(Variable::string("databasePath"))) qFatal(QT_TR_NOOP_UTF8("could not create database path"));
     }
 
     // failsafe
@@ -130,25 +130,25 @@ Database::Database(QObject *parent) : QObject(parent) {
         sqlite3 *libSqlite3 = *static_cast<sqlite3 **>(handle.data());
         if (libSqlite3 != nullptr && database.isOpen() && database.isValid()) {
             // initialize sqlite
-            qCWarning(Database_::Debug) << this->tr("initializing custom sqlite lib");
+            qCWarning(Database_::Debug) << tr("initializing custom sqlite lib");
             sqlite3_initialize();
 
             // initialize
             if (sqlite3_create_collation(libSqlite3, "localeCompare", SQLITE_UTF16, nullptr, localeAwareCompare) != SQLITE_OK)
-                qCWarning(Database_::Debug) << this->tr("could not add locale aware string collation");
+                qCWarning(Database_::Debug) << tr("could not add locale aware string collation");
         }
     }
 #endif
 
     // done
-    this->setInitialised();
+    setInitialised();
 }
 
 /**
  * @brief Database::removeOrphanedEntries removes orphaned entries in database tables
  */
 void Database::removeOrphanedEntries() {
-    for (Table *table : std::as_const(this->tables)) table->removeOrphanedEntries();
+    for (Table *table : std::as_const(tables)) table->removeOrphanedEntries();
 }
 
 /**
@@ -157,10 +157,10 @@ void Database::removeOrphanedEntries() {
 void Database::incrementCounter() {
     if (Variable::isDisabled("backup/enabled")) return;
     // increment value
-    this->m_counter++;
-    if (this->count() >= Variable::integer("backup/changes")) {
-        this->resetCounter();
-        this->writeBackup();
+    m_counter++;
+    if (count() >= Variable::integer("backup/changes")) {
+        resetCounter();
+        writeBackup();
     }
 }
 
@@ -172,20 +172,20 @@ Database::~Database() {
     bool open = false;
 
     // remove orphans
-    this->removeOrphanedEntries();
+    removeOrphanedEntries();
 
     // announce
     qCInfo(Database_::Debug) << Database::tr("unloading database");
-    this->setInitialised(false);
+    setInitialised(false);
 
     // unbind variables
     Variable::instance()->unbind("eventId");
     Variable::instance()->unbind("teamId");
     qCInfo(Database_::Debug) << Database::tr("clearing tables");
-    for (Table *table : std::as_const(this->tables)) table->clear();
+    for (Table *table : std::as_const(tables)) table->clear();
 
     // delete all tables
-    qDeleteAll(this->tables);
+    qDeleteAll(tables);
 
     // according to Qt5 documentation, this must be out of scope
     {
@@ -217,7 +217,7 @@ bool Database::add(Table *table) {
     const QStringList tableList(database.tables());
 
     // store table
-    this->tables[table->tableName()] = table;
+    tables[table->tableName()] = table;
 
     // announce
     if (!tableList.count()) qCInfo(Database_::Debug) << Database::tr("creating an empty database");
@@ -296,13 +296,13 @@ void Database::writeBackup() {
     const QDir dir(info.absolutePath() + +"/backups/");
     if (!dir.exists()) {
         dir.mkpath(dir.absolutePath());
-        qCDebug(Database_::Debug) << this->tr("making non-existant database backup path \"%1\"").arg(dir.absolutePath());
+        qCDebug(Database_::Debug) << tr("making non-existant database backup path \"%1\"").arg(dir.absolutePath());
         if (!dir.exists()) qFatal(QT_TR_NOOP_UTF8("could not create database backup path"));
     }
     // backup database filename
     const QString backup(QString("%1/%2_%3.db").arg(dir.absolutePath(), info.fileName().remove(".db"), QDateTime::currentDateTime().toString("hhmmss_ddMM")));
     // announce
-    qCDebug(Database_::Debug) << this->tr("performing backup to \"%1\"").arg(backup);
+    qCDebug(Database_::Debug) << tr("performing backup to \"%1\"").arg(backup);
     // perform a simple copy
     QFile::copy(Variable::string("databasePath"),
         QString("%1/%2_%3.db").arg(dir.absolutePath(), info.fileName().remove(".db"), QDateTime::currentDateTime().toString("hhmmss_ddMM")));
@@ -322,14 +322,14 @@ void Database::attach(const QFileInfo &info) {
 
     // check if database exists
     if (!info.exists()) {
-        qCDebug(Database_::Debug) << this->tr("database \"%1\" does not exist").arg(info.fileName());
+        qCDebug(Database_::Debug) << tr("database \"%1\" does not exist").arg(info.fileName());
         return;
     }
 
     // attach a foreign database
     QSqlQuery query;
     if (!query.exec(QString("attach '%1' as merge").arg(info.absoluteFilePath()))) {
-        qCritical(Database_::Debug) << this->tr("could not attach database, reason - \"%1\"").arg(query.lastError().text());
+        qCritical(Database_::Debug) << tr("could not attach database, reason - \"%1\"").arg(query.lastError().text());
         return;
     }
 
@@ -338,7 +338,7 @@ void Database::attach(const QFileInfo &info) {
     if (!query.exec(
             QString("SELECT not exists ( select * from %1 except select * from merge.%1 ) and not exists ( select * from merge.%1 except select * from %1 )")
                 .arg(Task::instance()->tableName()))) {
-        qCritical(Database_::Debug) << this->tr("could not compare task tables");
+        qCritical(Database_::Debug) << tr("could not compare task tables");
         return;
     } else {
         bool result = false;
@@ -346,7 +346,7 @@ void Database::attach(const QFileInfo &info) {
 
         // abort in case of mismatch
         if (!result) {
-            qCritical(Database_::Debug) << this->tr("task table mismatch");
+            qCritical(Database_::Debug) << tr("task table mismatch");
             return;
         }
     }
@@ -368,7 +368,7 @@ void Database::attach(const QFileInfo &info) {
 
     // abort if a matching event is not found
     if (!found) {
-        qCritical(Database_::Debug) << this->tr("could not find matching event");
+        qCritical(Database_::Debug) << tr("could not find matching event");
         return;
     }
 
@@ -431,12 +431,12 @@ void Database::attach(const QFileInfo &info) {
             teams++;
         }
     } else {
-        qCritical(Database_::Debug) << this->tr("could not perform team query");
+        qCritical(Database_::Debug) << tr("could not perform team query");
         return;
     }
 
     // report
-    qCDebug(Database_::Debug) << this->tr("imported %1 teams and %2 logs").arg(teams).arg(logs);
+    qCDebug(Database_::Debug) << tr("imported %1 teams and %2 logs").arg(teams).arg(logs);
 
     // detach database
     query.exec("detach merge");

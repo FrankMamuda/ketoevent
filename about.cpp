@@ -29,16 +29,16 @@
  * @param parent
  */
 About::About(QWidget *parent) : QDialog(parent), ui(new Ui::About) {
-    this->ui->setupUi(this);
-    QPushButton::connect(this->ui->closeButton, &QPushButton::clicked, this, [this]() { this->close(); });
-    QPushButton::connect(this->ui->qtButton, &QPushButton::clicked, this, [this]() { QMessageBox::aboutQt(this); });
+    ui->setupUi(this);
+    QPushButton::connect(ui->closeButton, &QPushButton::clicked, this, [this]() { close(); });
+    QPushButton::connect(ui->qtButton, &QPushButton::clicked, this, [this]() { QMessageBox::aboutQt(this); });
 }
 
 /**
  * @brief About::~About
  */
 About::~About() {
-    this->disconnect(this->ui->closeButton, SIGNAL(clicked()));
-    this->disconnect(this->ui->qtButton, SIGNAL(clicked()));
-    delete this->ui;
+    disconnect(ui->closeButton, SIGNAL(clicked()));
+    disconnect(ui->qtButton, SIGNAL(clicked()));
+    delete ui;
 }

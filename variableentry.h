@@ -54,25 +54,25 @@ public:
      * @brief key
      * @return
      */
-    [[nodiscard]] QString key() const { return this->m_key; }
+    [[nodiscard]] QString key() const { return m_key; }
 
     /**
      * @brief flags
      * @return
      */
-    [[nodiscard]] Flags flags() const { return this->m_flags; }
+    [[nodiscard]] Flags flags() const { return m_flags; }
 
     /**
      * @brief value
      * @return
      */
-    [[nodiscard]] virtual QVariant value() const { return this->m_value; }
+    [[nodiscard]] virtual QVariant value() const { return m_value; }
 
     /**
      * @brief defaultValue
      * @return
      */
-    [[nodiscard]] QVariant defaultValue() const { return this->m_defaultValue; }
+    [[nodiscard]] QVariant defaultValue() const { return m_defaultValue; }
 
     /**
      * @brief setValue

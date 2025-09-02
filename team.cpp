@@ -40,7 +40,7 @@ Team::Team() : Table("teams") {
     FIELD(Lock, QMetaType::Int);
     FIELD(Reviewer, QMetaType::QString);
     FIELD(Event, QMetaType::Int);
-    this->addUniqueConstraint(QStringList() << IDTOFIELD(Title) << IDTOFIELD(Event));
+    addUniqueConstraint(QStringList() << IDTOFIELD(Title) << IDTOFIELD(Event));
 }
 
 /**
@@ -55,7 +55,7 @@ Row Team::add(const QString &title, int members, const QTime &finishTime, const 
     // failsafe
     const Row event = MainWindow::instance()->currentEvent();
     if (event == Row::Invalid) {
-        qDebug() << this->tr("no active event, aborting");
+        qDebug() << tr("no active event, aborting");
         return Row::Invalid;
     }
 
@@ -71,8 +71,8 @@ void Team::removeOrphanedEntries() {
 
     // remove orphaned teams
     query.exec(QString("DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)")
-                   .arg(this->tableName(), this->fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
-    this->select();
+                   .arg(tableName(), fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
+    select();
 }
 
 /**

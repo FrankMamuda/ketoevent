@@ -70,7 +70,7 @@ public:
      * @param key
      * @return
      */
-    [[nodiscard]] bool contains(const QString &key) const { return this->list.contains(key); }
+    [[nodiscard]] bool contains(const QString &key) const { return list.contains(key); }
 
     /**
      * @brief value
@@ -319,14 +319,14 @@ public slots:
      * @param widget
      * @return
      */
-    QString bind(const QString &key, QWidget *widget) { return this->bind(key, qobject_cast<QObject *>(widget)); }
+    QString bind(const QString &key, QWidget *widget) { return bind(key, qobject_cast<QObject *>(widget)); }
     void unbind(const QString &key, QObject *object = nullptr);
 
     /**
      * @brief update
      * @param key
      */
-    void update(const QString &key) { emit this->valueChanged(key); }
+    void update(const QString &key) { emit valueChanged(key); }
 
 signals:
     void valueChanged(const QString &key);

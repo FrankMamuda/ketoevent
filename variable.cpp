@@ -35,7 +35,7 @@ Variable *Variable::i = nullptr;
 Variable::Variable() {
     // update widgets on variable change
     Variable::connect(this, &Variable::valueChanged, this, [this](const QString &key) {
-        const QList<Widget *> list(this->boundVariables.values(key));
+        const QList<Widget *> list(boundVariables.values(key));
         for (Widget *widget : list) {
             auto var(Variable::value<QVariant>(key));
 
@@ -45,7 +45,7 @@ Variable::Variable() {
 
     // update variable and sibling widgets on widget change
     Variable::connect(this, &Variable::widgetChanged, this, [this](const QString &key, Widget *widget, const QVariant &value) {
-        const QList<Widget *> list(this->boundVariables.values(key));
+        const QList<Widget *> list(boundVariables.values(key));
         for (Widget *boundWidget : list) {
             if (boundWidget == widget) {
                 Variable::setValue(key, value);
@@ -60,8 +60,8 @@ Variable::Variable() {
  * @brief Variable::~Variable
  */
 Variable::~Variable() {
-    this->disconnect(this, SIGNAL(widgetChanged(QString, Widget *, QVariant)));
-    this->disconnect(this, SIGNAL(valueChanged(QString)));
+    disconnect(this, SIGNAL(widgetChanged(QString, Widget *, QVariant)));
+    disconnect(this, SIGNAL(valueChanged(QString)));
 }
 
 /**
@@ -79,7 +79,7 @@ void Variable::bind(const QString &key, const QObject *receiver, const char *met
 
     // create an object/method pair and add pair to slotList
     ++method;
-    this->slotList[key] = qMakePair(const_cast<QObject *>(receiver), receiver->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(qPrintable(method))));
+    slotList[key] = qMakePair(const_cast<QObject *>(receiver), receiver->metaObject()->indexOfSlot(QMetaObject::normalizedSignature(qPrintable(method))));
 }
 
 /**
@@ -93,8 +93,8 @@ QString Variable::bind(const QString &key, QObject *object) {
 
     boundWidget->setValue(Variable::value<QVariant>(key));
     Variable::connect(
-        boundWidget, &Widget::changed, this, [this, key, boundWidget](const QVariant &value) { emit this->widgetChanged(key, boundWidget, value); });
-    this->boundVariables.insert(key, boundWidget);
+        boundWidget, &Widget::changed, this, [this, key, boundWidget](const QVariant &value) { emit widgetChanged(key, boundWidget, value); });
+    boundVariables.insert(key, boundWidget);
 
     return key;
 }
@@ -105,21 +105,21 @@ QString Variable::bind(const QString &key, QObject *object) {
  * @param object
  */
 void Variable::unbind(const QString &key, QObject *object) {
-    if (this->slotList.contains(key)) this->slotList.remove(key);
+    if (slotList.contains(key)) slotList.remove(key);
 
-    if (this->boundVariables.contains(key)) {
-        QList<Widget *> widgetList(this->boundVariables.values(key));
+    if (boundVariables.contains(key)) {
+        QList<Widget *> widgetList(boundVariables.values(key));
 
         if (object == nullptr) {
             qDeleteAll(widgetList);
-            this->boundVariables.remove(key);
+            boundVariables.remove(key);
             return;
         }
 
-        const QList<Widget *> list(this->boundVariables.values(key));
+        const QList<Widget *> list(boundVariables.values(key));
         for (Widget *compare : list) {
             if (compare->widget == object) {
-                this->boundVariables.remove(key, compare);
+                boundVariables.remove(key, compare);
                 delete compare;
             }
         }

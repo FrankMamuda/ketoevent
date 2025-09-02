@@ -76,25 +76,25 @@ public:
         if (Task::i == nullptr) Task::i = new Task();
         return Task::i;
     }
-    ~Task() override { this->setInitialised(false); }
+    ~Task() override { setInitialised(false); }
 
-    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(this->value(row, ID).toInt()); }
+    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(value(row, ID).toInt()); }
     Row add(const QString &taskName, int points, int multi, Task::Types type, Task::Styles style = Styles::NoStyle, const QString &description = QString(),
         const QString &pattern = QString());
-    [[nodiscard]] QString name(const Row &row) const { return this->value(row, Name).toString(); }
-    [[nodiscard]] int points(const Row &row) const { return this->value(row, Points).toInt(); }
-    [[nodiscard]] int multi(const Row &row) const { return this->value(row, Mult).toInt(); }
-    [[nodiscard]] Styles style(const Row &row) const { return static_cast<Styles>(this->value(row, Style).toInt()); }
-    [[nodiscard]] Types type(const Row &row) const { return static_cast<Types>(this->value(row, Type).toInt()); }
-    [[nodiscard]] int order(const Row &row) const { return this->value(row, Order_).toInt(); }
-    [[nodiscard]] QString description(const Row &row) const { return this->value(row, Desc).toString(); }
-    [[nodiscard]] QString pattern(const Row &row) const { return this->value(row, Pattern).toString(); }
-    [[nodiscard]] Id eventId(const Row &row) const { return static_cast<Id>(this->value(row, Event).toInt()); }
+    [[nodiscard]] QString name(const Row &row) const { return value(row, Name).toString(); }
+    [[nodiscard]] int points(const Row &row) const { return value(row, Points).toInt(); }
+    [[nodiscard]] int multi(const Row &row) const { return value(row, Mult).toInt(); }
+    [[nodiscard]] Styles style(const Row &row) const { return static_cast<Styles>(value(row, Style).toInt()); }
+    [[nodiscard]] Types type(const Row &row) const { return static_cast<Types>(value(row, Type).toInt()); }
+    [[nodiscard]] int order(const Row &row) const { return value(row, Order_).toInt(); }
+    [[nodiscard]] QString description(const Row &row) const { return value(row, Desc).toString(); }
+    [[nodiscard]] QString pattern(const Row &row) const { return value(row, Pattern).toString(); }
+    [[nodiscard]] Id eventId(const Row &row) const { return static_cast<Id>(value(row, Event).toInt()); }
     [[nodiscard]] int multiplier(const Row &row) const;
     [[nodiscard]] Id comboId(const Row &row) const;
     [[nodiscard]] QPair<Id, Id> getIds(const Row &row, bool *ok) const;
 
-    [[nodiscard]] bool hasInitialised() const { return this->m_initialised; }
+    [[nodiscard]] bool hasInitialised() const { return m_initialised; }
 
     void removeOrphanedEntries() override;
 
@@ -106,16 +106,16 @@ public:
     [[nodiscard]] bool validate(const Row &row, int value) const;
 
 public slots:
-    void setName(const Row &row, const QString &name) { this->setValue(row, Name, name); }
-    void setPoints(const Row &row, int points) { this->setValue(row, Points, points); }
-    void setMulti(const Row &row, int points) { this->setValue(row, Mult, points); }
-    void setStyle(const Row &row, Task::Styles style) { this->setValue(row, Style, static_cast<int>(style)); }
-    void setType(const Row &row, Task::Types type) { this->setValue(row, Type, static_cast<int>(type)); }
-    void setOrder(const Row &row, int position) { this->setValue(row, Order_, position); }
-    void setDescription(const Row &row, const QString &description) { this->setValue(row, Desc, description); }
-    void setPattern(const Row &row, const QString &pattern) { this->setValue(row, Pattern, pattern); }
+    void setName(const Row &row, const QString &name) { setValue(row, Name, name); }
+    void setPoints(const Row &row, int points) { setValue(row, Points, points); }
+    void setMulti(const Row &row, int points) { setValue(row, Mult, points); }
+    void setStyle(const Row &row, Task::Styles style) { setValue(row, Style, static_cast<int>(style)); }
+    void setType(const Row &row, Task::Types type) { setValue(row, Type, static_cast<int>(type)); }
+    void setOrder(const Row &row, int position) { setValue(row, Order_, position); }
+    void setDescription(const Row &row, const QString &description) { setValue(row, Desc, description); }
+    void setPattern(const Row &row, const QString &pattern) { setValue(row, Pattern, pattern); }
     void setMultiplier(const Row &row, int value);
-    void setInitialised(bool initialised = true) { this->m_initialised = initialised; }
+    void setInitialised(bool initialised = true) { m_initialised = initialised; }
 
 protected:
     QString selectStatement() const override;

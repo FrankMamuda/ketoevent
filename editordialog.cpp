@@ -38,14 +38,14 @@ EditorDialog *EditorDialog::i = nullptr;
  */
 EditorDialog::EditorDialog() : container(nullptr), dock(nullptr), toolBar(nullptr), ui(new Ui::EditorDialog) {
     // set up ui
-    this->ui->setupUi(this);
-    this->container = this->ui->tableView;
-    this->container->verticalHeader()->hide();
-    this->dock = this->ui->dockWidget;
-    this->hideDock();
+    ui->setupUi(this);
+    container = ui->tableView;
+    container->verticalHeader()->hide();
+    dock = ui->dockWidget;
+    hideDock();
 
     // connect close button
-    this->connect(this->ui->buttonClose, &QPushButton::clicked, this, [this]() { this->close(); });
+    connect(ui->buttonClose, &QPushButton::clicked, this, [this]() { close(); });
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -55,38 +55,38 @@ EditorDialog::EditorDialog() : container(nullptr), dock(nullptr), toolBar(nullpt
  * @brief EditorDialog::~EditorDialog
  */
 EditorDialog::~EditorDialog() {
-    this->disconnect(this->ui->buttonClose, SIGNAL(clicked()));
-    delete this->ui;
+    disconnect(ui->buttonClose, SIGNAL(clicked()));
+    delete ui;
 }
 
 /**
  * @brief EditorDialog::isDockVisible
  * @return
  */
-bool EditorDialog::isDockVisible() const { return this->dock->isVisible(); }
+bool EditorDialog::isDockVisible() const { return dock->isVisible(); }
 
 /**
  * @brief EditorDialog::showDock
  */
 void EditorDialog::showDock(QWidget *contents, const QString &title) {
-    this->dock->setWidget(contents);
-    this->dock->setWindowTitle(title);
-    this->dock->show();
-    this->ui->buttonClose->hide();
-    this->container->setDisabled(true);
+    dock->setWidget(contents);
+    dock->setWindowTitle(title);
+    dock->show();
+    ui->buttonClose->hide();
+    container->setDisabled(true);
 
-    if (this->toolBar != nullptr) this->toolBar->setDisabled(true);
+    if (toolBar != nullptr) toolBar->setDisabled(true);
 }
 
 /**
  * @brief EditorDialog::hideDock
  */
 void EditorDialog::hideDock() {
-    this->dock->hide();
-    this->ui->buttonClose->show();
-    this->container->setEnabled(true);
+    dock->hide();
+    ui->buttonClose->show();
+    container->setEnabled(true);
 
-    if (this->toolBar != nullptr) this->toolBar->setEnabled(true);
+    if (toolBar != nullptr) toolBar->setEnabled(true);
 }
 
 /**
@@ -94,9 +94,9 @@ void EditorDialog::hideDock() {
  * @param toolBar
  */
 void EditorDialog::setToolBar(QToolBar *widget) {
-    this->removeToolBar(this->toolBar);
-    this->toolBar = widget;
-    this->addToolBar(Qt::TopToolBarArea, this->toolBar);
+    removeToolBar(toolBar);
+    toolBar = widget;
+    addToolBar(Qt::TopToolBarArea, toolBar);
 }
 
 /**
@@ -106,15 +106,15 @@ void EditorDialog::setToolBar(QToolBar *widget) {
 void EditorDialog::showEvent(QShowEvent *event) {
     ModalWindow::showEvent(event);
 
-    if (!this->isMaximized()) {
-        if (this->toolBar == EventToolBar::instance() && !Variable::value<QVariant>("geometry/events").isNull())
-            this->restoreGeometry(Variable::compressedByteArray("geometry/events"));
+    if (!isMaximized()) {
+        if (toolBar == EventToolBar::instance() && !Variable::value<QVariant>("geometry/events").isNull())
+            restoreGeometry(Variable::compressedByteArray("geometry/events"));
 
-        if (this->toolBar == TaskToolBar::instance() && !Variable::value<QVariant>("geometry/tasks").isNull())
-            this->restoreGeometry(Variable::compressedByteArray("geometry/tasks"));
+        if (toolBar == TaskToolBar::instance() && !Variable::value<QVariant>("geometry/tasks").isNull())
+            restoreGeometry(Variable::compressedByteArray("geometry/tasks"));
 
-        if (this->toolBar == TeamToolBar::instance() && !Variable::value<QVariant>("geometry/teams").isNull())
-            this->restoreGeometry(Variable::compressedByteArray("geometry/teams"));
+        if (toolBar == TeamToolBar::instance() && !Variable::value<QVariant>("geometry/teams").isNull())
+            restoreGeometry(Variable::compressedByteArray("geometry/teams"));
     }
 }
 
@@ -123,13 +123,13 @@ void EditorDialog::showEvent(QShowEvent *event) {
  * @param event
  */
 void EditorDialog::closeEvent(QCloseEvent *event) {
-    if (!this->isMaximized()) {
-        if (this->toolBar == EventToolBar::instance()) Variable::setCompressedByteArray("geometry/events", this->saveGeometry());
-        if (this->toolBar == TaskToolBar::instance()) Variable::setCompressedByteArray("geometry/tasks", this->saveGeometry());
-        if (this->toolBar == TeamToolBar::instance()) Variable::setCompressedByteArray("geometry/teams", this->saveGeometry());
+    if (!isMaximized()) {
+        if (toolBar == EventToolBar::instance()) Variable::setCompressedByteArray("geometry/events", saveGeometry());
+        if (toolBar == TaskToolBar::instance()) Variable::setCompressedByteArray("geometry/tasks", saveGeometry());
+        if (toolBar == TeamToolBar::instance()) Variable::setCompressedByteArray("geometry/teams", saveGeometry());
     }
 
-    this->hideDock();
-    this->disconnect(this->container, SIGNAL(clicked(QModelIndex)));
+    hideDock();
+    disconnect(container, SIGNAL(clicked(QModelIndex)));
     ModalWindow::closeEvent(event);
 }

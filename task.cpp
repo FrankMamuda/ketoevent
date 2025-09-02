@@ -46,17 +46,17 @@ Task::Task() : Table("tasks") {
     FIELD(Event, QMetaType::Int);
     FIELD(Desc, QMetaType::QString);
     FIELD(Pattern, QMetaType::QString);
-    this->addUniqueConstraint(QStringList() << IDTOFIELD(Name) << IDTOFIELD(Event));
+    addUniqueConstraint(QStringList() << IDTOFIELD(Name) << IDTOFIELD(Event));
 
     // map types and styles
-    this->types[Types::Check] = QObject::tr("Check");
-    this->types[Types::Multi] = QObject::tr("Multi");
-    this->styles[Styles::Regular] = QObject::tr("Regular");
-    this->styles[Styles::Bold] = QObject::tr("Bold");
-    this->styles[Styles::Italic] = QObject::tr("Italic");
+    types[Types::Check] = QObject::tr("Check");
+    types[Types::Multi] = QObject::tr("Multi");
+    styles[Styles::Regular] = QObject::tr("Regular");
+    styles[Styles::Bold] = QObject::tr("Bold");
+    styles[Styles::Italic] = QObject::tr("Italic");
 
     // sort by order
-    this->setSort(Task::Order_, Qt::AscendingOrder);
+    setSort(Task::Order_, Qt::AscendingOrder);
 }
 
 /**
@@ -74,12 +74,12 @@ Row Task::add(const QString &taskName, int points, int multi, Task::Types type, 
     // failsafe
     const Row event = MainWindow::instance()->currentEvent();
     if (event == Row::Invalid) {
-        qDebug() << this->tr("no active event, aborting");
+        qDebug() << tr("no active event, aborting");
         return Row::Invalid;
     }
 
     // find highest order
-    for (y = 0; y < this->count(); y++) highest = qMax(highest, this->order(this->row(y)));
+    for (y = 0; y < count(); y++) highest = qMax(highest, order(row(y)));
 
     // add a new task
     return Table::add(QVariantList() << Database_::null << taskName << points << multi << static_cast<int>(style) << static_cast<int>(type) << highest + 1
@@ -187,7 +187,7 @@ Id Task::comboId(const Row &row) const {
     return ok ? Log::instance()->comboId(ids.first, ids.second) : Id::Invalid;
 
     // NOTE: could replace with a value from extended (LOG) table (could increase performance marginally)
-    // return static_cast<Id>( this->value( row, ComboID ).toInt());
+    // return static_cast<Id>( value( row, ComboID ).toInt());
 }
 
 /**
@@ -208,7 +208,7 @@ QPair<Id, Id> Task::getIds(const Row &row, bool *ok) const {
     out.second = Team::instance()->id(team);
     if (out.second == Id::Invalid) return out;
 
-    out.first = this->id(row);
+    out.first = id(row);
     if (out.first == Id::Invalid) return out;
 
     *ok = true;
@@ -223,8 +223,8 @@ void Task::removeOrphanedEntries() {
 
     // remove orphaned tasks
     query.exec(QString("DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)")
-                   .arg(this->tableName(), this->fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
-    this->select();
+                   .arg(tableName(), fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
+    select();
 }
 
 /**
@@ -245,7 +245,7 @@ void Task::setMultiplier(const Row &row, int value) {
  * @param value
  */
 bool Task::validate(const Row &row, int value) const {
-    if (this->type(row) != Task::Types::Multi) return true;
+    if (type(row) != Task::Types::Multi) return true;
 
     const QString &pattern(this->pattern(row));
     if (pattern.isEmpty()) return true;
@@ -308,7 +308,7 @@ QString Task::selectStatement() const {
     QString statement;
 
     // return default statment if database has not been initialized
-    if (!Database::instance()->hasInitialised() || !this->hasInitialised()) return Table::selectStatement();
+    if (!Database::instance()->hasInitialised() || !hasInitialised()) return Table::selectStatement();
 
     // validate team row
     const Row team = MainWindow::instance()->currentTeam();
@@ -327,10 +327,10 @@ QString Task::selectStatement() const {
 
     // add fields from TASK table
     for (y = 0; y < Task::Fields::Count; y++) {
-        const QString field(this->fieldName(y));
+        const QString field(fieldName(y));
         if (field.isEmpty()) return "";
 
-        statement.append(QString(" %1.%2,").arg(this->tableName(), field));
+        statement.append(QString(" %1.%2,").arg(tableName(), field));
     }
 
     // append fields from LOG table
@@ -338,7 +338,7 @@ QString Task::selectStatement() const {
     statement.append(QString(" %1.%2").arg(logs, Log::instance()->fieldName(Log::Fields::Combo)));
 
     // append table name
-    statement.append(QString(" FROM %1").arg(this->tableName()));
+    statement.append(QString(" FROM %1").arg(tableName()));
 
     // FROM table statement
     const QString leftTable(QString("( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1")
@@ -347,10 +347,10 @@ QString Task::selectStatement() const {
 
     // append JOIN statement from LOGS table
     statement.append(
-        QString(" LEFT JOIN %1 ON %2.%3=%4.%5").arg(leftTable, logs, Log::instance()->fieldName(Log::Fields::Task), this->tableName(), this->fieldName(ID)));
+        QString(" LEFT JOIN %1 ON %2.%3=%4.%5").arg(leftTable, logs, Log::instance()->fieldName(Log::Fields::Task), tableName(), fieldName(ID)));
 
     // append filter if any
-    if (!this->filter().isEmpty()) statement.append(QString(" WHERE %1").arg(this->filter()));
+    if (!filter().isEmpty()) statement.append(QString(" WHERE %1").arg(filter()));
 
     // remove trailing whitespace
     statement = statement.simplified();

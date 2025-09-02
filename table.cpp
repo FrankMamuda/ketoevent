@@ -47,7 +47,7 @@ QMultiMap<QMetaType::Type, QString> Table::FieldTypes = {
  * @brief Table::count
  * @return
  */
-int Table::count() const { return Database::instance()->hasInitialised() ? this->rowCount() : 0; }
+int Table::count() const { return Database::instance()->hasInitialised() ? rowCount() : 0; }
 
 /**
  * @brief Table::value
@@ -56,12 +56,12 @@ int Table::count() const { return Database::instance()->hasInitialised() ? this-
  * @return
  */
 QVariant Table::value(const Row &row, int fieldId) const {
-    if (!this->isValid()) return -1;
+    if (!isValid()) return -1;
 
     const QModelIndex index(this->index(static_cast<int>(row), fieldId));
-    if (row == Row::Invalid || !index.isValid() || index.row() < 0 || index.row() >= this->count()) {
-        qWarning(Database_::Debug) << Table::tr(R"(could not retrieve field "%1" value from table "%2")").arg(this->field(fieldId).name(), this->tableName())
-                                   << !index.isValid() << (index.row() < 0) << (index.row() >= this->count()) << row;
+    if (row == Row::Invalid || !index.isValid() || index.row() < 0 || index.row() >= count()) {
+        qWarning(Database_::Debug) << Table::tr(R"(could not retrieve field "%1" value from table "%2")").arg(field(fieldId).name(), tableName())
+                                   << !index.isValid() << (index.row() < 0) << (index.row() >= count()) << row;
         return -1;
     }
 
@@ -75,13 +75,13 @@ QVariant Table::value(const Row &row, int fieldId) const {
  * @return
  */
 QVariant Table::value(const Id &id, int fieldId) const {
-    if (!this->isValid()) return -1;
+    if (!isValid()) return -1;
 
-    if (!this->hasPrimaryField()) return -1;
+    if (!hasPrimaryField()) return -1;
 
     QSqlQuery query;
     query.exec(QString("SELECT %1, %2 from %3 where %1=%4")
-                   .arg(this->fieldName(this->primaryFieldIndex), this->fieldName(fieldId), this->tableName(), QString::number(static_cast<int>(id))));
+                   .arg(fieldName(primaryFieldIndex), fieldName(fieldId), tableName(), QString::number(static_cast<int>(id))));
 
     return query.next() ? query.value(1) : "";
 }
@@ -94,7 +94,7 @@ bool Table::select() {
     const bool result = QSqlTableModel::select();
 
     // fetch more
-    while (this->canFetchMore()) this->fetchMore();
+    while (canFetchMore()) fetchMore();
 
     return result;
 }
@@ -105,8 +105,8 @@ bool Table::select() {
  * @return
  */
 Row Table::row(const Id &id) const {
-    const QModelIndexList list(this->match(this->index(0, 0), IDRole, static_cast<int>(id), 1, Qt::MatchExactly));
-    return this->row(list.isEmpty() ? QModelIndex() : list.first());
+    const QModelIndexList list(match(index(0, 0), IDRole, static_cast<int>(id), 1, Qt::MatchExactly));
+    return row(list.isEmpty() ? QModelIndex() : list.first());
 }
 
 /**
@@ -121,7 +121,7 @@ QVariant Table::data(const QModelIndex &index, int role) const {
     if (role == IDRole || role == Qt::UserRole) {
         if (!index.isValid()) return static_cast<int>(Id::Invalid);
 
-        return this->hasPrimaryField() ? this->value(static_cast<Row>(index.row()), this->primaryFieldIndex).toInt() : -1;
+        return hasPrimaryField() ? value(static_cast<Row>(index.row()), primaryFieldIndex).toInt() : -1;
     }
 
     return QSqlTableModel::data(index, role);
@@ -133,7 +133,7 @@ QVariant Table::data(const QModelIndex &index, int role) const {
  */
 void Table::setFilter(const QString &filter) {
     QSqlTableModel::setFilter(filter);
-    this->select();
+    select();
 }
 
 /**
@@ -141,7 +141,7 @@ void Table::setFilter(const QString &filter) {
  * @param id
  * @return
  */
-QSqlField Table::field(int id) const { return this->record().field(id); }
+QSqlField Table::field(int id) const { return record().field(id); }
 
 /**
  * @brief Table::addField
@@ -153,7 +153,7 @@ QSqlField Table::field(int id) const { return this->record().field(id); }
  * @param primary
  */
 void Table::appendField(const QString &fieldName, QMetaType::Type type, bool unique, bool autoValue, bool primary) {
-    if (!this->database().isOpen() || this->tableName().isEmpty()) {
+    if (!database().isOpen() || tableName().isEmpty()) {
         qWarning(Database_::Debug) << Table::tr(R"(database not loaded)");
         return;
     }
@@ -163,29 +163,29 @@ void Table::appendField(const QString &fieldName, QMetaType::Type type, bool uni
         return;
     }
 
-    if (primary && this->hasPrimaryField()) {
-        qWarning(Database_::Debug) << Table::tr(R"(table "%1" already has a primary field")").arg(this->tableName());
+    if (primary && hasPrimaryField()) {
+        qWarning(Database_::Debug) << Table::tr(R"(table "%1" already has a primary field")").arg(tableName());
         return;
     }
 
     QSqlField field;
-    if (this->record().contains(fieldName)) {
-        field = this->record().field(fieldName);
+    if (record().contains(fieldName)) {
+        field = record().field(fieldName);
 
-        if (primary) this->primaryFieldIndex = this->record().indexOf(fieldName);
+        if (primary) primaryFieldIndex = record().indexOf(fieldName);
     } else {
         field = QSqlField(fieldName, QMetaType(type));
         field.setAutoValue(autoValue);
-        this->record().append(field);
+        record().append(field);
 
-        if (primary) this->primaryFieldIndex = static_cast<int>(this->tmpFields.count());
+        if (primary) primaryFieldIndex = static_cast<int>(tmpFields.count());
 
-        this->tmpFields << field;
+        tmpFields << field;
     }
 
-    if (unique) this->uniqueFields << field.name();
+    if (unique) uniqueFields << field.name();
 
-    this->fields++;
+    fields++;
 }
 
 /**
@@ -193,15 +193,15 @@ void Table::appendField(const QString &fieldName, QMetaType::Type type, bool uni
  * @param name
  */
 Row Table::add(const QVariantList &arguments) {
-    if (this->fields != arguments.count()) {
-        qCCritical(Database_::Debug) << Table::tr("argument count mismatch - %1, required - %2").arg(arguments.count()).arg(this->record().count());
+    if (fields != arguments.count()) {
+        qCCritical(Database_::Debug) << Table::tr("argument count mismatch - %1, required - %2").arg(arguments.count()).arg(record().count());
         return Row::Invalid;
     }
 
     // record might have extraneous fields when custom select statement is set
     // these have to be removed, otherwise record will not be inserted
     QSqlRecord record(this->record());
-    const int remove = static_cast<int>(record.count() - this->fields);
+    const int remove = static_cast<int>(record.count() - fields);
     for (int y = 0; y < remove; y++) record.remove(record.count() - 1);
 
     // prepare statement
@@ -218,27 +218,27 @@ Row Table::add(const QVariantList &arguments) {
             return Row::Invalid;
         }
 
-        if (y != this->primaryFieldIndex) record.setValue(field.name(), field.isAutoValue() ? 0 : argument);
+        if (y != primaryFieldIndex) record.setValue(field.name(), field.isAutoValue() ? 0 : argument);
     }
 
-    if (!this->insertRecord(-1, record)) {
+    if (!insertRecord(-1, record)) {
         qCCritical(Database_::Debug)
-            << Table::tr(R"(cannot insert record into table "%1" (reason - "%2")").arg(this->tableName()).arg(this->lastError().text());
+            << Table::tr(R"(cannot insert record into table "%1" (reason - "%2")").arg(tableName()).arg(lastError().text());
 
         return Row::Invalid;
     }
 
-    if (this->submitAll()) {
-        this->database().commit();
+    if (submitAll()) {
+        database().commit();
     } else {
-        this->database().rollback();
+        database().rollback();
         qCCritical(Database_::Debug)
-            << Table::tr(R"(cannot insert record into table "%1" (reason - "%2")").arg(this->tableName()).arg(this->lastError().text());
+            << Table::tr(R"(cannot insert record into table "%1" (reason - "%2")").arg(tableName()).arg(lastError().text());
         return Row::Invalid;
     }
 
-    this->select();
-    return static_cast<Row>(this->count() - 1);
+    select();
+    return static_cast<Row>(count() - 1);
 }
 
 /**
@@ -246,16 +246,16 @@ Row Table::add(const QVariantList &arguments) {
  * @return
  */
 QSqlQuery Table::prepare(bool ignore) const {
-    if (!this->isValid()) return QSqlQuery();
+    if (!isValid()) return QSqlQuery();
 
     // prepare statement
-    QString statement((ignore ? "insert or ignore into " : "insert into ") + this->tableName() + " (");
+    QString statement((ignore ? "insert or ignore into " : "insert into ") + tableName() + " (");
     QString values;
-    for (int y = 0; y < this->record().count(); y++) {
-        const QSqlField &field(this->record().field(y));
-        if (this->primaryFieldIndex == y) continue;
+    for (int y = 0; y < record().count(); y++) {
+        const QSqlField &field(record().field(y));
+        if (primaryFieldIndex == y) continue;
 
-        const bool last = (y == this->record().count() - 1);
+        const bool last = (y == record().count() - 1);
 
         values.append(" :_" + field.name() + +(last ? " )" : ","));
         statement.append(" " + field.name() + (last ? " ) values(" + values : ","));
@@ -271,10 +271,10 @@ QSqlQuery Table::prepare(bool ignore) const {
  * @param row
  */
 void Table::remove(const Row &row) {
-    if (!this->isValid() || row == Row::Invalid) return;
+    if (!isValid() || row == Row::Invalid) return;
 
-    this->removeRow(static_cast<int>(row));
-    this->select();
+    removeRow(static_cast<int>(row));
+    select();
 }
 
 /**
@@ -283,10 +283,10 @@ void Table::remove(const Row &row) {
  * @param fieldId
  */
 void Table::setValue(const Row &row, int fieldId, const QVariant &value) {
-    if (!this->isValid() || row == Row::Invalid) return;
+    if (!isValid() || row == Row::Invalid) return;
 
-    this->setData(this->index(static_cast<int>(row), fieldId), value);
-    this->submit();
+    setData(index(static_cast<int>(row), fieldId), value);
+    submit();
 }
 
 /**
@@ -298,10 +298,10 @@ void Table::setValue(const Row &row, int fieldId, const QVariant &value) {
 bool Table::contains(const QSqlField &field, const QVariant &value) const {
     int y;
 
-    if (!this->isValid()) return false;
+    if (!isValid()) return false;
 
-    for (y = 0; y < this->count(); y++) {
-        if (this->record(y).value(field.name()) == value) return true;
+    for (y = 0; y < count(); y++) {
+        if (record(y).value(field.name()) == value) return true;
     }
     return false;
 }

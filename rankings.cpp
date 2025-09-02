@@ -47,32 +47,32 @@ Rankings *Rankings::i = nullptr;
  */
 Rankings::Rankings() : ui(new Ui::Rankings), model(nullptr), proxyModel(nullptr) {
     // set up ui
-    this->ui->setupUi(this);
+    ui->setupUi(this);
 
     // setup pixmaps
-    this->ui->teamPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
+    ui->teamPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
 
     // make sure this window blocks other windows
-    this->setWindowModality(Qt::ApplicationModal);
+    setWindowModality(Qt::ApplicationModal);
 
     // set up progressbar and team selector
-    this->ui->progressBar->hide();
-    this->ui->teamCombo->setModel(Team::instance());
-    this->ui->teamCombo->setModelColumn(Team::Title);
+    ui->progressBar->hide();
+    ui->teamCombo->setModel(Team::instance());
+    ui->teamCombo->setModelColumn(Team::Title);
 
     // bind currentTeam action to a variable
     // and repaint table when either team or currentTeam variable changes
-    Variable::instance()->bind("rankingsCurrent", this->ui->actionCurrent);
-    this->connect(this->ui->actionCurrent, SIGNAL(toggled(bool)), this->ui->tableView->viewport(), SLOT(repaint()));
-    this->connect(this->ui->teamCombo, SIGNAL(currentIndexChanged(int)), this->ui->tableView->viewport(), SLOT(repaint()));
+    Variable::instance()->bind("rankingsCurrent", ui->actionCurrent);
+    connect(ui->actionCurrent, SIGNAL(toggled(bool)), ui->tableView->viewport(), SLOT(repaint()));
+    connect(ui->teamCombo, SIGNAL(currentIndexChanged(int)), ui->tableView->viewport(), SLOT(repaint()));
 
     // add to garbage man
     GarbageMan::instance()->add(this);
 
 #ifdef XLSX_SUPPORT
     // export action (xlsx)
-    this->ui->toolBar->addAction(QIcon::fromTheme("export"), this->tr("Export as xlsx"), [this]() {
-        QString path(QFileDialog::getSaveFileName(this, this->tr("Export rankings to XLSX format"), QDir::homePath(), this->tr("XLSX spreadsheet (*.xlsx)")));
+    ui->toolBar->addAction(QIcon::fromTheme("export"), tr("Export as xlsx"), [this]() {
+        QString path(QFileDialog::getSaveFileName(this, tr("Export rankings to XLSX format"), QDir::homePath(), tr("XLSX spreadsheet (*.xlsx)")));
 
         // check for empty filenames
         if (path.isEmpty()) return;
@@ -87,15 +87,15 @@ Rankings::Rankings() : ui(new Ui::Rankings), model(nullptr), proxyModel(nullptr)
         boldFormat.setFontBold(true);
 
         int row = 1;
-        xlsx.write(row, 1, this->tr("Team name"), boldFormat);
-        xlsx.write(row, 2, this->tr("Tasks"), boldFormat);
-        xlsx.write(row, 3, this->tr("Combos"), boldFormat);
-        xlsx.write(row, 4, this->tr("Time"), boldFormat);
-        xlsx.write(row, 5, this->tr("Penalty points"), boldFormat);
-        xlsx.write(row, 6, this->tr("Total points"), boldFormat);
+        xlsx.write(row, 1, tr("Team name"), boldFormat);
+        xlsx.write(row, 2, tr("Tasks"), boldFormat);
+        xlsx.write(row, 3, tr("Combos"), boldFormat);
+        xlsx.write(row, 4, tr("Time"), boldFormat);
+        xlsx.write(row, 5, tr("Penalty points"), boldFormat);
+        xlsx.write(row, 6, tr("Total points"), boldFormat);
         row++;
 
-        for (const TeamStatistics &team : std::as_const(this->list)) {
+        for (const TeamStatistics &team : std::as_const(list)) {
             xlsx.write(row, 1, team.title);
             xlsx.write(row, 2, team.completedTasks);
             xlsx.write(row, 3, team.combos);
@@ -118,18 +118,18 @@ Rankings::Rankings() : ui(new Ui::Rankings), model(nullptr), proxyModel(nullptr)
  * @brief Rankings::~Rankings
  */
 Rankings::~Rankings() {
-    Variable::instance()->unbind("rankingsCurrent", this->ui->actionCurrent);
-    this->disconnect(this->ui->actionCurrent, SIGNAL(toggled(bool)));
-    this->disconnect(this->ui->teamCombo, SIGNAL(currentIndexChanged(int)));
+    Variable::instance()->unbind("rankingsCurrent", ui->actionCurrent);
+    disconnect(ui->actionCurrent, SIGNAL(toggled(bool)));
+    disconnect(ui->teamCombo, SIGNAL(currentIndexChanged(int)));
 
-    delete this->ui;
+    delete ui;
 }
 
 /**
  * @brief Rankings::isDisplayingCurrentTeam
  * @return
  */
-bool Rankings::isDisplayingCurrentTeam() const { return this->ui->actionCurrent->isChecked(); }
+bool Rankings::isDisplayingCurrentTeam() const { return ui->actionCurrent->isChecked(); }
 
 /**
  * @brief Rankings::on_actionUpdate_triggered
@@ -141,27 +141,27 @@ void Rankings::on_actionUpdate_triggered() {
     Log::instance()->removeOrphanedEntries();
 
     // set up and show progress bar
-    this->ui->progressBar->setRange(0, Team::instance()->count());
-    this->ui->progressBar->setValue(0);
-    this->ui->progressBar->show();
+    ui->progressBar->setRange(0, Team::instance()->count());
+    ui->progressBar->setValue(0);
+    ui->progressBar->show();
 
     // create model if none available
-    if (this->model == nullptr || this->proxyModel == nullptr) {
-        this->model = new RankingsModel();
-        this->proxyModel = new QSortFilterProxyModel();
-        this->proxyModel->setSourceModel(this->model);
-        this->proxyModel->setDynamicSortFilter(true);
+    if (model == nullptr || proxyModel == nullptr) {
+        model = new RankingsModel();
+        proxyModel = new QSortFilterProxyModel();
+        proxyModel->setSourceModel(model);
+        proxyModel->setDynamicSortFilter(true);
 
         // setup table
-        this->ui->tableView->setModel(proxyModel);
-        this->ui->tableView->setWordWrap(true);
-        this->ui->tableView->verticalHeader()->hide();
-        this->ui->tableView->setSortingEnabled(true);
+        ui->tableView->setModel(proxyModel);
+        ui->tableView->setWordWrap(true);
+        ui->tableView->verticalHeader()->hide();
+        ui->tableView->setSortingEnabled(true);
     }
 
     // clear any leftover results
-    this->list.clear();
-    this->model->reset();
+    list.clear();
+    model->reset();
 
     // get event related variables
     const Row event = MainWindow::instance()->currentEvent();
@@ -185,7 +185,7 @@ void Rankings::on_actionUpdate_triggered() {
         QList<Id> dup;
 
         // update progress bar
-        this->ui->progressBar->setValue(team);
+        ui->progressBar->setValue(team);
 
         // go through logs
         for (int log = 0; log < Log::instance()->count(); log++) {
@@ -257,29 +257,29 @@ void Rankings::on_actionUpdate_triggered() {
         if (overTime > penaltyTime || Team::instance()->finishTime(teamRow) >= eventFinalTime) stats.points = 0;
 
         // add team stats to list
-        this->list << stats;
+        list << stats;
         totalLogged += stats.points;
     }
 
     // update model
-    this->model->reset();
+    model->reset();
 
     // hide progress bar
-    this->ui->progressBar->hide();
+    ui->progressBar->hide();
 
     // sort by points
-    this->proxyModel->sort(RankingsModel::Points, Qt::DescendingOrder);
+    proxyModel->sort(RankingsModel::Points, Qt::DescendingOrder);
 
     // scale window to contents
-    this->ui->tableView->resizeColumnsToContents();
-    this->ui->tableView->resizeRowsToContents();
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeRowsToContents();
 
     // calculate rank
     // NOTE: a really dumb way to do it
     QMultiMap<int, int> map;
 
     int y = 0;
-    for (const TeamStatistics &stats : std::as_const(this->list)) {
+    for (const TeamStatistics &stats : std::as_const(list)) {
         map.insert(stats.points, y);
         y++;
     }
@@ -291,26 +291,26 @@ void Rankings::on_actionUpdate_triggered() {
     for (const int p : std::as_const(points)) {
         QList<int> indices(map.values(p));
         for (int index : indices) {
-            TeamStatistics stats = this->list.at(index);
+            TeamStatistics stats = list.at(index);
             stats.rank = y;
-            this->list.replace(index, stats);
+            list.replace(index, stats);
         }
         y++;
     }
 
     // total teams
-    this->ui->totalTeamsEdit->setText(QString::number(Team::instance()->count()));
+    ui->totalTeamsEdit->setText(QString::number(Team::instance()->count()));
 
     // total members
     int members = 0;
     for (int y = 0; y < Team::instance()->count(); y++) members += Team::instance()->members(Team::instance()->row(y));
-    this->ui->totalMembersEdit->setText(QString::number(members));
+    ui->totalMembersEdit->setText(QString::number(members));
 
     // total logged points
-    this->ui->totalLoggedEdit->setText(QString::number(totalLogged));
+    ui->totalLoggedEdit->setText(QString::number(totalLogged));
 
     // total tasks
-    this->ui->totalTasksEdit->setText(QString::number(Task::instance()->count()));
+    ui->totalTasksEdit->setText(QString::number(Task::instance()->count()));
 
     // total points
     int totalPoints = 0;
@@ -326,7 +326,7 @@ void Rankings::on_actionUpdate_triggered() {
     case 3: comboPoints += Event::instance()->comboOfThree(MainWindow::instance()->currentEvent()); break;
     case 2: comboPoints += Event::instance()->comboOfTwo(MainWindow::instance()->currentEvent()); break;
     }
-    this->ui->totalPointsEdit->setText(this->tr("%1 (%2+%3)").arg(totalPoints + comboPoints).arg(totalPoints).arg(comboPoints));
+    ui->totalPointsEdit->setText(tr("%1 (%2+%3)").arg(totalPoints + comboPoints).arg(totalPoints).arg(comboPoints));
 
     // # of tasks completed
     int numTasksCompleted = 0;
@@ -334,7 +334,7 @@ void Rankings::on_actionUpdate_triggered() {
     query.exec(QString("SELECT COUNT(*) from %1 WHERE %2>0 GROUP BY %3")
                    .arg(Log::instance()->tableName(), Log::instance()->fieldName(Log::Multi), Log::instance()->fieldName(Log::Task)));
     while (query.next()) numTasksCompleted += query.value(0).toInt();
-    this->ui->completedEdit->setText(QString::number(numTasksCompleted));
+    ui->completedEdit->setText(QString::number(numTasksCompleted));
 }
 
 /**
@@ -345,15 +345,15 @@ void Rankings::showEvent(QShowEvent *event) {
     ModalWindow::showEvent(event);
 
     // scale window to contents
-    this->ui->tableView->resizeColumnsToContents();
-    this->ui->tableView->resizeRowsToContents();
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeRowsToContents();
 
     // set current team
-    this->ui->teamCombo->setCurrentIndex(static_cast<int>(MainWindow::instance()->currentTeam()));
+    ui->teamCombo->setCurrentIndex(static_cast<int>(MainWindow::instance()->currentTeam()));
 
     // restore main window geomery
-    if (!Variable::value<QVariant>("geometry/rankings").isNull() && !this->isMaximized())
-        this->restoreGeometry(Variable::compressedByteArray("geometry/rankings"));
+    if (!Variable::value<QVariant>("geometry/rankings").isNull() && !isMaximized())
+        restoreGeometry(Variable::compressedByteArray("geometry/rankings"));
 }
 
 /**
@@ -361,7 +361,7 @@ void Rankings::showEvent(QShowEvent *event) {
  * @param event
  */
 void Rankings::closeEvent(QCloseEvent *event) {
-    if (!this->isMaximized()) Variable::setCompressedByteArray("geometry/rankings", this->saveGeometry());
+    if (!isMaximized()) Variable::setCompressedByteArray("geometry/rankings", saveGeometry());
 
     ModalWindow::closeEvent(event);
 }
@@ -370,7 +370,7 @@ void Rankings::closeEvent(QCloseEvent *event) {
  * @brief Rankings::on_actionExport_triggered
  */
 void Rankings::on_actionExport_triggered() {
-    QString path(QFileDialog::getSaveFileName(this, this->tr("Export statistics to CSV format"), QDir::homePath(), this->tr("CSV file (*.csv)")));
+    QString path(QFileDialog::getSaveFileName(this, tr("Export statistics to CSV format"), QDir::homePath(), tr("CSV file (*.csv)")));
 
     // check for empty filenames
     if (path.isEmpty()) return;
@@ -383,9 +383,9 @@ void Rankings::on_actionExport_triggered() {
 
     if (csv.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&csv);
-        out << this->tr("Team name;Tasks;Combos;Time;Penalty points;Total points").append("\n");
+        out << tr("Team name;Tasks;Combos;Time;Penalty points;Total points").append("\n");
 
-        for (const TeamStatistics &team : std::as_const(this->list)) {
+        for (const TeamStatistics &team : std::as_const(list)) {
             out << QString("%1;%2;%3;%4;%5;%6%7")
                        .arg(team.title)
                        .arg(team.completedTasks)

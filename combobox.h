@@ -39,7 +39,7 @@ public:
      */
     void addItems(const QStringList &items) {
         QComboBox::addItems(items);
-        emit this->activated(this->currentIndex());
+        emit activated(currentIndex());
     }
 
     /**
@@ -57,7 +57,7 @@ public slots:
      */
     void setCurrentIndex(int index) {
         QComboBox::setCurrentIndex(index);
-        emit this->activated(index);
+        emit activated(index);
     }
 
 signals:

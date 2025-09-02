@@ -58,12 +58,12 @@ Q_DECLARE_METATYPE(Row)
  * FIELD macro generates a lowercase fieldName from field index (enum)
  */
 // field map
-#define FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type )
+#define FIELD( fieldId, type ) appendField( QString( #fieldId ).toLower(), QMetaType::type )
 #define IDTOFIELD( fieldId ) QString( #fieldId ).toLower()
-#define UNIQUE_FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type, true )
-#define PRIMARY_FIELD( fieldId ) this->appendField( QString( #fieldId ).toLower(), QMetaType::Int, true, true, true )
-#define FIELD_GETTER( type, fieldId, name ) public: [[nodiscard]] type name( const Row &row ) const { return this->value( row, fieldId ).value<type>(); } type name( const Id &id ) const { return this->value( id, fieldId ).value<type>(); }
-#define FIELD_SETTER( type, fieldId ) public slots: void set##fieldId( const Row &row, const type &variable ) { this->setValue( row, fieldId, QVariant::fromValue( variable )); }
+#define UNIQUE_FIELD( fieldId, type ) appendField( QString( #fieldId ).toLower(), QMetaType::type, true )
+#define PRIMARY_FIELD( fieldId ) appendField( QString( #fieldId ).toLower(), QMetaType::Int, true, true, true )
+#define FIELD_GETTER( type, fieldId, name ) public: [[nodiscard]] type name( const Row &row ) const { return value( row, fieldId ).value<type>(); } type name( const Id &id ) const { return value( id, fieldId ).value<type>(); }
+#define FIELD_SETTER( type, fieldId ) public slots: void set##fieldId( const Row &row, const type &variable ) { setValue( row, fieldId, QVariant::fromValue( variable )); }
 #define INITIALIZE_FIELD( type, fieldId, name ) FIELD_GETTER( type, fieldId, name ) FIELD_SETTER( type, fieldId )
 
 /**
@@ -81,23 +81,23 @@ public:
     enum Roles { IDRole = Qt::UserRole };
     Q_ENUM(Roles)
 
-    explicit Table(const QString &tableName = QString()) { this->setTable(tableName); }
+    explicit Table(const QString &tableName = QString()) { setTable(tableName); }
     ~Table() override {
-        this->setValid(false);
-        this->clear();
+        setValid(false);
+        clear();
     }
 
     /**
      * @brief isValid
      * @return
      */
-    [[nodiscard]] bool isValid() const { return this->m_valid; }
+    [[nodiscard]] bool isValid() const { return m_valid; }
 
     /**
      * @brief hasPrimaryField
      * @return
      */
-    [[nodiscard]] bool hasPrimaryField() const { return this->primaryFieldIndex != -1; }
+    [[nodiscard]] bool hasPrimaryField() const { return primaryFieldIndex != -1; }
     [[nodiscard]] Q_INVOKABLE int count() const;
 
     [[nodiscard]] virtual QVariant value(const Row &row, int fieldId) const;
@@ -109,7 +109,7 @@ public:
      * @param value
      * @return
      */
-    [[nodiscard]] bool contains(int fieldId, const QVariant &value) const { return this->contains(this->field(fieldId), value); }
+    [[nodiscard]] bool contains(int fieldId, const QVariant &value) const { return contains(field(fieldId), value); }
     bool select() override;
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     void setFilter(const QString &filter) override;
@@ -119,7 +119,7 @@ public:
      * @param id
      * @return
      */
-    [[nodiscard]] QString fieldName(int id) const { return this->record().fieldName(id); }
+    [[nodiscard]] QString fieldName(int id) const { return record().fieldName(id); }
 
     /**
      * @brief row
@@ -127,7 +127,7 @@ public:
      * @return
      */
     [[nodiscard]] Row row(const int index) const {
-        if (index < 0 || index >= this->count()) return Row::Invalid;
+        if (index < 0 || index >= count()) return Row::Invalid;
         return static_cast<Row>(index);
     }
 
@@ -137,7 +137,7 @@ public:
      * @return
      */
     [[nodiscard]] Row row(const QModelIndex &index) const {
-        if (index.row() < 0 || index.row() >= this->count() || index.model() != this) return Row::Invalid;
+        if (index.row() < 0 || index.row() >= count() || index.model() != this) return Row::Invalid;
 
         return static_cast<Row>(index.row());
     }
@@ -147,7 +147,7 @@ public:
      * @brief addUniqueConstraint
      * @param constrainedFields
      */
-    [[maybe_unused]] void addUniqueConstraint(const QStringList &constrainedFields) { this->constraints << constrainedFields; }
+    [[maybe_unused]] void addUniqueConstraint(const QStringList &constrainedFields) { constraints << constrainedFields; }
     [[maybe_unused]] [[nodiscard]] QSqlQuery prepare(bool ignore = true) const;
 
 public slots:
@@ -155,7 +155,7 @@ public slots:
      * @brief setValid
      * @param valid
      */
-    void setValid(bool valid = true) { this->m_valid = valid; }
+    void setValid(bool valid = true) { m_valid = valid; }
     void appendField(
         const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false);
     Row add(const QVariantList &arguments);

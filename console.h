@@ -62,9 +62,9 @@ public slots:
     bool completeCommand();
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override { this->m_windowPos = event->pos(); }
+    void mousePressEvent(QMouseEvent *event) override { m_windowPos = event->pos(); }
     void mouseMoveEvent(QMouseEvent *event) override {
-        if (event->buttons() & Qt::LeftButton) this->move(this->pos() + event->pos() - this->m_windowPos);
+        if (event->buttons() & Qt::LeftButton) move(pos() + event->pos() - m_windowPos);
     }
     bool eventFilter(QObject *object, QEvent *event) override;
 
@@ -89,24 +89,23 @@ class HistoryEdit final : public QLineEdit {
 
 public:
     explicit HistoryEdit(QWidget *parent = nullptr) : m_historyOffset(0) {
-        this->setParent(parent);
-        this->reset();
+        setParent(parent);
+        reset();
     }
-    ~HistoryEdit() override { this->history.clear(); }
-    [[nodiscard]] int offset() const { return this->m_historyOffset; }
+    [[nodiscard]] int offset() const { return m_historyOffset; }
 
 public slots:
-    void set(int offset = 0) { this->m_historyOffset = offset; }
-    void reset() { this->set(); }
-    void push() { this->m_historyOffset++; }
-    void pop() { this->m_historyOffset--; }
+    void set(int offset = 0) { m_historyOffset = offset; }
+    void reset() { set(); }
+    void push() { m_historyOffset++; }
+    void pop() { m_historyOffset--; }
     void add(const QString &text) {
-        if (this->history.count()) {
-            if (!QString::compare(this->history.last(), text)) return;
+        if (history.count()) {
+            if (!QString::compare(history.last(), text)) return;
         }
 
-        if (this->history.count() >= Ui::MaxConsoleHistory) this->history.removeFirst();
-        this->history << text;
+        if (history.count() >= Ui::MaxConsoleHistory) history.removeFirst();
+        history << text;
     }
 
 private:

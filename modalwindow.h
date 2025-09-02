@@ -32,7 +32,7 @@ class ModalWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit ModalWindow(QWidget *parent = nullptr) : QMainWindow(parent) { this->setWindowModality(Qt::ApplicationModal); }
+    explicit ModalWindow(QWidget *parent = nullptr) : QMainWindow(parent) { setWindowModality(Qt::ApplicationModal); }
     ~ModalWindow() override = default;
 
 protected:
@@ -61,7 +61,7 @@ protected:
      * @param event
      */
     void keyPressEvent(QKeyEvent *event) override {
-        if (event->key() == Qt::Key_Escape) this->hide();
+        if (event->key() == Qt::Key_Escape) hide();
 
         QMainWindow::keyPressEvent(event);
     }

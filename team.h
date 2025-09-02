@@ -59,23 +59,23 @@ public:
     }
     ~Team() override = default;
 
-    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(this->value(row, ID).toInt()); }
+    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(value(row, ID).toInt()); }
     Row add(const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
-    [[nodiscard]] QString title(const Row &row) const { return this->value(row, Title).toString(); }
-    [[nodiscard]] int members(const Row &row) const { return this->value(row, Members).toInt(); }
-    [[nodiscard]] QTime finishTime(const Row &row) const { return QTime::fromString(this->value(row, Finish).toString(), Database_::TimeFormat); }
-    [[nodiscard]] QString reviewer(const Row &row) const { return this->value(row, Reviewer).toString(); }
-    [[nodiscard]] Id eventId(const Row &row) const { return static_cast<Id>(this->value(row, Event).toInt()); }
+    [[nodiscard]] QString title(const Row &row) const { return value(row, Title).toString(); }
+    [[nodiscard]] int members(const Row &row) const { return value(row, Members).toInt(); }
+    [[nodiscard]] QTime finishTime(const Row &row) const { return QTime::fromString(value(row, Finish).toString(), Database_::TimeFormat); }
+    [[nodiscard]] QString reviewer(const Row &row) const { return value(row, Reviewer).toString(); }
+    [[nodiscard]] Id eventId(const Row &row) const { return static_cast<Id>(value(row, Event).toInt()); }
     void removeOrphanedEntries() override;
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 public slots:
-    void setTitle(const Row &row, const QString &title) { this->setValue(row, Title, title); }
-    void setMembers(const Row &row, int members) { this->setValue(row, Members, members); }
-    void setFinishTime(const Row &row, const QTime &time) { this->setValue(row, Finish, time.toString(Database_::TimeFormat)); }
-    void setReviewer(const Row &row, const QString &name) { this->setValue(row, Reviewer, name); }
+    void setTitle(const Row &row, const QString &title) { setValue(row, Title, title); }
+    void setMembers(const Row &row, int members) { setValue(row, Members, members); }
+    void setFinishTime(const Row &row, const QTime &time) { setValue(row, Finish, time.toString(Database_::TimeFormat)); }
+    void setReviewer(const Row &row, const QString &name) { setValue(row, Reviewer, name); }
 
 private:
     static Team *i;

@@ -37,7 +37,7 @@ public:
      * @brief ListView
      * @param parent
      */
-    explicit TaskView(QWidget *parent = nullptr) : QListView(parent) { this->setMouseTracking(true); }
+    explicit TaskView(QWidget *parent = nullptr) : QListView(parent) { setMouseTracking(true); }
     ~TaskView() override = default;
 
 protected:

@@ -54,21 +54,21 @@ public:
      * @param object
      */
     void add(QObject *object) {
-        if (!this->garbage.contains(object)) this->garbage << object;
+        if (!garbage.contains(object)) garbage << object;
     }
 
     /**
      * @brief clear deletes poiners in reverse order
      */
     void clear() {
-        std::reverse(this->garbage.begin(), this->garbage.end());
-        for (QObject *object : std::as_const(this->garbage)) {
+        std::reverse(garbage.begin(), garbage.end());
+        for (QObject *object : std::as_const(garbage)) {
             if (object != nullptr) {
                 delete object;
                 object = nullptr;
             }
         }
-        this->garbage.clear();
+        garbage.clear();
     }
 
 private:

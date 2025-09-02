@@ -40,51 +40,51 @@ TeamEdit::TeamEdit(QWidget *parent) : QWidget(parent), ui(new Ui::TeamEdit), m_e
     const Row event = MainWindow::instance()->currentEvent();
 
     // set up ui
-    this->ui->setupUi(this);
+    ui->setupUi(this);
 
     // setup pixmaps
-    this->ui->membersPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
-    this->ui->titlePixmap->setPixmap(QIcon::fromTheme("name").pixmap(16, 16));
-    this->ui->reviewerPixmap->setPixmap(QIcon::fromTheme("ketone").pixmap(16, 16));
+    ui->membersPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
+    ui->titlePixmap->setPixmap(QIcon::fromTheme("name").pixmap(16, 16));
+    ui->reviewerPixmap->setPixmap(QIcon::fromTheme("ketone").pixmap(16, 16));
 
     if (event == Row::Invalid) return;
 
     // set up defaults
-    this->ui->membersInteger->setMinimum(Event::instance()->minMembers(event));
-    this->ui->membersInteger->setMaximum(Event::instance()->maxMembers(event));
-    this->ui->finishTime->setMinimumTime(Event::instance()->startTime(event));
-    this->ui->finishTime->setMaximumTime(Event::instance()->finalTime(event).addSecs(10800));
+    ui->membersInteger->setMinimum(Event::instance()->minMembers(event));
+    ui->membersInteger->setMaximum(Event::instance()->maxMembers(event));
+    ui->finishTime->setMinimumTime(Event::instance()->startTime(event));
+    ui->finishTime->setMaximumTime(Event::instance()->finalTime(event).addSecs(10800));
 
     // only visible in quick add
-    this->setWindowTitle(this->tr("Add team"));
+    setWindowTitle(tr("Add team"));
 
     // empty team title check
     auto emptyTitle = [this]() {
         // warn upon empty team title
-        if (this->ui->titleEdit->text().isEmpty()) {
-            QMessageBox::information(this, this->tr("Empty team title"), this->tr("Please enter team title"));
+        if (ui->titleEdit->text().isEmpty()) {
+            QMessageBox::information(this, tr("Empty team title"), tr("Please enter team title"));
             return true;
         }
         return false;
     };
 
     // add button action
-    this->connect(this->ui->addButton, &QPushButton::clicked, this, [this, emptyTitle]() {
-        const QString teamTitle(this->ui->titleEdit->text());
+    connect(ui->addButton, &QPushButton::clicked, this, [this, emptyTitle]() {
+        const QString teamTitle(ui->titleEdit->text());
 
         // abort on empty team title
         if (emptyTitle()) return;
 
         // abort on existing team
-        if (Team::instance()->contains(Team::Title, teamTitle) && !this->isEditing()) {
-            QMessageBox::information(this, this->tr("Team already exists"), this->tr("Team already exists\nChoose a different title"));
+        if (Team::instance()->contains(Team::Title, teamTitle) && !isEditing()) {
+            QMessageBox::information(this, tr("Team already exists"), tr("Team already exists\nChoose a different title"));
             return;
         }
 
         // if everything is ok, add a new team
         Row team = Row::Invalid;
-        if (!this->isEditing()) {
-            team = Team::instance()->add(teamTitle, this->ui->membersInteger->value(), this->ui->finishTime->time(), this->ui->reviewerEdit->text());
+        if (!isEditing()) {
+            team = Team::instance()->add(teamTitle, ui->membersInteger->value(), ui->finishTime->time(), ui->reviewerEdit->text());
 
         } else {
             const Row team = Team::instance()->row(EditorDialog::instance()->container->currentIndex().row());
@@ -92,43 +92,43 @@ TeamEdit::TeamEdit(QWidget *parent) : QWidget(parent), ui(new Ui::TeamEdit), m_e
             if (team == Row::Invalid) return;
 
             Team::instance()->setTitle(team, teamTitle);
-            Team::instance()->setMembers(team, this->ui->membersInteger->value());
-            Team::instance()->setFinishTime(team, this->ui->finishTime->time());
-            Team::instance()->setReviewer(team, this->ui->reviewerEdit->text());
+            Team::instance()->setMembers(team, ui->membersInteger->value());
+            Team::instance()->setFinishTime(team, ui->finishTime->time());
+            Team::instance()->setReviewer(team, ui->reviewerEdit->text());
         }
 
         if (team != Row::Invalid) MainWindow::instance()->setCurrentTeam(team);
 
         // close dock
         if (EditorDialog::instance()->isDockVisible()) EditorDialog::instance()->hideDock();
-        else this->close();
+        else close();
     });
 
     // shortcut from title to members
-    this->connect(this->ui->titleEdit, &QLineEdit::returnPressed, this, [this, emptyTitle]() {
+    connect(ui->titleEdit, &QLineEdit::returnPressed, this, [this, emptyTitle]() {
         if (emptyTitle()) return;
 
-        this->ui->membersInteger->setFocus();
+        ui->membersInteger->setFocus();
     });
 
     // shortcut from members to time
-    this->connect(this->ui->membersInteger, &QSpinBox::editingFinished, this, [this]() { this->ui->finishTime->setFocus(); });
+    connect(ui->membersInteger, &QSpinBox::editingFinished, this, [this]() { ui->finishTime->setFocus(); });
 
     // shortcut from time to add button
-    this->connect(this->ui->finishTime, &QTimeEdit::editingFinished, this, [this]() {
-        this->ui->addButton->setFocus();
-        this->ui->addButton->setDefault(true);
-        this->ui->addButton->setAutoDefault(true);
+    connect(ui->finishTime, &QTimeEdit::editingFinished, this, [this]() {
+        ui->addButton->setFocus();
+        ui->addButton->setDefault(true);
+        ui->addButton->setAutoDefault(true);
     });
 
     // cancel button just closes the dialog
-    this->connect(this->ui->cancelButton, &QPushButton::clicked, this, [this]() {
+    connect(ui->cancelButton, &QPushButton::clicked, this, [this]() {
         if (EditorDialog::instance()->isDockVisible()) EditorDialog::instance()->hideDock();
-        else this->close();
+        else close();
     });
 
     // connect time button
-    this->connect(this->ui->finishButton, &QToolButton::pressed, this, [this]() { this->setCurrentTime(); });
+    connect(ui->finishButton, &QToolButton::pressed, this, [this]() { setCurrentTime(); });
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -139,46 +139,46 @@ TeamEdit::TeamEdit(QWidget *parent) : QWidget(parent), ui(new Ui::TeamEdit), m_e
  */
 TeamEdit::~TeamEdit() {
     // disconnect lambdas
-    this->disconnect(this->ui->addButton, SIGNAL(clicked()));
-    this->disconnect(this->ui->cancelButton, SIGNAL(clicked()));
-    this->disconnect(this->ui->titleEdit, SIGNAL(returnPressed()));
-    this->disconnect(this->ui->membersInteger, SIGNAL(editingFinished()));
-    this->disconnect(this->ui->finishTime, SIGNAL(editingFinished()));
-    this->disconnect(this->ui->finishButton, SIGNAL(pressed()));
+    disconnect(ui->addButton, SIGNAL(clicked()));
+    disconnect(ui->cancelButton, SIGNAL(clicked()));
+    disconnect(ui->titleEdit, SIGNAL(returnPressed()));
+    disconnect(ui->membersInteger, SIGNAL(editingFinished()));
+    disconnect(ui->finishTime, SIGNAL(editingFinished()));
+    disconnect(ui->finishButton, SIGNAL(pressed()));
 
     // delete ui
-    delete this->ui;
+    delete ui;
 }
 
 /**
  * @brief TeamEdit::reset
  */
 void TeamEdit::reset(bool edit) {
-    this->m_edit = edit;
+    m_edit = edit;
 
-    if (!this->isEditing()) {
+    if (!isEditing()) {
         // reset ui components to default values
-        this->ui->titleEdit->clear();
-        this->ui->finishTime->setTime(this->ui->finishTime->minimumTime());
-        this->ui->membersInteger->setValue(EventTable::DefaultMembers);
-        this->ui->reviewerEdit->setText(Variable::string("reviewerName"));
+        ui->titleEdit->clear();
+        ui->finishTime->setTime(ui->finishTime->minimumTime());
+        ui->membersInteger->setValue(EventTable::DefaultMembers);
+        ui->reviewerEdit->setText(Variable::string("reviewerName"));
     } else {
         const Row team = Team::instance()->row(EditorDialog::instance()->container->currentIndex().row());
 
         if (team == Row::Invalid) return;
 
-        this->ui->titleEdit->setText(Team::instance()->title(team));
-        this->ui->finishTime->setTime(Team::instance()->finishTime(team));
-        this->ui->membersInteger->setValue(Team::instance()->members(team));
-        this->ui->reviewerEdit->setText(Team::instance()->reviewer(team));
+        ui->titleEdit->setText(Team::instance()->title(team));
+        ui->finishTime->setTime(Team::instance()->finishTime(team));
+        ui->membersInteger->setValue(Team::instance()->members(team));
+        ui->reviewerEdit->setText(Team::instance()->reviewer(team));
     }
 
-    this->ui->titleEdit->setFocus();
-    this->ui->addButton->setDefault(false);
-    this->ui->addButton->setAutoDefault(false);
+    ui->titleEdit->setFocus();
+    ui->addButton->setDefault(false);
+    ui->addButton->setAutoDefault(false);
 }
 
 /**
  * @brief TeamEdit::setCurrentTime
  */
-void TeamEdit::setCurrentTime() { this->ui->finishTime->setTime(QTime::currentTime()); }
+void TeamEdit::setCurrentTime() { ui->finishTime->setTime(QTime::currentTime()); }

@@ -33,19 +33,19 @@ Combos *Combos::i = nullptr;
  * @brief Combos::Combos
  */
 Combos::Combos() : ui(new Ui::Combos) {
-    this->setWindowModality(Qt::ApplicationModal);
-    this->ui->setupUi(this);
-    this->connect(this->ui->closeButton, &QPushButton::clicked, [this]() { this->close(); });
+    setWindowModality(Qt::ApplicationModal);
+    ui->setupUi(this);
+    connect(ui->closeButton, &QPushButton::clicked, [this]() { close(); });
 
     // set up view
-    this->ui->view->setModel(ComboModel::instance());
-    this->ui->teamCombo->setModel(Team::instance());
-    this->ui->teamCombo->setModelColumn(Team::Title);
+    ui->view->setModel(ComboModel::instance());
+    ui->teamCombo->setModel(Team::instance());
+    ui->teamCombo->setModelColumn(Team::Title);
 
     // set up pixmaps
-    this->ui->teamPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
-    this->ui->comboPixmap->setPixmap(QIcon::fromTheme("combos").pixmap(16, 16));
-    this->ui->pointsPixmap->setPixmap(QIcon::fromTheme("star").pixmap(16, 16));
+    ui->teamPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
+    ui->comboPixmap->setPixmap(QIcon::fromTheme("combos").pixmap(16, 16));
+    ui->pointsPixmap->setPixmap(QIcon::fromTheme("star").pixmap(16, 16));
 
     // add to garbage man
     GarbageMan::instance()->add(this);
@@ -55,9 +55,9 @@ Combos::Combos() : ui(new Ui::Combos) {
  * @brief Combos::~Combos
  */
 Combos::~Combos() {
-    this->disconnect(this->ui->closeButton, SIGNAL(clicked()));
+    disconnect(ui->closeButton, SIGNAL(clicked()));
 
-    delete this->ui;
+    delete ui;
 }
 
 /**
@@ -69,9 +69,9 @@ void Combos::on_teamCombo_currentIndexChanged(int index) {
 
     ComboModel::instance()->reset(row == Row::Invalid ? Id::Invalid : Team::instance()->id(row));
 
-    this->ui->view->reset();
-    this->ui->combosEdit->setText(QString::number(ComboModel::instance()->combos));
-    this->ui->pointsEdit->setText(QString::number(ComboModel::instance()->points));
+    ui->view->reset();
+    ui->combosEdit->setText(QString::number(ComboModel::instance()->combos));
+    ui->pointsEdit->setText(QString::number(ComboModel::instance()->points));
 }
 
 /**
@@ -85,6 +85,6 @@ void Combos::showEvent(QShowEvent *event) {
     const Row row = MainWindow::instance()->currentTeam();
 
     // reset model on every show just to be safe
-    this->ui->teamCombo->setCurrentIndex(static_cast<int>(row));
-    this->on_teamCombo_currentIndexChanged(static_cast<int>(row));
+    ui->teamCombo->setCurrentIndex(static_cast<int>(row));
+    on_teamCombo_currentIndexChanged(static_cast<int>(row));
 }

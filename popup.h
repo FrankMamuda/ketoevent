@@ -36,13 +36,13 @@ class Popup : public QDialog {
 public:
     explicit Popup(QWidget *widget = nullptr, const QString &text = QString(), const int timeout = 5000);
     ~Popup() override {
-        delete this->shadow;
-        delete this->layout;
+        delete shadow;
+        delete layout;
     }
 
 public slots:
     void setText(const QString &text);
-    void setTextAlignment(const Qt::Alignment &alignment) { this->label->setAlignment(alignment); }
+    void setTextAlignment(const Qt::Alignment &alignment) { label->setAlignment(alignment); }
     void pointAt(const QPoint &point);
     void setTimeOut(const int msec = 5000);
 
@@ -51,7 +51,7 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override {
-        this->setupShape();
+        setupShape();
         QDialog::resizeEvent(event);
     }
     void paintEvent(QPaintEvent *event) override;

@@ -56,23 +56,23 @@ public:
     ~Log() override {}
 
     void add(const Id &taskId, const Id &teamId, int multiplier = 0, const Id &comboId = Id::Invalid);
-    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(this->value(row, ID).toInt()); }
+    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(value(row, ID).toInt()); }
     [[nodiscard]] Id id(const Id &taskId, const Id &teamId) const;
-    [[nodiscard]] int multiplier(const Row &row) const { return this->value(row, Multi).toInt(); }
+    [[nodiscard]] int multiplier(const Row &row) const { return value(row, Multi).toInt(); }
     [[nodiscard]] int multiplier(const Id &taskId, const Id &teamId) const;
-    [[nodiscard]] Id taskId(const Row &row) const { return static_cast<Id>(this->value(row, Task).toInt()); }
-    [[nodiscard]] Id teamId(const Row &row) const { return static_cast<Id>(this->value(row, Team).toInt()); }
-    [[nodiscard]] Id comboId(const Row &row) const { return static_cast<Id>(this->value(row, Combo).toInt()); }
+    [[nodiscard]] Id taskId(const Row &row) const { return static_cast<Id>(value(row, Task).toInt()); }
+    [[nodiscard]] Id teamId(const Row &row) const { return static_cast<Id>(value(row, Team).toInt()); }
+    [[nodiscard]] Id comboId(const Row &row) const { return static_cast<Id>(value(row, Combo).toInt()); }
     [[nodiscard]] Id comboId(const Id &taskId, const Id &teamId) const;
 
     void removeOrphanedEntries() override;
 
 public slots:
-    void setMultiplier(const Row &row, int multi) { this->setValue(row, Multi, multi); }
+    void setMultiplier(const Row &row, int multi) { setValue(row, Multi, multi); }
     void setMultiplier(int multi, const Id &taskId, const Id &teamId);
-    void setTaskId(const Row &row, const Id &id) { this->setValue(row, Task, static_cast<int>(id)); }
-    void setTeamId(const Row &row, const Id &id) { this->setValue(row, Team, static_cast<int>(id)); }
-    void setComboId(const Row &row, const Id &id) { this->setValue(row, Combo, static_cast<int>(id)); }
+    void setTaskId(const Row &row, const Id &id) { setValue(row, Task, static_cast<int>(id)); }
+    void setTeamId(const Row &row, const Id &id) { setValue(row, Team, static_cast<int>(id)); }
+    void setComboId(const Row &row, const Id &id) { setValue(row, Combo, static_cast<int>(id)); }
 
 private:
     static Log *i;

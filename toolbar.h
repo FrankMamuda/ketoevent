@@ -42,11 +42,11 @@ public:
      * @brief ToolBar
      */
     explicit ToolBar(QWidget *parent = nullptr) : QToolBar(parent) {
-        this->setFloatable(false);
-        this->setMovable(false);
-        this->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        this->setIconSize(QSize(Ui::ToolBarIconSize, Ui::ToolBarIconSize));
-        this->setAllowedAreas(Qt::TopToolBarArea);
+        setFloatable(false);
+        setMovable(false);
+        setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        setIconSize(QSize(Ui::ToolBarIconSize, Ui::ToolBarIconSize));
+        setAllowedAreas(Qt::TopToolBarArea);
     }
     virtual ~ToolBar() override = default;
 };

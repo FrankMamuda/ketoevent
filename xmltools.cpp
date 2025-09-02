@@ -88,7 +88,6 @@ void XMLTools::read() {
         node = std::as_const(node).nextSibling();
     }
 
-    document.clear();
     xmlFile.close();
 }
 
