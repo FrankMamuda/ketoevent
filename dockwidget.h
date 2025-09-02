@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,22 +22,22 @@
 /*
  * includes
  */
-#include <QDockWidget>
-#include <QCloseEvent>
 #include "editordialog.h"
+#include <QCloseEvent>
+#include <QDockWidget>
 
 /**
  * @brief The DockWidget class
  */
 class DockWidget : public QDockWidget {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( DockWidget )
+    Q_DISABLE_COPY_MOVE(DockWidget)
 
 public:
-    explicit DockWidget( QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags()) : QDockWidget( parent, flags ) {}
+    explicit DockWidget(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags()) : QDockWidget(parent, flags) {}
 
 protected:
-    void closeEvent ( QCloseEvent *event ) {
+    void closeEvent(QCloseEvent *event) {
         EditorDialog::instance()->hideDock();
         event->ignore();
     }

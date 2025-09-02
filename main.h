@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,31 +37,33 @@ namespace Main {
  * @brief The GarbageMan class
  */
 class GarbageMan final {
-    Q_DISABLE_COPY_MOVE( GarbageMan )
+    Q_DISABLE_COPY_MOVE(GarbageMan)
 
-public:    
+public:
     /**
      * @brief instance
      * @return
      */
-    static GarbageMan *instance() { if ( GarbageMan::i == nullptr ) GarbageMan::i = new GarbageMan(); return GarbageMan::i; }
+    static GarbageMan *instance() {
+        if (GarbageMan::i == nullptr) GarbageMan::i = new GarbageMan();
+        return GarbageMan::i;
+    }
 
     /**
      * @brief add adds pointers (singletons) to garbage collection list
      * @param object
      */
-    void add( QObject *object ) {
-        if ( !this->garbage.contains( object ))
-            this->garbage << object;
+    void add(QObject *object) {
+        if (!this->garbage.contains(object)) this->garbage << object;
     }
 
     /**
      * @brief clear deletes poiners in reverse order
      */
     void clear() {
-        std::reverse( this->garbage.begin(), this->garbage.end());
-        for ( QObject *object : std::as_const( this->garbage )) {
-            if ( object != nullptr ) {
+        std::reverse(this->garbage.begin(), this->garbage.end());
+        for (QObject *object : std::as_const(this->garbage)) {
+            if (object != nullptr) {
                 delete object;
                 object = nullptr;
             }
@@ -72,5 +74,5 @@ public:
 private:
     static GarbageMan *i;
     explicit GarbageMan() = default;
-    QList<QObject*> garbage;
+    QList<QObject *> garbage;
 };

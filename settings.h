@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,14 @@ class Settings;
  * @brief The Settings class
  */
 class Settings final : public ModalWindow {
-    Q_DISABLE_COPY_MOVE( Settings )
+    Q_DISABLE_COPY_MOVE(Settings)
     Q_OBJECT
 
 public:
-    static Settings *instance() { if ( Settings::i == nullptr ) Settings::i = new Settings(); return Settings::i; }
+    static Settings *instance() {
+        if (Settings::i == nullptr) Settings::i = new Settings();
+        return Settings::i;
+    }
     ~Settings() override;
 
 private:

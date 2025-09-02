@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public:
      * @brief ListView
      * @param parent
      */
-    explicit TaskView( QWidget *parent = nullptr ) : QListView( parent ) { this->setMouseTracking( true ); }
+    explicit TaskView(QWidget *parent = nullptr) : QListView(parent) { this->setMouseTracking(true); }
     ~TaskView() override = default;
 
 protected:
@@ -45,10 +45,10 @@ protected:
      * @brief resizeEvent
      * @param event
      */
-    void resizeEvent( QResizeEvent *event ) override { QListView::resizeEvent( event ); }
-    void mouseMoveEvent( QMouseEvent *event ) override;
-    void mouseReleaseEvent( QMouseEvent *event ) override;
-    void leaveEvent( QEvent *event ) override;
+    void resizeEvent(QResizeEvent *event) override { QListView::resizeEvent(event); }
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 
 private:
     QModelIndex m_focus;

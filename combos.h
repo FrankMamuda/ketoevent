@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,18 +35,21 @@ class Combos;
  * @brief The Combos class
  */
 class Combos final : public ModalWindow {
-    Q_DISABLE_COPY_MOVE( Combos )
+    Q_DISABLE_COPY_MOVE(Combos)
     Q_OBJECT
 
 public:
-    static Combos *instance() { if ( Combos::i == nullptr ) Combos::i = new Combos(); return Combos::i; }
+    static Combos *instance() {
+        if (Combos::i == nullptr) Combos::i = new Combos();
+        return Combos::i;
+    }
     ~Combos() override;
 
 protected:
-    void showEvent( QShowEvent *event ) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
-    void on_teamCombo_currentIndexChanged( int index );
+    void on_teamCombo_currentIndexChanged(int index);
 
 private:
     static Combos *i;

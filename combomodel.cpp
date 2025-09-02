@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
  * includes
  */
 #include "combomodel.h"
+#include "event.h"
 #include "log.h"
 #include "mainwindow.h"
 #include "task.h"
-#include "event.h"
 
 // singleton
 ComboModel *ComboModel::i = nullptr;
 
 // initialize colors
-QList<QRgb> ComboModel::colourList = std::move( QList<QRgb>() << 1073774592 << 1082195712 << 1082163200 << 1090453632 << 1082130687 << 1073774720 << 1073807232 );
+QList<QRgb> ComboModel::colourList = std::move(QList<QRgb>() << 1073774592 << 1082195712 << 1082163200 << 1090453632 << 1082130687 << 1073774720 << 1073807232);
 
 /**
  * @brief ComboModel::data
@@ -38,20 +38,17 @@ QList<QRgb> ComboModel::colourList = std::move( QList<QRgb>() << 1073774592 << 1
  * @param role
  * @return
  */
-QVariant ComboModel::data( const QModelIndex &index, int role ) const {
-    if ( !index.isValid())
-        return QVariant();
+QVariant ComboModel::data(const QModelIndex &index, int role) const {
+    if (!index.isValid()) return QVariant();
+    if (role == Qt::BackgroundRole) return QColor::fromRgba(this->colours[this->data(index, Qt::DisplayRole).toString()]);
 
-    if ( role == Qt::BackgroundRole )
-        return QColor::fromRgba( this->colours[this->data( index, Qt::DisplayRole ).toString()] );
-
-    return QStringListModel::data( index, role );
+    return QStringListModel::data(index, role);
 }
 
 /**
  * @brief ComboModel::reset
  */
-void ComboModel::reset( const Id &id ) {
+void ComboModel::reset(const Id &id) {
     QStringList list;
 
     // clear junk
@@ -60,46 +57,39 @@ void ComboModel::reset( const Id &id ) {
     this->colours.clear();
 
     // build comboId/taskName map and taskName/colour map
-    if ( id != Id::Invalid ) {
-        for ( int y = 0; y < Log::instance()->count(); y++ ) {
-            const Row log = Log::instance()->row( y );
-            if ( log == Row::Invalid )
-                return;
+    if (id != Id::Invalid) {
+        for (int y = 0; y < Log::instance()->count(); y++) {
+            const Row log = Log::instance()->row(y);
+            if (log == Row::Invalid) return;
 
-            if ( Log::instance()->teamId( log ) == id ) {
-                const Id comboId = Log::instance()->comboId( log );
-                const QString taskName( Task::instance()->name( Task::instance()->row( Log::instance()->taskId( log ))));
+            if (Log::instance()->teamId(log) == id) {
+                const Id comboId = Log::instance()->comboId(log);
+                const QString taskName(Task::instance()->name(Task::instance()->row(Log::instance()->taskId(log))));
 
-                if ( comboId > Id::Invalid ) {
-                    this->map.insert( comboId, taskName );
-                    this->colours[taskName] = ComboModel::colourForId( static_cast<int>( comboId ));
+                if (comboId > Id::Invalid) {
+                    this->map.insert(comboId, taskName);
+                    this->colours[taskName] = ComboModel::colourForId(static_cast<int>(comboId));
                 }
             }
         }
 
         // build display list
-        this->combos = static_cast<int>( this->map.uniqueKeys().count());
+        this->combos = static_cast<int>(this->map.uniqueKeys().count());
         this->points = 0;
-        const QList<Id>uniqueKeys( this->map.uniqueKeys());
-        for ( const Id &comboId : uniqueKeys ) {
-            const QStringList taskNames( this->map.values( comboId ));
-            const int count = static_cast<int>( taskNames.count());
+        const QList<Id> uniqueKeys(this->map.uniqueKeys());
+        for (const Id &comboId : uniqueKeys) {
+            const QStringList taskNames(this->map.values(comboId));
+            const int count = static_cast<int>(taskNames.count());
 
-            if ( count == 2 )
-                this->points += EventTable::DefaultComboOfTwo;
+            if (count == 2) this->points += EventTable::DefaultComboOfTwo;
+            if (count == 3) this->points += EventTable::DefaultComboOfThree;
+            if (count >= 4) this->points += EventTable::DefaultComboOfFourAndMore;
 
-            if ( count == 3 )
-                this->points += EventTable::DefaultComboOfThree;
-
-            if ( count >= 4 )
-                this->points += EventTable::DefaultComboOfFourAndMore;
-
-            for ( const QString &taskName : taskNames )
-                list << taskName;
+            for (const QString &taskName : taskNames) list << taskName;
         }
     }
 
     // set string list
-    this->setStringList( list );
+    this->setStringList(list);
     this->endResetModel();
 }

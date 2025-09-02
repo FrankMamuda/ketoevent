@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,17 +36,20 @@ class TaskEdit;
  */
 class TaskEdit final : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( TaskEdit )
+    Q_DISABLE_COPY_MOVE(TaskEdit)
 
 public:
-    static TaskEdit *instance() { if ( TaskEdit::i == nullptr ) TaskEdit::i = new TaskEdit(); return TaskEdit::i; }
+    static TaskEdit *instance() {
+        if (TaskEdit::i == nullptr) TaskEdit::i = new TaskEdit();
+        return TaskEdit::i;
+    }
     ~TaskEdit() override;
-    void reset( bool edit = false );
+    void reset(bool edit = false);
     [[nodiscard]] bool isEditing() const { return this->m_edit; }
 
 private:
     static TaskEdit *i;
-    explicit TaskEdit( QWidget *parent = nullptr );
+    explicit TaskEdit(QWidget *parent = nullptr);
     Ui::TaskEdit *ui;
     bool m_edit;
 };

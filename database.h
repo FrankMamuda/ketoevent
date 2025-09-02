@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 Armands Aleksejevs
+ * Copyright (C) 2018-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ class Table;
  * @brief The Database_ class
  */
 namespace Database_ {
-    const static QLoggingCategory Debug( "database" );
-    const static constexpr int null = 0;
-    [[maybe_unused]] static const constexpr int API = 1;
+const static QLoggingCategory Debug("database");
+const static constexpr int null = 0;
+[[maybe_unused]] static const constexpr int API = 1;
 }
 
 /**
@@ -45,16 +45,19 @@ namespace Database_ {
  */
 class Database final : public QObject {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( Database )
+    Q_DISABLE_COPY_MOVE(Database)
 
 public:
     /**
      * @brief instance
      * @return
      */
-    static Database *instance() { if ( Database::i == nullptr ) Database::i = new Database(); return Database::i; }
+    static Database *instance() {
+        if (Database::i == nullptr) Database::i = new Database();
+        return Database::i;
+    }
     ~Database() override;
-    bool add( Table *table );
+    bool add(Table *table);
 
     /**
      * @brief hasInitialised
@@ -71,21 +74,21 @@ public:
 public slots:
     void removeOrphanedEntries();
     void incrementCounter();
-    void attach( const QFileInfo &info );
+    void attach(const QFileInfo &info);
     void writeBackup();
     void resetCounter() { this->m_counter = 0; }
 
 private:
     static Database *i;
-    explicit Database( QObject *parent = nullptr );
-    bool testPath( const QString &path );
+    explicit Database(QObject *parent = nullptr);
+    bool testPath(const QString &path);
 
     /**
      * @brief setInitialised
      * @param initialised
      */
-    void setInitialised( bool initialised = true ) { this->m_initialised = initialised; }
-    QMap<QString, Table*> tables;
+    void setInitialised(bool initialised = true) { this->m_initialised = initialised; }
+    QMap<QString, Table *> tables;
     bool m_initialised = false;
     int m_counter = 0;
 };

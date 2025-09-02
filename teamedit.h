@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,12 +36,15 @@ class TeamEdit;
  */
 class TeamEdit final : public QWidget {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( TeamEdit )
+    Q_DISABLE_COPY_MOVE(TeamEdit)
 
 public:
-    static TeamEdit *instance() { if ( TeamEdit::i == nullptr ) TeamEdit::i = new TeamEdit(); return TeamEdit::i; }
+    static TeamEdit *instance() {
+        if (TeamEdit::i == nullptr) TeamEdit::i = new TeamEdit();
+        return TeamEdit::i;
+    }
     ~TeamEdit() override;
-    void reset( bool edit = false );
+    void reset(bool edit = false);
     [[nodiscard]] bool isEditing() const { return this->m_edit; }
 
 public slots:
@@ -49,7 +52,7 @@ public slots:
 
 private:
     static TeamEdit *i;
-    explicit TeamEdit( QWidget *parent = nullptr );
+    explicit TeamEdit(QWidget *parent = nullptr);
     Ui::TeamEdit *ui;
     bool m_edit;
 };

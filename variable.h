@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017-2018 Factory #12
- * Copyright (C) 2019-2020 Armands Aleksejevs
+ * Copyright (C) 2019-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,18 @@
 /*
  * includes
  */
-#include <QMap>
-#include <QString>
-#include <QMetaMethod>
-#include <QLoggingCategory>
-#include <QWidget>
 #include "variableentry.h"
+#include <QLoggingCategory>
+#include <QMap>
+#include <QMetaMethod>
+#include <QString>
+#include <QWidget>
 
 /**
  * @brief The Variable_ namespace
  */
 namespace Variable_ {
-    const static QLoggingCategory Debug( "variable" );
+const static QLoggingCategory Debug("variable");
 }
 
 //
@@ -46,7 +46,7 @@ class XMLTools;
  * @brief The Variable class
  */
 class Variable final : public QObject {
-    Q_DISABLE_COPY_MOVE( Variable )
+    Q_DISABLE_COPY_MOVE(Variable)
     Q_OBJECT
     friend class XMLTools;
     friend class Console;
@@ -60,14 +60,17 @@ public:
      * @brief instance
      * @return
      */
-    static Variable *instance() { if ( Variable::i == nullptr ) Variable::i = new Variable(); return Variable::i; }
+    static Variable *instance() {
+        if (Variable::i == nullptr) Variable::i = new Variable();
+        return Variable::i;
+    }
 
     /**
      * @brief contains
      * @param key
      * @return
      */
-    [[nodiscard]] bool contains( const QString &key ) const { return this->list.contains( key ); }
+    [[nodiscard]] bool contains(const QString &key) const { return this->list.contains(key); }
 
     /**
      * @brief value
@@ -75,12 +78,10 @@ public:
      * @param defaultValue
      * @return
      */
-    template<typename T>
-    static T value( const QString &key, bool defaultValue = false ) {
-        if ( !Variable::instance()->contains( key ))
-            return QVariant().value<T>();
-        if ( defaultValue ) return qvariant_cast<T>( Variable::instance()->list[key]->defaultValue());
-        return qvariant_cast<T>( Variable::instance()->list[key]->value());
+    template <typename T> static T value(const QString &key, bool defaultValue = false) {
+        if (!Variable::instance()->contains(key)) return QVariant().value<T>();
+        if (defaultValue) return qvariant_cast<T>(Variable::instance()->list[key]->defaultValue());
+        return qvariant_cast<T>(Variable::instance()->list[key]->value());
     }
 
     /**
@@ -89,9 +90,7 @@ public:
      * @param defaultValue
      * @return
      */
-    [[maybe_unused]] Q_INVOKABLE static int integer( const QString &key, bool defaultValue = false ) {
-        return Variable::value<int>( key, defaultValue );
-    }
+    [[maybe_unused]] Q_INVOKABLE static int integer(const QString &key, bool defaultValue = false) { return Variable::value<int>(key, defaultValue); }
 
     /**
      * @brief decimalValue
@@ -99,9 +98,7 @@ public:
      * @param defaultValue
      * @return
      */
-    [[maybe_unused]] Q_INVOKABLE static qreal decimalValue( const QString &key, bool defaultValue = false ) {
-        return Variable::value<qreal>( key, defaultValue );
-    }
+    [[maybe_unused]] Q_INVOKABLE static qreal decimalValue(const QString &key, bool defaultValue = false) { return Variable::value<qreal>(key, defaultValue); }
 
     /**
      * @brief isEnabled
@@ -109,9 +106,7 @@ public:
      * @param defaultValue
      * @return
      */
-    Q_INVOKABLE static bool isEnabled( const QString &key, bool defaultValue = false ) {
-        return Variable::value<bool>( key, defaultValue );
-    }
+    Q_INVOKABLE static bool isEnabled(const QString &key, bool defaultValue = false) { return Variable::value<bool>(key, defaultValue); }
 
     /**
      * @brief isDisabled
@@ -119,9 +114,7 @@ public:
      * @param defaultValue
      * @return
      */
-    Q_INVOKABLE static bool isDisabled( const QString &key, bool defaultValue = false ) {
-        return !Variable::isEnabled( key, defaultValue );
-    }
+    Q_INVOKABLE static bool isDisabled(const QString &key, bool defaultValue = false) { return !Variable::isEnabled(key, defaultValue); }
 
     /**
      * @brief string
@@ -129,9 +122,7 @@ public:
      * @param defaultValue
      * @return
      */
-    Q_INVOKABLE static QString string( const QString &key, bool defaultValue = false ) {
-        return Variable::value<QString>( key, defaultValue );
-    }
+    Q_INVOKABLE static QString string(const QString &key, bool defaultValue = false) { return Variable::value<QString>(key, defaultValue); }
 
     /**
      * @brief compressedString
@@ -139,8 +130,8 @@ public:
      * @param defaultValue
      * @return
      */
-    static QString compressedString( const QString &key, bool defaultValue = false ) {
-        return Variable::uncompressString( Variable::value<QString>( key, defaultValue ));
+    static QString compressedString(const QString &key, bool defaultValue = false) {
+        return Variable::uncompressString(Variable::value<QString>(key, defaultValue));
     }
 
     /**
@@ -149,9 +140,8 @@ public:
      * @param defaultValue
      * @return
      */
-    static QByteArray compressedByteArray( const QString &key, bool defaultValue = false ) {
-        return qUncompress(
-                QByteArray::fromBase64( Variable::string( key, defaultValue ).toUtf8().constData()));
+    static QByteArray compressedByteArray(const QString &key, bool defaultValue = false) {
+        return qUncompress(QByteArray::fromBase64(Variable::string(key, defaultValue).toUtf8().constData()));
     }
 
     /**
@@ -159,20 +149,16 @@ public:
      * @param string
      * @return
      */
-    [[nodiscard]]
-    static QString compressString( const QString &string ) {
-        return qCompress( QByteArray( string.toUtf8().constData())).toBase64().constData();
-    }
+    [[nodiscard]] static QString compressString(const QString &string) { return qCompress(QByteArray(string.toUtf8().constData())).toBase64().constData(); }
 
     /**
      * @brief uncompressString
      * @param string
      * @return
      */
-    [[nodiscard]]
-    static QString uncompressString( const QString &string ) {
-        if ( string.isEmpty()) return QString();
-        return qUncompress( QByteArray::fromBase64( string.toUtf8().constData())).constData();
+    [[nodiscard]] static QString uncompressString(const QString &string) {
+        if (string.isEmpty()) return QString();
+        return qUncompress(QByteArray::fromBase64(string.toUtf8().constData())).constData();
     }
 
     /**
@@ -180,14 +166,12 @@ public:
      * @param key
      * @param value
      */
-    template<typename T>
-    void updateConnections( const QString &key, const T &value ) {
-        if ( Variable::instance()->slotList.contains( key )) {
+    template <typename T> void updateConnections(const QString &key, const T &value) {
+        if (Variable::instance()->slotList.contains(key)) {
             QPair<QObject *, int> slot;
 
             slot = Variable::instance()->slotList[key];
-            slot.first->metaObject()->method( slot.second ).invoke( slot.first, Qt::QueuedConnection,
-                                                                    Q_ARG( QVariant, value ));
+            slot.first->metaObject()->method(slot.second).invoke(slot.first, Qt::QueuedConnection, Q_ARG(QVariant, value));
         }
     }
 
@@ -196,16 +180,16 @@ public:
      * @param var
      * @return
      */
-    [[nodiscard]] static QVariant validate( const QVariant &value ) {
-        QVariant var( value );
+    [[nodiscard]] static QVariant validate(const QVariant &value) {
+        QVariant var(value);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-        if ( var.typeId() == QMetaType::QString ) {
+        if (var.typeId() == QMetaType::QString) {
 #else
-        if ( var.type() == QVariant::String ) {
+        if (var.type() == QVariant::String) {
 #endif
-            if ( !QString::compare( var.toString(), "true" )) {
+            if (!QString::compare(var.toString(), "true")) {
                 var = true;
-            } else if ( !QString::compare( var.toString(), "false" )) {
+            } else if (!QString::compare(var.toString(), "false")) {
                 var = false;
             }
         }
@@ -218,26 +202,24 @@ public:
      * @param value
      * @param initial
      */
-    template<typename T>
-    static void setValue( const QString &key, const T &value, bool initial = false ) {
-        QVariant var( Variable::validate( value ));
+    template <typename T> static void setValue(const QString &key, const T &value, bool initial = false) {
+        QVariant var(Variable::validate(value));
 
-        if ( initial ) {
+        if (initial) {
             // initial read from configuration file
-            Variable::instance()->list[key]->setValue( var );
+            Variable::instance()->list[key]->setValue(var);
         } else {
             QVariant currentValue;
 
-            if ( !Variable::instance()->contains( key ))
-                return;
+            if (!Variable::instance()->contains(key)) return;
 
             currentValue = Variable::instance()->list[key]->value();
 
             // any subsequent value changes emit a valueChanged signal
-            if ( value != currentValue ) {
-                Variable::instance()->list[key]->setValue( var );
-                emit Variable::instance()->valueChanged( key );
-                Variable::instance()->updateConnections( key, var );
+            if (value != currentValue) {
+                Variable::instance()->list[key]->setValue(var);
+                emit Variable::instance()->valueChanged(key);
+                Variable::instance()->updateConnections(key, var);
             }
         }
     }
@@ -248,9 +230,8 @@ public:
      * @param value
      * @param flags
      */
-    template<typename T>
-    static void add( const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags ) {
-        Variable::add<Var, T>( key, value, flags );
+    template <typename T> static void add(const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags) {
+        Variable::add<Var, T>(key, value, flags);
     }
 
     /**
@@ -259,12 +240,10 @@ public:
      * @param value
      * @param flags
      */
-    template<class Container, typename T>
-    static void add( const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags ) {
-        const QVariant var( Variable::validate( value ));
+    template <class Container, typename T> static void add(const QString &key, const T &value, Var::Flags flags = Var::Flag::NoFlags) {
+        const QVariant var(Variable::validate(value));
 
-        if ( !Variable::instance()->list.contains( key ) && !key.isEmpty())
-            Variable::instance()->list[key] = Container( key, var, flags ).copy();
+        if (!Variable::instance()->list.contains(key) && !key.isEmpty()) Variable::instance()->list[key] = Container(key, var, flags).copy();
     }
 
 public slots:
@@ -273,31 +252,29 @@ public slots:
      * @param key
      * @param value
      */
-    Q_INVOKABLE static void setInteger( const QString &key, int value ) { Variable::setValue<int>( key, value ); }
+    Q_INVOKABLE static void setInteger(const QString &key, int value) { Variable::setValue<int>(key, value); }
 
     /**
      * @brief setDecimalValue
      * @param key
      * @param value
      */
-    Q_INVOKABLE static void setDecimalValue( const QString &key, qreal value ) { Variable::setValue<qreal>( key, value ); }
+    Q_INVOKABLE static void setDecimalValue(const QString &key, qreal value) { Variable::setValue<qreal>(key, value); }
 
     /**
      * @brief setCompressedString
      * @param key
      * @param string
      */
-    static void setCompressedString( const QString &key, const QString &string ) {
-        Variable::setValue<QString>( key, Variable::compressString( string ));
-    }
+    static void setCompressedString(const QString &key, const QString &string) { Variable::setValue<QString>(key, Variable::compressString(string)); }
 
     /**
      * @brief setCompressedByteArray
      * @param key
      * @param byteArray
      */
-    static void setCompressedByteArray( const QString &key, const QByteArray &byteArray ) {
-        Variable::setValue<QString>( key, qCompress( byteArray ).toBase64().constData());
+    static void setCompressedByteArray(const QString &key, const QByteArray &byteArray) {
+        Variable::setValue<QString>(key, qCompress(byteArray).toBase64().constData());
     }
 
     /**
@@ -305,39 +282,36 @@ public slots:
      * @param key
      * @param value
      */
-    Q_INVOKABLE static void setEnabled( const QString &key, bool value ) { Variable::setValue<bool>( key, value ); }
+    Q_INVOKABLE static void setEnabled(const QString &key, bool value) { Variable::setValue<bool>(key, value); }
 
     /**
      * @brief enable
      * @param key
      */
-    Q_INVOKABLE static void enable( const QString &key ) { Variable::setValue<bool>( key, true ); }
+    Q_INVOKABLE static void enable(const QString &key) { Variable::setValue<bool>(key, true); }
 
     /**
      * @brief disable
      * @param key
      */
-    Q_INVOKABLE static void disable( const QString &key ) { Variable::setValue<bool>( key, false ); }
+    Q_INVOKABLE static void disable(const QString &key) { Variable::setValue<bool>(key, false); }
 
     /**
      * @brief setString
      * @param key
      * @param string
      */
-    Q_INVOKABLE static void setString( const QString &key, const QString &string ) {
-        Variable::setValue<QString>( key, string );
-    }
+    Q_INVOKABLE static void setString(const QString &key, const QString &string) { Variable::setValue<QString>(key, string); }
 
     /**
      * @brief reset
      * @param key
      */
-    static void reset( const QString &key ) {
-        if ( Variable::instance()->contains( key ))
-            Variable::setValue<QVariant>( key, Variable::value<QVariant>( key, true ));
+    static void reset(const QString &key) {
+        if (Variable::instance()->contains(key)) Variable::setValue<QVariant>(key, Variable::value<QVariant>(key, true));
     }
-    void bind( const QString &key, const QObject *receiver, const char *method );
-    QString bind( const QString &key, QObject *object );
+    void bind(const QString &key, const QObject *receiver, const char *method);
+    QString bind(const QString &key, QObject *object);
 
     /**
      * @brief bind
@@ -345,22 +319,22 @@ public slots:
      * @param widget
      * @return
      */
-    QString bind( const QString &key, QWidget *widget ) { return this->bind( key, qobject_cast<QObject *>( widget )); }
-    void unbind( const QString &key, QObject *object = nullptr );
+    QString bind(const QString &key, QWidget *widget) { return this->bind(key, qobject_cast<QObject *>(widget)); }
+    void unbind(const QString &key, QObject *object = nullptr);
 
     /**
      * @brief update
      * @param key
      */
-    void update( const QString &key ) { emit this->valueChanged( key ); }
+    void update(const QString &key) { emit this->valueChanged(key); }
 
 signals:
-    void valueChanged( const QString &key );
-    void widgetChanged( const QString &key, Widget *widget, const QVariant &value );
+    void valueChanged(const QString &key);
+    void widgetChanged(const QString &key, Widget *widget, const QVariant &value);
 
 private:
     static Variable *i;
     QMap<QString, QSharedPointer<Var>> list;
     QMultiMap<QString, Widget *> boundVariables;
-    QMap<QString, QPair<QObject *, int> > slotList;
+    QMap<QString, QPair<QObject *, int>> slotList;
 };

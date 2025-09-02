@@ -34,13 +34,8 @@ public:
     /**
      * @brief The Flag enum
      */
-    enum class Flag {
-        NoFlags = 0x0,
-        ReadOnly = 0x1,
-        NoSave = 0x2,
-        Hidden = 0x4
-    };
-    Q_DECLARE_FLAGS( Flags, Flag )
+    enum class Flag { NoFlags = 0x0, ReadOnly = 0x1, NoSave = 0x2, Hidden = 0x4 };
+    Q_DECLARE_FLAGS(Flags, Flag)
 
     /**
      * @brief Var
@@ -48,9 +43,11 @@ public:
      * @param defaultValue
      * @param flags
      */
-    explicit Var( QString key = QString(), const QVariant &defaultValue = QVariant(),
-                  Flags flags = Flag::NoFlags ) : m_key( std::move( key )), m_value( defaultValue ), m_defaultValue( defaultValue ),
-                                                  m_flags( flags ) {}
+    explicit Var(QString key = QString(), const QVariant &defaultValue = QVariant(), Flags flags = Flag::NoFlags)
+        : m_key(std::move(key))
+        , m_value(defaultValue)
+        , m_defaultValue(defaultValue)
+        , m_flags(flags) {}
     virtual ~Var() = default;
 
     /**
@@ -81,17 +78,17 @@ public:
      * @brief setValue
      * @param value
      */
-    virtual void setValue( const QVariant &value ) { m_value = value; }
+    virtual void setValue(const QVariant &value) { m_value = value; }
 
     // copy op
-    Var &operator=( const Var & ) = default;
-    Var( const Var & ) = default;
+    Var &operator=(const Var &) = default;
+    Var(const Var &) = default;
 
     /**
      * @brief copy
      * @return
      */
-    [[nodiscard]] virtual QSharedPointer<Var> copy() const { return QSharedPointer<Var>( new Var( *this )); }
+    [[nodiscard]] virtual QSharedPointer<Var> copy() const { return QSharedPointer<Var>(new Var(*this)); }
 
 private:
     QString m_key;
@@ -101,4 +98,4 @@ private:
 };
 
 // declare flags
-Q_DECLARE_OPERATORS_FOR_FLAGS( Var::Flags )
+Q_DECLARE_OPERATORS_FOR_FLAGS(Var::Flags)

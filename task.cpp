@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
 #include "task.h"
 #include "database.h"
 #include "event.h"
-#include "mainwindow.h"
 #include "log.h"
+#include "mainwindow.h"
 #include "team.h"
 #include <QFont>
 #include <QSqlQuery>
@@ -35,28 +35,28 @@ Task *Task::i = nullptr;
 /**
  * @brief Task::Task
  */
-Task::Task() : Table( "tasks" ) {
-    PRIMARY_FIELD( ID );
-    FIELD( Name,     QMetaType::QString );
-    FIELD( Points,   QMetaType::Int );
-    FIELD( Mult,     QMetaType::Int );
-    FIELD( Style,    QMetaType::Int );
-    FIELD( Type,     QMetaType::Int );
-    FIELD( Order_,   QMetaType::Int );
-    FIELD( Event,    QMetaType::Int );
-    FIELD( Desc,     QMetaType::QString );
-    FIELD( Pattern,  QMetaType::QString );
-    this->addUniqueConstraint( QStringList() << IDTOFIELD( Name ) << IDTOFIELD( Event ));
+Task::Task() : Table("tasks") {
+    PRIMARY_FIELD(ID);
+    FIELD(Name, QMetaType::QString);
+    FIELD(Points, QMetaType::Int);
+    FIELD(Mult, QMetaType::Int);
+    FIELD(Style, QMetaType::Int);
+    FIELD(Type, QMetaType::Int);
+    FIELD(Order_, QMetaType::Int);
+    FIELD(Event, QMetaType::Int);
+    FIELD(Desc, QMetaType::QString);
+    FIELD(Pattern, QMetaType::QString);
+    this->addUniqueConstraint(QStringList() << IDTOFIELD(Name) << IDTOFIELD(Event));
 
     // map types and styles
-    this->types[Types::Check]     = QObject::tr( "Check" );
-    this->types[Types::Multi]     = QObject::tr( "Multi" );
-    this->styles[Styles::Regular] = QObject::tr( "Regular" );
-    this->styles[Styles::Bold]    = QObject::tr( "Bold" );
-    this->styles[Styles::Italic]  = QObject::tr( "Italic" );
+    this->types[Types::Check] = QObject::tr("Check");
+    this->types[Types::Multi] = QObject::tr("Multi");
+    this->styles[Styles::Regular] = QObject::tr("Regular");
+    this->styles[Styles::Bold] = QObject::tr("Bold");
+    this->styles[Styles::Italic] = QObject::tr("Italic");
 
     // sort by order
-    this->setSort( Task::Order_, Qt::AscendingOrder );
+    this->setSort(Task::Order_, Qt::AscendingOrder);
 }
 
 /**
@@ -68,34 +68,22 @@ Task::Task() : Table( "tasks" ) {
  * @param style
  * @param description
  */
-Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
-               Task::Styles style, const QString &description, const QString &pattern ) {
+Row Task::add(const QString &taskName, int points, int multi, Task::Types type, Task::Styles style, const QString &description, const QString &pattern) {
     int y, highest = -1;
 
     // failsafe
     const Row event = MainWindow::instance()->currentEvent();
-    if ( event == Row::Invalid ) {
-        qDebug() << this->tr( "no active event, aborting" );
+    if (event == Row::Invalid) {
+        qDebug() << this->tr("no active event, aborting");
         return Row::Invalid;
     }
 
     // find highest order
-    for ( y = 0; y < this->count(); y++ )
-        highest = qMax( highest, this->order( this->row( y )));
+    for (y = 0; y < this->count(); y++) highest = qMax(highest, this->order(this->row(y)));
 
     // add a new task
-    return Table::add( QVariantList() <<
-                       Database_::null <<
-                       taskName <<
-                       points <<
-                       multi <<
-                       static_cast<int>( style ) <<
-                       static_cast<int>( type ) <<
-                       highest + 1 <<
-                       static_cast<int>( Event::instance()->id( event )) <<
-                       description <<
-                       pattern
-                       );
+    return Table::add(QVariantList() << Database_::null << taskName << points << multi << static_cast<int>(style) << static_cast<int>(type) << highest + 1
+                                     << static_cast<int>(Event::instance()->id(event)) << description << pattern);
 }
 
 /**
@@ -104,43 +92,40 @@ Row Task::add( const QString &taskName, int points, int multi, Task::Types type,
  * @param role
  * @return
  */
-QVariant Task::data( const QModelIndex &index, int role ) const {
-    const Row row = this->row( index );
+QVariant Task::data(const QModelIndex &index, int role) const {
+    const Row row = this->row(index);
 
-    if ( role == Qt::FontRole && index.isValid() && row != Row::Invalid && index.column() == Task::Name ) {
-        QFont font( Table::data( index, Qt::FontRole ).value<QFont>());
+    if (role == Qt::FontRole && index.isValid() && row != Row::Invalid && index.column() == Task::Name) {
+        QFont font(Table::data(index, Qt::FontRole).value<QFont>());
 
-        if ( Task::instance()->style( row ) == Styles::Italic ) {
-            font.setItalic( true );
+        if (Task::instance()->style(row) == Styles::Italic) {
+            font.setItalic(true);
             return font;
         }
 
-        if ( Task::instance()->style( row ) == Styles::Bold ) {
-            font.setBold( true );
+        if (Task::instance()->style(row) == Styles::Bold) {
+            font.setBold(true);
             return font;
         }
     }
 
-    if ( role == Qt::DisplayRole && index.column() == Task::Type && row != Row::Invalid ) {
-        if ( Task::instance()->type( row ) == Types::Check )
-            return Task::tr( "\u2713" );
-        if ( Task::instance()->type( row ) == Types::Multi )
-            return Task::tr( "Multi" );
+    if (role == Qt::DisplayRole && index.column() == Task::Type && row != Row::Invalid) {
+        if (Task::instance()->type(row) == Types::Check) return Task::tr("\u2713");
+        if (Task::instance()->type(row) == Types::Multi) return Task::tr("Multi");
     }
 
-    if ( role == Qt::DisplayRole && index.column() == Task::Mult && row != Row::Invalid ) {
-        if ( Task::instance()->type( row ) != Types::Multi )
-            return "";
-        if ( Task::instance()->type( row ) == Types::Multi )
-            return QString( "%1\u00d7%2=%3" ).arg( QString::number( Task::instance()->points( row )), QString::number( Task::instance()->multi( row )), QString::number( Task::instance()->points( row ) * Task::instance()->multi( row )));
+    if (role == Qt::DisplayRole && index.column() == Task::Mult && row != Row::Invalid) {
+        if (Task::instance()->type(row) != Types::Multi) return "";
+        if (Task::instance()->type(row) == Types::Multi)
+            return QString("%1\u00d7%2=%3")
+                .arg(QString::number(Task::instance()->points(row)), QString::number(Task::instance()->multi(row)),
+                    QString::number(Task::instance()->points(row) * Task::instance()->multi(row)));
     }
 
-    if ( role == Qt::TextAlignmentRole && index.column() != Task::Name && index.column() != Task::Desc )
-        return Qt::AlignCenter;
+    if (role == Qt::TextAlignmentRole && index.column() != Task::Name && index.column() != Task::Desc) return Qt::AlignCenter;
 
-    return Table::data( index, role );
+    return Table::data(index, role);
 }
-
 
 /**
  * @brief Task::headerData
@@ -149,35 +134,33 @@ QVariant Task::data( const QModelIndex &index, int role ) const {
  * @param role
  * @return
  */
-QVariant Task::headerData( int section, Qt::Orientation orientation, int role ) const {
-    if ( role == Qt::DisplayRole ) {
-        switch ( section ) {
+QVariant Task::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (role == Qt::DisplayRole) {
+        switch (section) {
 
-        case Name: return Event::tr( "Name" );
-        case Points: return Event::tr( "Points" );
-        case Mult: return Event::tr( "Multi" );
-        case Desc: return Event::tr( "Description" );
-        case Type: return Event::tr( "Type" );
+        case Name: return Event::tr("Name");
+        case Points: return Event::tr("Points");
+        case Mult: return Event::tr("Multi");
+        case Desc: return Event::tr("Description");
+        case Type: return Event::tr("Type");
 
         default:
         case Style:
         case Order_:
         case Event:
-        case ID:
-            break;
+        case ID: break;
         }
     }
 
-    if ( role == Qt::TextAlignmentRole )
-        return Qt::AlignCenter;
+    if (role == Qt::TextAlignmentRole) return Qt::AlignCenter;
 
-    if ( role == Qt::FontRole ) {
+    if (role == Qt::FontRole) {
         QFont font;
-        font.setBold( true );
+        font.setBold(true);
         return font;
     }
 
-    return Table::headerData( section, orientation, role );
+    return Table::headerData(section, orientation, role);
 }
 
 /**
@@ -185,11 +168,11 @@ QVariant Task::headerData( int section, Qt::Orientation orientation, int role ) 
  * @param row
  * @return
  */
-int Task::multiplier( const Row &row ) const {
+int Task::multiplier(const Row &row) const {
     bool ok;
-    const QPair<Id, Id> ids( getIds( row, &ok ));
+    const QPair<Id, Id> ids(getIds(row, &ok));
 
-    return ok ? Log::instance()->multiplier( ids.first, ids.second ) : 0;
+    return ok ? Log::instance()->multiplier(ids.first, ids.second) : 0;
 }
 
 /**
@@ -197,14 +180,14 @@ int Task::multiplier( const Row &row ) const {
  * @param row
  * @return
  */
-Id Task::comboId( const Row &row ) const {
+Id Task::comboId(const Row &row) const {
     bool ok;
-    const QPair<Id, Id> ids( getIds( row, &ok ));
+    const QPair<Id, Id> ids(getIds(row, &ok));
 
-    return ok ? Log::instance()->comboId( ids.first, ids.second ) : Id::Invalid;
+    return ok ? Log::instance()->comboId(ids.first, ids.second) : Id::Invalid;
 
     // NOTE: could replace with a value from extended (LOG) table (could increase performance marginally)
-    //return static_cast<Id>( this->value( row, ComboID ).toInt());
+    // return static_cast<Id>( this->value( row, ComboID ).toInt());
 }
 
 /**
@@ -213,24 +196,20 @@ Id Task::comboId( const Row &row ) const {
  * @param ok
  * @return
  */
-QPair<Id, Id> Task::getIds( const Row &row, bool *ok ) const {
-    QPair<Id, Id> out( Id::Invalid, Id::Invalid );
+QPair<Id, Id> Task::getIds(const Row &row, bool *ok) const {
+    QPair<Id, Id> out(Id::Invalid, Id::Invalid);
     *ok = false;
 
-    if ( row == Row::Invalid )
-        return out;
+    if (row == Row::Invalid) return out;
 
     const Row team = MainWindow::instance()->currentTeam();
-    if ( team == Row::Invalid )
-        return out;
+    if (team == Row::Invalid) return out;
 
-    out.second = Team::instance()->id( team );
-    if ( out.second == Id::Invalid )
-        return out;
+    out.second = Team::instance()->id(team);
+    if (out.second == Id::Invalid) return out;
 
-    out.first = this->id( row );
-    if ( out.first == Id::Invalid )
-        return out;
+    out.first = this->id(row);
+    if (out.first == Id::Invalid) return out;
 
     *ok = true;
     return out;
@@ -243,11 +222,8 @@ void Task::removeOrphanedEntries() {
     QSqlQuery query;
 
     // remove orphaned tasks
-    query.exec( QString( "DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)" )
-                .arg( this->tableName(),
-                      this->fieldName( Event ),
-                      Event::instance()->fieldName( Event::ID ),
-                      Event::instance()->tableName()));
+    query.exec(QString("DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)")
+                   .arg(this->tableName(), this->fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
     this->select();
 }
 
@@ -256,12 +232,11 @@ void Task::removeOrphanedEntries() {
  * @param row
  * @param value
  */
-void Task::setMultiplier( const Row &row, int value ) {
+void Task::setMultiplier(const Row &row, int value) {
     bool ok;
-    QPair<Id, Id> ids( getIds( row, &ok ));
+    QPair<Id, Id> ids(getIds(row, &ok));
 
-    if ( ok )
-        Log::instance()->setMultiplier( value, ids.first, ids.second );
+    if (ok) Log::instance()->setMultiplier(value, ids.first, ids.second);
 }
 
 /**
@@ -269,13 +244,11 @@ void Task::setMultiplier( const Row &row, int value ) {
  * @param row
  * @param value
  */
-bool Task::validate( const Row &row, int value ) const {
-    if ( this->type( row ) != Task::Types::Multi )
-        return true;
+bool Task::validate(const Row &row, int value) const {
+    if (this->type(row) != Task::Types::Multi) return true;
 
-    const QString &pattern( this->pattern( row ));
-    if ( pattern.isEmpty())
-        return true;
+    const QString &pattern(this->pattern(row));
+    if (pattern.isEmpty()) return true;
 
     struct Validator {
         QList<int> integers;
@@ -288,50 +261,42 @@ bool Task::validate( const Row &row, int value ) const {
     };
 
     Validator validator;
-    const QStringList patterns( pattern.split( ";" ));
+    const QStringList patterns(pattern.split(";"));
 
-    for ( auto p : patterns ) {
+    for (auto p : patterns) {
         bool ok;
-        const int value = p.toInt( &ok );
-        if ( ok ) {
+        const int value = p.toInt(&ok);
+        if (ok) {
             validator.integers << value;
         } else {
-            QStringList range( p.split( "->" ));
-            if ( range.count() != 2 )
-                continue;
+            QStringList range(p.split("->"));
+            if (range.count() != 2) continue;
 
-            const int vmin = range.at( 0 ).toInt( &ok );
-            if ( !ok )
-                continue;
+            const int vmin = range.at(0).toInt(&ok);
+            if (!ok) continue;
 
-            const int vmax = range.at( 1 ).toInt( &ok );
-            if ( !ok )
-                continue;
-
-            if ( vmin >= vmax )
-                continue;
+            const int vmax = range.at(1).toInt(&ok);
+            if (!ok) continue;
+            if (vmin >= vmax) continue;
 
             Validator::Range r { vmin, vmax };
             validator.ranges << r;
         }
     }
 
-    auto validate = [=]( int num ) {
-        if ( validator.integers.isEmpty() && validator.ranges.isEmpty())
-            return true;
+    auto validate = [=](int num) {
+        if (validator.integers.isEmpty() && validator.ranges.isEmpty()) return true;
 
-        if ( validator.integers.contains( num ))
-            return true;
+        if (validator.integers.contains(num)) return true;
 
-        for ( const auto r : validator.ranges ) {
-            if ( num >= r.min && num <= r.max )
-                return true;
+        for (const auto r : validator.ranges) {
+            if (num >= r.min && num <= r.max) return true;
         }
 
         return false;
     };
 
-    return validate( value );
+    return validate(value);
 }
 
 /**
@@ -343,61 +308,49 @@ QString Task::selectStatement() const {
     QString statement;
 
     // return default statment if database has not been initialized
-    if ( !Database::instance()->hasInitialised() || !this->hasInitialised())
-        return Table::selectStatement();
+    if (!Database::instance()->hasInitialised() || !this->hasInitialised()) return Table::selectStatement();
 
     // validate team row
     const Row team = MainWindow::instance()->currentTeam();
-    if ( team == Row::Invalid )
-        return statement;
+    if (team == Row::Invalid) return statement;
 
     // validate team id
-    const Id teamId = Team::instance()->id( team );
-    if ( teamId == Id::Invalid )
-        return statement;
+    const Id teamId = Team::instance()->id(team);
+    if (teamId == Id::Invalid) return statement;
 
     // get table name from LOGS
-    const QString logs( Log::instance()->tableName());
-    if ( logs.isEmpty())
-        return statement;
+    const QString logs(Log::instance()->tableName());
+    if (logs.isEmpty()) return statement;
 
     // we are making a different statement to include logs
-    statement = QString( "SELECT" );
+    statement = QString("SELECT");
 
     // add fields from TASK table
-    for ( y = 0; y < Task::Fields::Count; y++ ) {
-        const QString field( this->fieldName( y ));
-        if ( field.isEmpty())
-            return "";
+    for (y = 0; y < Task::Fields::Count; y++) {
+        const QString field(this->fieldName(y));
+        if (field.isEmpty()) return "";
 
-        statement.append( QString( " %1.%2," ).arg( this->tableName(), field ));
+        statement.append(QString(" %1.%2,").arg(this->tableName(), field));
     }
 
     // append fields from LOG table
-    statement.append( QString( " %1.%2," ).arg( logs, Log::instance()->fieldName( Log::Fields::Multi )));
-    statement.append( QString( " %1.%2" ).arg( logs, Log::instance()->fieldName( Log::Fields::Combo )));
+    statement.append(QString(" %1.%2,").arg(logs, Log::instance()->fieldName(Log::Fields::Multi)));
+    statement.append(QString(" %1.%2").arg(logs, Log::instance()->fieldName(Log::Fields::Combo)));
 
     // append table name
-    statement.append( QString( " FROM %1" ).arg( this->tableName()));
+    statement.append(QString(" FROM %1").arg(this->tableName()));
 
     // FROM table statement
-    const QString leftTable( QString( "( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1" )
-                             .arg( logs,
-                                   Log::instance()->fieldName( Log::Fields::Team ),
-                                   QString::number( static_cast<int>( teamId )),
-                                   Log::instance()->fieldName( Log::Fields::Task )));
+    const QString leftTable(QString("( SELECT * FROM %1 WHERE %1.%2=%3 GROUP BY %1.%4 ) AS %1")
+                                .arg(logs, Log::instance()->fieldName(Log::Fields::Team), QString::number(static_cast<int>(teamId)),
+                                    Log::instance()->fieldName(Log::Fields::Task)));
 
     // append JOIN statement from LOGS table
-    statement.append( QString( " LEFT JOIN %1 ON %2.%3=%4.%5" )
-                      .arg( leftTable,
-                            logs,
-                            Log::instance()->fieldName( Log::Fields::Task ),
-                            this->tableName(),
-                            this->fieldName( ID )));
+    statement.append(
+        QString(" LEFT JOIN %1 ON %2.%3=%4.%5").arg(leftTable, logs, Log::instance()->fieldName(Log::Fields::Task), this->tableName(), this->fieldName(ID)));
 
     // append filter if any
-    if ( !this->filter().isEmpty())
-        statement.append( QString( " WHERE %1" ).arg( this->filter()));
+    if (!this->filter().isEmpty()) statement.append(QString(" WHERE %1").arg(this->filter()));
 
     // remove trailing whitespace
     statement = statement.simplified();

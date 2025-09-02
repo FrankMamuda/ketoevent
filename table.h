@@ -21,10 +21,10 @@
 /*
  * includes
  */
-#include <QSqlRelationalTableModel>
 #include <QSharedPointer>
-#include <QSqlRecord>
 #include <QSqlField>
+#include <QSqlRecord>
+#include <QSqlRelationalTableModel>
 
 //
 // classes
@@ -42,27 +42,22 @@ namespace Database_ {
 /**
  * @brief The Id enum strong-typed id
  */
-enum class Id : int {
-    Invalid = -1
-};
-QDebug operator<<( QDebug debug, const Id &id );
-Q_DECLARE_METATYPE( Id )
+enum class Id : int { Invalid = -1 };
+QDebug operator<<(QDebug debug, const Id &id);
+Q_DECLARE_METATYPE(Id)
 
 /**
  * @brief The Row enum strong-typed row
  */
-enum class Row : int {
-    Invalid = -1
-};
-QDebug operator<<( QDebug debug, const Row &row );
+enum class Row : int { Invalid = -1 };
+QDebug operator<<(QDebug debug, const Row &row);
 
-Q_DECLARE_METATYPE( Row )
+Q_DECLARE_METATYPE(Row)
 
 /*
  * FIELD macro generates a lowercase fieldName from field index (enum)
  */
 // field map
-
 #define FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type )
 #define IDTOFIELD( fieldId ) QString( #fieldId ).toLower()
 #define UNIQUE_FIELD( fieldId, type ) this->appendField( QString( #fieldId ).toLower(), QMetaType::type, true )
@@ -76,21 +71,19 @@ Q_DECLARE_METATYPE( Row )
  */
 class Table : public QSqlTableModel {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( Table )
+    Q_DISABLE_COPY_MOVE(Table)
     friend class Database;
 
 public:
     /**
      * @brief The Roles enum
      */
-    enum Roles {
-        IDRole = Qt::UserRole
-    };
-    Q_ENUM( Roles )
+    enum Roles { IDRole = Qt::UserRole };
+    Q_ENUM(Roles)
 
-    explicit Table( const QString &tableName = QString()) { this->setTable( tableName ); }
+    explicit Table(const QString &tableName = QString()) { this->setTable(tableName); }
     ~Table() override {
-        this->setValid( false );
+        this->setValid(false);
         this->clear();
     }
 
@@ -105,10 +98,10 @@ public:
      * @return
      */
     [[nodiscard]] bool hasPrimaryField() const { return this->primaryFieldIndex != -1; }
-    Q_INVOKABLE [[nodiscard]] int count() const;
+    [[nodiscard]] Q_INVOKABLE int count() const;
 
-    [[nodiscard]] virtual QVariant value( const Row &row, int fieldId ) const;
-    [[nodiscard]] virtual QVariant value( const Id &id, int fieldId ) const;
+    [[nodiscard]] virtual QVariant value(const Row &row, int fieldId) const;
+    [[nodiscard]] virtual QVariant value(const Id &id, int fieldId) const;
 
     /**
      * @brief contains
@@ -116,26 +109,26 @@ public:
      * @param value
      * @return
      */
-    [[nodiscard]] bool contains( int fieldId, const QVariant &value ) const { return this->contains( this->field( fieldId ), value ); }
+    [[nodiscard]] bool contains(int fieldId, const QVariant &value) const { return this->contains(this->field(fieldId), value); }
     bool select() override;
-    [[nodiscard]] QVariant data( const QModelIndex &index, int role ) const override;
-    void setFilter( const QString &filter ) override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+    void setFilter(const QString &filter) override;
 
     /**
      * @brief fieldName
      * @param id
      * @return
      */
-    [[nodiscard]] QString fieldName( int id ) const { return this->record().fieldName( id ); }
+    [[nodiscard]] QString fieldName(int id) const { return this->record().fieldName(id); }
 
     /**
      * @brief row
      * @param index
      * @return
      */
-    [[nodiscard]] Row row( const int index ) const {
-        if ( index < 0 || index >= this->count()) return Row::Invalid;
-        return static_cast<Row>( index );
+    [[nodiscard]] Row row(const int index) const {
+        if (index < 0 || index >= this->count()) return Row::Invalid;
+        return static_cast<Row>(index);
     }
 
     /**
@@ -143,31 +136,31 @@ public:
      * @param index
      * @return
      */
-    [[nodiscard]] Row row( const QModelIndex &index ) const {
-        if ( index.row() < 0 || index.row() >= this->count() || index.model() != this )
-            return Row::Invalid;
+    [[nodiscard]] Row row(const QModelIndex &index) const {
+        if (index.row() < 0 || index.row() >= this->count() || index.model() != this) return Row::Invalid;
 
-        return static_cast<Row>( index.row());
+        return static_cast<Row>(index.row());
     }
-    [[nodiscard]] Row row( const Id &id ) const;
+    [[nodiscard]] Row row(const Id &id) const;
 
     /**
      * @brief addUniqueConstraint
      * @param constrainedFields
      */
-    [[maybe_unused]] void addUniqueConstraint( const QStringList &constrainedFields ) { this->constraints << constrainedFields; }
-    [[maybe_unused]][[nodiscard]] QSqlQuery prepare( bool ignore = true ) const;
+    [[maybe_unused]] void addUniqueConstraint(const QStringList &constrainedFields) { this->constraints << constrainedFields; }
+    [[maybe_unused]] [[nodiscard]] QSqlQuery prepare(bool ignore = true) const;
 
 public slots:
     /**
      * @brief setValid
      * @param valid
      */
-    void setValid( bool valid = true ) { this->m_valid = valid; }
-    void appendField( const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false );
-    Row add( const QVariantList &arguments );
-    virtual void remove( const Row &row );
-    void setValue( const Row &row, int fieldId, const QVariant &value );
+    void setValid(bool valid = true) { this->m_valid = valid; }
+    void appendField(
+        const QString &fieldName = QString(), QMetaType::Type type = QMetaType::UnknownType, bool unique = false, bool autoValue = false, bool primary = false);
+    Row add(const QVariantList &arguments);
+    virtual void remove(const Row &row);
+    void setValue(const Row &row, int fieldId, const QVariant &value);
 
     /**
      * @brief removeOrphanedEntries
@@ -176,8 +169,8 @@ public slots:
 
 protected:
     QStringList uniqueFields;
-    [[nodiscard]] QSqlField field( int id ) const;
-    [[nodiscard]] bool contains( const QSqlField &field, const QVariant &value ) const;
+    [[nodiscard]] QSqlField field(int id) const;
+    [[nodiscard]] bool contains(const QSqlField &field, const QVariant &value) const;
     QList<QSqlField> tmpFields;
 
 private:
@@ -190,4 +183,4 @@ private:
 };
 
 // declare enums
-Q_DECLARE_METATYPE( Table::Roles )
+Q_DECLARE_METATYPE(Table::Roles)

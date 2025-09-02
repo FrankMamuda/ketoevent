@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
  * includes
  */
 #include "editordialog.h"
-#include "main.h"
 #include "eventtoolbar.h"
+#include "main.h"
 #include "tasktoolbar.h"
 #include "teamtoolbar.h"
 #include "ui_editordialog.h"
@@ -36,33 +36,26 @@ EditorDialog *EditorDialog::i = nullptr;
  * @brief EditorDialog::EditorDialog
  * @param parent
  */
-EditorDialog::EditorDialog() :
-    container( nullptr ),
-    dock( nullptr ),
-    toolBar( nullptr ),
-    ui( new Ui::EditorDialog )
-{
+EditorDialog::EditorDialog() : container(nullptr), dock(nullptr), toolBar(nullptr), ui(new Ui::EditorDialog) {
     // set up ui
-    this->ui->setupUi( this );
+    this->ui->setupUi(this);
     this->container = this->ui->tableView;
     this->container->verticalHeader()->hide();
     this->dock = this->ui->dockWidget;
     this->hideDock();
 
     // connect close button
-    this->connect( this->ui->buttonClose, &QPushButton::clicked, [ this ] () {
-        this->close();
-    } );
+    this->connect(this->ui->buttonClose, &QPushButton::clicked, this, [this]() { this->close(); });
 
     // add to garbage man
-    GarbageMan::instance()->add( this );
+    GarbageMan::instance()->add(this);
 }
 
 /**
  * @brief EditorDialog::~EditorDialog
  */
 EditorDialog::~EditorDialog() {
-    this->disconnect( this->ui->buttonClose, SIGNAL( clicked()));
+    this->disconnect(this->ui->buttonClose, SIGNAL(clicked()));
     delete this->ui;
 }
 
@@ -70,22 +63,19 @@ EditorDialog::~EditorDialog() {
  * @brief EditorDialog::isDockVisible
  * @return
  */
-bool EditorDialog::isDockVisible() const {
-    return this->dock->isVisible();
-}
+bool EditorDialog::isDockVisible() const { return this->dock->isVisible(); }
 
 /**
  * @brief EditorDialog::showDock
  */
-void EditorDialog::showDock( QWidget *contents , const QString &title ) {
-    this->dock->setWidget( contents );
-    this->dock->setWindowTitle( title );
+void EditorDialog::showDock(QWidget *contents, const QString &title) {
+    this->dock->setWidget(contents);
+    this->dock->setWindowTitle(title);
     this->dock->show();
     this->ui->buttonClose->hide();
-    this->container->setDisabled( true );
+    this->container->setDisabled(true);
 
-    if ( this->toolBar != nullptr )
-        this->toolBar->setDisabled( true );
+    if (this->toolBar != nullptr) this->toolBar->setDisabled(true);
 }
 
 /**
@@ -94,38 +84,37 @@ void EditorDialog::showDock( QWidget *contents , const QString &title ) {
 void EditorDialog::hideDock() {
     this->dock->hide();
     this->ui->buttonClose->show();
-    this->container->setEnabled( true );
+    this->container->setEnabled(true);
 
-    if ( this->toolBar != nullptr )
-        this->toolBar->setEnabled( true );
+    if (this->toolBar != nullptr) this->toolBar->setEnabled(true);
 }
 
 /**
  * @brief EditorDialog::setToolBar
  * @param toolBar
  */
-void EditorDialog::setToolBar( QToolBar *widget ) {
-    this->removeToolBar( this->toolBar );
+void EditorDialog::setToolBar(QToolBar *widget) {
+    this->removeToolBar(this->toolBar);
     this->toolBar = widget;
-    this->addToolBar( Qt::TopToolBarArea, this->toolBar );
+    this->addToolBar(Qt::TopToolBarArea, this->toolBar);
 }
 
 /**
  * @brief EditorDialog::showEvent
  * @param event
  */
-void EditorDialog::showEvent( QShowEvent *event ) {
-    ModalWindow::showEvent( event );
+void EditorDialog::showEvent(QShowEvent *event) {
+    ModalWindow::showEvent(event);
 
-    if ( !this->isMaximized()) {
-        if ( this->toolBar == EventToolBar::instance() && !Variable::value<QVariant>( "geometry/events" ).isNull())
-            this->restoreGeometry( Variable::compressedByteArray( "geometry/events" ));
+    if (!this->isMaximized()) {
+        if (this->toolBar == EventToolBar::instance() && !Variable::value<QVariant>("geometry/events").isNull())
+            this->restoreGeometry(Variable::compressedByteArray("geometry/events"));
 
-        if ( this->toolBar == TaskToolBar::instance() && !Variable::value<QVariant>( "geometry/tasks" ).isNull())
-            this->restoreGeometry( Variable::compressedByteArray( "geometry/tasks" ));
+        if (this->toolBar == TaskToolBar::instance() && !Variable::value<QVariant>("geometry/tasks").isNull())
+            this->restoreGeometry(Variable::compressedByteArray("geometry/tasks"));
 
-        if ( this->toolBar == TeamToolBar::instance() && !Variable::value<QVariant>( "geometry/teams" ).isNull())
-            this->restoreGeometry( Variable::compressedByteArray( "geometry/teams" ));
+        if (this->toolBar == TeamToolBar::instance() && !Variable::value<QVariant>("geometry/teams").isNull())
+            this->restoreGeometry(Variable::compressedByteArray("geometry/teams"));
     }
 }
 
@@ -133,19 +122,14 @@ void EditorDialog::showEvent( QShowEvent *event ) {
  * @brief EditorDialog::closeEvent
  * @param event
  */
-void EditorDialog::closeEvent( QCloseEvent *event ) {
-    if ( !this->isMaximized()) {
-        if ( this->toolBar == EventToolBar::instance())
-            Variable::setCompressedByteArray( "geometry/events", this->saveGeometry());
-
-        if ( this->toolBar == TaskToolBar::instance())
-            Variable::setCompressedByteArray( "geometry/tasks", this->saveGeometry());
-
-        if ( this->toolBar == TeamToolBar::instance())
-            Variable::setCompressedByteArray( "geometry/teams", this->saveGeometry());
+void EditorDialog::closeEvent(QCloseEvent *event) {
+    if (!this->isMaximized()) {
+        if (this->toolBar == EventToolBar::instance()) Variable::setCompressedByteArray("geometry/events", this->saveGeometry());
+        if (this->toolBar == TaskToolBar::instance()) Variable::setCompressedByteArray("geometry/tasks", this->saveGeometry());
+        if (this->toolBar == TeamToolBar::instance()) Variable::setCompressedByteArray("geometry/teams", this->saveGeometry());
     }
 
     this->hideDock();
-    this->disconnect( this->container, SIGNAL( clicked( QModelIndex )));
-    ModalWindow::closeEvent( event );
+    this->disconnect(this->container, SIGNAL(clicked(QModelIndex)));
+    ModalWindow::closeEvent(event);
 }

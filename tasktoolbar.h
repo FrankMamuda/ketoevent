@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,18 +30,21 @@
  */
 class TaskToolBar final : public ToolBar {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( TaskToolBar )
+    Q_DISABLE_COPY_MOVE(TaskToolBar)
 
 public:
-    static TaskToolBar *instance() { if ( TaskToolBar::i == nullptr ) TaskToolBar::i = new TaskToolBar(); return TaskToolBar::i; }
+    static TaskToolBar *instance() {
+        if (TaskToolBar::i == nullptr) TaskToolBar::i = new TaskToolBar();
+        return TaskToolBar::i;
+    }
     ~TaskToolBar() override = default;
 
 public slots:
-    void buttonTest (const QModelIndex &index = QModelIndex());
+    void buttonTest(const QModelIndex &index = QModelIndex());
 
 private:
     static TaskToolBar *i;
-    explicit TaskToolBar( QWidget *parent = nullptr );
+    explicit TaskToolBar(QWidget *parent = nullptr);
     QAction *moveUp;
     QAction *moveDown;
     QAction *edit;

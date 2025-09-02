@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,12 +41,12 @@ public:
     /**
      * @brief ToolBar
      */
-    explicit ToolBar( QWidget *parent = nullptr ) : QToolBar( parent ) {
-        this->setFloatable( false );
-        this->setMovable( false );
-        this->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-        this->setIconSize( QSize( Ui::ToolBarIconSize, Ui::ToolBarIconSize ));
-        this->setAllowedAreas( Qt::TopToolBarArea );
+    explicit ToolBar(QWidget *parent = nullptr) : QToolBar(parent) {
+        this->setFloatable(false);
+        this->setMovable(false);
+        this->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        this->setIconSize(QSize(Ui::ToolBarIconSize, Ui::ToolBarIconSize));
+        this->setAllowedAreas(Qt::TopToolBarArea);
     }
     virtual ~ToolBar() override = default;
 };

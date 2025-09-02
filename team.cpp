@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,15 +32,15 @@ Team *Team::i = nullptr;
 /**
  * @brief Team::Team
  */
-Team::Team() : Table( "teams" ) {
-    PRIMARY_FIELD( ID );
-    FIELD( Title,    QMetaType::QString );
-    FIELD( Members,  QMetaType::Int );
-    FIELD( Finish,   QMetaType::QString );
-    FIELD( Lock,     QMetaType::Int );
-    FIELD( Reviewer, QMetaType::QString );
-    FIELD( Event,    QMetaType::Int );
-    this->addUniqueConstraint( QStringList() << IDTOFIELD( Title ) << IDTOFIELD( Event ));
+Team::Team() : Table("teams") {
+    PRIMARY_FIELD(ID);
+    FIELD(Title, QMetaType::QString);
+    FIELD(Members, QMetaType::Int);
+    FIELD(Finish, QMetaType::QString);
+    FIELD(Lock, QMetaType::Int);
+    FIELD(Reviewer, QMetaType::QString);
+    FIELD(Event, QMetaType::Int);
+    this->addUniqueConstraint(QStringList() << IDTOFIELD(Title) << IDTOFIELD(Event));
 }
 
 /**
@@ -51,22 +51,16 @@ Team::Team() : Table( "teams" ) {
  * @param reviewer
  * @return
  */
-Row Team::add( const QString &title, int members, const QTime &finishTime, const QString &reviewer ) {
+Row Team::add(const QString &title, int members, const QTime &finishTime, const QString &reviewer) {
     // failsafe
     const Row event = MainWindow::instance()->currentEvent();
-    if ( event == Row::Invalid ) {
-        qDebug() << this->tr( "no active event, aborting" );
+    if (event == Row::Invalid) {
+        qDebug() << this->tr("no active event, aborting");
         return Row::Invalid;
     }
 
-    return Table::add( QVariantList() <<
-                Database_::null <<
-                title <<
-                members <<
-                finishTime.toString( Database_::TimeFormat ) <<
-                0 <<
-                reviewer <<
-                       static_cast<int>( Event::instance()->id( event )));
+    return Table::add(QVariantList() << Database_::null << title << members << finishTime.toString(Database_::TimeFormat) << 0 << reviewer
+                                     << static_cast<int>(Event::instance()->id(event)));
 }
 
 /**
@@ -76,11 +70,8 @@ void Team::removeOrphanedEntries() {
     QSqlQuery query;
 
     // remove orphaned teams
-    query.exec( QString( "DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)" )
-                .arg( this->tableName(),
-                      this->fieldName( Event ),
-                      Event::instance()->fieldName( Event::ID ),
-                      Event::instance()->tableName()));
+    query.exec(QString("DELETE FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)")
+                   .arg(this->tableName(), this->fieldName(Event), Event::instance()->fieldName(Event::ID), Event::instance()->tableName()));
     this->select();
 }
 
@@ -91,33 +82,31 @@ void Team::removeOrphanedEntries() {
  * @param role
  * @return
  */
-QVariant Team::headerData( int section, Qt::Orientation orientation, int role ) const {
-    if ( role == Qt::DisplayRole ) {
-        switch ( section ) {
+QVariant Team::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (role == Qt::DisplayRole) {
+        switch (section) {
 
-        case Title: return Event::tr( "Title" );
-        case Members: return Event::tr( "Members" );
-        case Finish: return Event::tr( "Finish time" );
+        case Title: return Event::tr("Title");
+        case Members: return Event::tr("Members");
+        case Finish: return Event::tr("Finish time");
 
         default:
         case Lock:
         case Reviewer:
         case Event:
-        case ID:
-            break;
+        case ID: break;
         }
     }
 
-    if ( role == Qt::TextAlignmentRole )
-        return Qt::AlignCenter;
+    if (role == Qt::TextAlignmentRole) return Qt::AlignCenter;
 
-    if ( role == Qt::FontRole ) {
+    if (role == Qt::FontRole) {
         QFont font;
-        font.setBold( true );
+        font.setBold(true);
         return font;
     }
 
-    return Table::headerData( section, orientation, role );
+    return Table::headerData(section, orientation, role);
 }
 
 /**
@@ -126,9 +115,8 @@ QVariant Team::headerData( int section, Qt::Orientation orientation, int role ) 
  * @param role
  * @return
  */
-QVariant Team::data( const QModelIndex &index, int role ) const {
-    if ( role == Qt::TextAlignmentRole && index.column() != Team::Title )
-        return Qt::AlignCenter;
+QVariant Team::data(const QModelIndex &index, int role) const {
+    if (role == Qt::TextAlignmentRole && index.column() != Team::Title) return Qt::AlignCenter;
 
-    return Table::data( index, role );
+    return Table::data(index, role);
 }

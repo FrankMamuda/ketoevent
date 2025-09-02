@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2013-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,20 +48,25 @@ class HistoryEdit;
  */
 class Console final : public QMainWindow {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( Console )
+    Q_DISABLE_COPY_MOVE(Console)
 
 public:
-    static Console *instance() { if ( Console::i == nullptr ) Console::i = new Console(); return Console::i; }
+    static Console *instance() {
+        if (Console::i == nullptr) Console::i = new Console();
+        return Console::i;
+    }
     ~Console() override;
 
 public slots:
-    void print( const QString &msg );
+    void print(const QString &msg);
     bool completeCommand();
 
 protected:
-    void mousePressEvent( QMouseEvent *event ) override { this->m_windowPos = event->pos(); }
-    void mouseMoveEvent( QMouseEvent *event ) override { if ( event->buttons() & Qt::LeftButton ) this->move( this->pos() + event->pos() - this->m_windowPos ); }
-    bool eventFilter( QObject *object, QEvent *event ) override;
+    void mousePressEvent(QMouseEvent *event) override { this->m_windowPos = event->pos(); }
+    void mouseMoveEvent(QMouseEvent *event) override {
+        if (event->buttons() & Qt::LeftButton) this->move(this->pos() + event->pos() - this->m_windowPos);
+    }
+    bool eventFilter(QObject *object, QEvent *event) override;
 
 private slots:
     void on_input_returnPressed();
@@ -79,28 +84,28 @@ private:
  */
 class HistoryEdit final : public QLineEdit {
     Q_OBJECT
-    Q_PROPERTY( int offset READ offset WRITE set RESET reset )
+    Q_PROPERTY(int offset READ offset WRITE set RESET reset)
     friend Console;
 
 public:
-    explicit HistoryEdit( QWidget *parent = nullptr ) : m_historyOffset( 0 ) { this->setParent( parent ); this->reset(); }
+    explicit HistoryEdit(QWidget *parent = nullptr) : m_historyOffset(0) {
+        this->setParent(parent);
+        this->reset();
+    }
     ~HistoryEdit() override { this->history.clear(); }
     [[nodiscard]] int offset() const { return this->m_historyOffset; }
 
 public slots:
-    void set( int offset = 0 ) { this->m_historyOffset = offset; }
+    void set(int offset = 0) { this->m_historyOffset = offset; }
     void reset() { this->set(); }
     void push() { this->m_historyOffset++; }
     void pop() { this->m_historyOffset--; }
-    void add( const QString &text ) {
-        if ( this->history.count()) {
-            if ( !QString::compare( this->history.last(), text ))
-                return;
+    void add(const QString &text) {
+        if (this->history.count()) {
+            if (!QString::compare(this->history.last(), text)) return;
         }
 
-        if ( this->history.count() >= Ui::MaxConsoleHistory )
-            this->history.removeFirst();
-
+        if (this->history.count() >= Ui::MaxConsoleHistory) this->history.removeFirst();
         this->history << text;
     }
 

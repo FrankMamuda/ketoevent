@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@
 #include "modalwindow.h"
 #include <QCloseEvent>
 #include <QDockWidget>
-#include <QTableView>
 #include <QMainWindow>
+#include <QTableView>
 #include <QToolBar>
 
 /**
@@ -41,23 +41,26 @@ class EditorDialog;
  */
 class EditorDialog final : public ModalWindow {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( EditorDialog )
+    Q_DISABLE_COPY_MOVE(EditorDialog)
 
 public:
-    static EditorDialog *instance() { if ( EditorDialog::i == nullptr ) EditorDialog::i = new EditorDialog(); return EditorDialog::i; }
+    static EditorDialog *instance() {
+        if (EditorDialog::i == nullptr) EditorDialog::i = new EditorDialog();
+        return EditorDialog::i;
+    }
     ~EditorDialog() override;
     QTableView *container;
     QDockWidget *dock;
     [[nodiscard]] bool isDockVisible() const;
 
 public slots:
-    void showDock( QWidget *contents = nullptr, const QString &title = QString());
+    void showDock(QWidget *contents = nullptr, const QString &title = QString());
     void hideDock();
-    void setToolBar( QToolBar *widget );
+    void setToolBar(QToolBar *widget);
 
 protected:
-    void showEvent( QShowEvent *event ) override;
-    void closeEvent( QCloseEvent *event ) override;
+    void showEvent(QShowEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     static EditorDialog *i;

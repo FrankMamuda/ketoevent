@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,18 +30,21 @@
  */
 class EventToolBar final : public ToolBar {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( EventToolBar )
+    Q_DISABLE_COPY_MOVE(EventToolBar)
 
 public:
-    static EventToolBar *instance() { if ( EventToolBar::i == nullptr ) EventToolBar::i = new EventToolBar(); return EventToolBar::i; }
+    static EventToolBar *instance() {
+        if (EventToolBar::i == nullptr) EventToolBar::i = new EventToolBar();
+        return EventToolBar::i;
+    }
     ~EventToolBar() override = default;
 
 public slots:
-    void buttonTest( const QModelIndex &index = QModelIndex());
+    void buttonTest(const QModelIndex &index = QModelIndex());
 
 private:
     static EventToolBar *i;
-    explicit EventToolBar( QWidget *parent = nullptr );
+    explicit EventToolBar(QWidget *parent = nullptr);
     QAction *edit;
     QAction *remove;
 };

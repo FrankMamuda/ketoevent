@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +51,18 @@ public:
         // do not remove
         ColumnCount
     };
-    Q_ENUM( Columns )
+    Q_ENUM(Columns)
 
-    explicit RankingsModel( QObject *parent = nullptr ) : QAbstractTableModel( parent ) { }
-    [[nodiscard]] QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
-    [[nodiscard]] int rowCount( const QModelIndex &parent = QModelIndex()) const override;
-    [[nodiscard]] int columnCount( const QModelIndex &parent = QModelIndex()) const override;
-    [[nodiscard]] QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
-    void reset() { this->beginResetModel(); this->endResetModel(); }
+    explicit RankingsModel(QObject *parent = nullptr) : QAbstractTableModel(parent) {}
+    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    void reset() {
+        this->beginResetModel();
+        this->endResetModel();
+    }
 };
 
 // declare enums
-Q_DECLARE_METATYPE( RankingsModel::Columns )
+Q_DECLARE_METATYPE(RankingsModel::Columns)

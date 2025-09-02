@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,25 +20,25 @@
 /*
  * includes
  */
-#include <QMessageBox>
 #include "about.h"
 #include "ui_about.h"
+#include <QMessageBox>
 
 /**
  * @brief About::About
  * @param parent
  */
-About::About( QWidget *parent ) : QDialog( parent ), ui( new Ui::About ) {
-    this->ui->setupUi( this );
-    QPushButton::connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
-    QPushButton::connect( this->ui->qtButton, &QPushButton::clicked, [ this ]() { QMessageBox::aboutQt( this ); } );
+About::About(QWidget *parent) : QDialog(parent), ui(new Ui::About) {
+    this->ui->setupUi(this);
+    QPushButton::connect(this->ui->closeButton, &QPushButton::clicked, this, [this]() { this->close(); });
+    QPushButton::connect(this->ui->qtButton, &QPushButton::clicked, this, [this]() { QMessageBox::aboutQt(this); });
 }
 
 /**
  * @brief About::~About
  */
 About::~About() {
-    this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
-    this->disconnect( this->ui->qtButton, SIGNAL( clicked()));
+    this->disconnect(this->ui->closeButton, SIGNAL(clicked()));
+    this->disconnect(this->ui->qtButton, SIGNAL(clicked()));
     delete this->ui;
 }

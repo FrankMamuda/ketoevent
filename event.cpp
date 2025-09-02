@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
  */
 #include "event.h"
 #include "database.h"
-
 #include <QFont>
 
 // singleton
@@ -37,43 +36,31 @@ using namespace EventTable;
  * @brief Event::Event
  * @param parent
  */
-Event::Event() : Table( "events" ) {
-    PRIMARY_FIELD( ID );
-    FIELD( API,     QMetaType::Int );
-    FIELD( Title,   QMetaType::QString );
-    FIELD( Min,     QMetaType::Int );
-    FIELD( Max,     QMetaType::Int );
-    FIELD( Start,   QMetaType::QString );
-    FIELD( Finish,  QMetaType::QString );
-    FIELD( Final,   QMetaType::QString );
-    FIELD( Penalty, QMetaType::Int );
-    FIELD( Combo2,  QMetaType::Int);
-    FIELD( Combo3,  QMetaType::Int );
-    FIELD( Combo4,  QMetaType::Int );
-    FIELD( Lock,    QMetaType::Int );
+Event::Event() : Table("events") {
+    PRIMARY_FIELD(ID);
+    FIELD(API, QMetaType::Int);
+    FIELD(Title, QMetaType::QString);
+    FIELD(Min, QMetaType::Int);
+    FIELD(Max, QMetaType::Int);
+    FIELD(Start, QMetaType::QString);
+    FIELD(Finish, QMetaType::QString);
+    FIELD(Final, QMetaType::QString);
+    FIELD(Penalty, QMetaType::Int);
+    FIELD(Combo2, QMetaType::Int);
+    FIELD(Combo3, QMetaType::Int);
+    FIELD(Combo4, QMetaType::Int);
+    FIELD(Lock, QMetaType::Int);
 }
 
 /**
  * @brief Event::add
  * @param title
  */
-Row Event::add( const QString &title, int minMembers, int maxMembers,
-                 const QTime &start, const QTime &finish, const QTime &final,
-                 int penalty, int two, int three, int fourPlus ) {
-    return Table::add( QVariantList() <<
-                Database_::null <<
-                Version <<
-                title <<
-                minMembers <<
-                maxMembers <<
-                start.toString( Database_::TimeFormat ) <<
-                finish.toString( Database_::TimeFormat ) <<
-                final.toString( Database_::TimeFormat ) <<
-                penalty <<
-                two <<
-                three <<
-                fourPlus <<
-                       0 );
+Row Event::add(const QString &title, int minMembers, int maxMembers, const QTime &start, const QTime &finish, const QTime &final, int penalty, int two,
+    int three, int fourPlus) {
+    return Table::add(QVariantList() << Database_::null << Version << title << minMembers << maxMembers << start.toString(Database_::TimeFormat)
+                                     << finish.toString(Database_::TimeFormat) << final.toString(Database_::TimeFormat) << penalty << two << three << fourPlus
+                                     << 0);
 }
 
 /**
@@ -83,39 +70,35 @@ Row Event::add( const QString &title, int minMembers, int maxMembers,
  * @param role
  * @return
  */
-QVariant Event::headerData( int section, Qt::Orientation orientation, int role ) const {
-    if ( role == Qt::DisplayRole ) {
-        switch ( section ) {
-
-        case Title: return Event::tr( "Title" );
-        case Min: return Event::tr( "Min members" );
-        case Max: return Event::tr( "Max members" );
-        case Start: return Event::tr( "Start time" );
-        case Finish: return Event::tr( "Finish time" );
-        case Final: return Event::tr( "Final time" );
-        case Penalty: return Event::tr( "Penalty" );
+QVariant Event::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (role == Qt::DisplayRole) {
+        switch (section) {
+        case Title: return Event::tr("Title");
+        case Min: return Event::tr("Min members");
+        case Max: return Event::tr("Max members");
+        case Start: return Event::tr("Start time");
+        case Finish: return Event::tr("Finish time");
+        case Final: return Event::tr("Final time");
+        case Penalty: return Event::tr("Penalty");
 
         default:
         case Lock:
-             case API:
-             case Combo2:
-             case Combo3:
-             case Combo4:
-        case ID:
-            break;
+        case API:
+        case Combo2:
+        case Combo3:
+        case Combo4:
+        case ID: break;
         }
     }
 
-    if ( role == Qt::TextAlignmentRole )
-        return Qt::AlignCenter;
-
-    if ( role == Qt::FontRole ) {
+    if (role == Qt::TextAlignmentRole) return Qt::AlignCenter;
+    if (role == Qt::FontRole) {
         QFont font;
-        font.setBold( true );
+        font.setBold(true);
         return font;
     }
 
-    return Table::headerData( section, orientation, role );
+    return Table::headerData(section, orientation, role);
 }
 
 /**
@@ -124,9 +107,7 @@ QVariant Event::headerData( int section, Qt::Orientation orientation, int role )
  * @param role
  * @return
  */
-QVariant Event::data( const QModelIndex &index, int role ) const {
-    if ( role == Qt::TextAlignmentRole && index.column() != Event::Title )
-        return Qt::AlignCenter;
-
-    return Table::data( index, role );
+QVariant Event::data(const QModelIndex &index, int role) const {
+    if (role == Qt::TextAlignmentRole && index.column() != Event::Title) return Qt::AlignCenter;
+    return Table::data(index, role);
 }

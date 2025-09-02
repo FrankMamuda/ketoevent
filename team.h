@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,15 @@
 /*
  * includes
  */
-#include <QTime>
 #include "table.h"
+#include <QTime>
 
 /**
  * @brief The Team class
  */
 class Team final : public Table {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( Team )
+    Q_DISABLE_COPY_MOVE(Team)
     friend class Log;
 
 public:
@@ -47,32 +47,35 @@ public:
         // count
         Count
     };
-    Q_ENUM( Fields )
+    Q_ENUM(Fields)
 
     /**
      * @brief instance
      * @return
      */
-    static Team *instance() { if ( Team::i == nullptr ) Team::i = new Team(); return Team::i; }
+    static Team *instance() {
+        if (Team::i == nullptr) Team::i = new Team();
+        return Team::i;
+    }
     ~Team() override = default;
 
-    [[nodiscard]] Id id( const Row &row ) const { return static_cast<Id>( this->value( row, ID ).toInt()); }
-    Row add( const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
-    [[nodiscard]] QString title( const Row &row ) const { return this->value( row, Title ).toString(); }
-    [[nodiscard]] int members( const Row &row ) const { return this->value( row, Members ).toInt(); }
-    [[nodiscard]] QTime finishTime( const Row &row ) const { return QTime::fromString( this->value( row, Finish ).toString(), Database_::TimeFormat ); }
-    [[nodiscard]] QString reviewer( const Row &row ) const { return this->value( row, Reviewer ).toString(); }
-    [[nodiscard]] Id eventId( const Row &row ) const { return static_cast<Id>( this->value( row, Event ).toInt()); }
+    [[nodiscard]] Id id(const Row &row) const { return static_cast<Id>(this->value(row, ID).toInt()); }
+    Row add(const QString &title, int members, const QTime &finishTime, const QString &reviewer = QString());
+    [[nodiscard]] QString title(const Row &row) const { return this->value(row, Title).toString(); }
+    [[nodiscard]] int members(const Row &row) const { return this->value(row, Members).toInt(); }
+    [[nodiscard]] QTime finishTime(const Row &row) const { return QTime::fromString(this->value(row, Finish).toString(), Database_::TimeFormat); }
+    [[nodiscard]] QString reviewer(const Row &row) const { return this->value(row, Reviewer).toString(); }
+    [[nodiscard]] Id eventId(const Row &row) const { return static_cast<Id>(this->value(row, Event).toInt()); }
     void removeOrphanedEntries() override;
 
-    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
-    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 public slots:
-    void setTitle( const Row &row, const QString &title ) { this->setValue( row, Title, title ); }
-    void setMembers( const Row &row, int members ) { this->setValue( row, Members, members ); }
-    void setFinishTime( const Row &row, const QTime &time ) { this->setValue( row, Finish, time.toString( Database_::TimeFormat )); }
-    void setReviewer( const Row &row, const QString &name ) { this->setValue( row, Reviewer, name ); }
+    void setTitle(const Row &row, const QString &title) { this->setValue(row, Title, title); }
+    void setMembers(const Row &row, int members) { this->setValue(row, Members, members); }
+    void setFinishTime(const Row &row, const QTime &time) { this->setValue(row, Finish, time.toString(Database_::TimeFormat)); }
+    void setReviewer(const Row &row, const QString &name) { this->setValue(row, Reviewer, name); }
 
 private:
     static Team *i;
@@ -80,4 +83,4 @@ private:
 };
 
 // declare enums
-Q_DECLARE_METATYPE( Team::Fields )
+Q_DECLARE_METATYPE(Team::Fields)

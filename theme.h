@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,12 @@
 /*
  * includes
  */
-#include <QObject>
-#include <QMap>
 #include <QColor>
+#include <QMap>
+#include <QObject>
 #include <QPalette>
-#include <QStyleFactory>
 #include <QStyle>
+#include <QStyleFactory>
 
 /**
  * @brief The Theme class
@@ -35,9 +35,9 @@ class Theme : public QObject {
     Q_OBJECT
 
 public:
-    explicit Theme( const QString &name = QString());
+    explicit Theme(const QString &name = QString());
     [[nodiscard]] QPalette palette() const;
-    [[maybe_unused]][[nodiscard]] static QMap<QString, QString> availableThemes();
+    [[maybe_unused]] [[nodiscard]] static QMap<QString, QString> availableThemes();
 
     /**
      * @brief isDark
@@ -52,7 +52,7 @@ public:
     [[nodiscard]] QStyle *style() const { return this->m_style; }
 
 private slots:
-    void readThemeFile( const QString &fileName );
+    void readThemeFile(const QString &fileName);
 
 private:
     QMap<QString, QColor> paletteMap;

@@ -31,16 +31,15 @@
  * @brief The XML namespace
  */
 namespace XMLTools_ {
-    [[maybe_unused]]
-    static constexpr const char *ConfigFile( "configuration.xml" );
-    const static QLoggingCategory Debug( "xml" );
+[[maybe_unused]] static constexpr const char *ConfigFile("configuration.xml");
+const static QLoggingCategory Debug("xml");
 }
 
 /**
  * @brief The XMLTools class
  */
 class XMLTools final : public QObject {
-    Q_DISABLE_COPY_MOVE( XMLTools )
+    Q_DISABLE_COPY_MOVE(XMLTools)
     Q_OBJECT
 
 public:
@@ -50,7 +49,10 @@ public:
      * @brief instance
      * @return
      */
-    static XMLTools *instance() { if ( XMLTools::i == nullptr ) XMLTools::i = new XMLTools(); return XMLTools::i; }
+    static XMLTools *instance() {
+        if (XMLTools::i == nullptr) XMLTools::i = new XMLTools();
+        return XMLTools::i;
+    }
     static void write();
     static void read();
 
@@ -61,5 +63,5 @@ private:
      * @brief XMLTools
      * @param parent
      */
-    explicit XMLTools( QObject *parent = nullptr ) : QObject( parent ) { GarbageMan::instance()->add( this ); }
+    explicit XMLTools(QObject *parent = nullptr) : QObject(parent) { GarbageMan::instance()->add(this); }
 };

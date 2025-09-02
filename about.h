@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@ class About;
  */
 class About final : public QDialog {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( About )
+    Q_DISABLE_COPY_MOVE(About)
 
 public:
-    explicit About( QWidget *parent = nullptr );
+    explicit About(QWidget *parent = nullptr);
     ~About() override;
 
 private:

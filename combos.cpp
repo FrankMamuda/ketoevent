@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,11 @@
 /*
  * includes
  */
-#include "combomodel.h"
 #include "combos.h"
+#include "combomodel.h"
 #include "main.h"
 #include "team.h"
 #include "ui_combos.h"
-#include "variable.h"
 
 // singleton
 Combos *Combos::i = nullptr;
@@ -33,31 +32,30 @@ Combos *Combos::i = nullptr;
 /**
  * @brief Combos::Combos
  */
-Combos::Combos() : ui( new Ui::Combos ) {
-    this->setWindowModality( Qt::ApplicationModal );
-    this->ui->setupUi( this );
-    this->connect( this->ui->closeButton, &QPushButton::clicked, [ this ]() { this->close(); } );
+Combos::Combos() : ui(new Ui::Combos) {
+    this->setWindowModality(Qt::ApplicationModal);
+    this->ui->setupUi(this);
+    this->connect(this->ui->closeButton, &QPushButton::clicked, [this]() { this->close(); });
 
     // set up view
-    this->ui->view->setModel( ComboModel::instance());
-    this->ui->teamCombo->setModel( Team::instance());
-    this->ui->teamCombo->setModelColumn( Team::Title );
+    this->ui->view->setModel(ComboModel::instance());
+    this->ui->teamCombo->setModel(Team::instance());
+    this->ui->teamCombo->setModelColumn(Team::Title);
 
     // set up pixmaps
-    this->ui->teamPixmap->setPixmap( QIcon::fromTheme( "teams" ).pixmap( 16, 16 ));
-    this->ui->comboPixmap->setPixmap( QIcon::fromTheme( "combos" ).pixmap( 16, 16 ));
-    this->ui->pointsPixmap->setPixmap( QIcon::fromTheme( "star" ).pixmap( 16, 16 ));
-
+    this->ui->teamPixmap->setPixmap(QIcon::fromTheme("teams").pixmap(16, 16));
+    this->ui->comboPixmap->setPixmap(QIcon::fromTheme("combos").pixmap(16, 16));
+    this->ui->pointsPixmap->setPixmap(QIcon::fromTheme("star").pixmap(16, 16));
 
     // add to garbage man
-    GarbageMan::instance()->add( this );
+    GarbageMan::instance()->add(this);
 }
 
 /**
  * @brief Combos::~Combos
  */
 Combos::~Combos() {
-    this->disconnect( this->ui->closeButton, SIGNAL( clicked()));
+    this->disconnect(this->ui->closeButton, SIGNAL(clicked()));
 
     delete this->ui;
 }
@@ -66,26 +64,27 @@ Combos::~Combos() {
  * @brief Combos::on_teamCombo_currentIndexChanged
  * @param index
  */
-void Combos::on_teamCombo_currentIndexChanged( int index ) {
-    const Row row = Team::instance()->row( index );
+void Combos::on_teamCombo_currentIndexChanged(int index) {
+    const Row row = Team::instance()->row(index);
 
-    ComboModel::instance()->reset( row == Row::Invalid ? Id::Invalid : Team::instance()->id( row ));
+    ComboModel::instance()->reset(row == Row::Invalid ? Id::Invalid : Team::instance()->id(row));
 
     this->ui->view->reset();
-    this->ui->combosEdit->setText( QString::number( ComboModel::instance()->combos ));
-    this->ui->pointsEdit->setText( QString::number( ComboModel::instance()->points ));}
+    this->ui->combosEdit->setText(QString::number(ComboModel::instance()->combos));
+    this->ui->pointsEdit->setText(QString::number(ComboModel::instance()->points));
+}
 
 /**
  * @brief Combos::showEvent
  * @param event
  */
-void Combos::showEvent( QShowEvent *event ) {
-    ModalWindow::showEvent( event );
+void Combos::showEvent(QShowEvent *event) {
+    ModalWindow::showEvent(event);
 
     // set current team
     const Row row = MainWindow::instance()->currentTeam();
 
     // reset model on every show just to be safe
-    this->ui->teamCombo->setCurrentIndex( static_cast<int>( row ));
-    this->on_teamCombo_currentIndexChanged( static_cast<int>( row ));
+    this->ui->teamCombo->setCurrentIndex(static_cast<int>(row));
+    this->on_teamCombo_currentIndexChanged(static_cast<int>(row));
 }

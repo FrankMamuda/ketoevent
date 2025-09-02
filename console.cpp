@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2013-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
 /*
  * includes
  */
-#include "cmd.h"
 #include "console.h"
+#include "cmd.h"
 #include "ui_console.h"
 #include "variable.h"
-#include "main.h"
 
 // singleton
 Console *Console::i = nullptr;
@@ -32,27 +31,27 @@ Console *Console::i = nullptr;
 /**
  * @brief Console::Console
  */
-Console::Console() : ui( new Ui::Console ) {
-    this->ui->setupUi( this );
+Console::Console() : ui(new Ui::Console) {
+    this->ui->setupUi(this);
     this->edit = this->ui->input;
-    this->setWindowFlags( Qt::Tool );
-    this->setWindowOpacity( 0.95 );
+    this->setWindowFlags(Qt::Tool);
+    this->setWindowOpacity(0.95);
     this->ui->screen->clear();
 
     // install event filter
-    this->edit->installEventFilter( this );
-    this->edit->history = Variable::string( "system/consoleHistory" ).split( ";" );
+    this->edit->installEventFilter(this);
+    this->edit->history = Variable::string("system/consoleHistory").split(";");
 
     // announce
-    this->print( this->tr( "This is the console. Type 'help' if unsure what to do.\n" ));
+    this->print(this->tr("This is the console. Type 'help' if unsure what to do.\n"));
 }
 
 /**
  * @brief Console::~Console
  */
 Console::~Console() {
-    Variable::setValue( "system/consoleHistory", this->edit->history.join( ";" ));
-    this->edit->removeEventFilter( this );
+    Variable::setValue("system/consoleHistory", this->edit->history.join(";"));
+    this->edit->removeEventFilter(this);
     delete this->ui;
 }
 
@@ -66,57 +65,53 @@ bool Console::completeCommand() {
     int y;
 
     // find matching commands
-    const QStringList keys( Cmd::instance()->keys());
-    for ( const QString &name : keys ) {
-        if ( name.startsWith( this->edit->text()))
-            matchedStrings << name;
+    const QStringList keys(Cmd::instance()->keys());
+    for (const QString &name : keys) {
+        if (name.startsWith(this->edit->text())) matchedStrings << name;
     }
 
     // find matching cvars
-    for ( const QSharedPointer<Var> &entry : qAsConst( Variable::instance()->list )) {
-        if ( !QString::compare( entry->key(), "system/consoleHistory" ))
-            continue;
+    for (const QSharedPointer<Var> &entry : std::as_const(Variable::instance()->list)) {
+        if (!QString::compare(entry->key(), "system/consoleHistory")) continue;
 
-        if ( entry->key().startsWith( this->edit->text()))
-            matchedStrings << entry->key();
+        if (entry->key().startsWith(this->edit->text())) matchedStrings << entry->key();
     }
 
     // complete to shortest string
-    if ( matchedStrings.count() == 1 ) {
+    if (matchedStrings.count() == 1) {
         // append extra space (since it's the only match that will likely be follwed by an argument)
-        this->edit->setText( matchedStrings.first() + " " );
-    } else if ( matchedStrings.count() > 1 ) {
+        this->edit->setText(matchedStrings.first() + " ");
+    } else if (matchedStrings.count() > 1) {
         match = 1;
-        for ( y = 0; y < matchedStrings.count(); y++ ) {
+        for (y = 0; y < matchedStrings.count(); y++) {
             // make sure we check string length
-            if ( matchedStrings.first().length() == match || matchedStrings.at( y ).length() == match )
-                break;
+            if (matchedStrings.first().length() == match || matchedStrings.at(y).length() == match) break;
 
-            if ( matchedStrings.first().at( match ) == matchedStrings.at( y ).at( match )) {
-                if ( y == matchedStrings.count()-1 ) {
+            if (matchedStrings.first().at(match) == matchedStrings.at(y).at(match)) {
+                if (y == matchedStrings.count() - 1) {
                     match++;
                     y = 0;
                 }
             }
         }
-        this->edit->setText( matchedStrings.first().left( match ));
-    } else if ( !matchedStrings.count()) {
+        this->edit->setText(matchedStrings.first().left(match));
+    } else if (!matchedStrings.count()) {
         return true;
     }
 
     // print out suggestions
-    qInfo() << this->tr( "Available commands and cvars:" );
-    for ( const QString &str : qAsConst( matchedStrings )) {
+    qInfo() << this->tr("Available commands and cvars:");
+    for (const QString &str : std::as_const(matchedStrings)) {
         // check commands
-        if ( Cmd::instance()->keys().contains( str )) {
-            QString description( Cmd::instance()->description( str ));
-            qInfo() << ( !description.isEmpty() ? QString( "  \"%1\" - %2" ).arg( str, description ) : QString( "  \"%1" ).arg( str ));
+        if (Cmd::instance()->keys().contains(str)) {
+            QString description(Cmd::instance()->description(str));
+            qInfo() << (!description.isEmpty() ? QString("  \"%1\" - %2").arg(str, description) : QString("  \"%1").arg(str));
         }
 
         // check variables
-        if ( Variable::instance()->contains( str )) {
-            QSharedPointer<Var> entry( Variable::instance()->list[str] );
-            qInfo() << this->tr( "  \"%1\" is \"%2\"" ).arg( entry->key(), entry->value().toString());
+        if (Variable::instance()->contains(str)) {
+            QSharedPointer<Var> entry(Variable::instance()->list[str]);
+            qInfo() << this->tr("  \"%1\" is \"%2\"").arg(entry->key(), entry->value().toString());
         }
     }
 
@@ -131,42 +126,38 @@ bool Console::completeCommand() {
  * @param event
  * @return
  */
-bool Console::eventFilter( QObject *object, QEvent *event ) {
-    HistoryEdit *edit( qobject_cast<HistoryEdit *>( object ));
+bool Console::eventFilter(QObject *object, QEvent *event) {
+    HistoryEdit *edit(qobject_cast<HistoryEdit *>(object));
 
-    if ( edit == nullptr )
-        return false;
+    if (edit == nullptr) return false;
 
-    if ( edit->hasFocus()) {
-        if ( event->type() == QEvent::KeyPress ) {
-            QKeyEvent *keyEvent( static_cast<QKeyEvent*>( event ));
+    if (edit->hasFocus()) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent(static_cast<QKeyEvent *>(event));
 
-            if ( keyEvent->key() == Qt::Key_Up ) {
-                if ( !edit->history.isEmpty()) {
-                    if ( edit->offset() < edit->history.count())
-                        edit->push();
+            if (keyEvent->key() == Qt::Key_Up) {
+                if (!edit->history.isEmpty()) {
+                    if (edit->offset() < edit->history.count()) edit->push();
 
-                    const int offset = static_cast<int>( edit->history.count() - edit->offset());
-                    edit->setText( offset > 0 ? edit->history.at( offset ) : edit->history.first());
+                    const int offset = static_cast<int>(edit->history.count() - edit->offset());
+                    edit->setText(offset > 0 ? edit->history.at(offset) : edit->history.first());
                 }
                 return true;
-            } else if ( keyEvent->key() == Qt::Key_Down ) {
-                if ( !edit->history.isEmpty()) {
-                    if ( edit->offset() > 0 )
-                        edit->pop();
+            } else if (keyEvent->key() == Qt::Key_Down) {
+                if (!edit->history.isEmpty()) {
+                    if (edit->offset() > 0) edit->pop();
 
-                    if ( edit->offset() == 0 ) {
+                    if (edit->offset() == 0) {
                         edit->clear();
                         return true;
                     }
 
-                    const int offset = static_cast<int>( edit->history.count() - edit->offset());
-                    edit->setText( offset < edit->history.count() ? edit->history.at( offset ) : edit->history.last());
+                    const int offset = static_cast<int>(edit->history.count() - edit->offset());
+                    edit->setText(offset < edit->history.count() ? edit->history.at(offset) : edit->history.last());
                 }
                 return true;
-            } else if ( keyEvent->key() == Qt::Key_Tab ) {
-                if ( edit->text().isEmpty())
-                    return true;
+            } else if (keyEvent->key() == Qt::Key_Tab) {
+                if (edit->text().isEmpty()) return true;
 
                 return this->completeCommand();
             }
@@ -179,29 +170,26 @@ bool Console::eventFilter( QObject *object, QEvent *event ) {
  * @brief Console::print
  * @param msg
  */
-void Console::print( const QString &msg ) {
-    QString out( msg );
+void Console::print(const QString &msg) {
+    QString out(msg);
 
-    if ( out.startsWith( '"' ))
-        out = out.mid( 1, out.length() - 2 );
+    if (out.startsWith('"')) out = out.mid(1, out.length() - 2);
 
-    this->ui->screen->append( out.replace( "\\\"", "\"" ) );
+    this->ui->screen->append(out.replace("\\\"", "\""));
 
     // move cursor
-    QTextCursor cursor( this->ui->screen->textCursor());
-    cursor.movePosition( QTextCursor::End );
-    this->ui->screen->setTextCursor( cursor );
+    QTextCursor cursor(this->ui->screen->textCursor());
+    cursor.movePosition(QTextCursor::End);
+    this->ui->screen->setTextCursor(cursor);
 }
 
 /**
  * @brief Console::on_input_returnPressed
  */
 void Console::on_input_returnPressed() {
-    if ( Cmd::instance()->execute( this->edit->text()))
-        this->edit->add( this->edit->text());
+    if (Cmd::instance()->execute(this->edit->text())) this->edit->add(this->edit->text());
 
     // set min offset
     this->edit->reset();
     this->edit->clear();
 }
-

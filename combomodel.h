@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,37 +31,38 @@
  * @brief The ComboModel class
  */
 class ComboModel final : public QStringListModel {
-    Q_DISABLE_COPY_MOVE( ComboModel )
+    Q_DISABLE_COPY_MOVE(ComboModel)
     Q_OBJECT
     friend class Combos;
 
 public:
-    static ComboModel *instance() { if ( ComboModel::i == nullptr ) ComboModel::i = new ComboModel(); return ComboModel::i; }
+    static ComboModel *instance() {
+        if (ComboModel::i == nullptr) ComboModel::i = new ComboModel();
+        return ComboModel::i;
+    }
 
     ~ComboModel() override = default;
-    QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     /**
      * @brief colourForId
      * @param id
      * @return
      */
-    [[nodiscard]] static QRgb colourForId( int id ) {
-        if ( id < 0 )
-            return ComboModel::colourList.at( 0 );
+    [[nodiscard]] static QRgb colourForId(int id) {
+        if (id < 0) return ComboModel::colourList.at(0);
 
-        if ( id >= ComboModel::colourList.count())
-            return ComboModel::colourForId( id - ComboModel::colourList.count() );
+        if (id >= ComboModel::colourList.count()) return ComboModel::colourForId(id - ComboModel::colourList.count());
 
-        return ComboModel::colourList.at( id );
+        return ComboModel::colourList.at(id);
     }
 
 public slots:
-    void reset( const Id &id );
+    void reset(const Id &id);
 
 private:
     static ComboModel *i;
-    explicit ComboModel() : combos( 0 ), points( 0 ) { GarbageMan::instance()->add( this ); }
+    explicit ComboModel() : combos(0), points(0) { GarbageMan::instance()->add(this); }
     QMultiMap<Id, QString> map;
     QMap<QString, QRgb> colours;
     static QList<QRgb> colourList;

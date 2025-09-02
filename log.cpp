@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 /*
  * includes
  */
-#include <QSqlError>
-#include <QSqlQuery>
 #include "log.h"
 #include "database.h"
 #include "task.h"
 #include "team.h"
+#include <QSqlError>
+#include <QSqlQuery>
 
 // singleton
 Log *Log::i = nullptr;
@@ -33,12 +33,12 @@ Log *Log::i = nullptr;
 /**
  * @brief Log::Log
  */
-Log::Log() : Table( "logs" ) {
-    PRIMARY_FIELD( ID );
-    FIELD( Multi, QMetaType::Int );
-    FIELD( Task,  QMetaType::Int );
-    FIELD( Team,  QMetaType::Int );
-    FIELD( Combo, QMetaType::Int );
+Log::Log() : Table("logs") {
+    PRIMARY_FIELD(ID);
+    FIELD(Multi, QMetaType::Int);
+    FIELD(Task, QMetaType::Int);
+    FIELD(Team, QMetaType::Int);
+    FIELD(Combo, QMetaType::Int);
 }
 
 /**
@@ -48,13 +48,8 @@ Log::Log() : Table( "logs" ) {
  * @param multiplier
  * @param comboId
  */
-void Log::add( const Id &taskId, const Id &teamId, int multiplier, const Id &comboId ) {
-    Table::add( QVariantList() <<
-                Database_::null <<
-                multiplier <<
-                static_cast<int>( taskId ) <<
-                static_cast<int>( teamId ) <<
-                static_cast<int>( comboId ) );
+void Log::add(const Id &taskId, const Id &teamId, int multiplier, const Id &comboId) {
+    Table::add(QVariantList() << Database_::null << multiplier << static_cast<int>(taskId) << static_cast<int>(teamId) << static_cast<int>(comboId));
 }
 
 /**
@@ -63,19 +58,13 @@ void Log::add( const Id &taskId, const Id &teamId, int multiplier, const Id &com
  * @param teamId
  * @return
  */
-int Log::multiplier( const Id &taskId, const Id &teamId ) const {
+int Log::multiplier(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
-    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
-                .arg( this->fieldName( Log::Multi ),
-                      this->fieldName( Log::Task ),
-                      this->fieldName( Log::Team ),
-                      this->tableName(),
-                      this->fieldName( Log::Task ),
-                      QString::number( static_cast<int>( taskId )),
-                      this->fieldName( Log::Team ),
-                      QString::number( static_cast<int>( teamId ))));
+    query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
+                   .arg(this->fieldName(Log::Multi), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
-    return query.next() ? query.value( 0 ).toInt() : 0;
+    return query.next() ? query.value(0).toInt() : 0;
 }
 
 /**
@@ -84,19 +73,13 @@ int Log::multiplier( const Id &taskId, const Id &teamId ) const {
  * @param teamId
  * @return
  */
-Id Log::comboId( const Id &taskId, const Id &teamId ) const {
+Id Log::comboId(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
-    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
-                .arg( this->fieldName( Log::Combo ),
-                      this->fieldName( Log::Task ),
-                      this->fieldName( Log::Team ),
-                      this->tableName(),
-                      this->fieldName( Log::Task ),
-                      QString::number( static_cast<int>( taskId )),
-                      this->fieldName( Log::Team ),
-                      QString::number( static_cast<int>( teamId ))));
+    query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
+                   .arg(this->fieldName(Log::Combo), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
-    return query.next() ? static_cast<Id>( query.value( 0 ).toInt()) : Id::Invalid;
+    return query.next() ? static_cast<Id>(query.value(0).toInt()) : Id::Invalid;
 }
 
 /**
@@ -106,63 +89,46 @@ void Log::removeOrphanedEntries() {
     QSqlQuery query;
 
     // remove orphaned logs
-    query.exec( QString( "delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)" )
-                .arg( this->tableName(),
-                      this->fieldName( Team ),
-                      Team::instance()->fieldName( Team::ID ),
-                      Team::instance()->tableName(),
-                      this->fieldName( Task ),
-                      Task::instance()->fieldName( Task::ID ),
-                      Task::instance()->tableName()));
+    query.exec(QString("delete from %1 where %2 not in (select %3 from %4) or %5 not in (select %6 from %7)")
+                   .arg(this->tableName(), this->fieldName(Team), Team::instance()->fieldName(Team::ID), Team::instance()->tableName(), this->fieldName(Task),
+                       Task::instance()->fieldName(Task::ID), Task::instance()->tableName()));
 
     // delete duplicate logs
-    for ( int y = 0; y < Team::instance()->count(); y++ ) {
-        const int teamId = static_cast<int>( Team::instance()->id( Team::instance()->row( y )));
+    for (int y = 0; y < Team::instance()->count(); y++) {
+        const int teamId = static_cast<int>(Team::instance()->id(Team::instance()->row(y)));
 
         // find duplicate log entries:
         //   (multiple instances of same taskId & teamId)
-        query.exec( QString( "SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2 HAVING COUNT(*) > 1" )
-                    .arg( this->fieldName( Task ),
-                          this->fieldName( Team ),
-                          this->tableName(),
-                          QString::number( teamId )));
+        query.exec(QString("SELECT %1, %2, COUNT(*) FROM %3 WHERE %2=%4 GROUP BY %1, %2 HAVING COUNT(*) > 1")
+                       .arg(this->fieldName(Task), this->fieldName(Team), this->tableName(), QString::number(teamId)));
 
-        while ( query.next()) {
-            const int count = query.value( 2 ).toInt();
-            const int team = query.value( 1 ).toInt();
-            const int task = query.value( 0 ).toInt();
+        while (query.next()) {
+            const int count = query.value(2).toInt();
+            const int team = query.value(1).toInt();
+            const int task = query.value(0).toInt();
             QSqlQuery subQuery;
 
             // announce the total amount of duplicate logs
-            qCDebug( Database_::Debug ) << this->tr( "performing deletion of %1 duplicate logs from team %2 for task %3" )
-                                           .arg( QString::number( count ),
-                                                 Team::instance()->title( Team::instance()->row( static_cast<Id>( team ))),
-                                                 Task::instance()->name( Task::instance()->row( static_cast<Id>( task ))));
+            qCDebug(Database_::Debug) << this->tr("performing deletion of %1 duplicate logs from team %2 for task %3")
+                                             .arg(QString::number(count), Team::instance()->title(Team::instance()->row(static_cast<Id>(team))),
+                                                 Task::instance()->name(Task::instance()->row(static_cast<Id>(task))));
 
             // delete actual logs
-            subQuery.exec( QString( "DELETE FROM %1 WHERE %2=%3 AND %4=%5" )
-                           .arg( this->tableName(),
-                                 this->fieldName( Team ),
-                                 QString::number( teamId ),
-                                 this->fieldName( Task ),
-                                 QString::number( task )));
+            subQuery.exec(QString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
+                              .arg(this->tableName(), this->fieldName(Team), QString::number(teamId), this->fieldName(Task), QString::number(task)));
         }
     }
 
     // removing orphaned combos here
     {
-        query.exec( QString( "SELECT %1, COUNT(*) FROM %2 WHERE %1>-1 GROUP BY %1 HAVING COUNT(*) = 1" )
-                    .arg( this->fieldName( Combo ), this->tableName()));
+        query.exec(QString("SELECT %1, COUNT(*) FROM %2 WHERE %1>-1 GROUP BY %1 HAVING COUNT(*) = 1").arg(this->fieldName(Combo), this->tableName()));
 
-        while ( query.next()) {
+        while (query.next()) {
             QSqlQuery subQuery;
-
-            const int combo = query.value( 0 ).toInt();
-            qCDebug( Database_::Debug ) << this->tr( "clearing an orphaned combo with id:%1" ).arg( combo );
-            subQuery.exec( QString( "UPDATE %1 SET %2=-1 WHERE %2=%3" )
-                           .arg( Log::instance()->tableName(),
-                                 Log::instance()->fieldName( Log::Combo ),
-                                 QString::number( combo )));
+            const int combo = query.value(0).toInt();
+            qCDebug(Database_::Debug) << this->tr("clearing an orphaned combo with id:%1").arg(combo);
+            subQuery.exec(
+                QString("UPDATE %1 SET %2=-1 WHERE %2=%3").arg(Log::instance()->tableName(), Log::instance()->fieldName(Log::Combo), QString::number(combo)));
         }
     }
 
@@ -176,19 +142,13 @@ void Log::removeOrphanedEntries() {
  * @param teamId
  * @return
  */
-Id Log::id( const Id &taskId, const Id &teamId ) const {
+Id Log::id(const Id &taskId, const Id &teamId) const {
     QSqlQuery query;
-    query.exec( QString( "SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8" )
-                .arg( this->fieldName( Log::ID ),
-                      this->fieldName( Log::Task ),
-                      this->fieldName( Log::Team ),
-                      this->tableName(),
-                      this->fieldName( Log::Task ),
-                      QString::number( static_cast<int>( taskId )),
-                      this->fieldName( Log::Team ),
-                      QString::number( static_cast<int>( teamId ))));
+    query.exec(QString("SELECT %1, %2, %3 from %4 where %5=%6 and %7=%8")
+                   .arg(this->fieldName(Log::ID), this->fieldName(Log::Task), this->fieldName(Log::Team), this->tableName(), this->fieldName(Log::Task),
+                       QString::number(static_cast<int>(taskId)), this->fieldName(Log::Team), QString::number(static_cast<int>(teamId))));
 
-    return query.next() ? static_cast<Id>( query.value( 0 ).toInt()) : Id::Invalid;
+    return query.next() ? static_cast<Id>(query.value(0).toInt()) : Id::Invalid;
 }
 
 /**
@@ -196,27 +156,26 @@ Id Log::id( const Id &taskId, const Id &teamId ) const {
  * @param taskId
  * @param teamId
  */
-void Log::setMultiplier( int multi, const Id &taskId, const Id &teamId ) {
-    const Id logId = this->id( taskId, teamId );
+void Log::setMultiplier(int multi, const Id &taskId, const Id &teamId) {
+    const Id logId = this->id(taskId, teamId);
 
-    if ( logId != Id::Invalid ) {
-        const Row row = this->row( logId );
-        if ( row == Row::Invalid )
-            return;
+    if (logId != Id::Invalid) {
+        const Row row = this->row(logId);
+        if (row == Row::Invalid) return;
 
         /*if ( multi <= 0 )
             Log::instance()->remove( row );
         else*/
         // NOTE: allow negative values
-        Log::instance()->setMultiplier( row, multi );
+        Log::instance()->setMultiplier(row, multi);
 
 #ifdef QT_DEBUG
-        qCDebug( Database_::Debug ) << ( multi <= 0 ? "delete" : "change" ) << "log at row" << row;
+        qCDebug(Database_::Debug) << (multi <= 0 ? "delete" : "change") << "log at row" << row;
 #endif
     } else {
 #ifdef QT_DEBUG
-        qCDebug( Database_::Debug ) << "new log";
+        qCDebug(Database_::Debug) << "new log";
 #endif
-        Log::instance()->add( taskId, teamId, multi );
+        Log::instance()->add(taskId, teamId, multi);
     }
 }

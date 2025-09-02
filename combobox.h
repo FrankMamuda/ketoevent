@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,23 +31,23 @@ class ComboBox final : public QComboBox {
     Q_OBJECT
 
 public:
-    explicit ComboBox( QWidget *parent = nullptr ) : QComboBox( parent ) {}
+    explicit ComboBox(QWidget *parent = nullptr) : QComboBox(parent) {}
 
     /**
      * @brief addItems
      * @param items
      */
-    void addItems( const QStringList &items ) {
-        QComboBox::addItems( items );
-        emit this->activated( this->currentIndex());
+    void addItems(const QStringList &items) {
+        QComboBox::addItems(items);
+        emit this->activated(this->currentIndex());
     }
 
     /**
      * @brief hidePopup
      */
     void hidePopup() override {
-      QComboBox::hidePopup();
-      emit popupHidden();
+        QComboBox::hidePopup();
+        emit popupHidden();
     }
 
 public slots:
@@ -55,9 +55,9 @@ public slots:
      * @brief setCurrentIndex
      * @param index
      */
-    void setCurrentIndex( int index ) {
-        QComboBox::setCurrentIndex( index );
-        emit this->activated( index );
+    void setCurrentIndex(int index) {
+        QComboBox::setCurrentIndex(index);
+        emit this->activated(index);
     }
 
 signals:

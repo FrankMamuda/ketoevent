@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,7 @@ class Rankings;
  */
 class TeamStatistics final {
 public:
-    explicit TeamStatistics( const QString &n = QString()) :
-        title( n ) {}
+    explicit TeamStatistics(const QString &n = QString()) : title(n) {}
     QString title;
     int completedTasks = 0;
     int combos = 0;
@@ -65,11 +64,14 @@ public:
  */
 class Rankings final : public ModalWindow {
     Q_OBJECT
-    Q_DISABLE_COPY_MOVE( Rankings )
+    Q_DISABLE_COPY_MOVE(Rankings)
     friend class RankingsModel;
 
 public:
-    static Rankings *instance() { if ( Rankings::i == nullptr ) Rankings::i = new Rankings(); return Rankings::i; }
+    static Rankings *instance() {
+        if (Rankings::i == nullptr) Rankings::i = new Rankings();
+        return Rankings::i;
+    }
     ~Rankings() override;
     [[nodiscard]] bool isDisplayingCurrentTeam() const;
 
@@ -79,8 +81,8 @@ private slots:
     void on_actionExport_triggered();
 
 protected:
-    void showEvent( QShowEvent *event ) override;
-    void closeEvent( QCloseEvent *event ) override;
+    void showEvent(QShowEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     static Rankings *i;

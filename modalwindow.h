@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class ModalWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit ModalWindow( QWidget *parent = nullptr ) : QMainWindow( parent ) { this->setWindowModality( Qt::ApplicationModal ); }
+    explicit ModalWindow(QWidget *parent = nullptr) : QMainWindow(parent) { this->setWindowModality(Qt::ApplicationModal); }
     ~ModalWindow() override = default;
 
 protected:
@@ -40,27 +40,29 @@ protected:
      * @brief showEvent
      * @param event
      */
-    void showEvent( QShowEvent *event ) override { MainWindow::instance()->setDisabled( true ); QMainWindow::showEvent( event ); }
+    void showEvent(QShowEvent *event) override {
+        MainWindow::instance()->setDisabled(true);
+        QMainWindow::showEvent(event);
+    }
 
     /**
      * @brief hideEvent
      * @param event
      */
-    void hideEvent( QHideEvent *event ) override {
-        MainWindow::instance()->setEnabled( true );
+    void hideEvent(QHideEvent *event) override {
+        MainWindow::instance()->setEnabled(true);
         // relock ui elements if required
         MainWindow::instance()->setLock();
-        QMainWindow::hideEvent( event );
+        QMainWindow::hideEvent(event);
     }
 
     /**
      * @brief MainWindow::keyPressEvent
      * @param event
      */
-    void keyPressEvent( QKeyEvent *event ) override {
-        if ( event->key() == Qt::Key_Escape )
-            this->hide();
+    void keyPressEvent(QKeyEvent *event) override {
+        if (event->key() == Qt::Key_Escape) this->hide();
 
-        QMainWindow::keyPressEvent( event );
+        QMainWindow::keyPressEvent(event);
     }
 };

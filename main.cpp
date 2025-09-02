@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Factory #12
- * Copyright (C) 2020 Armands Aleksejevs
+ * Copyright (C) 2020-2024 Armands Aleksejevs
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,26 +20,25 @@
 /*
  * includes
  */
-#include "mainwindow.h"
-#include <QApplication>
-#include <QMessageBox>
-#include <QSharedMemory>
-#include <QTranslator>
-#include <QSettings>
-#include "theme.h"
+#include "main.h"
+#include "console.h"
 #include "database.h"
 #include "event.h"
+#include "item.h"
+#include "log.h"
+#include "mainwindow.h"
+#include "rankingsmodel.h"
 #include "task.h"
 #include "team.h"
-#include "log.h"
-#include "editordialog.h"
-#include "xmltools.h"
+#include "theme.h"
 #include "variable.h"
-#include "console.h"
-#include "main.h"
-#include "item.h"
-#include "rankingsmodel.h"
 #include "widget.h"
+#include "xmltools.h"
+#include <QApplication>
+#include <QMessageBox>
+#include <QSettings>
+#include <QSharedMemory>
+#include <QTranslator>
 
 // singleton
 GarbageMan *GarbageMan::i = nullptr;
@@ -62,7 +61,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //
 
 // default message handler
-static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler( nullptr );
+static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
 static bool console_init = false;
 
 /**
@@ -71,16 +70,15 @@ static bool console_init = false;
  * @param context
  * @param msg
  */
-void messageFilter( QtMsgType type, const QMessageLogContext &context, const QString &msg ) {
-    ( *QT_DEFAULT_MESSAGE_HANDLER )( type, context, msg );
+void messageFilter(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
 
-    if ( type == QtFatalMsg ) {
+    if (type == QtFatalMsg) {
         QApplication::quit();
-        exit( 0 );
+        exit(0);
     }
 
-    if ( console_init )
-       Console::instance()->print( msg );
+    if (console_init) Console::instance()->print(msg);
 }
 
 /**
@@ -89,26 +87,30 @@ void messageFilter( QtMsgType type, const QMessageLogContext &context, const QSt
  * @param argv
  * @return
  */
-int main( int argc, char *argv[] ) {
-    QApplication a( argc, argv );
+int main(int argc, char *argv[]) {
+    QApplication a(argc, argv);
 
     // simple single instance implementation
     // NOTE: this however will fail if app crashes during startup
 #ifndef QT_DEBUG
     class SharedMemory : public QSharedMemory {
     public:
-        SharedMemory( const QString &key, QObject *parent = nullptr ) : QSharedMemory( key, parent ) {}
-        ~SharedMemory() { if ( this->isAttached()) { this->detach(); } }
+        SharedMemory(const QString &key, QObject *parent = nullptr) : QSharedMemory(key, parent) {}
+        ~SharedMemory() {
+            if (this->isAttached()) { this->detach(); }
+        }
 
         bool lock() {
-            if ( this->isAttached()) return false;
-            if ( this->attach( QSharedMemory::ReadOnly )) { this->detach(); return false; }
-            return this->create( sizeof( quint64 ));
+            if (this->isAttached()) return false;
+            if (this->attach(QSharedMemory::ReadOnly)) {
+                this->detach();
+                return false;
+            }
+            return this->create(sizeof(quint64));
         }
     };
-    QSharedPointer<SharedMemory> sharedMemory( new SharedMemory( "ketoevent_singleInstance", &a ));
-    if ( !sharedMemory->lock())
-        return 0;
+    QSharedPointer<SharedMemory> sharedMemory(new SharedMemory("ketoevent_singleInstance", &a));
+    if (!sharedMemory->lock()) return 0;
 #endif
 
     // register metatypes
@@ -124,74 +126,69 @@ int main( int argc, char *argv[] ) {
     qRegisterMetaType<Task::Types>();
     qRegisterMetaType<Task::Styles>();
     qRegisterMetaType<Team::Fields>();
-    //qRegisterMetaType<Var::Flags>();
+    // qRegisterMetaType<Var::Flags>();
     qRegisterMetaType<Widget::Types>();
 
     // set console output pattern
 #ifdef QT_DEBUG
-    qSetMessagePattern( "%{if-category}%{category}: %{endif}%{function}: %{message}" );
+    qSetMessagePattern("%{if-category}%{category}: %{endif}%{function}: %{message}");
 #else
-    qSetMessagePattern( "%{if-category}%{category}: %{endif}%{message}" );
+    qSetMessagePattern("%{if-category}%{category}: %{endif}%{message}");
 #endif
 
     // log to file in non-qtcreator environment
-    qInstallMessageHandler( messageFilter );
+    qInstallMessageHandler(messageFilter);
 
     // i18n
     QTranslator translator;
 #ifndef FORCE_LV_LOCALE
-    QLocale::setDefault( QLocale::System );
+    QLocale::setDefault(QLocale::System);
 #else
-    const QString locale( "lv_LV" );
-    QLocale::setDefault( QLocale::Latvian );
+    const QString locale("lv_LV");
+    QLocale::setDefault(QLocale::Latvian);
 #endif
-    if ( translator.load( ":/i18n/ketoevent_" + QLocale().name()))
-        QApplication::installTranslator( &translator );
+    if (translator.load(":/i18n/ketoevent_" + QLocale().name())) QApplication::installTranslator(&translator);
 
     // set variable defaults
-    Variable::add( "reviewerName", "" );
-    Variable::add( "eventId", -1, Var::Flag::Hidden );
-    Variable::add( "teamId", -1, Var::Flag::Hidden );
-    Variable::add( "rankingsCurrent", true );
-    Variable::add( "sortByType", true );
-    Variable::add( "system/consoleHistory", "", Var::Flag::Hidden );
-    Variable::add( "databasePath", "", Var::Flag::Hidden );
-    Variable::add( "backup/enabled", false );
-    Variable::add( "backup/changes", 25 );
-    Variable::add( "darkMode", false, Var::Flag::ReadOnly | Var::Flag::Hidden | Var::Flag::NoSave );
-    Variable::add( "overrideTheme", false, Var::Flag::ReadOnly | Var::Flag::Hidden );
-    Variable::add( "theme", "light", Var::Flag::ReadOnly | Var::Flag::Hidden );
-    Variable::add( "geometry/main", QByteArray(), Var::Flag::ReadOnly );
-    Variable::add( "geometry/events", QByteArray(), Var::Flag::ReadOnly );
-    Variable::add( "geometry/teams", QByteArray(), Var::Flag::ReadOnly );
-    Variable::add( "geometry/tasks", QByteArray(), Var::Flag::ReadOnly );
-    Variable::add( "geometry/rankings", QByteArray(), Var::Flag::ReadOnly ); // TODO
+    Variable::add("reviewerName", "");
+    Variable::add("eventId", -1, Var::Flag::Hidden);
+    Variable::add("teamId", -1, Var::Flag::Hidden);
+    Variable::add("rankingsCurrent", true);
+    Variable::add("sortByType", true);
+    Variable::add("system/consoleHistory", "", Var::Flag::Hidden);
+    Variable::add("databasePath", "", Var::Flag::Hidden);
+    Variable::add("backup/enabled", false);
+    Variable::add("backup/changes", 25);
+    Variable::add("darkMode", false, Var::Flag::ReadOnly | Var::Flag::Hidden | Var::Flag::NoSave);
+    Variable::add("overrideTheme", false, Var::Flag::ReadOnly | Var::Flag::Hidden);
+    Variable::add("theme", "light", Var::Flag::ReadOnly | Var::Flag::Hidden);
+    Variable::add("geometry/main", QByteArray(), Var::Flag::ReadOnly);
+    Variable::add("geometry/events", QByteArray(), Var::Flag::ReadOnly);
+    Variable::add("geometry/teams", QByteArray(), Var::Flag::ReadOnly);
+    Variable::add("geometry/tasks", QByteArray(), Var::Flag::ReadOnly);
+    Variable::add("geometry/rankings", QByteArray(), Var::Flag::ReadOnly); // TODO
 
     // read configuration
     XMLTools::read();
 
     // check for previous crashes
-    const QString apiFileName( QDir::currentPath() + "/badapi" );
-    if ( QFileInfo::exists( apiFileName )) {
-        const QFileInfo info( Variable::string( "databasePath" ));
+    const QString apiFileName(QDir::currentPath() + "/badapi");
+    if (QFileInfo::exists(apiFileName)) {
+        const QFileInfo info(Variable::string("databasePath"));
 
         // just change path
-        Variable::setString( "databasePath", info.absolutePath() + "/database_"
-                                                         + QDateTime::currentDateTime()
-                                                                 .toString( "yyyyMMdd_hhmmss" ) +
-                                                         ".db" );
+        Variable::setString("databasePath", info.absolutePath() + "/database_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".db");
         // reset vars
-        Variable::reset( "eventId" );
-        Variable::reset( "teamId" );
+        Variable::reset("eventId");
+        Variable::reset("teamId");
 
         // copy built-in demo version
-        //QFile::copy( ":/initial/database.db", Variable::string( "databasePath" ));
-        //QFile( Variable::string( "databasePath" )).setPermissions(
+        // QFile::copy( ":/initial/database.db", Variable::string( "databasePath" ));
+        // QFile( Variable::string( "databasePath" )).setPermissions(
         //        QFileDevice::ReadOwner | QFileDevice::WriteOwner );
 
-        QFile::remove( apiFileName );
+        QFile::remove(apiFileName);
     }
-
 
     // initialize database and its tables
     Database::instance();
@@ -199,25 +196,23 @@ int main( int argc, char *argv[] ) {
         bool success = true;
 
         // initialize database and its tables
-        success &= Database::instance()->add( Event::instance());
-        success &= Database::instance()->add( Task::instance());
-        success &= Database::instance()->add( Team::instance());
-        success &= Database::instance()->add( Log::instance());
+        success &= Database::instance()->add(Event::instance());
+        success &= Database::instance()->add(Task::instance());
+        success &= Database::instance()->add(Team::instance());
+        success &= Database::instance()->add(Log::instance());
 
         return success;
     };
 
-    if ( !loadTables()) {
-        QMessageBox::critical( nullptr,
-                               QObject::tr( "Internal error" ),
-                               QObject::tr( "Could not load database\n"
-                                            "New database will be created\n"
-                                            "Please restart the application" ),
-                               QMessageBox::Ok );
+    if (!loadTables()) {
+        QMessageBox::critical(nullptr, QObject::tr("Internal error"),
+            QObject::tr("Could not load database\n"
+                        "New database will be created\n"
+                        "Please restart the application"),
+            QMessageBox::Ok);
 
-        QFile badAPIFile( apiFileName );
-        if ( badAPIFile.open( QIODevice::WriteOnly ))
-            badAPIFile.close();
+        QFile badAPIFile(apiFileName);
+        if (badAPIFile.open(QIODevice::WriteOnly)) badAPIFile.close();
 
         QApplication::quit();
         return 0;
@@ -226,37 +221,35 @@ int main( int argc, char *argv[] ) {
     bool darkMode = false;
     bool darkModeWin10 = false;
 #ifdef Q_OS_WIN
-    const QVariant key( QSettings( R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",
-                                   QSettings::NativeFormat ).value( "AppsUseLightTheme" ));
-    if ( key.isValid() && !key.toBool()) {
+    const QVariant key(
+        QSettings(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)", QSettings::NativeFormat).value("AppsUseLightTheme"));
+    if (key.isValid() && !key.toBool()) {
         darkMode = true;
         darkModeWin10 = true;
 
-        if ( !Variable::isEnabled( "overrideTheme" ))
-            Variable::setString( "theme", "dark" );
+        if (!Variable::isEnabled("overrideTheme")) Variable::setString("theme", "dark");
     }
 #else
-    if ( qGray( QApplication::palette().color( QPalette::Base ).rgb()) < 128 )
-        darkMode = true;
+    if (qGray(QApplication::palette().color(QPalette::Base).rgb()) < 128) darkMode = true;
 #endif
 
     // set default icon theme
-    QIcon::setThemeName( darkMode ? "dark" : "light" );
+    QIcon::setThemeName(darkMode ? "dark" : "light");
 
-    if ( Variable::isEnabled( "overrideTheme" ) || darkModeWin10 ) {
+    if (Variable::isEnabled("overrideTheme") || darkModeWin10) {
         // load theme from file
-        auto *theme( new Theme( Variable::string( "theme" )));
+        auto *theme(new Theme(Variable::string("theme")));
 
         // override the variable
-        Variable::setEnabled( "darkMode", theme->isDark());
+        Variable::setEnabled("darkMode", theme->isDark());
 
         // override style and palette
-        QApplication::setStyle( theme->style());
-        QApplication::setPalette( theme->palette());
+        QApplication::setStyle(theme->style());
+        QApplication::setPalette(theme->palette());
 
         // override icon theme and syntax highlighter theme
-        QIcon::setThemeName( theme->isDark() ? "dark" : "light" );
-        //MainWindow::instance()->setTheme( theme );
+        QIcon::setThemeName(theme->isDark() ? "dark" : "light");
+        // MainWindow::instance()->setTheme( theme );
     }
 
     // show main window
@@ -270,8 +263,8 @@ int main( int argc, char *argv[] ) {
     console_init = true;
 
     // clean up on exit
-    qApp->connect( qApp, &QApplication::aboutToQuit, []() {
-        Task::instance()->setInitialised( false );
+    qApp->connect(qApp, &QApplication::aboutToQuit, []() {
+        Task::instance()->setInitialised(false);
 
         console_init = false;
         delete Console::instance();
@@ -281,11 +274,10 @@ int main( int argc, char *argv[] ) {
 
         delete GarbageMan::instance();
 
-        if ( Database::instance() != nullptr )
-            delete Database::instance();
+        if (Database::instance() != nullptr) delete Database::instance();
 
         delete Variable::instance();
-    } );
+    });
 
     return a.exec();
 }
