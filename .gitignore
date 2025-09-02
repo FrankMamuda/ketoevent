@@ -16,3 +16,4 @@ i18n/*.qm
 cmake*/*
 .idea/*
 3rdparty/*
+build/*
