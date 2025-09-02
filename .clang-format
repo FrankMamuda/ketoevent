@@ -1,0 +1,22 @@
+﻿---
+BasedOnStyle: WebKit
+
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+BreakBeforeBraces: Attach
+SpaceInEmptyBlock: false
+PointerAlignment: Right
+UseTab: Never
+UseCRLF: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+AlignArrayOfStructures: Left
+PackConstructorInitializers: CurrentLine
+ColumnLimit: 160
+...
