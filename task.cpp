@@ -263,7 +263,7 @@ bool Task::validate(const Row &row, int value) const {
     Validator validator;
     const QStringList patterns(pattern.split(";"));
 
-    for (auto p : patterns) {
+    for (const auto &p : patterns) {
         bool ok;
         const int value = p.toInt(&ok);
         if (ok) {

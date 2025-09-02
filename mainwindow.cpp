@@ -95,7 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
     completer.setCompletionColumn(Task::Name);
     completer.setCaseSensitivity(Qt::CaseInsensitive);
     completer.setFilterMode(Qt::MatchContains);
-    connect(ui->findEdit, &QLineEdit::textChanged, [this](const QString &) {
+    connect(ui->findEdit, &QLineEdit::textChanged, this, [this](const QString &) {
         setTaskFilter(isComboModeActive(), currentComboId());
         setLock();
     });
@@ -110,10 +110,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->quickBar->addWidget(quickSpacerRight);
 
     // currentTime button
-    connect(ui->actionLogTime, &QAction::triggered, [this]() { timeEdit->setTime(QTime::currentTime()); });
+    connect(ui->actionLogTime, &QAction::triggered, this, [this]() { timeEdit->setTime(QTime::currentTime()); });
 
     // done button
-    connect(ui->actionDone, &QAction::triggered, [this]() {
+    connect(ui->actionDone, &QAction::triggered, this, [this]() {
         // here's what we do (MIND that at this point we see the filtered list):
         //   1) we get a list of all comboIds currently visible, such as
         //      task1   -1
@@ -147,7 +147,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // time updater
-    connect(timeEdit, &QTimeEdit::timeChanged, [this](const QTime &time) {
+    connect(timeEdit, &QTimeEdit::timeChanged, this, [this](const QTime &time) {
         // check for valid event
         const Row event = currentEvent();
         if (event == Row::Invalid) return;
@@ -176,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // clear button
-    connect(ui->clearButton, &QToolButton::pressed, [this]() { ui->findEdit->clear(); });
+    connect(ui->clearButton, &QToolButton::pressed, this, [this]() { ui->findEdit->clear(); });
 
     // add to garbage man
     GarbageMan::instance()->add(this);

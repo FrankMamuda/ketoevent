@@ -144,7 +144,6 @@ int main(int argc, char *argv[]) {
 #ifndef FORCE_LV_LOCALE
     QLocale::setDefault(QLocale::System);
 #else
-    const QString locale("lv_LV");
     QLocale::setDefault(QLocale::Latvian);
 #endif
     if (translator.load(":/i18n/ketoevent_" + QLocale().name())) QApplication::installTranslator(&translator);

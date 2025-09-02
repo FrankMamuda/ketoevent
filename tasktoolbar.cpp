@@ -41,7 +41,7 @@ TaskToolBar *TaskToolBar::i = nullptr;
  */
 TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    addAction(QIcon::fromTheme("add"), tr("Add Task"), [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Task"), this, [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Add Task "));
             TaskEdit::instance()->reset();
@@ -49,7 +49,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // edit action
-    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Task"), [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Task"), this, [this]() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Edit Task "));
             TaskEdit::instance()->reset(true);
@@ -57,7 +57,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // remove action
-    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Task"), [this]() {
+    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Task"), this, [this]() {
         const QModelIndex index(EditorDialog::instance()->container->currentIndex());
 
         if (EditorDialog::instance()->isDockVisible() || !index.isValid()) return;
@@ -133,15 +133,15 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     };
 
     // move up action
-    moveUp = addAction(QIcon::fromTheme("up"), tr("Move up"), [move]() { move(true); });
+    moveUp = addAction(QIcon::fromTheme("up"), tr("Move up"), this, [move]() { move(true); });
     moveUp->setEnabled(false);
 
     // move down action
-    moveDown = addAction(QIcon::fromTheme("down"), tr("Move down"), [move]() { move(false); });
+    moveDown = addAction(QIcon::fromTheme("down"), tr("Move down"), this, [move]() { move(false); });
     moveDown->setEnabled(false);
 
     // export action
-    addAction(QIcon::fromTheme("export"), tr("Export tasks"), [this]() {
+    addAction(QIcon::fromTheme("export"), tr("Export tasks"), this, [this]() {
         QString path(QFileDialog::getSaveFileName(this, tr("Export tasks to CSV format"), QDir::homePath(), tr("CSV file (*.csv)")));
 
         // check for empty filenames
@@ -277,7 +277,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
 #endif
 
     // import action (csv)
-    addAction(QIcon::fromTheme("tasks"), tr("Import tasks"), [this]() {
+    addAction(QIcon::fromTheme("tasks"), tr("Import tasks"), this, [this]() {
         QString path(QFileDialog::getOpenFileName(this, tr("Import tasks from CSV format"), QDir::homePath(), tr("CSV file (*.csv)")));
 
         // check for empty filenames

@@ -24,7 +24,6 @@
 #include "database.h"
 #include "event.h"
 #include "log.h"
-#include "main.h"
 #include "mainwindow.h"
 #include "task.h"
 #include "team.h"
@@ -347,7 +346,7 @@ bool Cmd::tokenize(const QString &string, QString &command, QStringList &args) {
     args.clear();
 
     QStringList list(string.split(" "));
-    for (const QString &str : list) {
+    for (const QString &str : std::as_const(list)) {
         QString token(str.simplified());
         if (token.startsWith("\"")) token = token.remove(0, 1);
         if (token.endsWith("\"")) token = token.remove(token.length() - 1, 1);
@@ -370,7 +369,8 @@ bool Cmd::execute(const QString &buffer) {
     QStringList arguments, separated;
 
     // separate multiline commands first
-    separated = buffer.split(QRegularExpression(";|\\n"));
+    static QRegularExpression cmdRegExp(";|\\n");
+    separated = buffer.split(cmdRegExp);
 
     // parse separated command strings
     for (const QString &string : std::as_const(separated)) {
