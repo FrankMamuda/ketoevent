@@ -17,6 +17,9 @@
    <iconset resource="resources.qrc">
     <normaloff>:/icons/ketone_large</normaloff>:/icons/ketone_large</iconset>
   </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -62,7 +65,7 @@
     <item>
      <widget class="TaskView" name="taskView">
       <property name="editTriggers">
-       <set>QAbstractItemView::NoEditTriggers</set>
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
       </property>
      </widget>
     </item>
@@ -90,8 +93,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset theme="clear">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset theme="clear"/>
         </property>
        </widget>
       </item>
@@ -107,7 +109,7 @@
     <bool>false</bool>
    </property>
    <property name="allowedAreas">
-    <set>Qt::TopToolBarArea</set>
+    <set>Qt::ToolBarArea::TopToolBarArea</set>
    </property>
    <property name="iconSize">
     <size>
@@ -116,7 +118,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -144,7 +146,7 @@
     <bool>false</bool>
    </property>
    <property name="allowedAreas">
-    <set>Qt::BottomToolBarArea|Qt::TopToolBarArea</set>
+    <set>Qt::ToolBarArea::BottomToolBarArea|Qt::ToolBarArea::TopToolBarArea</set>
    </property>
    <property name="iconSize">
     <size>
@@ -153,7 +155,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextBesideIcon</enum>
+    <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -170,8 +172,7 @@
   </widget>
   <action name="actionTeams">
    <property name="icon">
-    <iconset theme="teams">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="teams"/>
    </property>
    <property name="text">
     <string>Teams</string>
@@ -182,8 +183,7 @@
   </action>
   <action name="actionTasks">
    <property name="icon">
-    <iconset theme="tasks">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="tasks"/>
    </property>
    <property name="text">
     <string>Tasks</string>
@@ -191,8 +191,7 @@
   </action>
   <action name="actionRankings">
    <property name="icon">
-    <iconset theme="rankings">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="rankings"/>
    </property>
    <property name="text">
     <string>Rankings</string>
@@ -200,8 +199,7 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset theme="overflow">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="overflow"/>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -209,8 +207,7 @@
   </action>
   <action name="actionConsole">
    <property name="icon">
-    <iconset theme="console">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="console"/>
    </property>
    <property name="text">
     <string>Console</string>
@@ -218,8 +215,7 @@
   </action>
   <action name="actionCombos">
    <property name="icon">
-    <iconset theme="combos">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="combos"/>
    </property>
    <property name="text">
     <string>Combos</string>
@@ -227,8 +223,7 @@
   </action>
   <action name="actionAddQuick">
    <property name="icon">
-    <iconset theme="add">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="add"/>
    </property>
    <property name="text">
     <string>Quickly add team</string>
@@ -236,8 +231,7 @@
   </action>
   <action name="actionLogTime">
    <property name="icon">
-    <iconset theme="time">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="time"/>
    </property>
    <property name="text">
     <string>Log current time</string>
@@ -253,8 +247,7 @@
   </action>
   <action name="actionEvents">
    <property name="icon">
-    <iconset theme="ketone">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="ketone"/>
    </property>
    <property name="text">
     <string>Events</string>
@@ -262,8 +255,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset theme="info">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="info"/>
    </property>
    <property name="text">
     <string>About</string>
@@ -271,8 +263,7 @@
   </action>
   <action name="actionExport_logs">
    <property name="icon">
-    <iconset theme="export">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="export"/>
    </property>
    <property name="text">
     <string>Export logs</string>

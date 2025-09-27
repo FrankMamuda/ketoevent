@@ -36,7 +36,7 @@ TeamToolBar *TeamToolBar::i = nullptr;
  */
 TeamToolBar::TeamToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    addAction(QIcon::fromTheme("add"), tr("Add Team"), this, [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Team"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TeamEdit::instance(), tr("Add Team "));
             TeamEdit::instance()->reset();
@@ -44,7 +44,7 @@ TeamToolBar::TeamToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // edit action
-    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Team"), this, [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Team"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TeamEdit::instance(), tr("Edit Team "));
             TeamEdit::instance()->reset(true);

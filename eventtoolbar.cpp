@@ -39,7 +39,7 @@ EventToolBar *EventToolBar::i = nullptr;
  */
 EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    addAction(QIcon::fromTheme("add"), tr("Add Event"), [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Event"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(EventEdit::instance(), tr("Add Event"));
             EventEdit::instance()->reset();
@@ -47,7 +47,7 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // edit action
-    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Event"), [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Event"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(EventEdit::instance(), tr("Edit Event"));
             EventEdit::instance()->reset(true);
@@ -55,7 +55,7 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // remove action
-    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Event"), [this]() {
+    remove = addAction(QIcon::fromTheme("remove"), tr("Remove Event"), this, [this]() {
         const QModelIndex index(EditorDialog::instance()->container->currentIndex());
 
         if (EditorDialog::instance()->isDockVisible() || !index.isValid()) return;
@@ -76,7 +76,7 @@ EventToolBar::EventToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // import action
-    addAction(QIcon::fromTheme("export"), tr("Import logs"), [this]() {
+    addAction(QIcon::fromTheme("export"), tr("Import logs"), this, [this]() {
         const QFileInfo info(
             QFileDialog::getOpenFileName(this, tr("Import logs from database"), QDir::homePath() + "/" + "database.db", tr("Database (*.db)")));
         if (!info.exists()) return;

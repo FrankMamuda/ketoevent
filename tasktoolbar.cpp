@@ -41,7 +41,7 @@ TaskToolBar *TaskToolBar::i = nullptr;
  */
 TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     // add action
-    addAction(QIcon::fromTheme("add"), tr("Add Task"), this, [this]() {
+    addAction(QIcon::fromTheme("add"), tr("Add Task"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Add Task "));
             TaskEdit::instance()->reset();
@@ -49,7 +49,7 @@ TaskToolBar::TaskToolBar(QWidget *parent) : ToolBar(parent) {
     });
 
     // edit action
-    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Task"), this, [this]() {
+    edit = addAction(QIcon::fromTheme("edit"), tr("Edit Task"), this, []() {
         if (!EditorDialog::instance()->isDockVisible()) {
             EditorDialog::instance()->showDock(TaskEdit::instance(), tr("Edit Task "));
             TaskEdit::instance()->reset(true);
