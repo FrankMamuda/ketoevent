@@ -6,20 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>326</width>
-    <height>102</height>
+    <width>511</width>
+    <height>119</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="teams">
-    <normaloff>.</normaloff>.</iconset>
+   <iconset theme="teams"/>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="2">
-    <layout class="QGridLayout" name="teamLayout">
+    <layout class="QGridLayout" name="teamLayout" columnstretch="2,2,7,1,2,2,2">
      <item row="1" column="1">
       <widget class="QLabel" name="reviewerLabel">
        <property name="text">
@@ -63,8 +62,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset theme="time">
-         <normaloff>.</normaloff>.</iconset>
+        <iconset theme="time"/>
        </property>
       </widget>
      </item>
@@ -137,12 +135,12 @@
      <item row="0" column="3" rowspan="2">
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>
@@ -155,8 +153,7 @@
       <string>Add</string>
      </property>
      <property name="icon">
-      <iconset theme="accept">
-       <normaloff>.</normaloff>.</iconset>
+      <iconset theme="accept"/>
      </property>
     </widget>
    </item>
@@ -166,8 +163,7 @@
       <string>Cancel</string>
      </property>
      <property name="icon">
-      <iconset theme="remove">
-       <normaloff>.</normaloff>.</iconset>
+      <iconset theme="remove"/>
      </property>
     </widget>
    </item>

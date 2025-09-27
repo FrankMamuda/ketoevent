@@ -99,8 +99,8 @@ Database::Database(QObject *parent) : QObject(parent) {
             qCDebug(Database_::Debug) << Database::tr("using built-in database") << Variable::string("databasePath");
         } else {
             // this should never happen, but just in case
-            file.open(QFile::WriteOnly);
-            file.close();
+            if (file.open(QFile::WriteOnly)) file.close();
+            else qFatal(QT_TR_NOOP_UTF8("could not create database"));
             qCDebug(Database_::Debug) << Database::tr("creating non-existant database") << Variable::string("databasePath");
         }
 
