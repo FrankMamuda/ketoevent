@@ -52,7 +52,6 @@ void ComboModel::reset(const Id &id) {
     QStringList list;
 
     // clear junk
-    beginResetModel();
     map.clear();
     colours.clear();
 
@@ -91,5 +90,4 @@ void ComboModel::reset(const Id &id) {
 
     // set string list
     setStringList(list);
-    endResetModel();
 }
