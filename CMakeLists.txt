@@ -19,6 +19,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+set(app_icon_macos "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns")
+set_source_files_properties(${app_icon_macos} PROPERTIES
+    MACOSX_PACKAGE_LOCATION "Resources")
+
 add_compile_definitions(FORCE_LV_LOCALE)
 
 set(TS_FILES ${project_ts})
@@ -32,6 +37,7 @@ qt_add_executable(ketoevent
     ${project_ui}
     ${project_res}
     ${icon_sources}
+    ${app_icon_macos}
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
