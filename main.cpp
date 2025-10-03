@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     // i18n
     QTranslator translator;
 #ifndef FORCE_LV_LOCALE
-    QLocale::setDefault(QLocale::System);
+    QLocale::setDefault(QLocale::system());
 #else
     QLocale::setDefault(QLocale::Latvian);
 #endif

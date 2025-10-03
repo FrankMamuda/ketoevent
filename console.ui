@@ -42,7 +42,7 @@
        <string notr="true">QTextEdit {background: #2e2f30; color: #bbbebf;}</string>
       </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="readOnly">
        <bool>true</bool>
