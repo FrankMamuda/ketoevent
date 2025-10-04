@@ -114,6 +114,8 @@ RESOURCES += \
 
 win32:RC_FILE = icon.rc
 
+ICON = icon.icns
+
 # custom sqlite lib switch
 # CONFIG += sqlite_custom
 sqlite_custom {
