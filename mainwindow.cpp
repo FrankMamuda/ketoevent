@@ -44,6 +44,9 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QSqlQuery>
+#ifdef __APPLE__
+#include <QMenu>
+#endif
 
 // singleton
 MainWindow *MainWindow::i = nullptr;
@@ -183,6 +186,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 #ifndef QT_DEBUG
     ui->quickBar->removeAction(ui->actionExport_logs);
+#endif
+
+#ifdef __APPLE__
+    auto menu = ui->menuBar->addMenu(tr("File"));
+    menu->addAction(tr("Events"), [&]() { on_actionEvents_triggered(); })->setMenuRole(QAction::ApplicationSpecificRole);
+    menu->addAction(tr("Teams"), [&]() { on_actionTeams_triggered(); })->setMenuRole(QAction::ApplicationSpecificRole);
+    menu->addAction(tr("Tasks"), [&]() { on_actionTasks_triggered(); })->setMenuRole(QAction::ApplicationSpecificRole);
+    menu->addAction(tr("Combos"), [&]() { on_actionCombos_triggered(); })->setMenuRole(QAction::ApplicationSpecificRole);
+    menu->addAction(tr("Rankings"), [&]() { on_actionRankings_triggered(); })->setMenuRole(QAction::ApplicationSpecificRole);
+    menu->addAction(tr("Preferences"), [&]() { on_actionSettings_triggered(); })->setMenuRole(QAction::PreferencesRole);
 #endif
 
     // lock/unlock ui elements

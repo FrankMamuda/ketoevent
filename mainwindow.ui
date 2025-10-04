@@ -170,6 +170,16 @@
    <addaction name="actionLogTime"/>
    <addaction name="actionExport_logs"/>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>520</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
   <action name="actionTeams">
    <property name="icon">
     <iconset theme="teams"/>
