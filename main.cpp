@@ -59,6 +59,12 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - patterns
 //   - add tasks for columns in rankings (also save column settings)
 //
+// TODO2025
+//   - fix patterns and paternless multi (-9999 bug)
+//   - multi delete
+//   - lock current team
+//   - selecting database prompts for overwrite
+//   - visual feedback on new log (flash or smth)
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
