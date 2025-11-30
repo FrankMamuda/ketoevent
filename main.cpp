@@ -65,6 +65,13 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - lock current team
 //   - selecting database prompts for overwrite
 //   - visual feedback on new log (flash or smth)
+//   - add a filter for done/combined tasks
+//   - or allow pinning tasks (not in the database)
+//     for example I log and pin 3 tasks, then press 'combine pinned'
+//   - or sort by recent logged (probably the easiest)
+//   - disable mouse wheel on team spinbox
+//   - team spinbox must have larger font
+//   - csv must export rank and pre-sort array
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
