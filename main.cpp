@@ -64,7 +64,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - multi delete
 //   - lock current team
 //   - [FIXED] selecting database prompts for overwrite (macOS only)
-//   - visual feedback on new log (flash or smth)
+//   - [GREEN TEXT] visual feedback on new log (flash or smth)
 //   - add a filter for done/combined tasks
 //   - or allow pinning tasks (not in the database)
 //     for example I log and pin 3 tasks, then press 'combine pinned'

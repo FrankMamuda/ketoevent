@@ -77,10 +77,11 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     // store rectSize
     rectSizes[index] = rect;
 
+    const bool hasValue = values.isEmpty() ? false : values[index] != 0;
+
     // draw cross/equals lambda
-    auto drawCrossEquals = [this, painter, index, rect, type, edit, isComboActive, isEventActive, isTeamActive]() {
+    auto drawCrossEquals = [this, painter, index, rect, type, edit, isComboActive, isEventActive, isTeamActive, hasValue]() {
         const int isSelected = edit ? false : (index == currentIndex());
-        const bool hasValue = values.isEmpty() ? false : values[index] != 0;
         QRect small(rect.right() + Delegate::ButtonWidth * 2 + Delegate::SmallWidth, rect.top(), Delegate::SmallWidth, Delegate::ItemHeight);
 
         if (type == Task::Types::Check || isComboActive || !isEventActive || !isTeamActive) return;
@@ -105,8 +106,15 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
         drawCrossEquals();
     }
 
-    // set up font and draw task name
-    painter->setFont({ option.font.family(), static_cast<int>(Delegate::ItemHeight * 0.4), font.weight(), font.italic() });
+    // set up font and draw task
+    QFont tfont(option.font.family(), static_cast<int>(Delegate::ItemHeight * 0.4), font.weight(), font.italic());
+    if (hasValue) {
+        QPen pen(painter->pen());
+        tfont.setBold(true);
+        pen.setColor(QColor::fromRgb(30, 200, 30));
+        painter->setPen(pen);
+    }
+    painter->setFont(tfont);
     painter->drawText(rect, QFontMetrics(painter->font()).elidedText(Task::instance()->name(row(index)), Qt::ElideRight, rect.width()),
         { Qt::AlignLeft | Qt::AlignVCenter });
 
