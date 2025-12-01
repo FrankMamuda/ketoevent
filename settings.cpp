@@ -58,8 +58,12 @@ Settings::Settings() : ui(new Ui::Settings) {
 
     // handle database path
     connect(ui->pathButton, &QPushButton::clicked, [this]() {
+        QFileDialog::Options opts = QFileDialog::DontConfirmOverwrite;
+#ifdef __APPLE__
+        opts |= QFileDialog::DontUseNativeDialog;
+#endif
         const QString fileName(QFileDialog::getSaveFileName(this, tr("Open database"), QFileInfo(Variable::string("databasePath")).absolutePath(),
-            tr("Database (*.db *.sqlite)"), nullptr, QFileDialog::DontConfirmOverwrite));
+            tr("Database (*.db *.sqlite)"), nullptr, opts));
 
         if (fileName.isEmpty()) {
             QMessageBox::warning(this, tr("Settings"), tr("Invalid database selection"), QMessageBox::Close);

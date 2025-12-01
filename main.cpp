@@ -63,7 +63,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - fix patterns and paternless multi (-9999 bug)
 //   - multi delete
 //   - lock current team
-//   - selecting database prompts for overwrite
+//   - [FIXED] selecting database prompts for overwrite (macOS only)
 //   - visual feedback on new log (flash or smth)
 //   - add a filter for done/combined tasks
 //   - or allow pinning tasks (not in the database)
@@ -72,6 +72,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - disable mouse wheel on team spinbox
 //   - team spinbox must have larger font
 //   - csv must export rank and pre-sort array
+//   - delgate paints over scrollbar (macOS only; rarely)
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
