@@ -60,7 +60,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - add tasks for columns in rankings (also save column settings)
 //
 // TODO2025
-//   - fix patterns and paternless multi (-9999 bug)
+//   - [PARTIAL FIX] fix patterns and paternless multi (-9999 bug)
 //   - multi delete
 //   - lock current team
 //   - [FIXED] selecting database prompts for overwrite (macOS only)

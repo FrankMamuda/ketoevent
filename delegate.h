@@ -47,6 +47,9 @@ class Delegate : public QStyledItemDelegate {
     friend class MainWindow;
 
 public:
+    static constexpr int MinValue = -9999;
+    static constexpr int MaxValue = 9999;
+
     explicit Delegate(QWidget *parent = nullptr) : QStyledItemDelegate(parent) {}
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     [[nodiscard]] QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;

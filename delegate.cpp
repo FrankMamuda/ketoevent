@@ -254,8 +254,8 @@ QWidget *Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, c
     currentEditWidget = edit;
 
     // set up widget
-    edit->setMinimum(-9999);
-    edit->setMaximum(Task::instance()->pattern(row(index)).isEmpty() ? Task::instance()->multi(row(index)) : 9999);
+    edit->setMinimum(MinValue);
+    edit->setMaximum(Task::instance()->pattern(row(index)).isEmpty() ? Task::instance()->multi(row(index)) : MaxValue);
     edit->setAlignment(Qt::AlignCenter);
     edit->setButtonSymbols(QAbstractSpinBox::NoButtons);
     edit->setStyleSheet("QSpinBox { background-color: transparent; color: white; text-align: center; selection-background-color: transparent; } "
@@ -286,6 +286,8 @@ void Delegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
 void Delegate::setModelData(QWidget *editor, QAbstractItemModel *, const QModelIndex &index) const {
     EditWidget *editWidget(qobject_cast<EditWidget *>(editor));
     editWidget->interpretText();
+    const int data = editWidget->value();
+    if (data == MinValue || data == MaxValue) return;
     Task::instance()->setMultiplier(row(index), editWidget->value());
 }
 
@@ -335,7 +337,7 @@ void EditWidget::paintEvent(QPaintEvent *event) {
  * @param pos
  * @return
  */
-QValidator::State EditWidget::validate(QString &text, int &) const {
+QValidator::State EditWidget::validate(QString &text, int &pos) const {
     if (text.isEmpty()) return QValidator::Acceptable;
 
     bool ok;
@@ -345,7 +347,7 @@ QValidator::State EditWidget::validate(QString &text, int &) const {
 
     const Row row = Task::instance()->row(index);
     if (row == Row::Invalid) return QValidator::Invalid;
-    if (Task::instance()->pattern(Task::instance()->row(index)).isEmpty()) return QValidator::Acceptable;
+    if (Task::instance()->pattern(Task::instance()->row(index)).isEmpty()) return QSpinBox::validate(text, pos);
 
     return Task::instance()->validate(row, value) ? QValidator::Acceptable : QValidator::Intermediate;
 }

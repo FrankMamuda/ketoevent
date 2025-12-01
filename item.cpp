@@ -154,7 +154,8 @@ void Item::paint(QPainter *painter, const QModelIndex &index) const {
             painter->drawPixmap(rect, Delegate::Remove());
         } else {
             drawEllipse(!hasValue ? LtBlue() : Blue());
-            drawText(QString::number(points * (edit ? delegate->currentEditorValue() : value)));
+            if ((edit && delegate->currentEditorValue() == Delegate::MinValue) || (!edit && value == Delegate::MinValue)) drawText("?");
+            else drawText(QString::number(points * (edit ? delegate->currentEditorValue() : value)));
         }
 
         break;
