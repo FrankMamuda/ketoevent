@@ -72,7 +72,7 @@ GarbageMan *GarbageMan::i = nullptr;
 //   - disable mouse wheel on team spinbox
 //   - team spinbox must have larger font
 //   - csv must export rank and pre-sort array
-//   - delgate paints over scrollbar (macOS only; rarely)
+//   - [UGLY FIX] delgate paints over scrollbar (macOS only; rarely)
 
 // default message handler
 static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);

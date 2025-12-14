@@ -46,6 +46,7 @@
 #include <QSqlQuery>
 #ifdef __APPLE__
 #include <QMenu>
+#include <QTimer>
 #endif
 
 // singleton
@@ -559,6 +560,16 @@ void MainWindow::showEvent(QShowEvent *event) {
 
     // restore main window geomery
     if (!Variable::value<QVariant>("geometry/main").isNull() && !isMaximized()) restoreGeometry(Variable::compressedByteArray("geometry/main"));
+
+#ifdef __APPLE__
+    // HACK: superugly hack that forces taskview's viewport to account for scrollbar (otherwise scrollbar is drawn over contents)
+    //       possibly a Qt bug, because content is drawn correctly 20% of the time
+    //       remove when/if fixed
+    QTimer::singleShot(250, this, [this]() {
+        ui->taskView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        ui->taskView->updateGeometry();
+    });
+#endif
 }
 
 /**
